@@ -1,0 +1,64 @@
+
+
+\usepackage[a4paper, top=25mm, bottom=25mm, left=25mm, right=25mm]{geometry}
+\usepackage[inline]{enumitem}
+\usepackage[linesnumbered,lined,ruled]{algorithm2e}
+\usepackage[table]{xcolor}
+\usepackage{
+  graphicx,
+  pdfpages,
+  appendix,
+  multicol,
+  xcolor,
+  soul,
+  lscape,
+  hyperref,
+  longtable,
+  listings,
+  float,
+  booktabs,
+  setspace,
+  wrapfig
+}
+
+% urls + href style
+\hypersetup{
+  colorlinks,
+  linkcolor={black},
+  citecolor={blue!50!black},
+  urlcolor={blue!80!black}
+}
+
+% common spacing command
+\newcommand{\x}{\vspace{2mm}\\}
+
+% highlight <colour, text>
+\newcommand{\hlc}[2]{ {\sethlcolor{#1} \hl{#2}} }
+
+\newcommand{\ra}[1]{\renewcommand{\arraystretch}{#1}}
+
+% code styling	
+\definecolor{code_comment}{rgb}{0,0.6,0}
+\definecolor{code_bg}{rgb}{0.95,0.95,0.92}
+
+\lstset{
+  backgroundcolor=\color{code_bg},
+  commentstyle=\color{code_comment},
+  keywordstyle=\color{magenta},
+  numberstyle=\tiny,
+  stringstyle=\color{blue},
+  basicstyle=\ttfamily\footnotesize,
+  breakatwhitespace=false,
+  breaklines=true,
+  captionpos=b,
+  keepspaces=true,
+  numbers=left,
+  numbersep=5pt,
+  showspaces=false,
+  showstringspaces=false,
+  showtabs=false,
+  tabsize=2,
+  emphstyle={\color{orange}}
+}
+
+\setlist{nosep}

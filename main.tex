@@ -1,0 +1,35 @@
+\documentclass[12pt]{report}
+
+\input{utility/utility}
+
+\begin{document}
+
+\input{sections/title-page}\newpage
+
+%% FOREWORDS
+
+\pagenumbering{roman}
+\input{sections/abstract.tex}\newpage
+\input{sections/statement-of-originality.tex}\newpage
+\input{sections/acknowledgements.tex}\newpage
+
+%% CONTENTS
+\tableofcontents
+
+\clearpage\pagenumbering{arabic}
+
+%% INPUT SECTIONS
+
+\input{sections/1-problem-statement/1.tex}
+\input{sections/2-background-research/2.tex}
+\input{sections/4-lit-review/4.tex}
+\input{sections/3-project-management/3.tex}
+
+%% END OF SECTIONS 
+
+\newpage
+\addcontentsline{toc}{chapter}{References}
+\bibliographystyle{plainurl}
+\bibliography{ref.bib}
+
+\end{document}

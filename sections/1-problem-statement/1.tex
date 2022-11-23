@@ -1,0 +1,46 @@
+
+\chapter{Problem Statement}
+
+Video games are large and highly popular pieces of software and this means that individual developers will typically not have the infrastructure to distribute their application at a large enough scale. To solve this, third party platforms, like Steam or Epic Games, are used facilitate the distribution of games and their subsequent updates. Some of the issues with doing this are that:
+
+\begin{itemize}
+  \item they take a cut of all revenue, for example Steam take 30\%,
+  \item they are vulnerable to censorship, for example the Chinese version of Steam is heavily censored, and
+  \item if the platform shuts down, the user will likely lose all access to their games.
+\end{itemize}
+
+\vspace{2mm}
+\noindent A distributed solution could solve all of these problems. The developer would not have to pay a cut of revenue but could offer in-game incentives to get users to help seed their software, content cannot be restricted or censored due to the nature of peer-to-peer networks and a user's access to a game is not tied to any one platform.
+
+\section{Goals}
+
+The goal of this application is to create a video game distribution platform, which allows developers to independently release their games whilst being able to offer high availability and be immune to censorship from larger bodies (like governments). Blockchain technology should enable this through its trustless property and means that users can trust the software they receive through the network and be able to use public key infrastructure to verify the uploader of the software.
+\x
+It is an important consideration of this project that users can be distinguished by whether they have purchased the software or not. This information must be publicly available and verifiable by any node in the network.
+\x
+Availability is an important factor for games distributed through this network so a user will also need to be able to prove their contribution to the network and have this verifiable by any node in the network.
+The idea is that the developer can identify users who have helped distribute their game and provide them with rewards to do this. It is expected that developers should provide rewards after certain distribution milestones to encourage long term contribution from their user-base.
+In-game rewards may be a suitable reward for users and the quality of these will have a direct impact on the contribution by the community.
+
+\section{Scope}
+
+For this project to be successful, it should:
+
+\begin{itemize}
+  \item distribute software between nodes by sharing fixed length shards of data,
+  \item use the blockchain to store software metadata that helps to identify and verify the software,
+  \item allow developers to publish their games to the blockchain,
+  \item allow developers to publish updates to their games already on the blockchain,
+  \item use encryption techniques to provide secure sharding of data between nodes,
+  \item use digital signatures to verify the identity of uploaders,
+  \item suggest a proof of purchase system to be called before sharing data with a node, and
+  \item be deployed to an ethereum testnet.
+\end{itemize}
+
+\vspace{1mm}
+\noindent This project will not:
+
+\begin{itemize}
+  \item offer a graphical user interface for users to locate software, and
+  \item implement a way for users to pay for games through the network.
+\end{itemize}

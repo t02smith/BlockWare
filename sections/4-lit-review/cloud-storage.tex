@@ -1,21 +1,36 @@
 
 \section{Blockchain-Based Cloud Storage}
 
-In table~\ref{tab:blockhain cloud storage}, I detail some examples of how blockchain has been used to solve problems within cloud storage systems.
+In table~\ref{tab:blockhain cloud storage}, I detail some examples of how blockchain has been used to solve problems within cloud storage systems. One interesting finding from these papers~\cite{sukhodolskiy_blockchain-based_2018,hasan_cloud_2019} is that blockchain can been used to provide additional services to cloud storage systems, such as monitoring access control or helping to verify the integrity of the data on these systems.
 
-\begin{longtable}{ p{0.3\textwidth} p{0.6\textwidth} }
+\begin{longtable}{ p{0.35\textwidth} p{0.6\textwidth} }
   \toprule
   \textbf{Paper} & \textbf{Description of Solution}
   \\\midrule\midrule
-  Blockchain Based Data Integrity Verification in P2P Cloud Storage~\cite{}
-                 & This paper uses Merkle trees to help verify the integrity of data within a P2P blockchain cloud storage network as well as looking at how different structures of Merkle trees effect the performance of the system.
+  Blockchain Based Data Integrity Verification in P2P Cloud Storage~\cite{yue_blockchain_2018}
+  & This paper uses Merkle trees to help verify the integrity of data within a P2P blockchain cloud storage network as well as looking at how different structures of Merkle trees effect the performance of the system.
   %
   \x
-  Deduplication with Blockchain for Secure Cloud Storage
-                 & This paper describes a deduplication scheme that uses the blockchain to record storage information and distribute files to multiple servers. This is implemented as a set of smart contracts.
+  Deduplication with Blockchain for Secure Cloud Storage~\cite{li_deduplication_2018}
+  & This paper describes a deduplication scheme that uses the blockchain to record storage information and distribute files to multiple servers. This is implemented as a set of smart contracts.
   %
   \x
-  Block-secure: Blockchain based scheme for secure P2P cloud storage
-                 &
+  Block-secure: Blockchain based scheme for secure P2P cloud storage~\cite{li_block-secure_2018}
+  & A distributed cloud system in which users divide their own data into encrypted chunks and upload those chunks randomly into the blockchain, P2P network. 
+  %
+  \x
+  Blockchain-Based Medical Records Secure Storage and Medical Service Framework~\cite{chen_blockchain-based_2018}
+  & Describes a secure and immutable storage scheme to manage personal medical records as well as a service framework to allow for the sharing of these records.
+  %
+  \x
+  A Blockchain-Based Access Control System for Cloud Storage~\cite{sukhodolskiy_blockchain-based_2018}
+  & This paper describes a method for using blockchain to facilitate the access control over a cloud storage system. The blockchain stores an immutable record of all `\textit{meaningful security events}', such as key generation, access policy, assignment, etc.
+  %
+  \x
+  Cloud Data Provenance using IPFS and Blockchain Technology~\cite{hasan_cloud_2019}
+  & Uses blockchain technology and IPFS to provide an efficient way to securely store provenance~\footnote{Provenance data are access logs of stored data that can trace the integrity of data and will contain private user information.} data such that it is out of reach of adversaries, but can be used to verify the integrity of data on a cloud storage system. 
   \\\bottomrule\bottomrule
+  \caption{\textit{Examples of blockchain cloud storage systems~\cite{sharma_blockchain_2021} }}
+  \label{tab:blockhain cloud storage}
 \end{longtable}
+

@@ -1,0 +1,24 @@
+
+\section{requirements}
+
+\begin{longtable}{ p{.1\textwidth} p{.8\textwidth} }
+  \toprule
+  \textbf{ID} & \textbf{Description}
+  \\\midrule\midrule
+  \multicolumn{2}{c}{\cellcolor{red!70}\textit{Must}}\\\midrule
+  M1 & Store software data on a blockchain, including a reference to a previous block where appropriate\\
+  M2 & Construct a Merkle Tree of any given data object\\
+  M3 & A node must request individual shards from its peers\\
+  M4 & A node must be able to discover peers relevant to the software it wants\\
+  M5 & Software must be updatable through the blockchain\\
+  M6 & A node must be able to upload software\\
+  \midrule\multicolumn{2}{c}{\cellcolor{orange!70}\textit{Should}}\\\midrule
+  S1 & Allow users to restrict their software to only a specific set of nodes\\
+  S2 & Implement a CLI for users to interface with\\
+  S3 & Allow a node to prove they have helped distribute software\\
+  \midrule\multicolumn{2}{c}{\cellcolor{green}\textit{Could}}\\\midrule
+  C1 & Allow users to request specific software versions\\
+  C2 & Allow nodes to join groups for automatic identity verification\\
+  \midrule
+  \bottomrule
+\end{longtable}

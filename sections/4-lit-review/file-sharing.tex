@@ -1,3 +1,28 @@
 
 \section{P2P File Sharing}
 
+\begin{longtable}{ p{0.15\textwidth} p{0.8\textwidth} }
+  \toprule
+  \textbf{System} & \textbf{Description of Solution}
+  \\\midrule\midrule
+  IPFS~\cite{benet_ipfs_2014}
+  & IPFS is a content-addressable, block storage system and forms a Merkle DAG, which is a data structure that allows the construction of versioned file systems, blockchains and a Permanent Web. IPFS
+  %
+  \x
+  BitTorrent~\cite{pouwelse_bittorrent_2005}
+  & BitTorrent is a p2p file-sharing system that has user bartering for chunks of data in a tit-for-tat fashion, which provides incentive for users to contribute to the network. Information about data is stored in .torrent files that can be found online and these help a user find other users interested in the same content they are. It is estimated that tens of millions of users use BitTorrent every day~\cite{wang_measuring_2013}.
+  %
+  \x
+  AFS~\cite{morris_andrew_1986,howard_scale_1988}
+  & The Andrew File System was a prototype distributed system by IBM and Carnegie-Mellon University in the 1980s that allowed users to access their files from any computer in the network.
+  %
+  \x
+  Napster~\cite{saroiu_measurement_2001}
+  & Napster uses a cluster of centralized servers to maintain an index of every file currently available and which peers have access to it. A node will maintain a connection to this central server and will query it to find files; the server responds with a list of peers and their bandwidth and the node will form a connection with one or many of them and download the data.
+  %
+  \x
+  Gnutella~\cite{saroiu_measurement_2001}
+  & Gnutella nodes form an overlay network by sending \textit{ping-pong} messages. When a node sends a \textit{ping} message to their peers, each of them replies with a \textit{pong} message and the \textit{ping} is forwarded to their peers. To download a file, a node will flood a message to its neighbors, who will check if they have and return a message saying so; regardless, the node will continue to flood their request till they find a suitable node to download off of.
+  \\\bottomrule
+  \caption{\textit{Various global distributed file systems.}}
+\end{longtable}

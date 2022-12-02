@@ -1,24 +1,44 @@
 
 \section{requirements}
 
+\subsection{Functional Requirements}
+
 \begin{longtable}{ p{.1\textwidth} p{.8\textwidth} }
   \toprule
   \textbf{ID} & \textbf{Description}
   \\\midrule\midrule
   \multicolumn{2}{c}{\cellcolor{red!70}\textit{Must}}\\\midrule
-  M1 & Store software data on a blockchain, including a reference to a previous block where appropriate\\
-  M2 & Construct a Merkle Tree of any given data object\\
-  M3 & A node must request individual shards from its peers\\
-  M4 & A node must be able to discover peers relevant to the software it wants\\
-  M5 & Software must be updatable through the blockchain\\
-  M6 & A node must be able to upload software\\
+  F\_M1 & Store software metadata on a blockchain, including a reference to a previous block where appropriate\\
+  F\_M2 & A node must request individual shards from its peers\\
+  F\_M3 & A node must be able to discover peers relevant to the software it wants\\
+  F\_M4 & Software must be updatable through the blockchain\\
+  F\_M5 & A node must be able to upload software\\
+  F\_M6 & A node must be able to download software in its entirety from nodes in the same network.\\
+  F\_M7 & A node must be able to verify the integrity of each block it downloads\\
   \midrule\multicolumn{2}{c}{\cellcolor{orange!70}\textit{Should}}\\\midrule
-  S1 & Allow users to restrict their software to only a specific set of nodes\\
-  S2 & Implement a CLI for users to interface with\\
-  S3 & Allow a node to prove they have helped distribute software\\
+  F\_S1 & Allow users to restrict their software to only a specific set of nodes\\
+  F\_S3 & Allow a node to prove they have helped distribute software\\
   \midrule\multicolumn{2}{c}{\cellcolor{green}\textit{Could}}\\\midrule
-  C1 & Allow users to request specific software versions\\
-  C2 & Allow nodes to join groups for automatic identity verification\\
+  F\_C1 & Allow users to request specific software versions\\
+  F\_C2 & Allow nodes to join groups for automatic identity verification\\
+  \midrule
+  \bottomrule
+\end{longtable}
+
+\subsection{Non-Functional Requirements}
+
+\begin{longtable}{ p{.1\textwidth} p{.8\textwidth} }
+  \toprule
+  \textbf{ID} & \textbf{Description}
+  \\\midrule\midrule
+  \multicolumn{2}{c}{\cellcolor{red!70}\textit{Must}}\\\midrule
+  NF\_M1 & The application is decentralized and cannot be controlled by any one party\\
+  NF\_M2 & Any user must be able to join and contribute to the network\\
+  NF\_M3 & Users should remain anonymous to other nodes in the network. However, to provide incentives and proof-of-purchase nodes will need to be identified by an uploader. \\
+  \midrule\multicolumn{2}{c}{\cellcolor{orange!70}\textit{Should}}\\\midrule
+  NF\_S1 & This application must be scalable, such that many users can upload and download the same software at the same time.\\
+  \midrule\multicolumn{2}{c}{\cellcolor{green}\textit{Could}}\\\midrule
+  \\
   \midrule
   \bottomrule
 \end{longtable}

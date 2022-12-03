@@ -15,3 +15,15 @@
         #2
     \end{quote}
 }
+
+% persona <name, type, img, description>
+\newcommand{\persona}[4]{
+  \begin{center}
+    \begin{tabular}[ht]{ p{0.25\textwidth} p{0.7\textwidth} }
+      \multirow{3}{*}{\includegraphics[width=0.23\textwidth]{#3}} & #1 \\
+      & \textit{#2}\\
+      & #4
+    \end{tabular}
+  \end{center}
+  
+}

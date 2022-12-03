@@ -18,8 +18,14 @@
   float,
   booktabs,
   setspace,
-  wrapfig
+  wrapfig,
+  fancyhdr
 }
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\leftmark}
+\fancyhead[R]{\thepage}
 
 % urls + href style
 \hypersetup{

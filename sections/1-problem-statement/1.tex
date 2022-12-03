@@ -1,46 +1,30 @@
 
 \chapter{Problem Statement}
 
-Video games are large and highly popular pieces of software and this means that individual developers will typically not have the infrastructure to distribute their application at a large enough scale. To solve this, third party platforms, like Steam or Epic Games, are used facilitate the distribution of games and their subsequent updates. Some of the issues with doing this are that:
-
-\begin{itemize}
-  \item they take a cut of all revenue, for example Steam take 30\%,
-  \item they are vulnerable to censorship, for example the Chinese version of Steam is heavily censored, and
-  \item if the platform shuts down, the user will likely lose all access to their games.
-\end{itemize}
-
-\vspace{2mm}
-\noindent A distributed solution could solve all of these problems. The developer would not have to pay a cut of revenue but could offer in-game incentives to get users to help seed their software, content cannot be restricted or censored due to the nature of peer-to-peer networks and a user's access to a game is not tied to any one platform.
+Video games are often large and highly popular pieces of software that are typically distributed for developers by a third party platform like Steam or Epic Games. Whilst these platforms provide benefits such as availability, and some social features they have some major downsides that includes:
+\vspace{1mm}
+\begin{enumerate}[label=(\alph*)]
+  \item taking a large cut of all revenue, \newline\textit{Steam take a 30\% cut}
+  \item being vulnerable to censorship from governments, and \newline\textit{The Chinese version of Steam is heavily censored}
+  \item the user's access to their games is linked to the platform. \newline\textit{If the platform shuts down, the user loses all their games}
+\end{enumerate}
+\vspace{1mm}
+\noindent A blockchain-based platform will provide greater profits to the developer, eliminate the need for trust in a third party platform, and allow users greater control over the games they own as their access is not directly linked to one service.
 
 \section{Goals}
 
-The goal of this application is to create a video game distribution platform, which allows developers to independently release their games whilst being able to offer high availability and be immune to censorship from larger bodies (like governments). Blockchain technology should enable this through its trustless property and means that users can trust the software they receive through the network and be able to use public key infrastructure to verify the uploader of the software.
-\x
-It is an important consideration of this project that users can be distinguished by whether they have purchased the software or not. This information must be publicly available and verifiable by any node in the network.
-\x
-Availability is an important factor for games distributed through this network so a user will also need to be able to prove their contribution to the network and have this verifiable by any node in the network.
-The idea is that the developer can identify users who have helped distribute their game and provide them with rewards to do this. It is expected that developers should provide rewards after certain distribution milestones to encourage long term contribution from their user-base.
-In-game rewards may be a suitable reward for users and the quality of these will have a direct impact on the contribution by the community.
+The goal of this project is to implement a large-scale distribution platform that will allow game developers to release and continuously update their games on a public network by directly interacting with their users. This aims to boost revenue for the developer, reduce the risk of censorship, and improve the rights of the user in terms of digital ownership. The design should include:
+\vspace{1mm}
+\begin{itemize}
+  \item how data is shared between nodes in the network,
+  \item how downloaded data can be verified using the network,
+  \item how users can be incentivised by developers to help distributed their games,
+  \item how users can prove their contribution,
+  \item how users can prove they have purchased a game.
+\end{itemize}
+\vspace{1mm}
+\noindent The application will consist of a set of smart contracts, written in Solidity, as well as an interface to the blockchain written using TypeScript, with libraries such as Web3. Tools like Truffle and Ganache will also be helpful during development. 
 
 \section{Scope}
 
-For this project to be successful, it should:
-
-\begin{itemize}
-  \item distribute software between nodes by sharing fixed length shards of data,
-  \item use the blockchain to store software metadata that helps to identify and verify the software,
-  \item allow developers to publish their games to the blockchain,
-  \item allow developers to publish updates to their games already on the blockchain,
-  \item use encryption techniques to provide secure sharding of data between nodes,
-  \item use digital signatures to verify the identity of uploaders,
-  \item suggest a proof of purchase system to be called before sharing data with a node, and
-  \item be deployed to an ethereum testnet.
-\end{itemize}
-
-\vspace{1mm}
-\noindent This project will not:
-
-\begin{itemize}
-  \item offer a graphical user interface for users to locate software, and
-  \item implement a way for users to pay for games through the network.
-\end{itemize}
+This project will look at how the Ethereum blockchain and smart contracts can be used to create a large-scale distribution platform for video games. This be deployed to a `testnet', where Ether has no value and applications can be tested in a live environment.

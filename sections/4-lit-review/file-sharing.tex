@@ -1,6 +1,10 @@
 
 \section{P2P File Sharing}
 
+These applications involve a distributed network of computers that share data with each other without the need for a central party to facilitate. Table~\ref{tab:lit-review-p2p} shows some example p2p file-sharing networks.
+\x
+One of the main issues with these networks come from their anonymity property in that you can never fully trust that what you're downloading isn't malicious. Using blockchain can add a layer of trust by allowing users to identify the author of an upload and match that to a real world entity, such as a company, or to their history of uploads within the network,
+
 \begin{longtable}{ p{0.15\textwidth} p{0.8\textwidth} }
   \toprule
   \textbf{System} & \textbf{Description of Solution}
@@ -25,4 +29,5 @@
   & Gnutella nodes form an overlay network by sending \textit{ping-pong} messages. When a node sends a \textit{ping} message to their peers, each of them replies with a \textit{pong} message and the \textit{ping} is forwarded to their peers. To download a file, a node will flood a message to its neighbors, who will check if they have and return a message saying so; regardless, the node will continue to flood their request till they find a suitable node to download off of.
   \\\bottomrule
   \caption{\textit{Various global distributed file systems.}}
+  \label{tab:lit-review-p2p}
 \end{longtable}

@@ -1,12 +1,12 @@
 
 \section{BitTorrent}
 
-BitTorrent~\cite{kaune_unraveling_2010,pouwelse_bittorrent_2005} is easily the most popular p2p file-sharing platform, in which users will barter for chunks of files by downloading and uploading them in a tit-for-tat fashion, such that peers with a high upload rate will typically also have a high download rate. For a user to download data from BitTorrent they would:
+BitTorrent~\cite{kaune_unraveling_2010,pouwelse_bittorrent_2005} is the most popular p2p file-sharing platform, in which users will barter for chunks of files by downloading and uploading them in a tit-for-tat fashion, such that peers with a high upload rate will typically also have a high download rate. For a user to download data from BitTorrent they would:
 
 \subsection{Download Protocol}
 
 \begin{enumerate}
-  \item Find the corresponding .torrent file that contains metadata about the torrent such as the location of a tracker, file information such as name, size and path in the directory.
+  \item Find the corresponding \.torrent file that contains metadata about the torrent such as the location of a tracker, file information such as name, size and path in the directory.
   \item The user will find peers also interested in that torrent through a tracker and will establish connections with them.
   \item The data is split into constant-sized blocks and are downloaded individually. BitTorrent uses a tit-for-tat mechanism that incentivises users to contribute by providing preferable treatment to nodes who upload data as well.
   \item The user will download blocks based upon the following priority:

@@ -1,7 +1,7 @@
 
 \section{Design Considerations}
 
-\subsection{Type of Blockchain}
+\subsection*{Type of Blockchain}
 
 It is clear by \textbf{NF\_M2} that the blockchain must be public. Some of the benefits we would gain from a public blockchain are that it:
 
@@ -13,7 +13,7 @@ It is clear by \textbf{NF\_M2} that the blockchain must be public. Some of the b
 
 The Ethereum blockchain provides an extensive platform for 
 
-\subsection{Verifying Integrity}
+\subsection*{Verifying Integrity}
 
 As per \textbf{F\_M7}, a node must be able to verify the integrity of each shard of data. To do this, the application will leverage blockchain's inherent immutability property and store the hash data of all files in the body of each block.
 \x
@@ -26,7 +26,7 @@ Figure~\ref{fig:hash-storage} shows how shard hashes are stored. Hashes are stor
   \label{fig:hash-storage}
 \end{figure}
 
-\subsection{Downloading Content}
+\subsection*{Downloading Content}
 
 To achieve \textbf{F\_M1}, \textbf{F\_M2}, and \textbf{F\_M6}, software in the application will be content addressable and nodes will communicate with each other to collect shards. In Section~\ref{}, I mentioned how BitTorrent nodes choose, which shards of data to request first and this application will use a similar model. The general steps for downloading data are:
 
@@ -37,7 +37,7 @@ To achieve \textbf{F\_M1}, \textbf{F\_M2}, and \textbf{F\_M6}, software in the a
   \item The node will download the entirety of the software and will continue to upload it.
 \end{enumerate}
 
-\subsection{Updating Software}
+\subsection*{Updating Software}
 
 As per \textbf{F\_M4}, software must be updatable through the network. To do this, when a block represents an update to a piece of software it will include the hash of the block containing the previous version of the software.
 
@@ -49,6 +49,6 @@ As per \textbf{F\_M4}, software must be updatable through the network. To do thi
 
 Each update to the software should contain its own complete directory tree, similar to Figure~\ref{fig:hash-storage}, but will likely contain duplicate hashes. When an update is released, a node will look for changes in the directory tree and request the corresponding shards. According to \textbf{F\_C1}, shards from old versions of software could be persisted but this should be down to the choice of the user.
 
-\subsection{Digital Ownership}
+\subsection*{Digital Ownership}
 
 Software is a digital asset, in which users will pay developers for the right to download and play their game. Only the uploader will own the game and have permission to distribute access rights. 

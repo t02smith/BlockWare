@@ -3,7 +3,7 @@
 
 BitTorrent~\cite{kaune_unraveling_2010,pouwelse_bittorrent_2005} is the most popular p2p file-sharing platform, in which users will barter for chunks of files by downloading and uploading them in a tit-for-tat fashion, such that peers with a high upload rate will typically also have a high download rate. For a user to download data from BitTorrent they would:
 
-\subsection{Download Protocol}
+\subsection*{Download Protocol}
 
 \begin{enumerate}
   \item Find the corresponding \.torrent file that contains metadata about the torrent such as the location of a tracker, file information such as name, size and path in the directory.
@@ -18,7 +18,8 @@ BitTorrent~\cite{kaune_unraveling_2010,pouwelse_bittorrent_2005} is the most pop
   \item The node will continuously upload blocks it has while active.
 \end{enumerate}
 
-\subsection{Availability}
+\subsection*{Availability}
+\label{subsec:availability}
 
 It is commonly suggested that availability of torrents is the biggest issue surrounding BitTorrent as \textit{`38\% of torrents become unavailable in the first month'}~\cite{kaune_unraveling_2010} and that \textit{`the majority of users disconnect from the network within a few hours after the download has finished'}~\cite{pouwelse_bittorrent_2005}.
 This paper~\cite{neglia_availability_2007} looks at how the use of multiple trackers for the same content and DHTs can be used to boost availability.

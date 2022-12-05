@@ -18,12 +18,13 @@
   F\_M6 & A node must be able to download software in its entirety from nodes in the same network.\\
   F\_M7 & A node must be able to verify the integrity of each block it downloads\\
   F\_M8 & The application should run on the Ethereum network\\
+  F\_M9 & Users must be able to purchase games from developers over the network\\
+  F\_M10 & Users must be able to prove they have purchased a game\\
   \midrule\multicolumn{2}{c}{\cellcolor{orange!70}\textit{Should}}\\\midrule
-  F\_S1 & Allow users to restrict their software to only a specific set of nodes\\
-  F\_S3 & Allow a node to prove they have helped distribute software\\
+  F\_S1 & Seeders should have a way to prove how much data they have seeded\\
+  F\_S2 & Seeders will only upload content to users who have a valid proof of purchase\\
   \midrule\multicolumn{2}{c}{\cellcolor{green}\textit{Could}}\\\midrule
   F\_C1 & Allow users to request specific software versions\\
-  F\_C2 & Allow nodes to join groups for automatic identity verification\\
   \midrule
   \bottomrule
 \end{longtable}
@@ -37,9 +38,11 @@
   \multicolumn{2}{c}{\cellcolor{red!70}\textit{Must}}\\\midrule
   NF\_M1 & The application is decentralized and cannot be controlled by any one party\\
   NF\_M2 & Any user must be able to join and contribute to the network\\
-  NF\_M3 & Users should remain anonymous to other nodes in the network. However, to provide incentives and proof-of-purchase nodes will need to be identified by an uploader. \\
+  NF\_M3 & Game uploaders should be publicly identifiable\\
+  NF\_M4 & Metadata required to download the game should be immutable\\
   \midrule\multicolumn{2}{c}{\cellcolor{orange!70}\textit{Should}}\\\midrule
-  NF\_S1 & This application must be scalable, such that many users can upload and download the same software at the same time.\\
+  NF\_S1 & This application must be scalable, such that many users can upload and download the same game at the same time.\\
+  NF\_S2 & Only the original uploader can upload an update to their game\\
   \midrule\multicolumn{2}{c}{\cellcolor{green}\textit{Could}}\\\midrule
   \\
   \midrule

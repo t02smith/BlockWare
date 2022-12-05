@@ -3,21 +3,21 @@
 
 \subsection*{Type of Blockchain}
 
-It is clear by \textbf{NF\_M2} that the blockchain must be public. Some of the benefits we would gain from a public blockchain are that it:
+To satisfy \textbf{NF\_M2} and \textbf{NF\_M1}, we will need to use a public blockchain, which will benefit our project by:
 
 \begin{itemize}
-  \item will result in a larger set of users, which will boost the availability of software,
-  \item will reduce the risk of censorship as no one set of nodes will have authority over the network, and
-  \item results in greater data integrity.
+  \item being accessible by a greater amount of people, which should boost availability and scalability (satisfying \textbf{NF\_S1}),
+  \item reducing the risk of censorship,
+  \item providing greater data integrity (\textbf{NF\_M4})
 \end{itemize}
 
-The Ethereum blockchain provides an extensive platform for development
+\noindent Ethereum is a public blockchain that allows developers to publish their own distributed applications to it; it comes with an extensive development toolchain so is an obvious choice for this project (\textbf{F\_M8}).
 
-\subsection*{Verifying Integrity}
 
-As per \textbf{F\_M7}, a node must be able to verify the integrity of each shard of data. To do this, the application will leverage blockchain's inherent immutability property and store the hash data of all files in the body of each block.
-\x
-Figure~\ref{fig:hash-storage} shows how shard hashes are stored. Hashes are stored in a tree, which mimics the folder layout of the software such that the leaves are hashes and all other nodes represents directories or files. 
+\subsection*{Uploading Content}
+\label{subsec:upload-content}
+
+For developers to upload their game (\textbf{F\_M5}), they must provide a digital certificate to prove their identity (\textbf{NF\_M3}) as well as the required metadata (\textbf{F\_M1}) for identifying, downloading and verifying the game. The developer is then expected to allow users to purchase the game off them and seed the game to at least an initial group of users.
 
 \begin{figure}[ht]
   \centering
@@ -26,22 +26,27 @@ Figure~\ref{fig:hash-storage} shows how shard hashes are stored. Hashes are stor
   \label{fig:hash-storage}
 \end{figure}
 
+\subsection*{Purchasing Content}
+
+Users will purchase content from developers using Ether (\textbf{F\_M9}) and will be provided with a proof of purchase (\textbf{F\_M10}) that is encrypted with their private key and can be used by any node in the network to verify the purchase.
+
 \subsection*{Downloading Content}
 
-To achieve \textbf{F\_M1}, \textbf{F\_M2}, and \textbf{F\_M6}, software in the application will be content addressable and nodes will communicate with each other to collect shards. In Section~\ref{subsec:bittorrent-download}, I mentioned how BitTorrent nodes choose, which shards of data to request first and this application will use a similar model. The general steps for downloading data are:
+Games will be content addressable, using their root hash stored on the blockchain, and will allow users to discover nodes to download off of (\textbf{F\_M3}). Once a user finds a node it will:
 
 \begin{enumerate}
-  \item A node will find the block containing information about the software they want,
-  \item They send out a discover request using the root hash to find peers that are also interested in the same software and then will form connections,
-  \item The node will then barter for shards of data by downloading and uploading with peers,
-  \item The node will download the entirety of the software and will continue to upload it.
+  \item Send their proof of purchase of the desired game (\textbf{F\_S2}).
+  \item request individual shards from the node using the shard's hash (\textbf{F\_M2}),
+  \item use the metadata from the blockchain to verify the block's contents (\textbf{F\_M7}),
+  \item send a confirmation message that proves the successful transfer of a block (\textbf{F\_S1}), 
+  \item and repeat this until the entirety of the game is installed (\textbf{F\_M6}).
 \end{enumerate}
 
-\noindent The blockchain will be used to store useful metadata about each game similar to a \.torrent file. Blockchain's inherent immutability property combined with the use of public key infrastructure for identifying developers means that software is safe and verifiable. 
+\noindent Shards will be downloaded in a similar order to that of BitTorrent, which is described in Section~\ref{subsec:bittorrent-download}.
 
-\subsection*{Updating Software}
+\subsection*{Updating Content}
 
-As per \textbf{F\_M4}, software must be updatable through the network. To do this, when a block represents an update to a piece of software it will include the hash of the block containing the previous version of the software.
+To satisfy \textbf{F\_M4}, developers will perform the same steps as in Section~\ref{subsec:upload-content} but will also include the hash of a previous block that contains the older version of the game. This will include the restriction that only the original uploader can upload an update to a piece of software (\textbf{NF\_S2}).
 
 \begin{figure}[ht]
   \centering
@@ -49,13 +54,8 @@ As per \textbf{F\_M4}, software must be updatable through the network. To do thi
   \caption{\textit{How blocks can relate to older blocks.}}
 \end{figure}
 
-\noindent Each update to the software should contain its own complete directory tree, similar to Figure~\ref{fig:hash-storage}, but will likely contain duplicate hashes. When an update is released, a node will look for changes in the directory tree and request the corresponding shards. According to \textbf{F\_C1}, shards from old versions of software could be persisted but this should be down to the choice of the user.
+\noindent It is likely that many shards will persist between versions so a node will only ever download the changed or new data. To satisfy \textbf{F\_C1}, a node may optionally keep older shards that have been removed or changed.
 
-\subsection*{Digital Ownership}
-
-Using public key infrastructure, developers can identify themselves publicly to users by including their digital certificate within every upload they make to the blockchain. Users will purchase access to the software through the Ethereum blockchain, using ether, and will be provided with a purchase certificate that's encrypted with the developers private key.
-\x
-This purchase certificate will need to be sent by users to seeders in the network before they can start downloading the software. This means that only users who have purchased the software can download it. 
 
 \subsection*{Proving Contribution}
 

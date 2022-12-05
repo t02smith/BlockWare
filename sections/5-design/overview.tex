@@ -11,7 +11,7 @@ It is clear by \textbf{NF\_M2} that the blockchain must be public. Some of the b
   \item results in greater data integrity.
 \end{itemize}
 
-The Ethereum blockchain provides an extensive platform for 
+The Ethereum blockchain provides an extensive platform for development
 
 \subsection*{Verifying Integrity}
 
@@ -21,14 +21,14 @@ Figure~\ref{fig:hash-storage} shows how shard hashes are stored. Hashes are stor
 
 \begin{figure}[ht]
   \centering
-  \includegraphics[width=.85\textwidth]{diagrams/block-body.png}
+  \includegraphics[width=.85\textwidth]{images/diagrams/block-body.png}
   \caption{\textit{How shard data is stored.}}
   \label{fig:hash-storage}
 \end{figure}
 
 \subsection*{Downloading Content}
 
-To achieve \textbf{F\_M1}, \textbf{F\_M2}, and \textbf{F\_M6}, software in the application will be content addressable and nodes will communicate with each other to collect shards. In Section~\ref{}, I mentioned how BitTorrent nodes choose, which shards of data to request first and this application will use a similar model. The general steps for downloading data are:
+To achieve \textbf{F\_M1}, \textbf{F\_M2}, and \textbf{F\_M6}, software in the application will be content addressable and nodes will communicate with each other to collect shards. In Section~\ref{subsec:bittorrent-download}, I mentioned how BitTorrent nodes choose, which shards of data to request first and this application will use a similar model. The general steps for downloading data are:
 
 \begin{enumerate}
   \item A node will find the block containing information about the software they want,
@@ -37,18 +37,34 @@ To achieve \textbf{F\_M1}, \textbf{F\_M2}, and \textbf{F\_M6}, software in the a
   \item The node will download the entirety of the software and will continue to upload it.
 \end{enumerate}
 
+\noindent The blockchain will be used to store useful metadata about each game similar to a \.torrent file. Blockchain's inherent immutability property combined with the use of public key infrastructure for identifying developers means that software is safe and verifiable. 
+
 \subsection*{Updating Software}
 
 As per \textbf{F\_M4}, software must be updatable through the network. To do this, when a block represents an update to a piece of software it will include the hash of the block containing the previous version of the software.
 
 \begin{figure}[ht]
   \centering
-  \includegraphics[width=.85\textwidth]{diagrams/update-software.png}
+  \includegraphics[width=.85\textwidth]{images/diagrams/update-software.png}
   \caption{\textit{How blocks can relate to older blocks.}}
 \end{figure}
 
-Each update to the software should contain its own complete directory tree, similar to Figure~\ref{fig:hash-storage}, but will likely contain duplicate hashes. When an update is released, a node will look for changes in the directory tree and request the corresponding shards. According to \textbf{F\_C1}, shards from old versions of software could be persisted but this should be down to the choice of the user.
+\noindent Each update to the software should contain its own complete directory tree, similar to Figure~\ref{fig:hash-storage}, but will likely contain duplicate hashes. When an update is released, a node will look for changes in the directory tree and request the corresponding shards. According to \textbf{F\_C1}, shards from old versions of software could be persisted but this should be down to the choice of the user.
 
 \subsection*{Digital Ownership}
 
-Software is a digital asset, in which users will pay developers for the right to download and play their game. Only the uploader will own the game and have permission to distribute access rights. 
+Using public key infrastructure, developers can identify themselves publicly to users by including their digital certificate within every upload they make to the blockchain. Users will purchase access to the software through the Ethereum blockchain, using ether, and will be provided with a purchase certificate that's encrypted with the developers private key.
+\x
+This purchase certificate will need to be sent by users to seeders in the network before they can start downloading the software. This means that only users who have purchased the software can download it. 
+
+\subsection*{Proving Contribution}
+
+When a user purchases a piece of software they will be granted a unique seeder token. When a user successfully downloads a shard of data off of a peer they will reply with a confirmation message, containing this seeder token, that is encrypted using the developers public key. When a user wants to prove that they have contributed to the distribution of the game, they will send a collection of these messages to the developer, who will judge their validity.
+
+\subsection*{Sequence Diagram}
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=.95\textwidth]{images/diagrams/seqeunce-diagram.png}
+  \caption{\textit{The main interactions within the application.}}
+\end{figure}

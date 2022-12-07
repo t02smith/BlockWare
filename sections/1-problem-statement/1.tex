@@ -1,25 +1,27 @@
 
 \chapter{Problem Statement}
 
-Video games are often large and highly popular pieces of software that are typically distributed for developers by a third party platform like Steam or Epic Games. Whilst these platforms provide benefits such as availability, and some social features they have some major downsides that includes:
+Video games are often large and highly popular pieces of software that are typically distributed for developers by a third party platform like Steam or Epic Games. Whilst these platforms provide benefits such as availability, and some social features they have some major downsides that include:
 \vspace{1mm}
 \begin{enumerate}[label=(\alph*)]
   \item taking a large cut of all revenue, \newline\textit{Steam take a 30\% cut}
-  \item being vulnerable to censorship from governments, and \newline\textit{The Chinese version of Steam is heavily censored}
+  \item being vulnerable to censorship from governments, \newline\textit{The Chinese version of Steam is heavily censored}
   \item the user's access to their games is linked to the platform. \newline\textit{If the platform shuts down, the user loses all their games}
 \end{enumerate}
 \vspace{1mm}
-\noindent A blockchain-based platform will provide greater profits to the developer, eliminate the need for trust in a third party platform, and allow users greater control over the games they own as their access is not directly linked to one service.
+\noindent A blockchain-based, decentralised platform will provide greater profits to developers, eliminate the need for trust in a third party platform, and allow users greater control over the games they own as their access is not directly linked to one service.
 
 \section{Goals}
 
-The goal of this project is to implement a large-scale distribution platform that will allow game developers to release and continuously update their games on a public network by directly interacting with their users. This aims to boost revenue for the developer, reduce the risk of censorship, and improve the rights of the user in terms of digital ownership. The design should include:
+The goal of this project is to implement a large-scale distribution platform that will allow game developers to release and continuously update their games on a public network by directly interacting with their users. The design should include:
 \vspace{1mm}
 \begin{itemize}
   \item how data is shared between nodes in the network,
   \item how downloaded data can be verified using the network,
-  \item how users can be incentivised by developers to help distributed their games,
+  \item how games are uploaded and updated,
+  \item how users can be incentivised by developers to help distribute their games,
   \item how users can prove their contribution,
+  \item how users purchase games,
   \item how users can prove they have purchased a game.
 \end{itemize}
 \vspace{1mm}
@@ -28,4 +30,4 @@ The goal of this project is to implement a large-scale distribution platform tha
 
 This project will look at how the Ethereum blockchain and smart contracts can be used to create a large-scale distribution platform for video games. This be deployed to a `testnet', where Ether has no value and applications can be tested in a live environment. Whilst the focus on this application is on video games, this should be a valid solution for software of all types.
 \x
-The application itself will consist of a set of smart contracts, written in Solidity, with tests and a basic UI to be written using TypeScript. Tools like Ganache and MetaMask may also be useful for development.
+The application itself will consist of a set of smart contracts, written in Solidity, with tests and a basic GUI to be written using TypeScript and React.js. Tools like Ganache and MetaMask may also be useful for development.

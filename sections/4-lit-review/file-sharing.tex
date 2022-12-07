@@ -1,20 +1,20 @@
 
 \section{P2P File Sharing}
 
-These applications involve a distributed network of computers that share data with each other without the need for a central party to facilitate. Table~\ref{tab:lit-review-p2p} shows some example p2p file-sharing networks.
+These applications involve a distributed network of computers that share data with each other without the need for a central party. Table~\ref{tab:lit-review-p2p} shows some example p2p file-sharing networks.
 \x
-One of the main issues with these networks come from their anonymity property in that you can never fully trust that what you're downloading isn't malicious. Using blockchain can add a layer of trust by allowing users to identify the author of an upload and match that to a real world entity, such as a company, or to their history of uploads within the network,
+One of the main issues with these networks come from their anonymity property in that you can never fully trust that what you're downloading isn't malicious. On top of this, these platforms don't offer a way for user to pay for the content they are downloading, which means that legal, proprietary content is rarely distributed over them.
 
 \begin{longtable}{ p{0.15\textwidth} p{0.8\textwidth} }
   \toprule
   \textbf{System} & \textbf{Description of Solution}
   \\\midrule\midrule
   IPFS~\cite{benet_ipfs_2014}
-  & IPFS is a content-addressable, block storage system and forms a Merkle DAG, which is a data structure that allows the construction of versioned file systems, blockchains and a Permanent Web. IPFS
+  & IPFS is a content-addressable, block storage system which forms a Merkle DAG, a data structure that allows the construction of versioned file systems, blockchains and a Permanent Web.
   %
   \x
   BitTorrent~\cite{pouwelse_bittorrent_2005}
-  & BitTorrent is a p2p file-sharing system that has user bartering for chunks of data in a tit-for-tat fashion, which provides incentive for users to contribute to the network. Information about data is stored in .torrent files that can be found online and these help a user find other users interested in the same content they are. It is estimated that tens of millions of users use BitTorrent every day~\cite{wang_measuring_2013}.
+  & BitTorrent is a p2p file-sharing system that has user bartering for chunks of data in a tit-for-tat fashion, which provides incentive for users to contribute to the network. More on BitTorrent can be found in Section~\ref{sec:bittorrent}
   %
   \x
   AFS~\cite{morris_andrew_1986,howard_scale_1988}

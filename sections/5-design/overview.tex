@@ -27,18 +27,21 @@ To satisfy \textbf{NF\_M1} and \textbf{NF\_M2}, we will need to use a public blo
 \subsection*{Uploading Content}
 \label{subsec:upload-content}
 
-For developers to upload their game (\textbf{F\_M5}), they must provide a digital certificate to prove their identity (\textbf{NF\_M3}) as well as the required metadata (\textbf{F\_M1}) for identifying\footnote{Such as the name, release date, version number, creator and price.}, downloading\footnote{Such as the address of where to purchase the game, the digital certificate of who you're purchasing off and a tracker} and verifying their game\footnote{The root hash and the hashes of each block of data}. The developer is then expected to allow users to purchase the game off them and seed the game to at least an initial group of users.
+For developers to upload their game (\textbf{F\_M5}), they must provide a digital certificate to prove their identity (\textbf{NF\_M3}) as well as the required metadata (\textbf{F\_M1}) for identifying\footnote{Such as the name, release date, version number, creator and price.},
+downloading\footnote{Such as the address of where to purchase the game, the digital certificate of who you're purchasing off and a tracker} and verifying their game\footnote{The root hash and the hashes of each block of data}. 
+The developer is then expected to allow users to purchase the game off them and seed the game to at least an initial group of users.
 
 \begin{figure}[ht]
   \centering
   \includegraphics[width=.85\textwidth]{assets/images/diagrams/block-body.png}
-  \caption{How shard data is stored.}
+  \caption{Hash data about shards will be stored in a tree that mimics the folder structure of the data}
   \label{fig:hash-storage}
 \end{figure}
 
 \subsection*{Purchasing Content}
 
-Users will purchase content from developers using Ether (\textbf{F\_M9}) and will be provided with a proof of purchase (\textbf{F\_M10}) that is encrypted with the developer's private key. By using public key infrastructure, it gives proof of purchases authenticity that allows them to be validated by any node in the network. The proof of purchase will include: the root hash of the title purchased, the developer's address, the purchaser's address, a timestamp, and a unique seeder token to be used for proving distribution.
+Users will purchase content from developers using Ether (\textbf{F\_M9}) and will be provided with a proof of purchase (\textbf{F\_M10}) that is encrypted with the developer's private key. By using public key infrastructure, it gives proof of purchases authenticity that allows them to be validated by any node in the network. 
+The proof of purchase will include: the root hash of the title purchased, the developer's address, the purchaser's address, a timestamp, and a unique seeder token to be used for proving distribution.
 
 \subsection*{Downloading Content}
 
@@ -60,8 +63,8 @@ To satisfy \textbf{F\_M4}, developers will perform the same steps as in \textbf{
 
 \begin{figure}[ht]
   \centering
-  \includegraphics[width=.85\textwidth]{assets/images/diagrams/update-software.png}
-  \caption{How blocks can relate to older blocks.}
+  \includegraphics[width=.85\textwidth]{assets/images/diagrams/software.png}
+  \caption{How blocks relate to each other. An update will reference the previous version whilst a DLC will reference, which piece of software and version it is dependent on.}
 \end{figure}
 
 \noindent It is likely that many shards will persist between versions so a node will only ever download the changed or new data. To satisfy \textbf{F\_C1}, a node may optionally keep older shards that have been removed or changed.
@@ -72,7 +75,8 @@ Downloadable Content DLC provides extensions to the base game that typically cos
 
 \subsection*{Proving Contribution}
 
-When a user purchases a piece of software they will be granted a unique seeder token. When a user successfully downloads a shard of data off of a peer they will reply with a confirmation message, containing their seeder token, that is encrypted using the developers public key. When a user wants to prove that they have contributed to the distribution of a game, they will send a collection of these messages to the developer, who will judge their validity.
+When a user purchases a piece of software they will be granted a unique seeder token. When a user successfully downloads a shard of data off of a peer they will reply with a confirmation message, containing their seeder token, that is encrypted using the developers public key. 
+When a user wants to prove that they have contributed to the distribution of a game, they will send a collection of these messages to the developer, who will judge their validity.
 
 \subsection*{Sequence Diagram}
 
@@ -81,6 +85,6 @@ Figure~\ref{fig:sequence-diagram}, shows the main interactions for a game upload
 \begin{figure}[ht]
   \centering
   \includegraphics[width=.95\textwidth]{assets/images/diagrams/seqeunce-diagram.png}
-  \caption{The main interactions within the application.}
+  \caption{A sequence diagram showing some of the main interactions within this application}
   \label{fig:sequence-diagram}
 \end{figure}

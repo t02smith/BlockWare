@@ -7,8 +7,8 @@ Figure~\ref{fig:architecture-diagram} shows the architecture of this application
 
 \begin{figure}[ht]
   \centering
-  \includegraphics*[width=.95\textwidth]{images/diagrams/architecture-diagram.png}
-  \caption{\textit{Architecture of the application}}
+  \includegraphics*[width=\textwidth]{assets/images/diagrams/architecture-diagram.png}
+  \caption{Architecture of the application}
   \label{fig:architecture-diagram}
 \end{figure}
 
@@ -31,8 +31,8 @@ For developers to upload their game (\textbf{F\_M5}), they must provide a digita
 
 \begin{figure}[ht]
   \centering
-  \includegraphics[width=.85\textwidth]{images/diagrams/block-body.png}
-  \caption{\textit{How shard data is stored.}}
+  \includegraphics[width=.85\textwidth]{assets/images/diagrams/block-body.png}
+  \caption{How shard data is stored.}
   \label{fig:hash-storage}
 \end{figure}
 
@@ -60,14 +60,14 @@ To satisfy \textbf{F\_M4}, developers will perform the same steps as in \textbf{
 
 \begin{figure}[ht]
   \centering
-  \includegraphics[width=.85\textwidth]{images/diagrams/update-software.png}
-  \caption{\textit{How blocks can relate to older blocks.}}
+  \includegraphics[width=.85\textwidth]{assets/images/diagrams/update-software.png}
+  \caption{How blocks can relate to older blocks.}
 \end{figure}
 
 \noindent It is likely that many shards will persist between versions so a node will only ever download the changed or new data. To satisfy \textbf{F\_C1}, a node may optionally keep older shards that have been removed or changed.
 
 \subsection*{Downloadable Content}
-
+\tbd\\\noindent
 Downloadable Content DLC provides extensions to the base game that typically cost money. This could be implemented in the same way that updates are but be separately purchasable and include a dependency that means a user cannot purchase this without already owning the base game.
 
 \subsection*{Proving Contribution}
@@ -80,7 +80,7 @@ Figure~\ref{fig:sequence-diagram}, shows the main interactions for a game upload
 
 \begin{figure}[ht]
   \centering
-  \includegraphics[width=.95\textwidth]{images/diagrams/seqeunce-diagram.png}
-  \caption{\textit{The main interactions within the application.}}
+  \includegraphics[width=.95\textwidth]{assets/images/diagrams/seqeunce-diagram.png}
+  \caption{The main interactions within the application.}
   \label{fig:sequence-diagram}
 \end{figure}

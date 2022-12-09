@@ -19,12 +19,13 @@
   booktabs,
   setspace,
   wrapfig,
-  fancyhdr
+  fancyhdr,
+  caption
 }
 
 \pagestyle{fancy}
 \fancyhf{}
-\fancyhead[L]{\leftmark}
+\fancyhead[L]{\nouppercase\leftmark}
 \fancyhead[R]{\thepage}
 
 % urls + href style
@@ -34,6 +35,9 @@
   citecolor={blue!50!black},
   urlcolor={blue!80!black}
 }
+
+% captions
+\captionsetup{labelfont={it}}
 
 % common spacing command
 \newcommand{\x}{\vspace{2mm}\\}

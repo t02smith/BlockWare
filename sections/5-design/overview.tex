@@ -70,8 +70,13 @@ To satisfy \textbf{F\_M4}, developers will perform the same steps as in \textbf{
 \noindent It is likely that many shards will persist between versions so a node will only ever download the changed or new data. To satisfy \textbf{F\_C1}, a node may optionally keep older shards that have been removed or changed.
 
 \subsection*{Downloadable Content}
-\tbd\\\noindent
-Downloadable Content DLC provides extensions to the base game that typically cost money. This could be implemented in the same way that updates are but be separately purchasable and include a dependency that means a user cannot purchase this without already owning the base game.
+
+Developers will typically offer paid or free DLC (\textbf{F\_S3}) for their games that users will purchase separately. Each DLC will need:
+
+\begin{enumerate}
+  \item \textbf{Dependency} A reference to the oldest version of the game they apply to, and
+  \item \textbf{Previous Version} A pointer to the previous
+\end{enumerate}
 
 \subsection*{Proving Contribution}
 

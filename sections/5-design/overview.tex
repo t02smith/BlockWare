@@ -55,7 +55,7 @@ Games will be content addressable, using their root hash stored on the blockchai
   \item and repeat this until the entirety of the game is installed (\textbf{F\_M6}).
 \end{enumerate}
 
-\noindent Shards will be downloaded in a similar order to that of BitTorrent, which is described in Section~\ref{subsec:bittorrent-download}.
+\noindent As the blockchain will only be used to store metadata about games uploaded to the network, not every node will have each game installed. Instead, this project will take ideas from networks like BitTorrent, where nodes will seek out peers who have the game installed using a tracker hosted by the uploader.
 
 \subsection*{Updating Content}
 

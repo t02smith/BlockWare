@@ -38,7 +38,7 @@ Figure~\ref{fig:sequence-diagram}, shows the main interactions between actors in
 \subsection*{Uploading Content}
 \label{subsec:upload-content}
 
-For developers to upload their game (\textbf{F\_M5}), they must provide a digital certificate to prove their identity (\textbf{NF\_M3}) as well as the required metadata (\textbf{F\_M1}) for identifying,downloading and verifying their game. 
+For developers to upload their game (\textbf{F\_M5}), they must provide a digital certificate to prove their identity (\textbf{NF\_M3}) as well as the required metadata (\textbf{F\_M1}) for identifying, downloading and verifying their game. 
 The developer is then expected to allow users to purchase the game off them and seed the game to at least an initial group of users.
 
 \begin{figure}[ht]
@@ -50,13 +50,13 @@ The developer is then expected to allow users to purchase the game off them and 
 
 \subsection*{Purchasing Content}
 
-Users will purchase content from developers using Ether (\textbf{F\_M9}) and will be provided with a proof of purchase (\textbf{F\_M10}) that is encrypted with the developer's private key. By using public key infrastructure, it gives proof of purchases authenticity that allows them to be validated by any node in the network.
+Users will purchase content from sellers using Ether (\textbf{F\_M9}) and will be provided with a proof of purchase (\textbf{F\_M10}) that is encrypted with the developer's private key. By using public key infrastructure, it gives proof of purchases authenticity that allows them to be validated by any node in the network.
 \x
-The proof of purchase will include: the root hash of the title purchased, the developer's address, the purchaser's address, a timestamp, and a unique seeder token to be used for proving distribution.
+The proof of purchase will include: the root hash of the title purchased, the seller's address, the buyer's address, a timestamp, and a unique seeder token to be used for proving distribution.
 
 \subsection*{Downloading Content}
 
-Games will be content addressable, using their root hash stored on the blockchain. This will allow nodes to connect with each other based on the content they are interested in (\textbf{F\_M3}). Once a user connects to a node it will:
+Games will be content addressable, using their root hash stored on the blockchain. This will be used to help connect nodes who are interested in the same content (\textbf{F\_M3}). Once a user connects to a node it will:
 \vspace{2mm}
 \begin{enumerate}
   \item Send their proof of purchase (\textbf{F\_S2}).
@@ -72,7 +72,7 @@ Games will be content addressable, using their root hash stored on the blockchai
 
 To satisfy \textbf{F\_M4}, developers will perform the same steps as in \textbf{Uploading Content} but will also include the hash of a previous block that contains the older version of the game. This will include the restriction that only the original uploader can upload an update for their game (\textbf{NF\_S2}).
 
-\vspace{2mm}\noindent It is likely that many shards will persist between versions so a node will only ever download the changed or new data. To satisfy \textbf{F\_C1}, a node may optionally keep older shards that have been removed or changed.
+\vspace{2mm}\noindent It is likely that many shards will persist between versions so a node will only ever download the new or changed data. To satisfy \textbf{F\_C1}, a node may optionally keep older shards that have been removed or changed.
 
 \subsubsection*{Downloadable Content}
 
@@ -80,7 +80,7 @@ Developers will typically offer paid or free DLC (\textbf{F\_S3}) for their game
 
 \begin{enumerate}
   \item \textbf{Dependency} A reference to the oldest version of the game they apply to, and
-  \item \textbf{Previous Version} A pointer to the previous
+  \item \textbf{Previous Version} A pointer to the previous version of the DLC.
 \end{enumerate}
 
 
@@ -92,4 +92,4 @@ Developers will typically offer paid or free DLC (\textbf{F\_S3}) for their game
 
 \subsection*{Proving Contribution}
 
-A purchase certificate will include a confidential \textit{seeder token}. When a user successful downloads a shard of data they send a confirmation message, including this token, that is encrypted with the game developer's public key. A user will prove their contribution (\textbf{F\_S1}) by sending a collection of these messages to the developer, who can decrypt and validate the tokens.
+A purchase certificate will include a confidential \textit{seeder token}. When a user successful downloads a shard of data they will send a confirmation message, including their seeder token, that is encrypted with the game developer's public key. A user will prove their contribution (\textbf{F\_S1}) by sending a collection of these messages to the developer, who can decrypt and validate the tokens.

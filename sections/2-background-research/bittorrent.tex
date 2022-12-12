@@ -2,10 +2,10 @@
 \section{BitTorrent}
 \label{sec:bittorrent}
 
-It is an unrealistic to expect that every game uploaded to the network will be downloaded by every user so only a subset of users will actually have the game installed and available to share with other nodes in the network. 
+It is an unrealistic to expect that every game uploaded to the network will be downloaded by every user so only a subset of users will have the game installed and available to share. 
 In this section and Section~\ref{sec:lit-p2p}, I will look at how various peer-to-peer file-sharing networks allow users to discover and download content that is fragmented across the network. 
 \x
-BitTorrent~\cite{kaune_unraveling_2010,pouwelse_bittorrent_2005} is the most popular p2p file-sharing platform, in which users will barter for chunks of files by downloading and uploading them in a tit-for-tat fashion, such that peers with a high upload rate will typically also have a high download rate.
+BitTorrent~\cite{kaune_unraveling_2010,pouwelse_bittorrent_2005} is the most popular P2P file-sharing platform, in which users will barter for chunks of files by downloading and uploading them in a tit-for-tat fashion, such that peers with a high upload rate will typically also have a high download rate.
 It is estimated that tens of millions of users use BitTorrent every day~\cite{wang_measuring_2013}.
 
 \subsection*{Download Protocol}
@@ -16,9 +16,9 @@ For a user to download data from BitTorrent they would:
 \begin{enumerate}
   \item Find the corresponding~.torrent file that contains metadata about the torrent.
   \item The user will find peers, using a tracker identified in the~.torrent, that are also interested in that content and will establish connections with them.
-  \item The user will download blocks~\footnote{nodes may reject downloads without the user providing data themselves in a tit-for-tat fashion}, from peers, based upon the following priority:
+  \item The user will download blocks\footnote{nodes may reject downloads without the user providing data themselves in a tit-for-tat fashion}, from peers, based upon the following priority:
         \begin{enumerate}
-          \item \textbf{Strict Priority} Data is split into pieces and sub-pieces with the aim that once a given sub-piece is requested then all of the other sub-pieces in the same piece are requested
+          \item \textbf{Strict Priority} Data is split into pieces and sub-pieces with the aim that once a given sub-piece is requested then all of the other sub-pieces in the same piece are requested.
           \item \textbf{Rarest First} Aims to download the piece that the fewest peers have to increase supply.
           \item \textbf{Random First Piece} When a peer has no pieces, it will try to get one as soon as possible to be able to contribute.
         \end{enumerate}
@@ -28,6 +28,5 @@ For a user to download data from BitTorrent they would:
 \subsection*{Availability}
 \label{subsec:availability}
 
-It is commonly suggested that availability of torrents is the biggest issue surrounding BitTorrent as \textit{`38\% of torrents become unavailable in the first month'}~\cite{kaune_unraveling_2010} and that \textit{`the majority of users disconnect from the network within a few hours after the download has finished'}~\cite{pouwelse_bittorrent_2005}.
+One of the most significant issues facing BitTorrent is the availability of torrents, where \textit{`38\% of torrents become unavailable in the first month'}~\cite{kaune_unraveling_2010} and that \textit{`the majority of users disconnect from the network within a few hours after the download has finished'}~\cite{pouwelse_bittorrent_2005}.
 This paper~\cite{neglia_availability_2007} looks at how the use of multiple trackers for the same content and DHTs can be used to boost availability.
-

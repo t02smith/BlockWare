@@ -3,7 +3,7 @@
 
 \input{sections/5-design/stakeholders.tex}
 
-\subsection{Requirements}
+\subsection*{Requirements}
 \label{subsec:requirements}
 
 
@@ -16,12 +16,12 @@ Tables~\ref{tab:functional-requirements} and~\ref{tab:non-functional-requirement
   \textbf{ID} & \textbf{Description}
   \\\midrule\midrule
   \multicolumn{2}{c}{\cellcolor{red!70}\textit{Must}}\\\midrule
-  F\_M1 & Store software metadata on a blockchain\\
-  F\_M2 & A node must request individual shards from its peers\\
+  F\_M1 & Store game metadata on a blockchain\\
+  F\_M2 & A node must data as constant-sized shards from its peers\\
   F\_M3 & A node must be able to discover peers who have their desired game installed\\
-  F\_M4 & Software must be updatable through the blockchain\\
-  F\_M5 & A node must be able to upload software\\
-  F\_M6 & A node must be able to download software in its entirety from nodes in the same network.\\
+  F\_M4 & Games must be updatable through the blockchain\\
+  F\_M5 & A node must be able to upload games\\
+  F\_M6 & A node must be able to download games in their entirety from nodes in the network.\\
   F\_M7 & A node must be able to verify the integrity of each block it downloads\\
   F\_M8 & The application should run on the Ethereum network\\
   F\_M9 & Users must be able to purchase games from developers over the network\\
@@ -31,7 +31,7 @@ Tables~\ref{tab:functional-requirements} and~\ref{tab:non-functional-requirement
   F\_S2 & Seeders will only upload content to users who have a valid proof of purchase\\
   F\_S3 & Allow for the distribution of DLC for games\\
   \midrule\multicolumn{2}{c}{\cellcolor{green}\textit{Could}}\\\midrule
-  F\_C1 & Allow users to request specific software versions\\
+  F\_C1 & Allow users to request specific game versions\\
   F\_C2 & Provide a simple GUI for interacting with the blockchain\\
   \midrule
   \bottomrule

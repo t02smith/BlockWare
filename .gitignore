@@ -1,1 +1,10 @@
 .vscode
+*.aux
+*.bbl
+*.blg
+*.toc
+*.log
+*.gz
+*.fdb_latexmk
+*.out
+*.fls

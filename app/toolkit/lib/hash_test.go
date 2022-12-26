@@ -27,8 +27,8 @@ func TestNewHashTreeValid(t *testing.T) {
 		t.Errorf("error creating hash tree")
 	}
 
-	if tree.RootDir.Dirname != "." && tree.RootDirLocation != "." {
-		t.Errorf("root directory location not set")
+	if tree.RootDir != nil {
+		t.Errorf("by default the root directory should be nil")
 	}
 
 	if tree.ShardSize != 1024 {
@@ -61,4 +61,64 @@ func TestShardFileCorrect(t *testing.T) {
 	if fmt.Sprintf("%x", f.Hashes[0]) != "12998c017066eb0d2a70b94e6ed3192985855ce390f321bbdb832022888bd251" {
 		t.Errorf("Incorrect hash")
 	}
+}
+
+// hashDir
+
+func TestHashDirCorrectTree(t *testing.T) {
+	ht, _ := NewHashTree("../test/data", 1024)
+	err := ht.Hash()
+
+	if err != nil {
+		t.Errorf("error hashing directory %s", err)
+	}
+
+	rdir := ht.RootDir
+	if rdir.Dirname != "" {
+		t.Errorf("directory is root so should have an empty dirname")
+	}
+
+	if len(rdir.Files) != 2 {
+		t.Errorf("incorrect number of files found in the root directory")
+	}
+
+	if len(rdir.Subdirs) != 1 {
+		t.Errorf("incorrect number of subdirs found")
+	}
+
+	if len(rdir.Subdirs[0].Files) != 1 && rdir.Subdirs[0].Files[0].Filename != "chip8.c" {
+		t.Errorf("incorrect number of files or file in subdir")
+	}
+}
+
+// verifyTree
+
+func TestVerifyTreeSameDir(t *testing.T) {
+	ht1, _ := NewHashTree("../test/data", 256)
+	ht1.Hash()
+
+	res, err := ht1.VerifyTree("../test/data")
+	if err != nil {
+		t.Errorf("error verifying tree %s", err)
+	}
+
+	if !res {
+		t.Errorf("result should be correct => is false")
+	}
+
+}
+
+func TestVerifyTreeDifferentDir(t *testing.T) {
+	ht1, _ := NewHashTree("../test/data", 256)
+	ht1.Hash()
+
+	res, err := ht1.VerifyTree("../test")
+	if err != nil {
+		t.Errorf("error verifying tree %s", err)
+	}
+
+	if res {
+		t.Errorf("result should be incorrect => is true")
+	}
+
 }

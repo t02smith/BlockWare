@@ -7,6 +7,7 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
+	"github.com/t02smith/part-iii-project/toolkit/lib"
 )
 
 var (
@@ -25,7 +26,11 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("verify called")
+		f, err := lib.ReadHashTreeFromFile(verifyExpectedHashFile)
+		if err != nil {
+			fmt.Printf("error reading hash file: %s\n", err)
+		}
+		fmt.Println(f)
 	},
 }
 

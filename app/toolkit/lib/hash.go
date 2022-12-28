@@ -46,6 +46,12 @@ type hashTreeFile struct {
 	Hashes [][32]byte `json:"hashes"`
 }
 
+type VerifyHashTreeConfig struct {
+	IgnoreNewFilesAndDirs     bool
+	ContinueAfterError        bool
+	continueAfterErrorCounter uint
+}
+
 func NewHashTree(rootDir string, shardSize uint) (*hashTree, error) {
 	if shardSize == 0 {
 		return nil, errors.New("shard size must be greater than 0")
@@ -197,16 +203,17 @@ func (ht *hashTree) shardFile(currentDirectory string, filename string) (*hashTr
 	return htf, nil
 }
 
-func (ht *hashTree) VerifyTree(chosenDirectory string) (bool, error) {
+func (ht *hashTree) VerifyTree(config *VerifyHashTreeConfig, chosenDirectory string) (bool, error) {
 	if ht.RootDir == nil {
 		return false, errors.New("hash tree not found to compare given directory to")
 	}
 
 	fmt.Printf("Verifying directory %s\n", chosenDirectory)
-	return ht.verifyDir(chosenDirectory, "", ht.RootDir)
+	return ht.verifyDir(config, chosenDirectory, "", ht.RootDir)
 }
 
-func (ht *hashTree) verifyDir(currentDir string, directoryBeingVerified string, htDir *hashTreeDir) (bool, error) {
+func (ht *hashTree) verifyDir(config *VerifyHashTreeConfig, currentDir string, directoryBeingVerified string, htDir *hashTreeDir) (bool, error) {
+	fmt.Printf("verifying directory %s/%s\n", currentDir, directoryBeingVerified)
 	file, err := os.Open(filepath.Join(currentDir, directoryBeingVerified))
 	if err != nil {
 		return false, err
@@ -237,16 +244,26 @@ func (ht *hashTree) verifyDir(currentDir string, directoryBeingVerified string, 
 			}()
 
 			if subdir == nil {
-				return false, nil
+				if config.IgnoreNewFilesAndDirs {
+					continue
+				}
+
+				fmt.Printf("Unexpected directory %s/%s/%s\n", currentDir, directoryBeingVerified, name)
+
+				if !config.ContinueAfterError {
+					return false, nil
+				}
 			}
 
-			subdirRes, err := ht.verifyDir(filepath.Join(currentDir, directoryBeingVerified), name, subdir)
+			subdirRes, err := ht.verifyDir(config, filepath.Join(currentDir, directoryBeingVerified), name, subdir)
 			if err != nil {
 				return false, err
 			}
 
 			if !subdirRes {
-				return false, nil
+				if !config.ContinueAfterError {
+					return false, nil
+				}
 			}
 
 		} else {
@@ -262,7 +279,14 @@ func (ht *hashTree) verifyDir(currentDir string, directoryBeingVerified string, 
 			}()
 
 			if fileExists == nil {
-				return false, nil
+				if config.IgnoreNewFilesAndDirs {
+					continue
+				}
+
+				fmt.Printf("Unexpected file %s/%s/%s\n", currentDir, directoryBeingVerified, name)
+				if !config.ContinueAfterError {
+					return false, nil
+				}
 			}
 
 			// compare hashes
@@ -272,7 +296,9 @@ func (ht *hashTree) verifyDir(currentDir string, directoryBeingVerified string, 
 			}
 
 			if !fileRes {
-				return false, nil
+				if !config.ContinueAfterError {
+					return false, nil
+				}
 			}
 		}
 	}
@@ -303,6 +329,7 @@ func (ht *hashTree) verifyFile(htf *hashTreeFile, currentDirectory string, filen
 
 		hash := sha256.Sum256(buffer)
 		if !bytes.Equal(hash[:], htf.Hashes[counter][:]) {
+			fmt.Printf("Incorrect hash found in file %s/%s at block %d\n", currentDirectory, filename, counter)
 			return false, nil
 		}
 

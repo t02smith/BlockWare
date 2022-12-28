@@ -11,8 +11,10 @@ import (
 )
 
 var (
-	verifyDirToVerify      string
-	verifyExpectedHashFile string
+	verifyDirToVerify           string
+	verifyExpectedHashFile      string
+	verifyIgnoreNewFilesAndDirs bool
+	verifyContinueAfterError    bool
 )
 
 // verifyCmd represents the verify command
@@ -29,8 +31,21 @@ to quickly create a Cobra application.`,
 		f, err := lib.ReadHashTreeFromFile(verifyExpectedHashFile)
 		if err != nil {
 			fmt.Printf("error reading hash file: %s\n", err)
+			return
 		}
-		fmt.Println(f)
+
+		config := &lib.VerifyHashTreeConfig{
+			IgnoreNewFilesAndDirs: verifyIgnoreNewFilesAndDirs,
+			ContinueAfterError:    verifyContinueAfterError,
+		}
+
+		res, err := f.VerifyTree(config, verifyDirToVerify)
+		if err != nil {
+			fmt.Printf("error verifying directory: %s\n", err)
+			return
+		}
+
+		fmt.Printf("Directory matches: %t\n", res)
 	},
 }
 
@@ -39,4 +54,7 @@ func init() {
 
 	verifyCmd.Flags().StringVarP(&verifyDirToVerify, "directory", "d", "", "Which directory are you attempting to verify")
 	verifyCmd.Flags().StringVarP(&verifyExpectedHashFile, "hash-file", "f", "hash.json", "The location of your hash file with your expected results")
+
+	verifyCmd.Flags().BoolVarP(&verifyIgnoreNewFilesAndDirs, "ignore-new-data", "i", false, "Ignore new files or directories that have been added")
+	verifyCmd.Flags().BoolVarP(&verifyContinueAfterError, "continue-after-error", "c", false, "Don't stop the verification if an error is found")
 }

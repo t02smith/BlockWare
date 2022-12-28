@@ -39,16 +39,16 @@ func TestNewHashTreeValid(t *testing.T) {
 // shardFile
 
 func TestShardFileInvalidFile(t *testing.T) {
-	ht, _ := NewHashTree("../test/data", 4)
-	_, err := ht.shardFile("../test/data", "fake.txt")
+	ht, _ := NewHashTree("../test/data/testdir", 4)
+	_, err := ht.shardFile("../test/data/testdir", "fake.txt")
 	if err == nil {
 		t.Errorf("file doesn't exist and this should throw an error")
 	}
 }
 
 func TestShardFileCorrect(t *testing.T) {
-	ht, _ := NewHashTree("../test/data", 11)
-	f, err := ht.shardFile("../test/data/", "test.txt")
+	ht, _ := NewHashTree("../test/data/testdir", 11)
+	f, err := ht.shardFile("../test/data/testdir", "test.txt")
 
 	if err != nil {
 		t.Errorf("error sharding file %s", err)
@@ -66,7 +66,7 @@ func TestShardFileCorrect(t *testing.T) {
 // hashDir
 
 func TestHashDirCorrectTree(t *testing.T) {
-	ht, _ := NewHashTree("../test/data", 1024)
+	ht, _ := NewHashTree("../test/data/testdir", 1024)
 	err := ht.Hash()
 
 	if err != nil {
@@ -94,10 +94,10 @@ func TestHashDirCorrectTree(t *testing.T) {
 // verifyTree
 
 func TestVerifyTreeSameDir(t *testing.T) {
-	ht1, _ := NewHashTree("../test/data", 256)
+	ht1, _ := NewHashTree("../test/data/testdir", 256)
 	ht1.Hash()
 
-	res, err := ht1.VerifyTree("../test/data")
+	res, err := ht1.VerifyTree(&VerifyHashTreeConfig{false, false, 0}, "../test/data/testdir")
 	if err != nil {
 		t.Errorf("error verifying tree %s", err)
 	}
@@ -109,10 +109,10 @@ func TestVerifyTreeSameDir(t *testing.T) {
 }
 
 func TestVerifyTreeDifferentDir(t *testing.T) {
-	ht1, _ := NewHashTree("../test/data", 256)
+	ht1, _ := NewHashTree("../test/data/testdir", 256)
 	ht1.Hash()
 
-	res, err := ht1.VerifyTree("../test")
+	res, err := ht1.VerifyTree(&VerifyHashTreeConfig{false, false, 0}, "../test")
 	if err != nil {
 		t.Errorf("error verifying tree %s", err)
 	}

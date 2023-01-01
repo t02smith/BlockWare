@@ -31,6 +31,9 @@ type hashTreeDir struct {
 	// the path relative to the root directory location
 	Dirname string `json:"dirname"`
 
+	// the SHA256 hash of the directories contents
+	RootHash [32]byte `json:"roothash"`
+
 	// all subdirectories recursively stored
 	Subdirs []*hashTreeDir `json:"subdirs"`
 
@@ -44,6 +47,9 @@ type hashTreeFile struct {
 
 	// A list of SHA256 hashes that represent each shard of data in the file
 	Hashes [][32]byte `json:"hashes"`
+
+	// The hash produced by the Merkle Tree of each file
+	RootHash [32]byte `json:"roothash"`
 }
 
 type VerifyHashTreeConfig struct {
@@ -113,7 +119,7 @@ func ReadHashTreeFromFile(filename string) (*hashTree, error) {
 	return ht, nil
 }
 
-//
+// Hashing functions
 
 func (ht *hashTree) Hash() error {
 	fmt.Printf("Starting hash on directory %s\n", ht.RootDirLocation)
@@ -168,6 +174,16 @@ func (ht *hashTree) hashDir(currentDir string, directory string) (*hashTreeDir, 
 		}
 	}
 
+	// generate the root hash
+	hashes := [][32]byte{}
+	for _, d := range dir.Subdirs {
+		hashes = append(hashes, d.RootHash)
+	}
+	for _, f := range dir.Files {
+		hashes = append(hashes, f.RootHash)
+	}
+
+	dir.RootHash = CalculateRootHash(hashes)
 	return dir, nil
 }
 
@@ -200,6 +216,7 @@ func (ht *hashTree) shardFile(currentDirectory string, filename string) (*hashTr
 		htf.Hashes = append(htf.Hashes, hash)
 	}
 
+	htf.RootHash = CalculateRootHash(htf.Hashes)
 	return htf, nil
 }
 
@@ -337,4 +354,31 @@ func (ht *hashTree) verifyFile(htf *hashTreeFile, currentDirectory string, filen
 	}
 
 	return true, nil
+}
+
+// Utility
+
+func CalculateRootHash(hashes [][32]byte) [32]byte {
+
+	oldLayer, newLayer := hashes, [][32]byte{}
+
+	for len(oldLayer) != 1 {
+
+		// duplicate the last element if there an odd number
+		if len(oldLayer)%2 == 1 {
+			oldLayer = append(oldLayer, oldLayer[len(oldLayer)-1])
+		}
+
+		// hash each pair
+		for i := 0; i < len(oldLayer); i += 2 {
+			newLayer = append(newLayer, sha256.Sum256(append(oldLayer[i][:], oldLayer[i+1][:]...)))
+
+		}
+
+		oldLayer = newLayer
+		newLayer = [][32]byte{}
+	}
+
+	return oldLayer[0]
+
 }

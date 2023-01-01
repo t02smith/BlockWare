@@ -11,9 +11,8 @@ import (
 )
 
 var (
-	hashDirectory  string
-	hashShardSize  uint
-	hashOutputFile string
+	hashDirectory string
+	hashShardSize uint
 )
 
 // hashCmd represents the hash command
@@ -31,7 +30,7 @@ var hashCmd = &cobra.Command{
 		}
 
 		t.Hash()
-		t.OutputToFile(hashOutputFile)
+		t.OutputToFile(fmt.Sprintf(".%x.json", t.RootDir.RootHash))
 	},
 }
 
@@ -40,5 +39,4 @@ func init() {
 
 	hashCmd.Flags().StringVarP(&hashDirectory, "directory", "d", "", "The path to the directory you'd like to hash")
 	hashCmd.Flags().UintVarP(&hashShardSize, "shard-size", "s", 1024, "The size (in bytes) of each shard to be hashed")
-	hashCmd.Flags().StringVarP(&hashOutputFile, "output", "o", "hash.json", "The output file for the hash data")
 }

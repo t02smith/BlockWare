@@ -1,25 +1,30 @@
-// SPDX-License-Identifier: MIT
-pragma solidity >=0.4.22 <0.9.0;
+// SPDX-License-Identifier: UNLICENSED
+pragma solidity ^0.8.9;
 
 contract Game {
-    address public author;
-    uint256 public price;
-    GameData data;
+    // information about the game
+    string public title;
+    string public version;
+    int public price;
 
-    struct GameData {
+    Developer public developer;
+
+    struct Developer {
         string name;
-        string version;
-        GameDirectory rootDir;
+        address payable addr;
+        // used for fetching SSL certificate
+        string domain;
     }
 
-    struct GameDirectory {
-        string name;
-        GameFile[] files;
-        GameDirectory[] subdirs;
-    }
-
-    struct GameFile {
-        string name;
-        bytes32[] hashes;
+    constructor(
+        string memory _title,
+        string memory _version,
+        int _price,
+        Developer memory _developer
+    ) {
+        title = _title;
+        version = _version;
+        price = _price;
+        developer = _developer;
     }
 }

@@ -7,7 +7,7 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
-	"github.com/t02smith/part-iii-project/toolkit/lib"
+	"github.com/t02smith/part-iii-project/toolkit/lib/io"
 )
 
 var (
@@ -24,7 +24,7 @@ var hashCmd = &cobra.Command{
 	hashes of each shard of data. This will allow your users to 
 	verify the contents they are downloading.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		t, err := lib.NewHashTree(hashDirectory, hashShardSize)
+		t, err := io.NewHashTree(hashDirectory, hashShardSize)
 		if err != nil {
 			fmt.Println(err)
 		}

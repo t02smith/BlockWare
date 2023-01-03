@@ -1,19 +1,22 @@
-package lib
+package io
 
 import (
 	"bufio"
 	"bytes"
 	"errors"
+	"log"
 	"os"
 	"path/filepath"
 )
 
 func (t *hashTree) GetShard(hash [32]byte) ([]byte, error) {
+	log.Printf("Looking for shard %x in %s", hash, t.RootDirLocation)
 	found, location, offset := t.findShard(hash)
 	if !found {
 		return nil, errors.New("shard not found")
 	}
 
+	log.Printf("Shard found at %s - piece %d", location, offset)
 	return t.readShard(location, offset)
 }
 
@@ -71,4 +74,53 @@ func (t *hashTree) readShard(filename string, offset int) ([]byte, error) {
 
 	return buffer, nil
 
+}
+
+// DOWNLOADING A FILE
+
+func setupFile(filename string, shardSize, shardCount uint) error {
+	log.Printf("Creating empty file %s", filename)
+	file, err := os.Create(filename)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	emptyBuffer := make([]byte, shardSize)
+	writer := bufio.NewWriter(file)
+
+	for i := 0; i < int(shardCount); i++ {
+		_, err := writer.Write(emptyBuffer)
+		writer.Flush()
+		if err != nil {
+			return err
+		}
+	}
+
+	log.Printf("%s created", filename)
+	return nil
+}
+
+func insertData(filename string, shardSize, offset uint, data []byte) error {
+	if len(data) != int(shardSize) {
+		return errors.New("data should be the same length as the byte size")
+	}
+
+	file, err := os.OpenFile(filename, os.O_RDWR, 0644)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	_, err = file.Seek(int64(offset*shardSize), 0)
+	if err != nil {
+		return err
+	}
+
+	log.Printf("Writing shard to %s:%d", filename, offset)
+	writer := bufio.NewWriter(file)
+	writer.Write(data)
+	writer.Flush()
+
+	return nil
 }

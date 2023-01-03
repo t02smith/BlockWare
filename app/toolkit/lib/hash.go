@@ -22,7 +22,7 @@ type hashTree struct {
 	ShardSize uint `json:"shardsize"`
 
 	// the local physical location of the root directory
-	RootDirLocation string
+	RootDirLocation string `json:"location"`
 }
 
 // Describes a directory with tracked files
@@ -192,6 +192,7 @@ func (ht *hashTree) shardFile(currentDirectory string, filename string) (*hashTr
 	if err != nil {
 		return nil, err
 	}
+	defer file.Close()
 
 	htf := &hashTreeFile{
 		Filename: filename,
@@ -328,6 +329,7 @@ func (ht *hashTree) verifyFile(htf *hashTreeFile, currentDirectory string, filen
 	if err != nil {
 		return false, err
 	}
+	defer file.Close()
 
 	buffer := make([]byte, ht.ShardSize)
 	reader := bufio.NewReader(file)

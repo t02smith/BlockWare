@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
+	"github.com/t02smith/part-iii-project/toolkit/cmd/new"
 	"github.com/t02smith/part-iii-project/toolkit/cmd/start"
 )
 
@@ -26,7 +27,6 @@ func Execute() {
 }
 
 func init() {
-
 	rootCmd.AddCommand(start.StartCmd)
-
+	rootCmd.AddCommand(new.NewCmd)
 }

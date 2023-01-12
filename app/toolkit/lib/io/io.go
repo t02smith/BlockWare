@@ -9,7 +9,7 @@ import (
 	"path/filepath"
 )
 
-func (t *hashTree) GetShard(hash [32]byte) ([]byte, error) {
+func (t *HashTree) GetShard(hash [32]byte) ([]byte, error) {
 	log.Printf("Looking for shard %x in %s", hash, t.RootDirLocation)
 	found, location, offset := t.findShard(hash)
 	if !found {
@@ -22,7 +22,7 @@ func (t *hashTree) GetShard(hash [32]byte) ([]byte, error) {
 
 // LOCATING SHARDS
 
-func (t *hashTree) findShard(hash [32]byte) (bool, string, int) {
+func (t *HashTree) findShard(hash [32]byte) (bool, string, int) {
 	found, path, offset := t.RootDir.findShard(hash)
 	return found, filepath.Join(t.RootDirLocation, path), offset
 }
@@ -51,7 +51,7 @@ func (td *hashTreeDir) findShard(hash [32]byte) (bool, string, int) {
 
 // READING SHARD
 
-func (t *hashTree) readShard(filename string, offset int) ([]byte, error) {
+func (t *HashTree) readShard(filename string, offset int) ([]byte, error) {
 
 	file, err := os.Open(filename)
 	if err != nil {

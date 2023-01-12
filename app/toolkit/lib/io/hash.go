@@ -13,7 +13,7 @@ import (
 )
 
 // Describes a directory in terms of its files hashes
-type hashTree struct {
+type HashTree struct {
 
 	// the directory object for the root folder
 	RootDir *hashTreeDir `json:"rootdir"`
@@ -58,7 +58,7 @@ type VerifyHashTreeConfig struct {
 	continueAfterErrorCounter uint
 }
 
-func NewHashTree(rootDir string, shardSize uint) (*hashTree, error) {
+func NewHashTree(rootDir string, shardSize uint) (*HashTree, error) {
 	if shardSize == 0 {
 		return nil, errors.New("shard size must be greater than 0")
 	}
@@ -67,7 +67,7 @@ func NewHashTree(rootDir string, shardSize uint) (*hashTree, error) {
 		return nil, err
 	}
 
-	return &hashTree{
+	return &HashTree{
 		RootDir:         nil,
 		RootDirLocation: rootDir,
 		ShardSize:       shardSize,
@@ -76,7 +76,7 @@ func NewHashTree(rootDir string, shardSize uint) (*hashTree, error) {
 
 // IO
 
-func (ht *hashTree) OutputToFile(filename string) error {
+func (ht *HashTree) OutputToFile(filename string) error {
 	fmt.Printf("outputting to file %s\n", filename)
 	e, err := json.Marshal(ht)
 	if err != nil {
@@ -96,7 +96,7 @@ func (ht *hashTree) OutputToFile(filename string) error {
 	return nil
 }
 
-func ReadHashTreeFromFile(filename string) (*hashTree, error) {
+func ReadHashTreeFromFile(filename string) (*HashTree, error) {
 	file, err := os.Open(filename)
 	if err != nil {
 		return nil, err
@@ -108,7 +108,7 @@ func ReadHashTreeFromFile(filename string) (*hashTree, error) {
 		return nil, err
 	}
 
-	ht := &hashTree{
+	ht := &HashTree{
 		RootDirLocation: filename,
 	}
 
@@ -121,7 +121,7 @@ func ReadHashTreeFromFile(filename string) (*hashTree, error) {
 
 // Hashing functions
 
-func (ht *hashTree) Hash() error {
+func (ht *HashTree) Hash() error {
 	fmt.Printf("Starting hash on directory %s\n", ht.RootDirLocation)
 	dir, err := ht.hashDir(ht.RootDirLocation, "")
 	if err != nil {
@@ -132,7 +132,7 @@ func (ht *hashTree) Hash() error {
 	return nil
 }
 
-func (ht *hashTree) hashDir(currentDir string, directory string) (*hashTreeDir, error) {
+func (ht *HashTree) hashDir(currentDir string, directory string) (*hashTreeDir, error) {
 	fmt.Printf("Hashing directory %s\n", directory)
 	file, err := os.Open(filepath.Join(currentDir, directory))
 	if err != nil {
@@ -187,7 +187,7 @@ func (ht *hashTree) hashDir(currentDir string, directory string) (*hashTreeDir, 
 	return dir, nil
 }
 
-func (ht *hashTree) shardFile(currentDirectory string, filename string) (*hashTreeFile, error) {
+func (ht *HashTree) shardFile(currentDirectory string, filename string) (*hashTreeFile, error) {
 	file, err := os.Open(filepath.Join(currentDirectory, filename))
 	if err != nil {
 		return nil, err
@@ -221,7 +221,7 @@ func (ht *hashTree) shardFile(currentDirectory string, filename string) (*hashTr
 	return htf, nil
 }
 
-func (ht *hashTree) VerifyTree(config *VerifyHashTreeConfig, chosenDirectory string) (bool, error) {
+func (ht *HashTree) VerifyTree(config *VerifyHashTreeConfig, chosenDirectory string) (bool, error) {
 	if ht.RootDir == nil {
 		return false, errors.New("hash tree not found to compare given directory to")
 	}
@@ -230,7 +230,7 @@ func (ht *hashTree) VerifyTree(config *VerifyHashTreeConfig, chosenDirectory str
 	return ht.verifyDir(config, chosenDirectory, "", ht.RootDir)
 }
 
-func (ht *hashTree) verifyDir(config *VerifyHashTreeConfig, currentDir string, directoryBeingVerified string, htDir *hashTreeDir) (bool, error) {
+func (ht *HashTree) verifyDir(config *VerifyHashTreeConfig, currentDir string, directoryBeingVerified string, htDir *hashTreeDir) (bool, error) {
 	fmt.Printf("verifying directory %s/%s\n", currentDir, directoryBeingVerified)
 	file, err := os.Open(filepath.Join(currentDir, directoryBeingVerified))
 	if err != nil {
@@ -324,7 +324,7 @@ func (ht *hashTree) verifyDir(config *VerifyHashTreeConfig, currentDir string, d
 	return true, nil
 }
 
-func (ht *hashTree) verifyFile(htf *hashTreeFile, currentDirectory string, filename string) (bool, error) {
+func (ht *HashTree) verifyFile(htf *hashTreeFile, currentDirectory string, filename string) (bool, error) {
 	file, err := os.Open(filepath.Join(currentDirectory, filename))
 	if err != nil {
 		return false, err

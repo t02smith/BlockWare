@@ -9,7 +9,7 @@ import (
 	"testing"
 )
 
-func produceTestHashTree() (*hashTree, error) {
+func produceTestHashTree() (*HashTree, error) {
 	ht, err := NewHashTree("../../test/data/testdir", 1024)
 	if err != nil {
 		return nil, err
@@ -137,5 +137,10 @@ func TestInsertDataCorrect(t *testing.T) {
 
 	if !bytes.Equal(buffer, newShard) {
 		t.Error("Shard not written correctly to file")
+	}
+
+	err = os.Remove(tmpFile)
+	if err != nil {
+		t.Errorf("Error removing tmp file")
 	}
 }

@@ -16,19 +16,19 @@ func TestCreateGameSuccess(t *testing.T) {
 		return
 	}
 
-	if game.title != "test-game" {
+	if game.Title != "test-game" {
 		t.Errorf("Incorrect game name")
 	}
 
-	if game.developer != "google.com" {
+	if game.Developer != "google.com" {
 		t.Errorf("Incorrect developer")
 	}
 
-	if game.version != "1.1.1" {
+	if game.Version != "1.1.1" {
 		t.Errorf("Incorrect version")
 	}
 
-	if game.releaseDate != datetime {
+	if game.ReleaseDate != datetime {
 		t.Errorf("Invalid release date")
 	}
 

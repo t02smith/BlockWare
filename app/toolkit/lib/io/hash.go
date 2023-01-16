@@ -45,6 +45,8 @@ type hashTreeDir struct {
 type hashTreeFile struct {
 	Filename string `json:"filename"`
 
+	AbsoluteFilename string
+
 	// A list of SHA256 hashes that represent each shard of data in the file
 	Hashes [][32]byte `json:"hashes"`
 
@@ -122,87 +124,119 @@ func ReadHashTreeFromFile(filename string) (*HashTree, error) {
 // Hashing functions
 
 func (ht *HashTree) Hash() error {
-	fmt.Printf("Starting hash on directory %s\n", ht.RootDirLocation)
-	dir, err := ht.hashDir(ht.RootDirLocation, "")
+
+	fileCount, err := ht.buildTree()
 	if err != nil {
 		return err
 	}
 
-	ht.RootDir = dir
+	wg, fileIn, _ := hasherPool(5, fileCount, ht.ShardSize)
+	_ = ht.RootDir.shardData(fileIn, ht.ShardSize)
+	wg.Wait()
 	return nil
 }
 
-func (ht *HashTree) hashDir(currentDir string, directory string) (*hashTreeDir, error) {
-	fmt.Printf("Hashing directory %s\n", directory)
-	file, err := os.Open(filepath.Join(currentDir, directory))
-	if err != nil {
-		return nil, err
-	}
+// Data collection
 
-	defer file.Close()
-	list, err := file.Readdirnames(0)
-	if err != nil {
-		return nil, err
-	}
+// build a directory tree and count the number of files
+func (ht *HashTree) buildTree() (int, error) {
+	fmt.Printf("Building tree of directory %s\n", ht.RootDirLocation)
 
-	dir := &hashTreeDir{
-		Dirname: directory,
+	ht.RootDir = &hashTreeDir{
+		Dirname: "",
 		Subdirs: []*hashTreeDir{},
 		Files:   []*hashTreeFile{},
 	}
 
-	for _, name := range list {
-		f, err := os.Stat(filepath.Join(currentDir, directory, name))
-		if err != nil {
-			return nil, err
-		}
-
-		if f.IsDir() {
-			subdir, err := ht.hashDir(filepath.Join(currentDir, directory), name)
-			if err != nil {
-				return nil, err
-			}
-
-			dir.Subdirs = append(dir.Subdirs, subdir)
-		} else {
-			htf, err := ht.shardFile(filepath.Join(currentDir, directory), name)
-			if err != nil {
-				return nil, err
-			}
-
-			dir.Files = append(dir.Files, htf)
-		}
-	}
-
-	// generate the root hash
-	hashes := [][32]byte{}
-	for _, d := range dir.Subdirs {
-		hashes = append(hashes, d.RootHash)
-	}
-	for _, f := range dir.Files {
-		hashes = append(hashes, f.RootHash)
-	}
-
-	dir.RootHash = CalculateRootHash(hashes)
-	return dir, nil
+	return ht.RootDir.traverseDirectory(ht.RootDirLocation)
 }
 
-func (ht *HashTree) shardFile(currentDirectory string, filename string) (*hashTreeFile, error) {
-	file, err := os.Open(filepath.Join(currentDirectory, filename))
+// perform a search to build a directory tree
+func (htd *hashTreeDir) traverseDirectory(absolutePath string) (int, error) {
+	fmt.Printf("Hashing directory %s\n", htd.Dirname)
+
+	counter := 0
+	dir, err := os.Open(filepath.Join(absolutePath, htd.Dirname))
 	if err != nil {
-		return nil, err
+		return counter, err
+	}
+	defer dir.Close()
+
+	dirContents, err := dir.Readdirnames(0)
+	if err != nil {
+		return counter, err
+	}
+
+	// look in the current directory
+	for _, name := range dirContents {
+		f, err := os.Stat(filepath.Join(absolutePath, htd.Dirname, name))
+		if err != nil {
+			return counter, err
+		}
+
+		// the data object is a directory
+		if f.IsDir() {
+			htd.Subdirs = append(htd.Subdirs, &hashTreeDir{
+				Dirname: name,
+				Files:   []*hashTreeFile{},
+				Subdirs: []*hashTreeDir{},
+			})
+
+			continue
+		}
+
+		// the data object is a file
+		htd.Files = append(htd.Files, &hashTreeFile{
+			Filename:         name,
+			AbsoluteFilename: filepath.Join(absolutePath, htd.Dirname, name),
+		})
+		counter++
+	}
+
+	// look in subdirectories
+	for _, subdir := range htd.Subdirs {
+		fileCount, err := subdir.traverseDirectory(filepath.Join(filepath.Join(absolutePath, htd.Dirname)))
+		if err != nil {
+			return counter, err
+		}
+
+		counter += fileCount
+	}
+
+	return counter, nil
+}
+
+// hashing
+
+func (htd *hashTreeDir) shardData(fileIn chan *hashTreeFile, shardSize uint) error {
+
+	for _, f := range htd.Files {
+		fileIn <- f
+	}
+
+	for _, subdir := range htd.Subdirs {
+		err := subdir.shardData(fileIn, shardSize)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (htf *hashTreeFile) shardFile(shardSize uint) error {
+	htf.Hashes = [][32]byte{}
+
+	file, err := os.Open(htf.AbsoluteFilename)
+	if err != nil {
+		return err
 	}
 	defer file.Close()
 
-	htf := &hashTreeFile{
-		Filename: filename,
-		Hashes:   [][32]byte{},
-	}
-
-	buffer := make([]byte, ht.ShardSize)
+	buffer := make([]byte, shardSize)
 	reader := bufio.NewReader(file)
 
-	fmt.Printf("\tSharding file '%s'\n", filename)
+	fmt.Printf("Sharding file %s\n", htf.AbsoluteFilename)
 	for {
 		_, err := reader.Read(buffer)
 		if err == io.EOF {
@@ -210,7 +244,7 @@ func (ht *HashTree) shardFile(currentDirectory string, filename string) (*hashTr
 		}
 
 		if err != nil {
-			return nil, err
+			return err
 		}
 
 		hash := sha256.Sum256(buffer)
@@ -218,7 +252,7 @@ func (ht *HashTree) shardFile(currentDirectory string, filename string) (*hashTr
 	}
 
 	htf.RootHash = CalculateRootHash(htf.Hashes)
-	return htf, nil
+	return nil
 }
 
 func (ht *HashTree) VerifyTree(config *VerifyHashTreeConfig, chosenDirectory string) (bool, error) {

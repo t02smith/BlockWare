@@ -39,26 +39,30 @@ func TestNewHashTreeValid(t *testing.T) {
 // shardFile
 
 func TestShardFileInvalidFile(t *testing.T) {
-	ht, _ := NewHashTree("../../test/data/testdir", 4)
-	_, err := ht.shardFile("../../test/data/testdir", "fake.txt")
+	htf := &hashTreeFile{
+		Filename:         "not-real.jpg",
+		AbsoluteFilename: "./fake/path/do/no/replicate",
+	}
+
+	err := htf.shardFile(1024)
 	if err == nil {
 		t.Errorf("file doesn't exist and this should throw an error")
 	}
 }
 
 func TestShardFileCorrect(t *testing.T) {
-	ht, _ := NewHashTree("../../test/data/testdir", 11)
-	f, err := ht.shardFile("../../test/data/testdir", "test.txt")
 
+	htf := &hashTreeFile{
+		Filename:         "test.txt",
+		AbsoluteFilename: "../../test/data/testdir/test.txt",
+	}
+
+	err := htf.shardFile(11)
 	if err != nil {
 		t.Errorf("error sharding file %s", err)
 	}
 
-	if f.Filename != "test.txt" {
-		t.Errorf("incorrect filename stored")
-	}
-
-	if fmt.Sprintf("%x", f.Hashes[0]) != "12998c017066eb0d2a70b94e6ed3192985855ce390f321bbdb832022888bd251" {
+	if fmt.Sprintf("%x", htf.Hashes[0]) != "12998c017066eb0d2a70b94e6ed3192985855ce390f321bbdb832022888bd251" {
 		t.Errorf("Incorrect hash")
 	}
 }

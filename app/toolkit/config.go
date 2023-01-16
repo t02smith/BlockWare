@@ -22,8 +22,17 @@ func SetupConfig() {
 func defaultConfig() {
 
 	// toolkit meta info
+
+	// where toolkit data is stored
 	viper.SetDefault("meta.directory", "/home/tom/.toolkit")
-	viper.SetDefault("meta.hashes.directory", ".toolkit/hashes")
+
+	// max amount of threads to use
+	viper.SetDefault("meta.threadPoolSize", 10)
+
+	// where hashes are stored inside the toolkit folder
+	viper.SetDefault("meta.hashes.directory", "/hashes")
+
+	// default shard size when hashing
 	viper.SetDefault("meta.hashes.shardSize", 16384)
 
 	// user info

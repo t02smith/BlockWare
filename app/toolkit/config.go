@@ -13,9 +13,9 @@ func SetupConfig() {
 	viper.AddConfigPath(".")
 
 	defaultConfig()
+	viper.SafeWriteConfig()
 
 	viper.ReadInConfig()
-	viper.SafeWriteConfig()
 
 }
 
@@ -34,6 +34,9 @@ func defaultConfig() {
 
 	// default shard size when hashing
 	viper.SetDefault("meta.hashes.shardSize", 16384)
+
+	// how many threads should be hashing at any given time
+	viper.SetDefault("meta.hashes.workerCount", 5)
 
 	// user info
 	viper.SetDefault("user.info.domain", "")

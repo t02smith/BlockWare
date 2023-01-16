@@ -10,6 +10,8 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+
+	"github.com/spf13/viper"
 )
 
 // Describes a directory in terms of its files hashes
@@ -130,7 +132,7 @@ func (ht *HashTree) Hash() error {
 		return err
 	}
 
-	wg, fileIn, _ := hasherPool(5, fileCount, ht.ShardSize)
+	wg, fileIn, _ := hasherPool(viper.GetInt("meta.hashes.workercount"), fileCount, ht.ShardSize)
 	_ = ht.RootDir.shardData(fileIn, ht.ShardSize)
 	wg.Wait()
 	return nil
@@ -236,7 +238,6 @@ func (htf *hashTreeFile) shardFile(shardSize uint) error {
 	buffer := make([]byte, shardSize)
 	reader := bufio.NewReader(file)
 
-	fmt.Printf("Sharding file %s\n", htf.AbsoluteFilename)
 	for {
 		_, err := reader.Read(buffer)
 		if err == io.EOF {

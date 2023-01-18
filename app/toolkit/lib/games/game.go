@@ -2,8 +2,12 @@ package games
 
 import (
 	"bufio"
+	"bytes"
+	"compress/gzip"
 	"crypto/sha256"
 	"crypto/tls"
+	"encoding/base64"
+	"encoding/gob"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -149,11 +153,10 @@ func OutputToFile(g *Game) error {
 }
 
 // load all the game data stored in storage
-func LoadGames() ([]*Game, error) {
-	dirName := viper.GetString("meta.directory")
+func LoadGames(gameDataLocation string) ([]*Game, error) {
 
 	// does the directory to load from exist?
-	_, err := os.Stat(dirName)
+	_, err := os.Stat(gameDataLocation)
 	if err != nil {
 		return nil, err
 	}
@@ -161,7 +164,7 @@ func LoadGames() ([]*Game, error) {
 	// Parse the games
 	games := []*Game{}
 
-	dir, err := os.Open(dirName)
+	dir, err := os.Open(gameDataLocation)
 	if err != nil {
 		return nil, err
 	}
@@ -174,14 +177,14 @@ func LoadGames() ([]*Game, error) {
 	}
 
 	for _, game := range gameList {
-		f, err := os.Stat(filepath.Join(dirName, game))
+		f, err := os.Stat(filepath.Join(gameDataLocation, game))
 
 		// we only care about json files
 		if err != nil || f.IsDir() || !strings.HasSuffix(game, ".json") {
 			continue
 		}
 
-		gameFile, err := os.Open(filepath.Join(dirName, game))
+		gameFile, err := os.Open(filepath.Join(gameDataLocation, game))
 		if err != nil {
 			continue
 		}
@@ -199,4 +202,64 @@ func LoadGames() ([]*Game, error) {
 	}
 
 	return games, nil
+}
+
+// Serialisation
+
+// Turns a game into a base64 encoded, gzip compressed byte stream
+func (g *Game) Serialise() (string, error) {
+
+	// encode
+	b := bytes.Buffer{}
+	e := gob.NewEncoder(&b)
+
+	err := e.Encode(*g)
+	if err != nil {
+		return "", err
+	}
+
+	// compress
+	compressed := bytes.Buffer{}
+	compressor := gzip.NewWriter(&compressed)
+
+	compressor.Write(b.Bytes())
+	compressor.Close()
+
+	return base64.StdEncoding.EncodeToString(compressed.Bytes()), nil
+}
+
+// Takes a serialised game and turns it into a struct
+func DeserialiseGame(data string) (*Game, error) {
+	g := &Game{}
+
+	// from base64
+	decodedData, err := base64.StdEncoding.DecodeString(data)
+	if err != nil {
+		return nil, err
+	}
+
+	b := bytes.Buffer{}
+	_, err = b.Write(decodedData)
+	if err != nil {
+		return nil, err
+	}
+
+	// decompress
+	decompressor, err := gzip.NewReader(&b)
+	if err != nil {
+		return nil, err
+	}
+	decompressor.Close()
+
+	decompressed := bytes.Buffer{}
+	io.Copy(&decompressed, decompressor)
+
+	// decode
+	d := gob.NewDecoder(&decompressed)
+	err = d.Decode(g)
+	if err != nil {
+		return nil, err
+	}
+
+	return g, nil
 }

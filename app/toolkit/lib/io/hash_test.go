@@ -2,8 +2,19 @@ package io
 
 import (
 	"fmt"
+	"os"
 	"testing"
+
+	"github.com/spf13/viper"
 )
+
+func TestMain(m *testing.M) {
+
+	viper.Set("meta.hashes.workerCount", 5)
+
+	code := m.Run()
+	os.Exit(code)
+}
 
 // NewHashTree
 

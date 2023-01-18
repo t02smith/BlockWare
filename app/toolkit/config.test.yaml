@@ -1,0 +1,11 @@
+meta:
+  directory: ./test/data/.toolkit
+  hashes:
+    directory: /hashes
+    shardsize: 16384
+    workercount: 5
+  threadpoolsize: 10
+user:
+  info:
+    domain: ""
+    name: ""

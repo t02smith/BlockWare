@@ -9,7 +9,7 @@ func SetupConfig() {
 	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")
 
-	viper.AddConfigPath("$HOME/.toolkit")
+	// viper.AddConfigPath("$HOME/.toolkit")
 	viper.AddConfigPath(".")
 
 	defaultConfig()

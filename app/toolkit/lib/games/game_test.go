@@ -1,9 +1,21 @@
 package games
 
 import (
+	"fmt"
+	"os"
 	"testing"
 	"time"
+
+	"github.com/spf13/viper"
 )
+
+func TestMain(m *testing.M) {
+
+	viper.Set("meta.hashes.workerCount", 5)
+
+	code := m.Run()
+	os.Exit(code)
+}
 
 // Create Game
 
@@ -36,7 +48,6 @@ func TestCreateGameSuccess(t *testing.T) {
 		t.Errorf("Invalid game data")
 	}
 
-	// checks for data content omitted and assumed correct
 }
 
 func TestCreateGameInvalidRootDir(t *testing.T) {
@@ -62,4 +73,28 @@ func TestCreateGameInvalidArguments(t *testing.T) {
 		t.Errorf("Invalid domain accepted")
 	}
 
+}
+
+func TestSerialise(t *testing.T) {
+	g := Game{
+		Title:       "Test Game",
+		Version:     "1.0.2",
+		ReleaseDate: time.Now().String(),
+		Developer:   "tcs1g20",
+		RootHash:    []byte("test"),
+	}
+
+	serialised, err := g.Serialise()
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	deserialised, err := DeserialiseGame(serialised)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	fmt.Println(deserialised)
 }

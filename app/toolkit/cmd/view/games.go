@@ -9,6 +9,7 @@ import (
 
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	"github.com/t02smith/part-iii-project/toolkit/lib/games"
 )
 
@@ -18,7 +19,7 @@ var gamesCmd = &cobra.Command{
 	Short: "Print out a table of your games",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		gameLs, err := games.LoadGames()
+		gameLs, err := games.LoadGames(viper.GetString("meta.directory"))
 		if err != nil {
 			fmt.Printf("Error loading games: %s\n", err)
 			return

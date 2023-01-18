@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"strings"
 )
 
 /**
@@ -40,7 +41,7 @@ func InitServer(hostname string, port uint) *TCPServer {
 	}
 }
 
-func (s *TCPServer) Start(onMessage func([]byte, *TCPServerClient)) error {
+func (s *TCPServer) Start(onMessage func([]string, *TCPServerClient)) error {
 	log.Printf("Starting server on %s:%d", s.hostname, s.port)
 	ln, err := net.Listen("tcp", fmt.Sprintf("%s:%d", s.hostname, s.port))
 	if err != nil {
@@ -54,7 +55,7 @@ func (s *TCPServer) Start(onMessage func([]byte, *TCPServerClient)) error {
 	return nil
 }
 
-func (s *TCPServer) listen(onMessage func([]byte, *TCPServerClient)) {
+func (s *TCPServer) listen(onMessage func([]string, *TCPServerClient)) {
 	for {
 		con, err := s.listener.Accept()
 		if err != nil {
@@ -74,21 +75,21 @@ func (s *TCPServer) listen(onMessage func([]byte, *TCPServerClient)) {
 	}
 }
 
-func (c *TCPServerClient) listen(onMessage func([]byte, *TCPServerClient)) {
-	buffer := make([]byte, 1)
+func (c *TCPServerClient) listen(onMessage func([]string, *TCPServerClient)) {
 
 	for {
-		n, err := c.reader.Read(buffer)
+		msg, err := c.reader.ReadString('\n')
 		if err != nil {
 			log.Printf("Malformed message from client: %s", err)
 			return
 		}
 
-		if n == 0 {
-			continue
-		}
-
-		log.Printf("message received %x", buffer)
-		onMessage(buffer, c)
+		log.Printf("message received %s\n", msg)
+		onMessage(strings.Split(msg, ";"), c)
 	}
+}
+
+func (c *TCPServerClient) send(msg string) {
+	c.writer.WriteString(msg)
+	c.writer.Flush()
 }

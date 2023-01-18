@@ -10,10 +10,16 @@ import (
 )
 
 func TestMain(m *testing.M) {
-
 	viper.Set("meta.hashes.workerCount", 5)
 
+	old := verifyDomain
+	mockVerifyDomain = func(domain string) (bool, error) {
+		return true, nil
+	}
+
 	code := m.Run()
+
+	mockVerifyDomain = old
 	os.Exit(code)
 }
 
@@ -76,7 +82,7 @@ func TestCreateGameInvalidArguments(t *testing.T) {
 }
 
 func TestSerialise(t *testing.T) {
-	g := Game{
+	g := &Game{
 		Title:       "Test Game",
 		Version:     "1.0.2",
 		ReleaseDate: time.Now().String(),

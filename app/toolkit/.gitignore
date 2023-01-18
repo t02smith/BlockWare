@@ -1,7 +1,7 @@
 
 .vscode
 *.json
-config.yaml
+./test/data/.toolkit
 
 **/tmp/*
 !**/tmp/.gitkeep

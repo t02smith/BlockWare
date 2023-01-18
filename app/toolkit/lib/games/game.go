@@ -36,6 +36,12 @@ type Game struct {
 	data *hashIO.HashTree
 }
 
+// mocked functions
+
+var (
+	mockVerifyDomain = verifyDomain
+)
+
 // Creator
 
 func CreateGame(title, version, releaseDate, developer, rootDir string, shardSize uint) (*Game, error) {
@@ -60,7 +66,7 @@ func CreateGame(title, version, releaseDate, developer, rootDir string, shardSiz
 	}
 
 	// check domain has SSL certificate
-	domainCorrect, err := verifyDomain(developer)
+	domainCorrect, err := mockVerifyDomain(developer)
 	if err != nil {
 		return nil, err
 	}

@@ -22,8 +22,8 @@ var serverCmd = &cobra.Command{
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
 		server := toolkitNet.InitServer("localhost", startServerPort)
-		server.Start(func(b []byte, tc *toolkitNet.TCPServerClient) {
-			fmt.Printf("%x\n", b)
+		server.Start(func(s []string, tc *toolkitNet.TCPServerClient) {
+			fmt.Printf("%s\n", s)
 		})
 	},
 }

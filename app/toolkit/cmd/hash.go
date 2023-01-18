@@ -22,9 +22,9 @@ var hashCmd = &cobra.Command{
 	Use:   "hash",
 	Short: "Generate the hash tree for a game directory.",
 	Long: `This function will take the root directory of the video
-	game you want to upload and generate a hash tree containing the 
-	hashes of each shard of data. This will allow your users to 
-	verify the contents they are downloading.`,
+game you want to upload and generate a hash tree containing the 
+hashes of each shard of data. This will allow your users to 
+verify the contents they are downloading.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		t, err := io.NewHashTree(hashDirectory, uint(hashShardSize))
 		if err != nil {

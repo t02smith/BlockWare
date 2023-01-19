@@ -42,11 +42,29 @@ func (c *TCPClient) Send(command []byte) error {
 	_, err := c.writer.Write(command)
 	if err != nil {
 		log.Printf("Error sending message %s", err)
+		return err
 	}
 
 	err = c.writer.Flush()
 	if err != nil {
 		log.Printf("Error sending message %s", err)
+		return err
+	}
+
+	return nil
+}
+
+func (c *TCPClient) SendString(command string) error {
+	_, err := c.writer.WriteString(command)
+	if err != nil {
+		log.Printf("Error sending message %s", err)
+		return err
+	}
+
+	err = c.writer.Flush()
+	if err != nil {
+		log.Printf("Error sending message %s", err)
+		return err
 	}
 
 	return nil

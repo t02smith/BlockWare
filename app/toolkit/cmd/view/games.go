@@ -25,18 +25,22 @@ var gamesCmd = &cobra.Command{
 			return
 		}
 
-		t := table.NewWriter()
-		t.SetOutputMirror(os.Stdout)
-		t.AppendHeader(table.Row{"#", "Title", "Version", "Release"})
-
-		for i, g := range gameLs {
-			t.AppendRow(table.Row{fmt.Sprint(i + 1), g.Title, g.Version, g.ReleaseDate})
-		}
-
-		t.Render()
+		OutputGamesTable(gameLs)
 	},
 }
 
 func init() {
 	ViewCmd.AddCommand(gamesCmd)
+}
+
+func OutputGamesTable(gameLs []*games.Game) {
+	t := table.NewWriter()
+	t.SetOutputMirror(os.Stdout)
+	t.AppendHeader(table.Row{"#", "Title", "Version", "Release"})
+
+	for i, g := range gameLs {
+		t.AppendRow(table.Row{fmt.Sprint(i + 1), g.Title, g.Version, g.ReleaseDate})
+	}
+
+	t.Render()
 }

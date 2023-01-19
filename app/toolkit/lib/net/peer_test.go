@@ -42,5 +42,4 @@ func TestGameListToMessage(t *testing.T) {
 			t.Errorf("Incorrect serialised game in pos %d", i)
 		}
 	}
-
 }

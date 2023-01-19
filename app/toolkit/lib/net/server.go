@@ -85,11 +85,39 @@ func (c *TCPServerClient) listen(onMessage func([]string, *TCPServerClient)) {
 		}
 
 		log.Printf("message received %s\n", msg)
-		onMessage(strings.Split(msg, ";"), c)
+		onMessage(strings.Split(msg[:len(msg)-1], ";"), c)
 	}
 }
 
-func (c *TCPServerClient) send(msg string) {
-	c.writer.WriteString(msg)
-	c.writer.Flush()
+func (c *TCPServerClient) Send(command []byte) error {
+	_, err := c.writer.Write(command)
+	if err != nil {
+		log.Printf("Error sending message %s", err)
+		return err
+	}
+
+	err = c.writer.Flush()
+	if err != nil {
+		log.Printf("Error sending message %s", err)
+		return err
+	}
+
+	return nil
+}
+
+func (c *TCPServerClient) SendString(command string) error {
+	fmt.Printf("Sending %s\n", command)
+	_, err := c.writer.WriteString(command)
+	if err != nil {
+		log.Printf("Error sending message %s", err)
+		return err
+	}
+
+	err = c.writer.Flush()
+	if err != nil {
+		log.Printf("Error sending message %s", err)
+		return err
+	}
+
+	return nil
 }

@@ -1,12 +1,16 @@
 package net
 
 import (
-	"bytes"
 	"fmt"
 
-	"github.com/spf13/viper"
+	"github.com/t02smith/part-iii-project/toolkit/cmd/view"
 	"github.com/t02smith/part-iii-project/toolkit/lib/games"
 )
+
+type PeerIT interface {
+	Send(command []byte) error
+	SendString(command string) error
+}
 
 type Peer struct {
 
@@ -19,13 +23,21 @@ type Peer struct {
 	games         []*games.Game
 }
 
-func StartPeer(serverHostname string, serverPort uint, installFolder, gameDataLocation string) error {
+type PeerData struct {
+	Hostname string
+	Port     uint
+	Peer     PeerIT
+}
+
+func StartPeer(serverHostname string, serverPort uint, installFolder, gameDataLocation string) (*Peer, error) {
 	gameLs, err := games.LoadGames(gameDataLocation)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	fmt.Printf("Found %d games\n", len(gameLs))
+	view.OutputGamesTable(gameLs)
+
 	p := &Peer{
 		server:        InitServer(serverHostname, serverPort),
 		clients:       []*TCPClient{},
@@ -33,79 +45,42 @@ func StartPeer(serverHostname string, serverPort uint, installFolder, gameDataLo
 		games:         gameLs,
 	}
 
-	p.server.Start(onMessage)
+	go p.server.Start(onMessage)
+	return p, nil
+}
+
+// commands
+
+func (p *Peer) ConnectToPeer(hostname string, portNo uint) error {
+
+	client, err := InitTCPClient(hostname, portNo)
+	if err != nil {
+		return err
+	}
+
+	p.clients = append(p.clients, client)
 	return nil
 }
 
-//
+func (p *Peer) GetPeers() []PeerData {
 
-func onMessage(cmd []string, client *TCPServerClient) {
-	switch cmd[0] {
+	peers := []PeerData{}
 
-	// LIBRARY => request a list of a peers games
-	case "LIBRARY":
-		fmt.Println("Library command called")
-
-		gameLs, err := games.LoadGames(viper.GetString("meta.directory"))
-		if err != nil {
-			fmt.Printf("Error loading games: %s\n", err)
-			return
-		}
-
-		gameStr, err := gameListToMessage(gameLs)
-		if err != nil {
-			fmt.Printf("Error serialising games: %s\n", err)
-			return
-		}
-
-		client.send(gameStr)
-		return
-
-	// GAMES => a list of users games
-	case "GAMES":
-		fmt.Println("Games command called")
-
-		_, err := gameMessageToGameList(cmd)
-		if err != nil {
-			fmt.Printf("Error reading games: %s\n", err)
-			return
-		}
-
-		return
-
-	}
-}
-
-//
-
-func gameListToMessage(games []*games.Game) (string, error) {
-	var buf bytes.Buffer
-	buf.WriteString("GAMES;")
-
-	for _, g := range games {
-		encoded, err := g.Serialise()
-		if err != nil {
-			return "", nil
-		}
-
-		buf.WriteString(fmt.Sprintf("%s;", encoded))
+	for _, p := range p.clients {
+		peers = append(peers, PeerData{
+			Hostname: p.hostname,
+			Port:     p.port,
+			Peer:     p,
+		})
 	}
 
-	buf.WriteString("\n")
-	return buf.String(), nil
-}
-
-func gameMessageToGameList(parts []string) ([]*games.Game, error) {
-	gameLs := []*games.Game{}
-
-	for i := 1; i < len(parts); i++ {
-		g, err := games.DeserialiseGame(parts[i])
-		if err != nil {
-			return nil, err
-		}
-
-		gameLs = append(gameLs, g)
+	for _, p := range p.server.clients {
+		peers = append(peers, PeerData{
+			Hostname: p.con.LocalAddr().String(),
+			Port:     0000,
+			Peer:     p,
+		})
 	}
 
-	return gameLs, nil
+	return peers
 }

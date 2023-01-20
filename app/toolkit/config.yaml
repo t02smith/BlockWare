@@ -1,9 +1,10 @@
 meta:
-  directory: ./test/data/.toolkit
+  directory: /home/tom/.toolkit
   hashes:
     directory: /hashes
     shardsize: 16384
     workercount: 5
+  log: info.log
   threadpoolsize: 10
 user:
   info:

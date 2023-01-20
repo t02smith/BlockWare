@@ -3,28 +3,29 @@ package net
 import (
 	"bytes"
 	"fmt"
+	"io"
+	"log"
 
 	"github.com/spf13/viper"
 	"github.com/t02smith/part-iii-project/toolkit/lib/games"
 )
 
-func onMessage(cmd []string, client *TCPServerClient) {
-	fmt.Println(cmd)
+func onMessage(cmd []string, client PeerIT) {
 	switch cmd[0] {
 
 	// LIBRARY => request a list of a peers games
 	case "LIBRARY":
-		fmt.Println("Library command called")
+		log.Println("Library command called")
 
 		gameLs, err := games.LoadGames(viper.GetString("meta.directory"))
 		if err != nil {
-			fmt.Printf("Error loading games: %s\n", err)
+			log.Printf("Error loading games: %s\n", err)
 			return
 		}
 
 		gameStr, err := gameListToMessage(gameLs)
 		if err != nil {
-			fmt.Printf("Error serialising games: %s\n", err)
+			log.Printf("Error serialising games: %s\n", err)
 			return
 		}
 
@@ -33,14 +34,15 @@ func onMessage(cmd []string, client *TCPServerClient) {
 
 	// GAMES => a list of users games
 	case "GAMES":
-		fmt.Println("Games command called")
+		log.Println("Games command called")
 
-		_, err := gameMessageToGameList(cmd)
+		ls, err := gameMessageToGameList(cmd)
 		if err != nil {
-			fmt.Printf("Error reading games: %s\n", err)
+			log.Printf("Error reading games: %s\n", err)
 			return
 		}
 
+		fmt.Println(ls)
 		return
 
 	}
@@ -70,6 +72,11 @@ func gameMessageToGameList(parts []string) ([]*games.Game, error) {
 
 	for i := 1; i < len(parts); i++ {
 		g, err := games.DeserialiseGame(parts[i])
+
+		if err == io.EOF {
+			return gameLs, nil
+		}
+
 		if err != nil {
 			return nil, err
 		}

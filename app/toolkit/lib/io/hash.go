@@ -6,8 +6,8 @@ import (
 	"crypto/sha256"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io"
+	"log"
 	"os"
 	"path/filepath"
 
@@ -81,10 +81,10 @@ func NewHashTree(rootDir string, shardSize uint) (*HashTree, error) {
 // IO
 
 func (ht *HashTree) OutputToFile(filename string) error {
-	fmt.Printf("outputting to file %s\n", filename)
+	log.Printf("outputting to file %s\n", filename)
 	e, err := json.Marshal(ht)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return err
 	}
 
@@ -142,7 +142,7 @@ func (ht *HashTree) Hash() error {
 
 // build a directory tree and count the number of files
 func (ht *HashTree) buildTree() (int, error) {
-	fmt.Printf("Building tree of directory %s\n", ht.RootDirLocation)
+	log.Printf("Building tree of directory %s\n", ht.RootDirLocation)
 
 	ht.RootDir = &hashTreeDir{
 		Dirname: "",
@@ -155,7 +155,7 @@ func (ht *HashTree) buildTree() (int, error) {
 
 // perform a search to build a directory tree
 func (htd *hashTreeDir) traverseDirectory(absolutePath string) (int, error) {
-	fmt.Printf("Hashing directory %s\n", htd.Dirname)
+	log.Printf("Hashing directory %s\n", htd.Dirname)
 
 	counter := 0
 	dir, err := os.Open(filepath.Join(absolutePath, htd.Dirname))
@@ -261,12 +261,12 @@ func (ht *HashTree) VerifyTree(config *VerifyHashTreeConfig, chosenDirectory str
 		return false, errors.New("hash tree not found to compare given directory to")
 	}
 
-	fmt.Printf("Verifying directory %s\n", chosenDirectory)
+	log.Printf("Verifying directory %s\n", chosenDirectory)
 	return ht.verifyDir(config, chosenDirectory, "", ht.RootDir)
 }
 
 func (ht *HashTree) verifyDir(config *VerifyHashTreeConfig, currentDir string, directoryBeingVerified string, htDir *hashTreeDir) (bool, error) {
-	fmt.Printf("verifying directory %s/%s\n", currentDir, directoryBeingVerified)
+	log.Printf("verifying directory %s/%s\n", currentDir, directoryBeingVerified)
 	file, err := os.Open(filepath.Join(currentDir, directoryBeingVerified))
 	if err != nil {
 		return false, err
@@ -301,7 +301,7 @@ func (ht *HashTree) verifyDir(config *VerifyHashTreeConfig, currentDir string, d
 					continue
 				}
 
-				fmt.Printf("Unexpected directory %s/%s/%s\n", currentDir, directoryBeingVerified, name)
+				log.Printf("Unexpected directory %s/%s/%s\n", currentDir, directoryBeingVerified, name)
 
 				if !config.ContinueAfterError {
 					return false, nil
@@ -336,7 +336,7 @@ func (ht *HashTree) verifyDir(config *VerifyHashTreeConfig, currentDir string, d
 					continue
 				}
 
-				fmt.Printf("Unexpected file %s/%s/%s\n", currentDir, directoryBeingVerified, name)
+				log.Printf("Unexpected file %s/%s/%s\n", currentDir, directoryBeingVerified, name)
 				if !config.ContinueAfterError {
 					return false, nil
 				}
@@ -370,7 +370,7 @@ func (ht *HashTree) verifyFile(htf *hashTreeFile, currentDirectory string, filen
 	reader := bufio.NewReader(file)
 	counter := 0
 
-	fmt.Printf("\tSharding file '%s'\n", filename)
+	log.Printf("\tSharding file '%s'\n", filename)
 	for {
 		_, err := reader.Read(buffer)
 		if err == io.EOF {
@@ -383,7 +383,7 @@ func (ht *HashTree) verifyFile(htf *hashTreeFile, currentDirectory string, filen
 
 		hash := sha256.Sum256(buffer)
 		if !bytes.Equal(hash[:], htf.Hashes[counter][:]) {
-			fmt.Printf("Incorrect hash found in file %s/%s at block %d\n", currentDirectory, filename, counter)
+			log.Printf("Incorrect hash found in file %s/%s at block %d\n", currentDirectory, filename, counter)
 			return false, nil
 		}
 

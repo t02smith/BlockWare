@@ -5,7 +5,7 @@ package new
 
 import (
 	"errors"
-	"fmt"
+	"log"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -26,7 +26,7 @@ var gameCmd = &cobra.Command{
 
 		cwd, err := os.Getwd()
 		if err != nil {
-			fmt.Printf("Error creating game: %s\n", err)
+			log.Printf("Error creating game: %s\n", err)
 		}
 
 		// game title
@@ -43,7 +43,7 @@ var gameCmd = &cobra.Command{
 
 		title, err := titlePrompt.Run()
 		if err != nil {
-			fmt.Printf("Error creating game: %s\n", err)
+			log.Printf("Error creating game: %s\n", err)
 			return
 		}
 
@@ -61,7 +61,7 @@ var gameCmd = &cobra.Command{
 
 		version, err := versionPrompt.Run()
 		if err != nil {
-			fmt.Printf("Error creating game: %s\n", err)
+			log.Printf("Error creating game: %s\n", err)
 			return
 		}
 
@@ -73,7 +73,7 @@ var gameCmd = &cobra.Command{
 
 		dev, err := devPrompt.Run()
 		if err != nil {
-			fmt.Printf("Error creating game: %s\n", err)
+			log.Printf("Error creating game: %s\n", err)
 			return
 		}
 
@@ -96,7 +96,7 @@ var gameCmd = &cobra.Command{
 
 		release, err := releasePrompt.Run()
 		if err != nil {
-			fmt.Printf("Error creating game: %s\n", err)
+			log.Printf("Error creating game: %s\n", err)
 			return
 		}
 
@@ -122,7 +122,7 @@ var gameCmd = &cobra.Command{
 
 		rootDir, err := rootDirPrompt.Run()
 		if err != nil {
-			fmt.Printf("Error creating game: %s\n", err)
+			log.Printf("Error creating game: %s\n", err)
 			return
 		}
 
@@ -139,7 +139,7 @@ var gameCmd = &cobra.Command{
 
 		shardSize, err := shardSizePrompt.Run()
 		if err != nil {
-			fmt.Printf("Error creating game: %s\n", err)
+			log.Printf("Error creating game: %s\n", err)
 			return
 		}
 
@@ -148,20 +148,20 @@ var gameCmd = &cobra.Command{
 		shardSizeUint, _ := strconv.ParseUint(shardSize, 10, 64)
 		releaseStr, err := time.Parse("2006-01-02", release)
 		if err != nil {
-			fmt.Printf("Error creating game: %s\n", err)
+			log.Printf("Error creating game: %s\n", err)
 			return
 		}
 
 		game, err := games.CreateGame(title, version, releaseStr.String(), dev, rootDir, uint(shardSizeUint))
 		if err != nil {
-			fmt.Printf("Error creating game: %s\n", err)
+			log.Printf("Error creating game: %s\n", err)
 			return
 		}
 
 		// write game to file
 		err = games.OutputToFile(game)
 		if err != nil {
-			fmt.Printf("Error writing game to file: %s\n", err)
+			log.Printf("Error writing game to file: %s\n", err)
 		}
 	},
 }

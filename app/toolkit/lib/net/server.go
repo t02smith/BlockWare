@@ -41,7 +41,7 @@ func InitServer(hostname string, port uint) *TCPServer {
 	}
 }
 
-func (s *TCPServer) Start(onMessage func([]string, *TCPServerClient)) error {
+func (s *TCPServer) Start(onMessage func([]string, PeerIT)) error {
 	log.Printf("Starting server on %s:%d", s.hostname, s.port)
 	ln, err := net.Listen("tcp", fmt.Sprintf("%s:%d", s.hostname, s.port))
 	if err != nil {
@@ -55,7 +55,7 @@ func (s *TCPServer) Start(onMessage func([]string, *TCPServerClient)) error {
 	return nil
 }
 
-func (s *TCPServer) listen(onMessage func([]string, *TCPServerClient)) {
+func (s *TCPServer) listen(onMessage func([]string, PeerIT)) {
 	for {
 		con, err := s.listener.Accept()
 		if err != nil {
@@ -75,7 +75,7 @@ func (s *TCPServer) listen(onMessage func([]string, *TCPServerClient)) {
 	}
 }
 
-func (c *TCPServerClient) listen(onMessage func([]string, *TCPServerClient)) {
+func (c *TCPServerClient) listen(onMessage func([]string, PeerIT)) {
 
 	for {
 		msg, err := c.reader.ReadString('\n')
@@ -106,7 +106,7 @@ func (c *TCPServerClient) Send(command []byte) error {
 }
 
 func (c *TCPServerClient) SendString(command string) error {
-	fmt.Printf("Sending %s\n", command)
+	log.Printf("Sending %s\n", command)
 	_, err := c.writer.WriteString(command)
 	if err != nil {
 		log.Printf("Error sending message %s", err)

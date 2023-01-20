@@ -2,16 +2,13 @@ package start
 
 import (
 	"fmt"
+	"log"
 	"strconv"
 
 	"github.com/manifoldco/promptui"
+	"github.com/t02smith/part-iii-project/toolkit/cmd/util"
 	"github.com/t02smith/part-iii-project/toolkit/lib/net"
 )
-
-// the interactive interface started after a peer is created
-func startPeerTerminal() {
-
-}
 
 // commands
 
@@ -50,15 +47,18 @@ func menu(p *net.Peer) {
 	}
 
 	menuSelect := promptui.Select{
-		Label:     "Select an Option",
+		Label:     "\nSelect an Option",
 		Items:     options,
 		Templates: template,
 	}
 
+	serveHost, serverPort := p.GetServerInfo()
+
 	for {
+		fmt.Printf("Welcome %s%s%s:%d%s!\n", util.ColourCyan, serveHost, util.ColourYellow, serverPort, util.ColourReset)
 		i, _, err := menuSelect.Run()
 		if err != nil {
-			fmt.Printf("Error running cmd %s: %s\n", options[i].Label, err)
+			log.Printf("Error running cmd %s: %s\n", options[i].Label, err)
 			continue
 		}
 
@@ -69,7 +69,7 @@ func menu(p *net.Peer) {
 		options[i].Function(p)
 	}
 
-	fmt.Println("Shutting down...")
+	log.Println("Shutting down...")
 
 }
 
@@ -96,7 +96,7 @@ func choosePeer(p *net.Peer) (*net.PeerData, error) {
 		return nil, err
 	}
 
-	return &peersLs[i], nil
+	return peersLs[i], nil
 }
 
 // options
@@ -123,25 +123,25 @@ func connect(p *net.Peer) {
 
 	hostname, err := host.Run()
 	if err != nil {
-		fmt.Println("Failed to read hostname")
+		log.Println("Failed to read hostname")
 		return
 	}
 
 	portNo, err := port.Run()
 	if err != nil {
-		fmt.Println("Error reading port")
+		log.Println("Error reading port")
 		return
 	}
 
 	portNoUint, err := strconv.ParseUint(portNo, 10, 32)
 	if err != nil {
-		fmt.Println("Error reading port")
+		log.Println("Error reading port")
 		return
 	}
 
 	err = p.ConnectToPeer(hostname, uint(portNoUint))
 	if err != nil {
-		fmt.Printf("Error connecting to peer: %s\n", err)
+		log.Printf("Error connecting to peer: %s\n", err)
 	}
 }
 
@@ -159,7 +159,7 @@ func message(p *net.Peer) {
 	// who to send the message to
 	chosen, err := choosePeer(p)
 	if err != nil {
-		fmt.Printf("Error choosing a peer: %s\n", err)
+		log.Printf("Error choosing a peer: %s\n", err)
 		return
 	}
 

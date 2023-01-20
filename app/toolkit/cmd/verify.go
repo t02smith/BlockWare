@@ -4,7 +4,7 @@ Copyright © 2022 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
-	"fmt"
+	"log"
 
 	"github.com/spf13/cobra"
 	"github.com/t02smith/part-iii-project/toolkit/lib/io"
@@ -30,7 +30,7 @@ to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		f, err := io.ReadHashTreeFromFile(verifyExpectedHashFile)
 		if err != nil {
-			fmt.Printf("error reading hash file: %s\n", err)
+			log.Printf("error reading hash file: %s\n", err)
 			return
 		}
 
@@ -41,11 +41,11 @@ to quickly create a Cobra application.`,
 
 		res, err := f.VerifyTree(config, verifyDirToVerify)
 		if err != nil {
-			fmt.Printf("error verifying directory: %s\n", err)
+			log.Printf("error verifying directory: %s\n", err)
 			return
 		}
 
-		fmt.Printf("Directory matches: %t\n", res)
+		log.Printf("Directory matches: %t\n", res)
 	},
 }
 

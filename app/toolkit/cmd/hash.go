@@ -5,6 +5,7 @@ package cmd
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -28,7 +29,7 @@ verify the contents they are downloading.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		t, err := io.NewHashTree(hashDirectory, uint(hashShardSize))
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 		}
 
 		viper.Set("meta.hashes.workerCount", workerCount)

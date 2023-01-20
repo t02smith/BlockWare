@@ -4,7 +4,7 @@ Copyright © 2023 NAME HERE <EMAIL ADDRESS>
 package start
 
 import (
-	"fmt"
+	"log"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -32,7 +32,7 @@ var peerCmd = &cobra.Command{
 		// run peer
 		peer, err := net.StartPeer(peerHostname, peerPort, peerGameInstallFolder, peerGameDataLocation)
 		if err != nil {
-			fmt.Printf("Error creating peer: %s\n", err)
+			log.Printf("Error creating peer: %s\n", err)
 		}
 
 		menu(peer)

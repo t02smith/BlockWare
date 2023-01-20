@@ -131,7 +131,7 @@ func verifyDomain(domain string) (bool, error) {
 
 func OutputToFile(g *Game) error {
 	gameFilename := filepath.Join(viper.GetString("meta.directory"), fmt.Sprintf("%s-%s-%s.json", g.Title, g.Version, g.Developer))
-	fmt.Printf("Outputting game data to %s\n", gameFilename)
+	log.Printf("Outputting game data to %s\n", gameFilename)
 
 	// output game metadata
 	e, err := json.Marshal(g)

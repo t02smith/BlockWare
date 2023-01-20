@@ -1,7 +1,7 @@
 package net
 
 import (
-	"fmt"
+	"log"
 
 	"github.com/t02smith/part-iii-project/toolkit/cmd/view"
 	"github.com/t02smith/part-iii-project/toolkit/lib/games"
@@ -17,6 +17,9 @@ type Peer struct {
 	// connections
 	server  *TCPServer
 	clients []*TCPClient
+
+	// state
+	peers []*PeerData
 
 	// data
 	installFolder string
@@ -35,18 +38,40 @@ func StartPeer(serverHostname string, serverPort uint, installFolder, gameDataLo
 		return nil, err
 	}
 
-	fmt.Printf("Found %d games\n", len(gameLs))
+	log.Printf("Found %d games\n", len(gameLs))
 	view.OutputGamesTable(gameLs)
 
 	p := &Peer{
 		server:        InitServer(serverHostname, serverPort),
 		clients:       []*TCPClient{},
+		peers:         []*PeerData{},
 		installFolder: installFolder,
 		games:         gameLs,
 	}
 
 	go p.server.Start(onMessage)
 	return p, nil
+}
+
+func (p *Peer) onConnection(hostname string, port uint, peer PeerIT) {
+	p.peers = append(p.peers, &PeerData{
+		Hostname: hostname,
+		Port:     port,
+		Peer:     peer,
+	})
+}
+
+func (p *Peer) onClose(peer PeerIT) {
+	for i, ps := range p.peers {
+		if peer == ps.Peer {
+			p.peers = append(p.peers[:i], p.peers[i+1:]...)
+			return
+		}
+	}
+}
+
+func (p *Peer) GetServerInfo() (string, uint) {
+	return p.server.hostname, p.server.port
 }
 
 // commands
@@ -62,25 +87,26 @@ func (p *Peer) ConnectToPeer(hostname string, portNo uint) error {
 	return nil
 }
 
-func (p *Peer) GetPeers() []PeerData {
+func (p *Peer) GetPeers() []*PeerData {
 
-	peers := []PeerData{}
+	peers := []*PeerData{}
 
-	for _, p := range p.clients {
-		peers = append(peers, PeerData{
-			Hostname: p.hostname,
-			Port:     p.port,
-			Peer:     p,
+	for _, peer := range p.clients {
+		peers = append(peers, &PeerData{
+			Hostname: peer.hostname,
+			Port:     peer.port,
+			Peer:     peer,
 		})
 	}
 
-	for _, p := range p.server.clients {
-		peers = append(peers, PeerData{
-			Hostname: p.con.LocalAddr().String(),
+	for _, peer := range p.server.clients {
+		peers = append(peers, &PeerData{
+			Hostname: peer.con.LocalAddr().String(),
 			Port:     0000,
-			Peer:     p,
+			Peer:     peer,
 		})
 	}
 
+	p.peers = peers
 	return peers
 }

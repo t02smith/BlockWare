@@ -5,6 +5,7 @@ package view
 
 import (
 	"fmt"
+	"log"
 	"os"
 
 	"github.com/jedib0t/go-pretty/v6/table"
@@ -21,7 +22,7 @@ var gamesCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		gameLs, err := games.LoadGames(viper.GetString("meta.directory"))
 		if err != nil {
-			fmt.Printf("Error loading games: %s\n", err)
+			log.Printf("Error loading games: %s\n", err)
 			return
 		}
 

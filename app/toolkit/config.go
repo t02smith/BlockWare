@@ -26,6 +26,8 @@ func defaultConfig() {
 	// where toolkit data is stored
 	viper.SetDefault("meta.directory", "/home/tom/.toolkit")
 
+	viper.SetDefault("meta.log", "stdout")
+
 	// max amount of threads to use
 	viper.SetDefault("meta.threadPoolSize", 10)
 

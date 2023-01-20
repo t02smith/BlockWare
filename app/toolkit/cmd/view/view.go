@@ -4,8 +4,6 @@ Copyright © 2023 NAME HERE <EMAIL ADDRESS>
 package view
 
 import (
-	"fmt"
-
 	"github.com/spf13/cobra"
 )
 
@@ -15,6 +13,6 @@ var ViewCmd = &cobra.Command{
 	Short: "Print some data out",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("view called")
+
 	},
 }

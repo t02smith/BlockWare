@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"strings"
 )
 
 type TCPClient struct {
@@ -35,7 +36,21 @@ func InitTCPClient(serverHostname string, serverPort uint) (*TCPClient, error) {
 		writer:   bufio.NewWriter(con),
 	}
 
+	go client.listen(onMessage)
 	return client, nil
+}
+
+func (c *TCPClient) listen(onMessage func([]string, PeerIT)) {
+	for {
+		msg, err := c.reader.ReadString('\n')
+		if err != nil {
+			log.Printf("Malformed message from client: %s", err)
+			return
+		}
+
+		log.Printf("message received %s\n", msg)
+		onMessage(strings.Split(msg[:len(msg)-1], ";"), c)
+	}
 }
 
 func (c *TCPClient) Send(command []byte) error {

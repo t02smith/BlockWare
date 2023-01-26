@@ -36,6 +36,9 @@ func InitTCPClient(serverHostname string, serverPort uint) (*TCPClient, error) {
 		writer:   bufio.NewWriter(con),
 	}
 
+	p := GetPeerInstance()
+	p.onConnection(serverHostname, serverPort, client)
+
 	go client.listen(onMessage)
 	return client, nil
 }

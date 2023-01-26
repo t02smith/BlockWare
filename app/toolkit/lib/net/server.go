@@ -71,6 +71,9 @@ func (s *TCPServer) listen(onMessage func([]string, PeerIT)) {
 		}
 		s.clients = append(s.clients, client)
 
+		p := GetPeerInstance()
+		p.onConnection(con.RemoteAddr().String(), 0000, client)
+
 		go client.listen(onMessage)
 	}
 }

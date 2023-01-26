@@ -30,12 +30,12 @@ var peerCmd = &cobra.Command{
 		}
 
 		// run peer
-		peer, err := net.StartPeer(peerHostname, peerPort, peerGameInstallFolder, peerGameDataLocation)
+		_, err := net.StartPeer(peerHostname, peerPort, peerGameInstallFolder, peerGameDataLocation)
 		if err != nil {
 			log.Printf("Error creating peer: %s\n", err)
 		}
 
-		menu(peer)
+		menu()
 	},
 }
 

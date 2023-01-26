@@ -11,6 +11,8 @@ import (
 )
 
 func onMessage(cmd []string, client PeerIT) {
+	p := GetPeerInstance()
+
 	switch cmd[0] {
 
 	// LIBRARY => request a list of a peers games
@@ -42,7 +44,11 @@ func onMessage(cmd []string, client PeerIT) {
 			return
 		}
 
-		fmt.Println(ls)
+		if peer, ok := p.peers[client]; ok {
+			log.Println("Client found. Updating library")
+			peer.Library = ls
+		}
+
 		return
 
 	}

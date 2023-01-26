@@ -4,7 +4,7 @@ meta:
     directory: /hashes
     shardsize: 16384
     workercount: 5
-  log: info.log
+  log: stdout
   threadpoolsize: 10
 user:
   info:

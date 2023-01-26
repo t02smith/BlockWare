@@ -14,7 +14,7 @@ import (
 
 type menuOption struct {
 	Label    string
-	Function func(*net.Peer)
+	Function func()
 }
 
 type messageOption struct {
@@ -22,7 +22,8 @@ type messageOption struct {
 	Message string
 }
 
-func menu(p *net.Peer) {
+func menu() {
+	p := net.GetPeerInstance()
 
 	options := []menuOption{
 		{
@@ -66,7 +67,7 @@ func menu(p *net.Peer) {
 			break
 		}
 
-		options[i].Function(p)
+		options[i].Function()
 	}
 
 	log.Println("Shutting down...")
@@ -75,7 +76,8 @@ func menu(p *net.Peer) {
 
 // util
 
-func choosePeer(p *net.Peer) (*net.PeerData, error) {
+func choosePeer() (net.PeerIT, error) {
+	p := net.GetPeerInstance()
 
 	template := &promptui.SelectTemplates{
 		Label:    "{{ .Hostname }}:{{ .Port }}?",
@@ -84,7 +86,11 @@ func choosePeer(p *net.Peer) (*net.PeerData, error) {
 		Selected: "\U0001F336 {{ .Hostname | green }}:{{ .Port | green }}",
 	}
 
-	peersLs := p.GetPeers()
+	peersLs := []*net.PeerData{}
+	for _, v := range p.GetPeers() {
+		peersLs = append(peersLs, v)
+	}
+
 	peers := promptui.Select{
 		Label:     "Choose a peer to send the message to",
 		Items:     peersLs,
@@ -96,13 +102,14 @@ func choosePeer(p *net.Peer) (*net.PeerData, error) {
 		return nil, err
 	}
 
-	return peersLs[i], nil
+	return peersLs[i].Peer, nil
 }
 
 // options
 
 // connect to a new peer
-func connect(p *net.Peer) {
+func connect() {
+	p := net.GetPeerInstance()
 	fmt.Println("Connect to another peer")
 
 	host := promptui.Prompt{
@@ -146,7 +153,7 @@ func connect(p *net.Peer) {
 }
 
 // send a message to an existing peer
-func message(p *net.Peer) {
+func message() {
 
 	// what message to send
 	_ = []messageOption{
@@ -157,15 +164,15 @@ func message(p *net.Peer) {
 	}
 
 	// who to send the message to
-	chosen, err := choosePeer(p)
+	chosen, err := choosePeer()
 	if err != nil {
 		log.Printf("Error choosing a peer: %s\n", err)
 		return
 	}
 
-	chosen.Peer.SendString("LIBRARY\n")
+	chosen.SendString("LIBRARY\n")
 }
 
-func exit(p *net.Peer) {
+func exit() {
 
 }

@@ -2,9 +2,15 @@ package net
 
 import (
 	"log"
+	"sync"
 
 	"github.com/t02smith/part-iii-project/toolkit/cmd/view"
 	"github.com/t02smith/part-iii-project/toolkit/lib/games"
+)
+
+var (
+	singleton *peer
+	once      sync.Once
 )
 
 type PeerIT interface {
@@ -12,14 +18,16 @@ type PeerIT interface {
 	SendString(command string) error
 }
 
-type Peer struct {
+type peer struct {
 
 	// connections
 	server  *TCPServer
 	clients []*TCPClient
 
 	// state
-	peers []*PeerData
+	// peers []*PeerData
+
+	peers map[PeerIT]*PeerData
 
 	// data
 	installFolder string
@@ -30,53 +38,59 @@ type PeerData struct {
 	Hostname string
 	Port     uint
 	Peer     PeerIT
+	Library  []*games.Game
 }
 
-func StartPeer(serverHostname string, serverPort uint, installFolder, gameDataLocation string) (*Peer, error) {
-	gameLs, err := games.LoadGames(gameDataLocation)
-	if err != nil {
-		return nil, err
-	}
-
-	log.Printf("Found %d games\n", len(gameLs))
-	view.OutputGamesTable(gameLs)
-
-	p := &Peer{
-		server:        InitServer(serverHostname, serverPort),
-		clients:       []*TCPClient{},
-		peers:         []*PeerData{},
-		installFolder: installFolder,
-		games:         gameLs,
-	}
-
-	go p.server.Start(onMessage)
-	return p, nil
+func GetPeerInstance() *peer {
+	return singleton
 }
 
-func (p *Peer) onConnection(hostname string, port uint, peer PeerIT) {
-	p.peers = append(p.peers, &PeerData{
+func StartPeer(serverHostname string, serverPort uint, installFolder, gameDataLocation string) (*peer, error) {
+	log.Println("Starting peer")
+	once.Do(func() {
+		gameLs, err := games.LoadGames(gameDataLocation)
+		if err != nil {
+			return
+		}
+
+		log.Printf("Found %d games\n", len(gameLs))
+		view.OutputGamesTable(gameLs)
+
+		singleton = &peer{
+			server:        InitServer(serverHostname, serverPort),
+			clients:       []*TCPClient{},
+			peers:         make(map[PeerIT]*PeerData),
+			installFolder: installFolder,
+			games:         gameLs,
+		}
+
+		go singleton.server.Start(onMessage)
+	})
+
+	return singleton, nil
+}
+
+func (p *peer) onConnection(hostname string, port uint, peer PeerIT) {
+	p.peers[peer] = &PeerData{
 		Hostname: hostname,
 		Port:     port,
 		Peer:     peer,
-	})
-}
-
-func (p *Peer) onClose(peer PeerIT) {
-	for i, ps := range p.peers {
-		if peer == ps.Peer {
-			p.peers = append(p.peers[:i], p.peers[i+1:]...)
-			return
-		}
+		Library:  []*games.Game{},
 	}
 }
 
-func (p *Peer) GetServerInfo() (string, uint) {
+func (p *peer) onClose(peer PeerIT) {
+	delete(p.peers, peer)
+}
+
+func (p *peer) GetServerInfo() (string, uint) {
 	return p.server.hostname, p.server.port
 }
 
 // commands
 
-func (p *Peer) ConnectToPeer(hostname string, portNo uint) error {
+// form a connection to another peer
+func (p *peer) ConnectToPeer(hostname string, portNo uint) error {
 
 	client, err := InitTCPClient(hostname, portNo)
 	if err != nil {
@@ -87,26 +101,12 @@ func (p *Peer) ConnectToPeer(hostname string, portNo uint) error {
 	return nil
 }
 
-func (p *Peer) GetPeers() []*PeerData {
+// get a list of peers
+func (p *peer) GetPeers() map[PeerIT]*PeerData {
+	return p.peers
+}
 
-	peers := []*PeerData{}
-
-	for _, peer := range p.clients {
-		peers = append(peers, &PeerData{
-			Hostname: peer.hostname,
-			Port:     peer.port,
-			Peer:     peer,
-		})
-	}
-
-	for _, peer := range p.server.clients {
-		peers = append(peers, &PeerData{
-			Hostname: peer.con.LocalAddr().String(),
-			Port:     0000,
-			Peer:     peer,
-		})
-	}
-
-	p.peers = peers
-	return peers
+// get an existing peer
+func (p *peer) GetPeer(peer PeerIT) *PeerData {
+	return p.peers[peer]
 }

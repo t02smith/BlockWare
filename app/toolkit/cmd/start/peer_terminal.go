@@ -58,6 +58,10 @@ func menu() {
 			Function: peers,
 		},
 		{
+			Label:    "Download",
+			Function: download,
+		},
+		{
 			Label:    "Message",
 			Function: message,
 		},
@@ -240,6 +244,10 @@ func peers() {
 	}
 
 	res.Function()
+
+}
+
+func download() {
 
 }
 

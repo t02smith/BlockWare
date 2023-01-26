@@ -11,6 +11,8 @@ import (
 
 func TestMain(m *testing.M) {
 	viper.Set("meta.hashes.workerCount", 5)
+	viper.Set("meta.hashes.directory", "../../test/data/.toolkit/hashes")
+	viper.Set("games.installFolder", "../../test/data/tmp")
 
 	old := verifyDomain
 	mockVerifyDomain = func(domain string) (bool, error) {

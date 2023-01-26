@@ -101,6 +101,7 @@ func (ht *HashTree) OutputToFile(filename string) error {
 }
 
 func ReadHashTreeFromFile(filename string) (*HashTree, error) {
+	log.Printf("Attempting to read hash data from %s", filename)
 	file, err := os.Open(filename)
 	if err != nil {
 		return nil, err
@@ -120,6 +121,7 @@ func ReadHashTreeFromFile(filename string) (*HashTree, error) {
 		return nil, err
 	}
 
+	log.Printf("Hash data read from %s successfully", filename)
 	return ht, nil
 }
 

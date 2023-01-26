@@ -129,6 +129,22 @@ func verifyDomain(domain string) (bool, error) {
 
 // IO
 
+func (g *Game) ReadHashData() error {
+	dir := viper.GetString("meta.hashes.directory")
+	if len(dir) == 0 {
+		return errors.New(".toolkit directory not specified")
+	}
+
+	hashFileName := fmt.Sprintf("%s-%s-%s.hash.json", g.Title, g.Version, g.Developer)
+	data, err := hashIO.ReadHashTreeFromFile(filepath.Join(dir, hashFileName))
+	if err != nil {
+		return err
+	}
+
+	g.data = data
+	return nil
+}
+
 func OutputToFile(g *Game) error {
 	gameFilename := filepath.Join(viper.GetString("meta.directory"), fmt.Sprintf("%s-%s-%s.json", g.Title, g.Version, g.Developer))
 	log.Printf("Outputting game data to %s\n", gameFilename)

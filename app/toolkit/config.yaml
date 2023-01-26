@@ -1,12 +1,14 @@
+games:
+    installfolder: ./test/data/tmp
 meta:
-  directory: /home/tom/.toolkit
-  hashes:
-    directory: /hashes
-    shardsize: 16384
-    workercount: 5
-  log: info.log
-  threadpoolsize: 10
+    directory: ./test/data/.toolkit
+    hashes:
+        directory: ./test/data/.toolkit/hashes
+        shardsize: 16384
+        workercount: 5
+    log: stdout
+    threadpoolsize: 10
 user:
-  info:
-    domain: ""
-    name: ""
+    info:
+        domain: t02smith.com
+        name: tom

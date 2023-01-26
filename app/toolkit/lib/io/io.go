@@ -78,6 +78,54 @@ func (t *HashTree) readShard(filename string, offset int) ([]byte, error) {
 
 // DOWNLOADING A FILE
 
+func (t *HashTree) CreateDummyFiles(rootDir, title string) error {
+
+	err := os.Mkdir(filepath.Join(rootDir, title), 0777)
+	if err != nil {
+		return err
+	}
+
+	err = t.createDummyFilesFromDirectory(t.RootDir, filepath.Join(rootDir, title))
+	if err != nil {
+		return err
+	}
+
+	return nil
+
+}
+
+func (t *HashTree) createDummyFilesFromDirectory(dir *hashTreeDir, path string) error {
+	log.Printf("Generating files for folder %s", filepath.Join(path, dir.Dirname))
+
+	if len(dir.Dirname) > 0 {
+		err := os.Mkdir(filepath.Join(path, dir.Dirname), 0777)
+		if err != nil {
+			return err
+		}
+	}
+
+	// generate files
+	for _, f := range dir.Files {
+		fileLocation := filepath.Join(path, dir.Dirname, f.Filename)
+		log.Printf("Creating dummy for %s", fileLocation)
+		err := setupFile(fileLocation, t.ShardSize, uint(len(f.Hashes)))
+		if err != nil {
+			return err
+		}
+	}
+
+	// generate subdirs
+	newPath := filepath.Join(path, dir.Dirname)
+	for _, d := range dir.Subdirs {
+		err := t.createDummyFilesFromDirectory(d, newPath)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 func setupFile(filename string, shardSize, shardCount uint) error {
 	log.Printf("Creating empty file %s", filename)
 	file, err := os.Create(filename)

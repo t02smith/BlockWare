@@ -24,7 +24,7 @@ func defaultConfig() {
 	// toolkit meta info
 
 	// where toolkit data is stored
-	viper.SetDefault("meta.directory", "/home/tom/.toolkit")
+	viper.SetDefault("meta.directory", "./test/data/.toolkit")
 
 	viper.SetDefault("meta.log", "stdout")
 
@@ -32,7 +32,7 @@ func defaultConfig() {
 	viper.SetDefault("meta.threadPoolSize", 10)
 
 	// where hashes are stored inside the toolkit folder
-	viper.SetDefault("meta.hashes.directory", "/hashes")
+	viper.SetDefault("meta.hashes.directory", "./test/data/.toolkit/hashes")
 
 	// default shard size when hashing
 	viper.SetDefault("meta.hashes.shardSize", 16384)
@@ -40,8 +40,11 @@ func defaultConfig() {
 	// how many threads should be hashing at any given time
 	viper.SetDefault("meta.hashes.workerCount", 5)
 
+	// game info
+	viper.SetDefault("games.installFolder", "./test/data/tmp")
+
 	// user info
-	viper.SetDefault("user.info.domain", "")
-	viper.SetDefault("user.info.name", "")
+	viper.SetDefault("user.info.domain", "t02smith.com")
+	viper.SetDefault("user.info.name", "tom")
 
 }

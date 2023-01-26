@@ -3,6 +3,7 @@ package net
 import (
 	"bufio"
 	"fmt"
+	"io"
 	"log"
 	"net"
 	"strings"
@@ -83,8 +84,13 @@ func (c *TCPServerClient) listen(onMessage func([]string, PeerIT)) {
 	for {
 		msg, err := c.reader.ReadString('\n')
 		if err != nil {
+			if err == io.EOF {
+				GetPeerInstance().onClose(c)
+				return
+			}
+
 			log.Printf("Malformed message from client: %s", err)
-			return
+			continue
 		}
 
 		log.Printf("message received %s\n", msg)
@@ -123,4 +129,8 @@ func (c *TCPServerClient) SendString(command string) error {
 	}
 
 	return nil
+}
+
+func (c *TCPServerClient) Info() string {
+	return fmt.Sprintf("%s", c.con.RemoteAddr())
 }

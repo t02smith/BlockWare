@@ -16,6 +16,7 @@ var (
 type PeerIT interface {
 	Send(command []byte) error
 	SendString(command string) error
+	Info() string
 }
 
 type peer struct {
@@ -80,6 +81,7 @@ func (p *peer) onConnection(hostname string, port uint, peer PeerIT) {
 }
 
 func (p *peer) onClose(peer PeerIT) {
+	log.Printf("Closing connection to %s", peer.Info())
 	delete(p.peers, peer)
 }
 

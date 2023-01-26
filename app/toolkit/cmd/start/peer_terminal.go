@@ -7,6 +7,7 @@ import (
 
 	"github.com/manifoldco/promptui"
 	"github.com/t02smith/part-iii-project/toolkit/cmd/util"
+	"github.com/t02smith/part-iii-project/toolkit/cmd/view"
 	"github.com/t02smith/part-iii-project/toolkit/lib/net"
 )
 
@@ -22,24 +23,7 @@ type messageOption struct {
 	Message string
 }
 
-func menu() {
-	p := net.GetPeerInstance()
-
-	options := []menuOption{
-		{
-			Label:    "Connect",
-			Function: connect,
-		},
-		{
-			Label:    "Message",
-			Function: message,
-		},
-		{
-			Label:    "Exit",
-			Function: exit,
-		},
-	}
-
+func menuTemplate(options []menuOption) (*menuOption, error) {
 	template := &promptui.SelectTemplates{
 		Label:    "{{ .Label }}?",
 		Active:   "\U0001F336 {{ .Label | cyan }}",
@@ -53,21 +37,51 @@ func menu() {
 		Templates: template,
 	}
 
+	i, _, err := menuSelect.Run()
+	if err != nil {
+		return nil, err
+	}
+
+	return &options[i], nil
+}
+
+func menu() {
+	p := net.GetPeerInstance()
+
+	options := []menuOption{
+		{
+			Label:    "Connect",
+			Function: connect,
+		},
+		{
+			Label:    "Peers",
+			Function: peers,
+		},
+		{
+			Label:    "Message",
+			Function: message,
+		},
+		{
+			Label:    "Exit",
+			Function: exit,
+		},
+	}
+
 	serveHost, serverPort := p.GetServerInfo()
 
 	for {
 		fmt.Printf("Welcome %s%s%s:%d%s!\n", util.ColourCyan, serveHost, util.ColourYellow, serverPort, util.ColourReset)
-		i, _, err := menuSelect.Run()
+		res, err := menuTemplate(options)
 		if err != nil {
-			log.Printf("Error running cmd %s: %s\n", options[i].Label, err)
+			log.Printf("Error running cmd %s: %s\n", res.Label, err)
 			continue
 		}
 
-		if options[i].Label == "Exit" {
+		if res.Label == "Exit" {
 			break
 		}
 
-		options[i].Function()
+		res.Function()
 	}
 
 	log.Println("Shutting down...")
@@ -82,7 +96,7 @@ func choosePeer() (net.PeerIT, error) {
 	template := &promptui.SelectTemplates{
 		Label:    "{{ .Hostname }}:{{ .Port }}?",
 		Active:   "\U0001F336 {{ .Hostname | yellow }}:{{ .Port | cyan }}",
-		Inactive: "\U0001F336 {{ .Hostname | cyan }}:{{ .Port | cyan }}",
+		Inactive: "{{ .Hostname | cyan }}:{{ .Port | cyan }}",
 		Selected: "\U0001F336 {{ .Hostname | green }}:{{ .Port | green }}",
 	}
 
@@ -92,7 +106,7 @@ func choosePeer() (net.PeerIT, error) {
 	}
 
 	peers := promptui.Select{
-		Label:     "Choose a peer to send the message to",
+		Label:     "Select a peer",
 		Items:     peersLs,
 		Templates: template,
 	}
@@ -156,21 +170,77 @@ func connect() {
 func message() {
 
 	// what message to send
-	_ = []messageOption{
+	msgOptions := []messageOption{
 		{
-			Label:   "View a peer's library",
-			Message: "LIBRARY",
+			Label:   "Get library",
+			Message: "LIBRARY\n",
+		},
+		{
+			Label:   "Back to menu",
+			Message: "RETURN",
 		},
 	}
 
 	// who to send the message to
-	chosen, err := choosePeer()
+	chosenPeer, err := choosePeer()
 	if err != nil {
 		log.Printf("Error choosing a peer: %s\n", err)
 		return
 	}
 
-	chosen.SendString("LIBRARY\n")
+	//
+	template := &promptui.SelectTemplates{
+		Label:    "{{ .Label }}",
+		Active:   "\U0001F336 {{ .Label | yellow }}",
+		Inactive: "{{ .Label | cyan }}",
+		Selected: "\U0001F336 {{ .Label | green }}",
+	}
+
+	chooseMessagePrompt := promptui.Select{
+		Label:     "Choose a peer to send the message to",
+		Items:     msgOptions,
+		Templates: template,
+	}
+
+	chosenMessage, _, err := chooseMessagePrompt.Run()
+	if err != nil {
+		log.Printf("Error choosing a message: %s\n", err)
+		return
+	}
+
+	if msgOptions[chosenMessage].Message == "RETURN" {
+		return
+	}
+
+	log.Printf("Sending %s", msgOptions[chosenMessage].Message)
+	chosenPeer.SendString(msgOptions[chosenMessage].Message)
+}
+
+func peers() {
+	chosenPeer, err := choosePeer()
+	if err != nil {
+		log.Printf("Error choosing a peer: %s\n", err)
+		return
+	}
+
+	p := net.GetPeerInstance()
+	options := []menuOption{
+		{
+			Label: "View library",
+			Function: func() {
+				view.OutputGamesTable(p.GetPeer(chosenPeer).Library)
+			},
+		},
+	}
+
+	res, err := menuTemplate(options)
+	if err != nil {
+		log.Printf("Error running cmd %s: %s\n", res.Label, err)
+		return
+	}
+
+	res.Function()
+
 }
 
 func exit() {

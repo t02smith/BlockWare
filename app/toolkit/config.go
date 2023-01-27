@@ -42,6 +42,7 @@ func defaultConfig() {
 
 	// game info
 	viper.SetDefault("games.installFolder", "./test/data/tmp")
+	viper.SetDefault("games.tracker.directory", "./test/data/.toolkit/tracker")
 
 	// user info
 	viper.SetDefault("user.info.domain", "t02smith.com")

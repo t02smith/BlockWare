@@ -112,3 +112,10 @@ func (p *peer) GetPeers() map[PeerIT]*PeerData {
 func (p *peer) GetPeer(peer PeerIT) *PeerData {
 	return p.peers[peer]
 }
+
+// send a message to all peers
+func (p *peer) Broadcast(message string) {
+	for peer := range p.peers {
+		peer.SendString(message)
+	}
+}

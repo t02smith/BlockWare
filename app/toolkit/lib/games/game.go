@@ -20,7 +20,7 @@ import (
 	"time"
 
 	"github.com/spf13/viper"
-	hashIO "github.com/t02smith/part-iii-project/toolkit/lib/io"
+	hashIO "github.com/t02smith/part-iii-project/toolkit/lib/hash"
 )
 
 type Game struct {

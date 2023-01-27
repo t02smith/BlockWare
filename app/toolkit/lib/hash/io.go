@@ -1,4 +1,4 @@
-package io
+package hash
 
 import (
 	"bufio"
@@ -27,7 +27,7 @@ func (t *HashTree) findShard(hash [32]byte) (bool, string, int) {
 	return found, filepath.Join(t.RootDirLocation, path), offset
 }
 
-func (td *hashTreeDir) findShard(hash [32]byte) (bool, string, int) {
+func (td *HashTreeDir) findShard(hash [32]byte) (bool, string, int) {
 
 	for _, f := range td.Files {
 		for i, h := range f.Hashes {
@@ -78,14 +78,14 @@ func (t *HashTree) readShard(filename string, offset int) ([]byte, error) {
 
 // DOWNLOADING A FILE
 
-func (t *HashTree) CreateDummyFiles(rootDir, title string) error {
+func (t *HashTree) CreateDummyFiles(rootDir, title string, onCreate func(string, *HashTreeFile)) error {
 
 	err := os.Mkdir(filepath.Join(rootDir, title), 0777)
 	if err != nil {
 		return err
 	}
 
-	err = t.createDummyFilesFromDirectory(t.RootDir, filepath.Join(rootDir, title))
+	err = t.createDummyFilesFromDirectory(t.RootDir, filepath.Join(rootDir, title), onCreate)
 	if err != nil {
 		return err
 	}
@@ -94,7 +94,7 @@ func (t *HashTree) CreateDummyFiles(rootDir, title string) error {
 
 }
 
-func (t *HashTree) createDummyFilesFromDirectory(dir *hashTreeDir, path string) error {
+func (t *HashTree) createDummyFilesFromDirectory(dir *HashTreeDir, path string, onCreate func(string, *HashTreeFile)) error {
 	log.Printf("Generating files for folder %s", filepath.Join(path, dir.Dirname))
 
 	if len(dir.Dirname) > 0 {
@@ -112,12 +112,13 @@ func (t *HashTree) createDummyFilesFromDirectory(dir *hashTreeDir, path string) 
 		if err != nil {
 			return err
 		}
+		onCreate(fileLocation, f)
 	}
 
 	// generate subdirs
 	newPath := filepath.Join(path, dir.Dirname)
 	for _, d := range dir.Subdirs {
-		err := t.createDummyFilesFromDirectory(d, newPath)
+		err := t.createDummyFilesFromDirectory(d, newPath, onCreate)
 		if err != nil {
 			return err
 		}

@@ -1,4 +1,4 @@
-package io
+package hash
 
 import (
 	"fmt"
@@ -50,7 +50,7 @@ func TestNewHashTreeValid(t *testing.T) {
 // shardFile
 
 func TestShardFileInvalidFile(t *testing.T) {
-	htf := &hashTreeFile{
+	htf := &HashTreeFile{
 		Filename:         "not-real.jpg",
 		AbsoluteFilename: "./fake/path/do/no/replicate",
 	}
@@ -63,7 +63,7 @@ func TestShardFileInvalidFile(t *testing.T) {
 
 func TestShardFileCorrect(t *testing.T) {
 
-	htf := &hashTreeFile{
+	htf := &HashTreeFile{
 		Filename:         "test.txt",
 		AbsoluteFilename: "../../test/data/testdir/test.txt",
 	}

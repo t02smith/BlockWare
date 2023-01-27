@@ -2,6 +2,8 @@ package games
 
 import (
 	"testing"
+
+	"github.com/t02smith/part-iii-project/toolkit/test/util"
 )
 
 func TestSetupDownload(t *testing.T) {
@@ -26,6 +28,8 @@ func TestSetupDownload(t *testing.T) {
 	_, err = SetupDownload(g)
 	if err != nil {
 		t.Error(err)
+		return
 	}
 
+	util.ClearTmp("../../")
 }

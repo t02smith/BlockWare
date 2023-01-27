@@ -1,4 +1,4 @@
-package io
+package hash
 
 import (
 	"log"
@@ -12,9 +12,9 @@ A worker pool for sharding and hashing files
 */
 
 // starts a worker pool with N workers awaiting instructions
-func hasherPool(capacity int, fileCount int, shardSize uint) (*sync.WaitGroup, chan *hashTreeFile, chan error) {
+func hasherPool(capacity int, fileCount int, shardSize uint) (*sync.WaitGroup, chan *HashTreeFile, chan error) {
 
-	files := make(chan *hashTreeFile, fileCount)
+	files := make(chan *HashTreeFile, fileCount)
 	errors := make(chan error, fileCount)
 
 	var wg sync.WaitGroup
@@ -27,7 +27,7 @@ func hasherPool(capacity int, fileCount int, shardSize uint) (*sync.WaitGroup, c
 	return &wg, files, errors
 }
 
-func worker(id int, wg *sync.WaitGroup, shardSize uint, files <-chan *hashTreeFile, errors chan<- error) {
+func worker(id int, wg *sync.WaitGroup, shardSize uint, files <-chan *HashTreeFile, errors chan<- error) {
 
 	for f := range files {
 		log.Printf("WORKER %d: Sharding file %s\n", id, f.AbsoluteFilename)

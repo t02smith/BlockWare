@@ -7,12 +7,15 @@ import (
 	"time"
 
 	"github.com/spf13/viper"
+	"github.com/t02smith/part-iii-project/toolkit/test/util"
 )
 
 func TestMain(m *testing.M) {
 	viper.Set("meta.hashes.workerCount", 5)
 	viper.Set("meta.hashes.directory", "../../test/data/.toolkit/hashes")
 	viper.Set("games.installFolder", "../../test/data/tmp")
+
+	util.ClearTmp("../../")
 
 	old := verifyDomain
 	mockVerifyDomain = func(domain string) (bool, error) {

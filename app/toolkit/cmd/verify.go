@@ -7,7 +7,7 @@ import (
 	"log"
 
 	"github.com/spf13/cobra"
-	"github.com/t02smith/part-iii-project/toolkit/lib/io"
+	"github.com/t02smith/part-iii-project/toolkit/lib/hash"
 )
 
 var (
@@ -28,13 +28,13 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		f, err := io.ReadHashTreeFromFile(verifyExpectedHashFile)
+		f, err := hash.ReadHashTreeFromFile(verifyExpectedHashFile)
 		if err != nil {
 			log.Printf("error reading hash file: %s\n", err)
 			return
 		}
 
-		config := &io.VerifyHashTreeConfig{
+		config := &hash.VerifyHashTreeConfig{
 			IgnoreNewFilesAndDirs: verifyIgnoreNewFilesAndDirs,
 			ContinueAfterError:    verifyContinueAfterError,
 		}

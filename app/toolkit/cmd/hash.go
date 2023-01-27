@@ -9,7 +9,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/t02smith/part-iii-project/toolkit/lib/io"
+	"github.com/t02smith/part-iii-project/toolkit/lib/hash"
 )
 
 var (
@@ -27,7 +27,7 @@ game you want to upload and generate a hash tree containing the
 hashes of each shard of data. This will allow your users to 
 verify the contents they are downloading.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		t, err := io.NewHashTree(hashDirectory, uint(hashShardSize))
+		t, err := hash.NewHashTree(hashDirectory, uint(hashShardSize))
 		if err != nil {
 			log.Println(err)
 		}

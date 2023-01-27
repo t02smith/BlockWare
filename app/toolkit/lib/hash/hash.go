@@ -1,4 +1,4 @@
-package io
+package hash
 
 import (
 	"bufio"
@@ -18,7 +18,7 @@ import (
 type HashTree struct {
 
 	// the directory object for the root folder
-	RootDir *hashTreeDir `json:"rootdir"`
+	RootDir *HashTreeDir `json:"rootdir"`
 
 	// what size should each shard of data be in bytes
 	ShardSize uint `json:"shardsize"`
@@ -28,7 +28,7 @@ type HashTree struct {
 }
 
 // Describes a directory with tracked files
-type hashTreeDir struct {
+type HashTreeDir struct {
 
 	// the path relative to the root directory location
 	Dirname string `json:"dirname"`
@@ -37,14 +37,14 @@ type hashTreeDir struct {
 	RootHash [32]byte `json:"roothash"`
 
 	// all subdirectories recursively stored
-	Subdirs []*hashTreeDir `json:"subdirs"`
+	Subdirs []*HashTreeDir `json:"subdirs"`
 
 	// all files within this folder
-	Files []*hashTreeFile `json:"files"`
+	Files []*HashTreeFile `json:"files"`
 }
 
 // Describes a singular tracked files
-type hashTreeFile struct {
+type HashTreeFile struct {
 	Filename string `json:"filename"`
 
 	AbsoluteFilename string
@@ -146,17 +146,17 @@ func (ht *HashTree) Hash() error {
 func (ht *HashTree) buildTree() (int, error) {
 	log.Printf("Building tree of directory %s\n", ht.RootDirLocation)
 
-	ht.RootDir = &hashTreeDir{
+	ht.RootDir = &HashTreeDir{
 		Dirname: "",
-		Subdirs: []*hashTreeDir{},
-		Files:   []*hashTreeFile{},
+		Subdirs: []*HashTreeDir{},
+		Files:   []*HashTreeFile{},
 	}
 
 	return ht.RootDir.traverseDirectory(ht.RootDirLocation)
 }
 
 // perform a search to build a directory tree
-func (htd *hashTreeDir) traverseDirectory(absolutePath string) (int, error) {
+func (htd *HashTreeDir) traverseDirectory(absolutePath string) (int, error) {
 	log.Printf("Hashing directory %s\n", htd.Dirname)
 
 	counter := 0
@@ -180,17 +180,17 @@ func (htd *hashTreeDir) traverseDirectory(absolutePath string) (int, error) {
 
 		// the data object is a directory
 		if f.IsDir() {
-			htd.Subdirs = append(htd.Subdirs, &hashTreeDir{
+			htd.Subdirs = append(htd.Subdirs, &HashTreeDir{
 				Dirname: name,
-				Files:   []*hashTreeFile{},
-				Subdirs: []*hashTreeDir{},
+				Files:   []*HashTreeFile{},
+				Subdirs: []*HashTreeDir{},
 			})
 
 			continue
 		}
 
 		// the data object is a file
-		htd.Files = append(htd.Files, &hashTreeFile{
+		htd.Files = append(htd.Files, &HashTreeFile{
 			Filename:         name,
 			AbsoluteFilename: filepath.Join(absolutePath, htd.Dirname, name),
 		})
@@ -212,7 +212,7 @@ func (htd *hashTreeDir) traverseDirectory(absolutePath string) (int, error) {
 
 // hashing
 
-func (htd *hashTreeDir) shardData(fileIn chan *hashTreeFile, shardSize uint) error {
+func (htd *HashTreeDir) shardData(fileIn chan *HashTreeFile, shardSize uint) error {
 
 	for _, f := range htd.Files {
 		fileIn <- f
@@ -228,7 +228,7 @@ func (htd *hashTreeDir) shardData(fileIn chan *hashTreeFile, shardSize uint) err
 	return nil
 }
 
-func (htf *hashTreeFile) shardFile(shardSize uint) error {
+func (htf *HashTreeFile) shardFile(shardSize uint) error {
 	htf.Hashes = [][32]byte{}
 
 	file, err := os.Open(htf.AbsoluteFilename)
@@ -267,7 +267,7 @@ func (ht *HashTree) VerifyTree(config *VerifyHashTreeConfig, chosenDirectory str
 	return ht.verifyDir(config, chosenDirectory, "", ht.RootDir)
 }
 
-func (ht *HashTree) verifyDir(config *VerifyHashTreeConfig, currentDir string, directoryBeingVerified string, htDir *hashTreeDir) (bool, error) {
+func (ht *HashTree) verifyDir(config *VerifyHashTreeConfig, currentDir string, directoryBeingVerified string, htDir *HashTreeDir) (bool, error) {
 	log.Printf("verifying directory %s/%s\n", currentDir, directoryBeingVerified)
 	file, err := os.Open(filepath.Join(currentDir, directoryBeingVerified))
 	if err != nil {
@@ -289,7 +289,7 @@ func (ht *HashTree) verifyDir(config *VerifyHashTreeConfig, currentDir string, d
 		if f.IsDir() {
 
 			// check the subdir should exist
-			subdir := func() *hashTreeDir {
+			subdir := func() *HashTreeDir {
 				for _, htd := range htDir.Subdirs {
 					if htd.Dirname == name {
 						return htd
@@ -324,7 +324,7 @@ func (ht *HashTree) verifyDir(config *VerifyHashTreeConfig, currentDir string, d
 		} else {
 
 			// check file should exist
-			fileExists := func() *hashTreeFile {
+			fileExists := func() *HashTreeFile {
 				for _, htf := range htDir.Files {
 					if htf.Filename == name {
 						return htf
@@ -361,7 +361,7 @@ func (ht *HashTree) verifyDir(config *VerifyHashTreeConfig, currentDir string, d
 	return true, nil
 }
 
-func (ht *HashTree) verifyFile(htf *hashTreeFile, currentDirectory string, filename string) (bool, error) {
+func (ht *HashTree) verifyFile(htf *HashTreeFile, currentDirectory string, filename string) (bool, error) {
 	file, err := os.Open(filepath.Join(currentDirectory, filename))
 	if err != nil {
 		return false, err

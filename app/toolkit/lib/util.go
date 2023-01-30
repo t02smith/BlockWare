@@ -32,6 +32,17 @@ func SetupToolkitEnvironment() error {
 		return err
 	}
 
+	// tracker dir
+	trackerDir := viper.GetString("games.tracker.directory")
+	if len(trackerDir) == 0 {
+		trackerDir = filepath.Join(toolkitDir, "tracker")
+	}
+
+	err = createDirectoryIfNotExist(trackerDir)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 

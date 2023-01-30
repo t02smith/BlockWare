@@ -9,6 +9,8 @@ import (
 )
 
 var (
+
+	// peer is a singleton type so should only be instantiated once
 	singleton *peer
 	once      sync.Once
 )
@@ -19,6 +21,7 @@ type PeerIT interface {
 	Info() string
 }
 
+// A peer represents a node in a distributed network
 type peer struct {
 
 	// connections
@@ -26,8 +29,6 @@ type peer struct {
 	clients []*TCPClient
 
 	// state
-	// peers []*PeerData
-
 	peers map[PeerIT]*PeerData
 
 	// data
@@ -35,17 +36,26 @@ type peer struct {
 	games         []*games.Game
 }
 
+// Stores useful information about other peers
 type PeerData struct {
+
+	// peer details for logging
 	Hostname string
 	Port     uint
-	Peer     PeerIT
-	Library  []*games.Game
+
+	// socket interface to communicate with peer
+	Peer PeerIT
+
+	// what games they have installed
+	Library []*games.Game
 }
 
+// Get the singleton instance of the current peer if it exists
 func GetPeerInstance() *peer {
 	return singleton
 }
 
+// start a new instance of a peer
 func StartPeer(serverHostname string, serverPort uint, installFolder, gameDataLocation string) (*peer, error) {
 	log.Println("Starting peer")
 	once.Do(func() {
@@ -71,6 +81,7 @@ func StartPeer(serverHostname string, serverPort uint, installFolder, gameDataLo
 	return singleton, nil
 }
 
+// run this function every time we connect to a new peer
 func (p *peer) onConnection(hostname string, port uint, peer PeerIT) {
 	p.peers[peer] = &PeerData{
 		Hostname: hostname,
@@ -80,11 +91,13 @@ func (p *peer) onConnection(hostname string, port uint, peer PeerIT) {
 	}
 }
 
+// run this function after closing a connection to an existing peer
 func (p *peer) onClose(peer PeerIT) {
 	log.Printf("Closing connection to %s", peer.Info())
 	delete(p.peers, peer)
 }
 
+// get information about the current peer
 func (p *peer) GetServerInfo() (string, uint) {
 	return p.server.hostname, p.server.port
 }

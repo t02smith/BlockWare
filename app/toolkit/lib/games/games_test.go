@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/t02smith/part-iii-project/toolkit/lib"
-	testutil "github.com/t02smith/part-iii-project/toolkit/test/util"
+	"github.com/t02smith/part-iii-project/toolkit/test/testutil"
 )
 
 func TestMain(m *testing.M) {

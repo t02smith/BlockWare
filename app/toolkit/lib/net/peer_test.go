@@ -2,6 +2,9 @@ package net
 
 import (
 	"testing"
+	"time"
+
+	"github.com/t02smith/part-iii-project/toolkit/test/testutil"
 )
 
 // start peer
@@ -29,36 +32,31 @@ func TestStartPeer(t *testing.T) {
 	}
 }
 
-// func TestConnectToPeer(t *testing.T) {
-// 	mockClient := InitServer("localhost", 9009)
+func TestConnectToPeer(t *testing.T) {
+	p, err := StartPeer("localhost", 7887, "../../test/data/tmp", "../../test/data")
+	if err != nil {
+		t.Error(err)
+		return
+	}
 
-// 	go mockClient.Start(func(s []string, pi PeerIT) {
-// 		log.Printf("Mock Client received: %s", strings.Join(s, ";"))
-// 		pi.SendString("hello")
-// 	})
+	mp, err := testutil.StartMockPeer(7887)
+	if err != nil {
+		t.Error(err)
+		return
+	}
 
-// 	p, err := StartPeer("localhost", 7887, "../../test/data/tmp", "../../test/data")
-// 	if err != nil {
-// 		t.Error(err)
-// 		return
-// 	}
+	time.Sleep(25 * time.Millisecond)
+	if len(p.peers) == 0 {
+		t.Error("Peer not tracked/connected")
+		return
+	}
 
-// 	time.Sleep(300 * time.Millisecond)
-// 	err = p.ConnectToPeer("localhost", 9009)
-// 	if err != nil {
-// 		t.Error(err)
-// 		return
-// 	}
+	mpClient := p.server.clients[0]
+	mpClient.SendString("test message\n")
+	time.Sleep(25 * time.Millisecond)
 
-// 	time.Sleep(300 * time.Millisecond)
-// 	if len(p.clients) == 0 {
-// 		t.Error("client not added to peer")
-// 		return
-// 	}
-
-// 	peerClient := p.clients[0]
-// 	peerClient.SendString("hello-there-test;")
-// 	time.Sleep(300 * time.Millisecond)
-
-// 	t.Error("")
-// }
+	if mp.GetLastMessage() != "test message\n" {
+		t.Error("Test message not received")
+		return
+	}
+}

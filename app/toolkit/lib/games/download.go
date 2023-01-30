@@ -21,6 +21,9 @@ type Download struct {
 
 	// progress of each file being downloaded
 	Progress map[[32]byte]FileProgress
+
+	// total number of blocks to install
+	TotalBlocks int
 }
 
 type FileProgress struct {
@@ -34,6 +37,7 @@ type FileProgress struct {
 
 // serialisation
 
+// file -> download object
 func DeserializeDownload(gameHash []byte) (*Download, error) {
 	log.Printf("Deserialized download %x", gameHash)
 	dir := viper.GetString("games.tracker.directory")
@@ -58,6 +62,7 @@ func DeserializeDownload(gameHash []byte) (*Download, error) {
 	return d, nil
 }
 
+// download obj -> file
 func (d *Download) Serialise() error {
 	log.Printf("Serialising download %x", d.GameRootHash)
 	dir := viper.GetString("games.tracker.directory")
@@ -84,8 +89,9 @@ func (d *Download) Serialise() error {
 	return nil
 }
 
-// setup
+// ? setup
 
+// create a new download for an existing game
 func SetupDownload(game *Game) (*Download, error) {
 
 	// read hash data if isn't already loaded
@@ -100,6 +106,7 @@ func SetupDownload(game *Game) (*Download, error) {
 	d := &Download{
 		GameRootHash: game.RootHash,
 		Progress:     make(map[[32]byte]FileProgress),
+		TotalBlocks:  0,
 	}
 
 	// generate dummy files
@@ -126,6 +133,8 @@ func SetupDownload(game *Game) (*Download, error) {
 		return nil, err
 	}
 
+	d.TotalBlocks = len(d.Progress)
+
 	err = d.Serialise()
 	if err != nil {
 		log.Printf("Error saving download to file: %s", err)
@@ -133,4 +142,24 @@ func SetupDownload(game *Game) (*Download, error) {
 	}
 
 	return d, nil
+}
+
+// ? downloading data
+
+// start up an existing download
+func (d *Download) ContinueDownload() error {
+	return nil
+}
+
+// find a new block from current peers
+func (d *Download) FindBlock(hash [32]byte) error {
+
+	return nil
+}
+
+// ? misc functions
+
+// get the total download progress as a percent
+func (d *Download) GetProgress() (float32, error) {
+	return 1 - float32(len(d.Progress))/float32(d.TotalBlocks), nil
 }

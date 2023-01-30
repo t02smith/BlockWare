@@ -2,6 +2,7 @@ package games
 
 import (
 	"bytes"
+	"crypto/sha256"
 	"errors"
 	"fmt"
 	"os"
@@ -99,4 +100,32 @@ func TestDeserialiseDownload(t *testing.T) {
 		t.Error("Games not the same")
 		return
 	}
+}
+
+func TestFindBlock(t *testing.T) {
+	t.SkipNow()
+	gamesTestSetup()
+	defer gamesTestTeardown()
+
+	d, err := setupTestDownload()
+	if err != nil {
+		t.Error(err)
+	}
+
+	missingHash := sha256.Sum256([]byte("hello"))
+
+	// request with no peers connected
+	err = d.FindBlock(missingHash)
+	if err == nil {
+		t.Error("This function should error if no peers are connected")
+	}
+
+	// * connect a new peer
+
+	// request an unknown hash
+	err = d.FindBlock(missingHash)
+	if err == nil {
+		t.Error("This block doesn't exist and should error")
+	}
+
 }

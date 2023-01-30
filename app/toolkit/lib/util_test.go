@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/spf13/viper"
-	testutil "github.com/t02smith/part-iii-project/toolkit/test/util"
+	"github.com/t02smith/part-iii-project/toolkit/test/testutil"
 )
 
 func utilTestSetup() {
@@ -60,6 +60,12 @@ func TestSetupToolkitEnvironment(t *testing.T) {
 	}
 
 	_, err = os.Stat("../test/data/tmp/.toolkit/hashes")
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	_, err = os.Stat("../test/data/tmp/.toolkit/tracker")
 	if err != nil {
 		t.Error(err)
 		return

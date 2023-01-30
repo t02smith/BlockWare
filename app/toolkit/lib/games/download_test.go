@@ -36,6 +36,9 @@ func setupTestDownload() (*Download, error) {
 }
 
 func TestSetupDownload(t *testing.T) {
+	gamesTestSetup()
+	defer gamesTestTeardown()
+
 	_, err := setupTestDownload()
 	if err != nil {
 		t.Error(err)
@@ -43,6 +46,9 @@ func TestSetupDownload(t *testing.T) {
 }
 
 func TestSerialize(t *testing.T) {
+	gamesTestSetup()
+	defer gamesTestTeardown()
+
 	d, err := setupTestDownload()
 	if err != nil {
 		t.Error(err)
@@ -68,6 +74,9 @@ func TestSerialize(t *testing.T) {
 }
 
 func TestDeserialiseDownload(t *testing.T) {
+	gamesTestSetup()
+	defer gamesTestTeardown()
+
 	d, err := setupTestDownload()
 	if err != nil {
 		t.Error(err)

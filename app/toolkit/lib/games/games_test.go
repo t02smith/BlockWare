@@ -17,6 +17,7 @@ func TestMain(m *testing.M) {
 	err := setupTestGame()
 	if err != nil {
 		log.Println(err)
+		gamesTestTeardown()
 		os.Exit(1)
 	}
 
@@ -25,7 +26,9 @@ func TestMain(m *testing.M) {
 		return true, nil
 	}
 
+	gamesTestSetup()
 	code := m.Run()
+	gamesTestTeardown()
 
 	mockVerifyDomain = old
 	os.Exit(code)
@@ -33,6 +36,12 @@ func TestMain(m *testing.M) {
 
 // create a test game and store it in long term storage
 func setupTestGame() error {
+
+	_, err := os.Stat("../../test/data/.toolkit/toolkit-1.0.4-google.com.json")
+	if err == nil {
+		return nil
+	}
+
 	datetime := time.Date(2002, 1, 10, 0, 0, 0, 0, time.UTC).String()
 	game, err := CreateGame("toolkit", "1.0.4", datetime, "google.com", "../../test/data/testdir", 16384)
 
@@ -60,5 +69,4 @@ func gamesTestSetup() {
 
 func gamesTestTeardown() {
 	testutil.ClearTmp("../../")
-	testutil.SetupTmp("../../")
 }

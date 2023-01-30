@@ -53,6 +53,7 @@ func (s *TCPServer) Start(onMessage func([]string, PeerIT)) error {
 	s.listener = ln
 	log.Printf("Server listening on %s:%d", s.hostname, s.port)
 	s.listen(onMessage)
+	log.Println("server started")
 	return nil
 }
 
@@ -61,7 +62,7 @@ func (s *TCPServer) listen(onMessage func([]string, PeerIT)) {
 		con, err := s.listener.Accept()
 		if err != nil {
 			log.Printf("Error connecting to client: %s", err)
-			continue
+			return
 		}
 
 		log.Printf("Client joined: %s", con.RemoteAddr())
@@ -79,8 +80,14 @@ func (s *TCPServer) listen(onMessage func([]string, PeerIT)) {
 	}
 }
 
-func (c *TCPServerClient) listen(onMessage func([]string, PeerIT)) {
+func (s *TCPServer) Close() {
+	s.listener.Close()
+	for _, c := range s.clients {
+		c.Close()
+	}
+}
 
+func (c *TCPServerClient) listen(onMessage func([]string, PeerIT)) {
 	for {
 		msg, err := c.reader.ReadString('\n')
 		if err != nil {
@@ -133,4 +140,8 @@ func (c *TCPServerClient) SendString(command string) error {
 
 func (c *TCPServerClient) Info() string {
 	return fmt.Sprintf("%s", c.con.RemoteAddr())
+}
+
+func (c *TCPServerClient) Close() {
+	c.con.Close()
 }

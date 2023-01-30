@@ -8,6 +8,7 @@ import (
 
 	"github.com/spf13/viper"
 	"github.com/t02smith/part-iii-project/toolkit/lib/games"
+	"github.com/t02smith/part-iii-project/toolkit/lib/hash"
 )
 
 func onMessage(cmd []string, client PeerIT) {
@@ -51,11 +52,24 @@ func onMessage(cmd []string, client PeerIT) {
 
 		return
 
+	// BLOCK <hash> => Request a block of data from a user
+	case "BLOCK":
+		log.Printf("Block command called for block %s", cmd[1])
+
+		// haveBlock, err :=
+
+		return
+
+	// SEND_BLOCK <hash> <shard> => Download a shard off of a user
+	case "SEND_BLOCK":
+		return
+
 	}
 }
 
 //
 
+// turns a game library to a message to send to a peer
 func gameListToMessage(games []*games.Game) (string, error) {
 	var buf bytes.Buffer
 	buf.WriteString("GAMES;")
@@ -73,6 +87,7 @@ func gameListToMessage(games []*games.Game) (string, error) {
 	return buf.String(), nil
 }
 
+// takes a game library message and converts it to a list of games
 func gameMessageToGameList(parts []string) ([]*games.Game, error) {
 	gameLs := []*games.Game{}
 
@@ -91,4 +106,8 @@ func gameMessageToGameList(parts []string) ([]*games.Game, error) {
 	}
 
 	return gameLs, nil
+}
+
+func locateBlock(hash string) (string, *hash.HashTreeFile, error) {
+	return "", nil, nil
 }

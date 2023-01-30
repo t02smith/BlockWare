@@ -9,7 +9,6 @@ import (
 )
 
 var (
-
 	// peer is a singleton type so should only be instantiated once
 	singleton *peer
 	once      sync.Once
@@ -34,6 +33,7 @@ type peer struct {
 	// data
 	installFolder string
 	games         []*games.Game
+	downloads     []*games.Download
 }
 
 // Stores useful information about other peers
@@ -73,6 +73,7 @@ func StartPeer(serverHostname string, serverPort uint, installFolder, gameDataLo
 			peers:         make(map[PeerIT]*PeerData),
 			installFolder: installFolder,
 			games:         gameLs,
+			downloads:     []*games.Download{},
 		}
 
 		go singleton.server.Start(onMessage)
@@ -130,5 +131,13 @@ func (p *peer) GetPeer(peer PeerIT) *PeerData {
 func (p *peer) Broadcast(message string) {
 	for peer := range p.peers {
 		peer.SendString(message)
+	}
+}
+
+// shutdown the peer
+func (p *peer) Close() {
+	p.server.Close()
+	for _, c := range p.clients {
+		c.Close()
 	}
 }

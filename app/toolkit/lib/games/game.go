@@ -285,3 +285,47 @@ func DeserialiseGame(data string) (*Game, error) {
 
 	return g, nil
 }
+
+func GamesAreEqual(g1 *Game, g2 *Game) bool {
+	return g1.Title == g2.Title &&
+		g1.Version == g2.Version &&
+		g1.Developer == g2.Developer &&
+		g1.ReleaseDate == g2.ReleaseDate &&
+		bytes.Equal(g1.RootHash, g2.RootHash)
+}
+
+func (g *Game) FetchShard(hash [32]byte) ([]byte, error) {
+
+	// find the shards location
+	err := g.ReadHashData()
+	if err != nil {
+		return nil, err
+	}
+
+	htf, offset := g.data.RootDir.FindShard(hash)
+	if htf == nil {
+		return nil, errors.New("shard not found")
+	}
+
+	// get shard from file
+	f, err := os.Open(htf.AbsoluteFilename)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+
+	buffer := make([]byte, g.data.ShardSize)
+	reader := bufio.NewReader(f)
+
+	_, err = f.Seek(int64(offset*int(g.data.ShardSize)), 0)
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = reader.Read(buffer)
+	if err != nil {
+		return nil, err
+	}
+
+	return buffer, nil
+}

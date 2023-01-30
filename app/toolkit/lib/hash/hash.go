@@ -80,6 +80,7 @@ func NewHashTree(rootDir string, shardSize uint) (*HashTree, error) {
 
 // IO
 
+// output a hash tree to a json file
 func (ht *HashTree) OutputToFile(filename string) error {
 	log.Printf("outputting to file %s\n", filename)
 	e, err := json.Marshal(ht)
@@ -100,6 +101,7 @@ func (ht *HashTree) OutputToFile(filename string) error {
 	return nil
 }
 
+// read a hash tree from a json file
 func ReadHashTreeFromFile(filename string) (*HashTree, error) {
 	log.Printf("Attempting to read hash data from %s", filename)
 	file, err := os.Open(filename)
@@ -420,4 +422,30 @@ func CalculateRootHash(hashes [][32]byte) [32]byte {
 
 	return oldLayer[0]
 
+}
+
+// Finder
+
+// find a shard from a given hash tree
+// returns file, location
+func (htd *HashTreeDir) FindShard(hash [32]byte) (*HashTreeFile, int) {
+
+	// in current dir
+	for _, f := range htd.Files {
+		for i, b := range f.Hashes {
+			if bytes.Equal(b[:], hash[:]) {
+				return f, i
+			}
+		}
+	}
+
+	// in subdirs
+	for _, sd := range htd.Subdirs {
+		htf, offset := sd.FindShard(hash)
+		if htf != nil {
+			return htf, offset
+		}
+	}
+
+	return nil, -1
 }

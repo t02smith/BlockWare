@@ -97,3 +97,7 @@ func (c *TCPClient) SendString(command string) error {
 func (c *TCPClient) Info() string {
 	return fmt.Sprintf("%s:%d", c.hostname, c.port)
 }
+
+func (c *TCPClient) Close() {
+	c.con.Close()
+}

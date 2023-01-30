@@ -127,7 +127,6 @@ func TestInsertDataCorrect(t *testing.T) {
 
 	// test change occurred
 	file, _ := os.Open(tmpFile)
-	defer file.Close()
 
 	buffer := make([]byte, 64)
 	reader := bufio.NewReader(file)
@@ -139,8 +138,9 @@ func TestInsertDataCorrect(t *testing.T) {
 		t.Error("Shard not written correctly to file")
 	}
 
+	file.Close()
 	err = os.Remove(tmpFile)
 	if err != nil {
-		t.Errorf("Error removing tmp file")
+		t.Errorf("Error removing tmp file %s", err)
 	}
 }

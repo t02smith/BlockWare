@@ -1,30 +1,10 @@
 package games
 
 import (
-	"fmt"
-	"os"
+	"bytes"
 	"testing"
 	"time"
-
-	"github.com/t02smith/part-iii-project/toolkit/test/util"
 )
-
-func TestMain(m *testing.M) {
-	util.SetupTestConfig()
-	util.ClearTmp("../../")
-	util.SetupTmp("../../")
-
-	old := verifyDomain
-	mockVerifyDomain = func(domain string) (bool, error) {
-		return true, nil
-	}
-
-	code := m.Run()
-	util.ClearTmp("../../")
-
-	mockVerifyDomain = old
-	os.Exit(code)
-}
 
 // Create Game
 
@@ -85,6 +65,9 @@ func TestCreateGameInvalidArguments(t *testing.T) {
 }
 
 func TestSerialise(t *testing.T) {
+	gamesTestSetup()
+	defer gamesTestTeardown()
+
 	g := &Game{
 		Title:       "Test Game",
 		Version:     "1.0.2",
@@ -99,11 +82,19 @@ func TestSerialise(t *testing.T) {
 		return
 	}
 
-	deserialised, err := DeserialiseGame(serialised)
+	d, err := DeserialiseGame(serialised)
 	if err != nil {
 		t.Error(err)
 		return
 	}
 
-	fmt.Println(deserialised)
+	// compare original and deserialised
+	if g.Title != d.Title ||
+		g.Version != d.Version ||
+		g.ReleaseDate != d.ReleaseDate ||
+		g.Developer != d.Developer ||
+		!bytes.Equal(g.RootHash, d.RootHash) {
+
+		t.Error("Deserialised game not identical to original")
+	}
 }

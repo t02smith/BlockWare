@@ -166,7 +166,7 @@ func OutputToFile(g *Game) error {
 	writer.Flush()
 
 	// output game data
-	err = g.data.OutputToFile(filepath.Join(viper.GetString("meta.directory"), viper.GetString("meta.hashes.directory"), fmt.Sprintf("%s-%s-%s.hash.json", g.Title, g.Version, g.Developer)))
+	err = g.data.OutputToFile(filepath.Join(viper.GetString("meta.hashes.directory"), fmt.Sprintf("%s-%s-%s.hash.json", g.Title, g.Version, g.Developer)))
 	if err != nil {
 		return err
 	}

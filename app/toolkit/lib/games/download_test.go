@@ -9,13 +9,9 @@ import (
 	"testing"
 
 	"github.com/spf13/viper"
-	"github.com/t02smith/part-iii-project/toolkit/test/util"
 )
 
 func setupTestDownload() (*Download, error) {
-	util.ClearTmp("../../")
-	util.SetupTmp("../../")
-
 	games, err := LoadGames("../../test/data/.toolkit")
 	if err != nil {
 		return nil, err

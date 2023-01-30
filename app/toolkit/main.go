@@ -9,10 +9,13 @@ import (
 
 	"github.com/spf13/viper"
 	"github.com/t02smith/part-iii-project/toolkit/cmd"
+	"github.com/t02smith/part-iii-project/toolkit/lib"
 )
 
 func main() {
 	SetupConfig()
+
+	log.SetFlags(log.LstdFlags | log.Lshortfile)
 
 	logLocation := viper.GetString("meta.log")
 	if logLocation != "stdout" {
@@ -25,5 +28,6 @@ func main() {
 		log.SetOutput(f)
 	}
 
+	lib.SetupToolkitEnvironment()
 	cmd.Execute()
 }

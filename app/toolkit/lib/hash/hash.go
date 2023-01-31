@@ -62,6 +62,7 @@ type VerifyHashTreeConfig struct {
 	continueAfterErrorCounter uint
 }
 
+// create a new hash tree of a directory
 func NewHashTree(rootDir string, shardSize uint) (*HashTree, error) {
 	if shardSize == 0 {
 		return nil, errors.New("shard size must be greater than 0")
@@ -130,13 +131,17 @@ func ReadHashTreeFromFile(filename string) (*HashTree, error) {
 // Hashing functions
 
 func (ht *HashTree) Hash() error {
-
 	fileCount, err := ht.buildTree()
 	if err != nil {
 		return err
 	}
 
-	wg, fileIn, _ := hasherPool(viper.GetInt("meta.hashes.workercount"), fileCount, ht.ShardSize)
+	wc := viper.GetInt("meta.hashes.workercount")
+	if wc <= 0 {
+		wc = 1
+	}
+
+	wg, fileIn, _ := hasherPool(wc, fileCount, ht.ShardSize)
 	_ = ht.RootDir.shardData(fileIn, ht.ShardSize)
 	wg.Wait()
 	return nil

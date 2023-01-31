@@ -2,7 +2,6 @@ package games
 
 import (
 	"bytes"
-	"crypto/sha256"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -21,86 +20,99 @@ func TestSetupDownload(t *testing.T) {
 	}
 }
 
-func TestSerialize(t *testing.T) {
-	gamesTestSetup()
-	defer gamesTestTeardown()
+func TestSerialization(t *testing.T) {
+	t.Cleanup(gamesTestTeardown)
 
-	d, _, err := setupTestDownload()
-	if err != nil {
-		t.Error(err)
-		return
-	}
+	t.Run("serialize", func(t *testing.T) {
 
-	err = d.Serialise()
-	if err != nil {
-		t.Errorf("Error serialising download: %s", err)
-		return
-	}
+		t.Run("success", func(t *testing.T) {
+			gamesTestSetup()
+			d, _, err := setupTestDownload()
+			if err != nil {
+				t.Fatal(err)
+			}
 
-	f, err := os.Stat(filepath.Join(viper.GetString("games.tracker.directory"), fmt.Sprintf("%x", d.GameRootHash)))
-	if err != nil {
-		t.Error(err)
-		return
-	}
+			err = d.Serialise()
+			if err != nil {
+				t.Fatalf("Error serialising download: %s", err)
+			}
 
-	if f.Size() == 0 {
-		t.Error("No contents stored in tracker file")
-		return
-	}
-}
+			f, err := os.Stat(filepath.Join(viper.GetString("games.tracker.directory"), fmt.Sprintf("%x", d.GameRootHash)))
+			if err != nil {
+				t.Fatal(err)
+			}
 
-func TestDeserialiseDownload(t *testing.T) {
-	gamesTestSetup()
-	defer gamesTestTeardown()
+			if f.Size() == 0 {
+				t.Fatalf("No contents stored in tracker file")
+			}
+		})
 
-	d, _, err := setupTestDownload()
-	if err != nil {
-		t.Error(err)
-	}
+	})
 
-	err = d.Serialise()
-	if err != nil {
-		t.Errorf("Error serialising download: %s", err)
-		return
-	}
+	t.Run("deserialize", func(t *testing.T) {
 
-	d2, err := DeserializeDownload(d.GameRootHash)
-	if err != nil {
-		t.Errorf("Error deserializing download: %s", err)
-		return
-	}
+		t.Run("success", func(t *testing.T) {
+			gamesTestSetup()
 
-	// compare downloads
-	if !bytes.Equal(d.GameRootHash[:], d2.GameRootHash[:]) {
-		t.Error("Games not the same")
-		return
-	}
+			d, _, err := setupTestDownload()
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			err = d.Serialise()
+			if err != nil {
+				t.Fatalf("Error serialising download: %s", err)
+			}
+
+			d2, err := DeserializeDownload(d.GameRootHash)
+			if err != nil {
+				t.Fatalf("Error deserializing download: %s", err)
+			}
+
+			// compare downloads
+			if !bytes.Equal(d.GameRootHash[:], d2.GameRootHash[:]) {
+				t.Fatal("Games not the same")
+			}
+		})
+	})
+
 }
 
 func TestFindBlock(t *testing.T) {
-	t.SkipNow()
-	gamesTestSetup()
-	defer gamesTestTeardown()
 
-	d, _, err := setupTestDownload()
-	if err != nil {
-		t.Error(err)
-	}
+	t.Cleanup(gamesTestTeardown)
 
-	missingHash := sha256.Sum256([]byte("hello"))
-
-	// request with no peers connected
-	err = d.FindBlock(missingHash)
-	if err == nil {
-		t.Error("This function should error if no peers are connected")
-	}
-
-	// * connect a new peer
-
-	// request an unknown hash
-	err = d.FindBlock(missingHash)
-	if err == nil {
-		t.Error("This block doesn't exist and should error")
-	}
+	t.Run("success", func(t *testing.T) {
+		gamesTestSetup()
+		// TODO
+	})
 
 }
+
+// func TestFindBlock2(t *testing.T) {
+// 	t.SkipNow()
+// 	gamesTestSetup()
+// 	defer gamesTestTeardown()
+
+// 	d, _, err := setupTestDownload()
+// 	if err != nil {
+// 		t.Error(err)
+// 	}
+
+// 	missingHash := sha256.Sum256([]byte("hello"))
+
+// 	// request with no peers connected
+// 	err = d.FindBlock(missingHash)
+// 	if err == nil {
+// 		t.Error("This function should error if no peers are connected")
+// 	}
+
+// 	// * connect a new peer
+
+// 	// request an unknown hash
+// 	err = d.FindBlock(missingHash)
+// 	if err == nil {
+// 		t.Error("This block doesn't exist and should error")
+// 	}
+
+// }

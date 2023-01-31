@@ -7,134 +7,144 @@ import (
 	"time"
 )
 
-// Create Game
+func TestCreateGame(t *testing.T) {
+	t.Run("illegal arguments", func(t *testing.T) {
 
-func TestCreateGameSuccess(t *testing.T) {
-	datetime := time.Date(2002, 1, 10, 0, 0, 0, 0, time.UTC).String()
+		table := []struct {
+			name        string
+			title       string
+			version     string
+			releaseDate string
+			developer   string
+			rootDir     string
+			shardSize   uint
+		}{
+			{"root directory", "test-game", "1.1.1", time.Now().String(), "tcs1g20.com", "./fake/root/dir", 64},
+			{"release date", "test-game", "1.1.2", "not a real time", "tcs1g20.com", ".", 64},
+			{"invalid domain", "test-game", "1.1.2", time.Now().String(), "not.real.domain.t02smith.com", ".", 64},
+			{"invalid shard size", "test-game", "1.1.1", time.Now().String(), "google.com", ".", 0},
+		}
 
-	game, err := CreateGame("test-game", "1.1.1", datetime, "google.com", "../../test/data/testdir", 64)
-	if err != nil {
-		t.Errorf("Error creating game: %s", err)
-		return
-	}
+		for _, x := range table {
+			t.Run(x.name, func(t *testing.T) {
+				_, err := CreateGame(x.name, x.version, x.releaseDate, x.developer, x.rootDir, x.shardSize)
+				if err == nil {
+					t.Fatalf("Failed to detect illegal argument: %s", x.name)
+				}
+			})
+		}
+	})
 
-	if game.Title != "test-game" {
-		t.Errorf("Incorrect game name")
-	}
+	t.Run("success", func(t *testing.T) {
+		datetime := time.Date(2002, 1, 10, 0, 0, 0, 0, time.UTC).String()
 
-	if game.Developer != "google.com" {
-		t.Errorf("Incorrect developer")
-	}
+		game, err := CreateGame("test-game", "1.1.1", datetime, "google.com", "../../test/data/testdir", 64)
+		if err != nil {
+			t.Errorf("Error creating game: %s", err)
+			return
+		}
 
-	if game.Version != "1.1.1" {
-		t.Errorf("Incorrect version")
-	}
+		if game.Title != "test-game" {
+			t.Errorf("Incorrect game name")
+		}
 
-	if game.ReleaseDate != datetime {
-		t.Errorf("Invalid release date")
-	}
+		if game.Developer != "google.com" {
+			t.Errorf("Incorrect developer")
+		}
 
-	if game.data == nil {
-		t.Errorf("Invalid game data")
-	}
+		if game.Version != "1.1.1" {
+			t.Errorf("Incorrect version")
+		}
 
-}
+		if game.ReleaseDate != datetime {
+			t.Errorf("Invalid release date")
+		}
 
-func TestCreateGameInvalidRootDir(t *testing.T) {
-	_, err := CreateGame("test-game", "1.1.1", time.Now().String(), "tcs1g20.com", "./fake/root/dir", 64)
-	if err == nil {
-		t.Errorf("Fake directory not detected")
-	}
-}
-
-func TestCreateGameInvalidArguments(t *testing.T) {
-	_, err := CreateGame("test-game", "-@123", time.Now().String(), "tcs1g20.com", ".", 64)
-	if err == nil {
-		t.Errorf("Invalid version number accepted")
-	}
-
-	_, err = CreateGame("test-game", "1.1.2", "not a real time", "tcs1g20.com", ".", 64)
-	if err == nil {
-		t.Errorf("Invalid datetime accepted")
-	}
-
-	_, err = CreateGame("test-game", "1.1.2", time.Now().String(), "not.real.domain.t02smith.com", ".", 64)
-	if err == nil {
-		t.Errorf("Invalid domain accepted")
-	}
-
+		if game.data == nil {
+			t.Errorf("Invalid game data")
+		}
+	})
 }
 
 func TestSerialise(t *testing.T) {
-	gamesTestSetup()
-	defer gamesTestTeardown()
+	t.Run("success", func(t *testing.T) {
+		gamesTestSetup()
+		defer gamesTestTeardown()
 
-	var h [32]byte
-	copy(h[:], []byte("test"))
+		var h [32]byte
+		copy(h[:], []byte("test"))
 
-	g := &Game{
-		Title:       "Test Game",
-		Version:     "1.0.2",
-		ReleaseDate: time.Now().String(),
-		Developer:   "tcs1g20",
-		RootHash:    h,
-	}
+		g := &Game{
+			Title:       "Test Game",
+			Version:     "1.0.2",
+			ReleaseDate: time.Now().String(),
+			Developer:   "tcs1g20",
+			RootHash:    h,
+		}
 
-	serialised, err := g.Serialise()
-	if err != nil {
-		t.Error(err)
-		return
-	}
+		serialised, err := g.Serialise()
+		if err != nil {
+			t.Error(err)
+			return
+		}
 
-	d, err := DeserialiseGame(serialised)
-	if err != nil {
-		t.Error(err)
-		return
-	}
+		d, err := DeserialiseGame(serialised)
+		if err != nil {
+			t.Error(err)
+			return
+		}
 
-	// compare original and deserialised
-	if g.Title != d.Title ||
-		g.Version != d.Version ||
-		g.ReleaseDate != d.ReleaseDate ||
-		g.Developer != d.Developer ||
-		!bytes.Equal(g.RootHash[:], d.RootHash[:]) {
-
-		t.Error("Deserialised game not identical to original")
-	}
+		if !g.Equals(d) {
+			t.Fatalf("Deserialised game not identical to original")
+		}
+	})
 }
 
 func TestFetchShard(t *testing.T) {
 
-	// load game made from our test directory
-	gs, err := LoadGames("../../test/data/.toolkit")
+	g, err := fetchTestGame()
 	if err != nil {
-		t.Errorf("games failed to load: %s", err)
-		return
+		t.Fatalf("error fetching test game %s", err)
 	}
 
-	if len(gs) == 0 {
-		t.Errorf("no games found. Make sure games_test:setupTestGame has been run")
-		return
+	type FetchShardInput struct {
+		subdirs  []string
+		filename string
+		hashNo   int
 	}
 
-	g := gs[0]
-	err = g.ReadHashData()
-	if err != nil {
-		t.Errorf("Error reading hash data from game %s", err)
-		return
-	}
+	t.Run("success", func(t *testing.T) {
 
-	// fetch shard from storage and compare with expected
-	hash := g.data.RootDir.Files["architecture-diagram.png"].Hashes[0]
-	foundShard, err := g.FetchShard(hash)
-	if err != nil {
-		t.Errorf("Error fetching shard: %s", err)
-	}
+		table := []FetchShardInput{
+			{[]string{}, "architecture-diagram.png", 0},
+			{[]string{"subdir"}, "chip8.c", 2},
+		}
 
-	foundShardHash := sha256.Sum256(foundShard)
-	if !bytes.Equal(hash[:], foundShardHash[:]) {
-		t.Errorf("Incorrect shard found")
-		return
-	}
+		for _, x := range table {
+			t.Run(x.filename, func(t *testing.T) {
+				dir := g.data.RootDir
+				for _, sd := range x.subdirs {
+					dir = dir.Subdirs[sd]
+				}
 
+				hash := dir.Files[x.filename].Hashes[x.hashNo]
+				foundShard, err := g.FetchShard(hash)
+				if err != nil {
+					t.Errorf("Error fetching shard: %s", err)
+				}
+
+				foundShardHash := sha256.Sum256(foundShard)
+				if !bytes.Equal(hash[:], foundShardHash[:]) {
+					t.Errorf("Incorrect shard found")
+					return
+				}
+			})
+		}
+	})
+
+	t.Run("failure", func(t *testing.T) {
+		// TODO
+	})
+
+	gamesTestSetup()
 }

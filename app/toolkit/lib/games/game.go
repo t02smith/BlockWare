@@ -46,6 +46,11 @@ var (
 
 func CreateGame(title, version, releaseDate, developer, rootDir string, shardSize uint) (*Game, error) {
 
+	if shardSize == 0 {
+		log.Println("shard size should be > 0")
+		return nil, errors.New("invalid shard size")
+	}
+
 	// check version format
 	versionMatches, err := regexp.MatchString("^(\\d+\\.)*\\d+$", version)
 	if err != nil {

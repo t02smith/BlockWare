@@ -28,11 +28,10 @@ func (t *HashTree) FindShard(hash [32]byte) (bool, string, int) {
 }
 
 func (td *HashTreeDir) findShard(hash [32]byte) (bool, string, int) {
-
 	for _, f := range td.Files {
 		for i, h := range f.Hashes {
 			if bytes.Equal(hash[:], h[:]) {
-				return true, f.Filename, i
+				return true, filepath.Join(td.Dirname, f.Filename), i
 			}
 		}
 	}

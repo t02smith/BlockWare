@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/t02smith/part-iii-project/toolkit/lib/games"
+	"github.com/t02smith/part-iii-project/toolkit/test/testutil"
 )
 
 func TestGameListToMessage(t *testing.T) {
@@ -54,119 +55,114 @@ func TestGameListToMessage(t *testing.T) {
 	}
 }
 
-func TestOnMessageLibrary(t *testing.T) {
-	beforeEach()
+func TestOnMessage(t *testing.T) {
 
-	var h [32]byte
-	copy(h[:], []byte("hello there"))
-
-	datetime := time.Date(2002, 01, 10, 0, 0, 0, 0, time.Local).String()
-	fakeGame := &games.Game{
-		Title:       "fake game",
-		Version:     "2.7.5",
-		ReleaseDate: datetime,
-		Developer:   "t02smith.com",
-		RootHash:    h,
-	}
-
-	s, err := fakeGame.Serialise()
+	mp, err := testutil.StartMockPeer(7887)
 	if err != nil {
-		t.Error(err)
-		return
+		t.Fatalf("Failed to start mock peer %s", err)
 	}
 
-	mockPeer.SetResponse("LIBRARY\n", fmt.Sprintf("GAMES;%s;\n", s))
-	mockPeerClient.SendString("LIBRARY\n")
-	time.Sleep(25 * time.Millisecond)
-
-	if pd, ok := testPeer.peers[mockPeerClient]; ok {
-
-		if len(pd.Library) == 0 {
-			t.Error("Games not stored")
-			return
-		}
-
-		g := pd.Library[0]
-
-		fmt.Println(g)
-
-		if !g.Equals(fakeGame) {
-			t.Error("Games not equal")
-			return
-		}
-	} else {
-		t.Error("Game not stored in peer's library")
-	}
-}
-
-func TestOnMessageBlockWhenBlockExists(t *testing.T) {
-	t.Skip()
-	beforeEach()
-
-	testHash := sha256.Sum256([]byte("1234567890"))
-	message := fmt.Sprintf("BLOCK;%x;\n", testHash)
-
-	data := make([]byte, 8192)
-	for i := range data {
-		data[i] = 1
-	}
-
-	mockPeer.SetResponse(message, "SEND_BLOCK;%x;\n")
-	mockPeer.SetOnReceive(message, func() {
-		mockPeer.SendBytes(data)
+	t.Cleanup(func() {
+		mp.Clear()
 	})
 
-	mockPeerClient.SendString(message)
-	time.Sleep(25 * time.Millisecond)
-}
+	t.Run("LIBRARY", func(t *testing.T) {
+		var h [32]byte
+		copy(h[:], []byte("hello there"))
 
-func TestOnMessageBlockWhenBlockDoesntExist(t *testing.T) {
+		datetime := time.Date(2002, 01, 10, 0, 0, 0, 0, time.Local).String()
+		fakeGame := &games.Game{
+			Title:       "fake game",
+			Version:     "2.7.5",
+			ReleaseDate: datetime,
+			Developer:   "t02smith.com",
+			RootHash:    h,
+		}
 
+		s, err := fakeGame.Serialise()
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		mockPeer.SetResponse("LIBRARY\n", fmt.Sprintf("GAMES;%s;\n", s))
+		mockPeerClient.SendString("LIBRARY\n")
+		time.Sleep(25 * time.Millisecond)
+
+		if pd, ok := testPeer.peers[mockPeerClient]; ok {
+
+			if len(pd.Library) == 0 {
+				t.Fatal("Games not stored")
+			}
+
+			g := pd.Library[0]
+			if !g.Equals(fakeGame) {
+				t.Fatal("Games not equal")
+			}
+
+			return
+		}
+
+		t.Fatal("Game not stored in peer's library")
+	})
+
+	t.Run("BLOCK", func(t *testing.T) {
+		// TODO
+
+		t.Run("block exists", func(t *testing.T) {
+
+		})
+
+		t.Run("block doesn't exist", func(t *testing.T) {
+
+		})
+
+	})
+
+	mp.Close()
 }
 
 // util functions
 
 func TestFetchBlock(t *testing.T) {
-	beforeEach()
 
-	// ! game doesn't exist
-	_, err := fetchBlock([32]byte{}, [32]byte{})
-	if err == nil {
-		t.Error("Missing game not identified as not existing")
-	}
-
-	// ! game exists but block does not
+	t.Run("game doesn't exist", func(t *testing.T) {
+		_, err := fetchBlock([32]byte{}, [32]byte{})
+		if err == nil {
+			t.Error("Missing game not identified as not existing")
+		}
+	})
 
 	p := GetPeerInstance()
 	g, err := fetchTestGame()
 	if err != nil {
-		t.Error(err)
-		return
+		t.Fatal(err)
 	}
 
 	p.library.AddGame(g)
 
-	_, err = fetchBlock(g.RootHash, [32]byte{})
-	if err == nil {
-		t.Error("Block should not have been identified")
-	}
+	t.Run("game exists but block does not", func(t *testing.T) {
+		_, err = fetchBlock(g.RootHash, [32]byte{})
+		if err == nil {
+			t.Error("Block should not have been identified")
+		}
+	})
 
-	// ! game and block exists and is fetched successfully
-	ht, err := g.GetData()
-	if err != nil {
-		t.Error(err)
-		return
-	}
+	t.Run("success", func(t *testing.T) {
+		ht, err := g.GetData()
+		if err != nil {
+			t.Fatal(err)
+		}
 
-	hash := ht.RootDir.Files["architecture-diagram.png"].Hashes[1]
-	data, err := fetchBlock(g.RootHash, hash)
-	if err != nil {
-		t.Error(err)
-		return
-	}
+		hash := ht.RootDir.Files["architecture-diagram.png"].Hashes[1]
+		data, err := fetchBlock(g.RootHash, hash)
+		if err != nil {
+			t.Fatal(err)
+		}
 
-	dataHash := sha256.Sum256(data)
-	if !bytes.Equal(dataHash[:], hash[:]) {
-		t.Error("incorrect block fetched")
-	}
+		dataHash := sha256.Sum256(data)
+		if !bytes.Equal(dataHash[:], hash[:]) {
+			t.Fatal("incorrect block fetched")
+		}
+	})
+
 }

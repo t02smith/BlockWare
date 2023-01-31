@@ -1,8 +1,9 @@
 package hash
 
 import (
-	"log"
 	"sync"
+
+	"github.com/t02smith/part-iii-project/toolkit/lib"
 )
 
 /**
@@ -30,7 +31,7 @@ func hasherPool(capacity int, fileCount int, shardSize uint) (*sync.WaitGroup, c
 func worker(id int, wg *sync.WaitGroup, shardSize uint, files <-chan *HashTreeFile, errors chan<- error) {
 
 	for f := range files {
-		log.Printf("WORKER %d: Sharding file %s\n", id, f.AbsoluteFilename)
+		lib.Logger.Infof("WORKER %d: Sharding file %s\n", id, f.AbsoluteFilename)
 		err := f.shardFile(shardSize)
 		if err != nil {
 			errors <- err

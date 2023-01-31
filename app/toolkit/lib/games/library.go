@@ -2,7 +2,8 @@ package games
 
 import (
 	"errors"
-	"log"
+
+	"github.com/t02smith/part-iii-project/toolkit/lib"
 )
 
 /*
@@ -34,7 +35,7 @@ func NewLibrary() *Library {
 }
 
 func (l *Library) createDownload(g *Game) error {
-	log.Printf("Creating download for %s:%x", g.Title, g.RootHash)
+	lib.Logger.Infof("Creating download for %s:%x", g.Title, g.RootHash)
 	if _, ok := l.games[g.RootHash]; !ok {
 		return errors.New("game not found in library, cannot add download")
 	}
@@ -49,7 +50,7 @@ func (l *Library) createDownload(g *Game) error {
 	}
 
 	l.AddDownload(d)
-	log.Printf("Download created for %s:%x", g.Title, g.RootHash)
+	lib.Logger.Infof("Download created for %s:%x", g.Title, g.RootHash)
 	return nil
 }
 

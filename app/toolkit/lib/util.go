@@ -1,7 +1,6 @@
 package lib
 
 import (
-	"log"
 	"os"
 	"path/filepath"
 
@@ -54,7 +53,7 @@ func createDirectoryIfNotExist(dir string) error {
 	}
 
 	if os.IsNotExist(err) {
-		log.Printf("Directory %s not found. Creating directory", dir)
+		Logger.Infof("Directory %s not found. Creating directory", dir)
 		err = os.Mkdir(dir, 0775)
 
 		if err != nil {

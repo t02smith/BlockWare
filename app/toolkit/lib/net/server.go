@@ -4,9 +4,10 @@ import (
 	"bufio"
 	"fmt"
 	"io"
-	"log"
 	"net"
 	"strings"
+
+	"github.com/t02smith/part-iii-project/toolkit/lib"
 )
 
 /**
@@ -43,17 +44,18 @@ func InitServer(hostname string, port uint) *TCPServer {
 }
 
 func (s *TCPServer) Start(onMessage func([]string, PeerIT)) error {
-	log.Printf("Starting server on %s:%d", s.hostname, s.port)
+	lib.Logger.Infof("Starting server on %s:%d", s.hostname, s.port)
+
 	ln, err := net.Listen("tcp", fmt.Sprintf("%s:%d", s.hostname, s.port))
 	if err != nil {
-		log.Printf("Error starting server: %s", err)
+		lib.Logger.Errorf("Error starting server: %s", err)
 		return err
 	}
 
 	s.listener = ln
-	log.Printf("Server listening on %s:%d", s.hostname, s.port)
+	lib.Logger.Infof("Server listening on %s:%d", s.hostname, s.port)
 	s.listen(onMessage)
-	log.Println("server started")
+	lib.Logger.Infof("server started")
 	return nil
 }
 
@@ -61,11 +63,11 @@ func (s *TCPServer) listen(onMessage func([]string, PeerIT)) {
 	for {
 		con, err := s.listener.Accept()
 		if err != nil {
-			log.Printf("Error connecting to client: %s", err)
+			lib.Logger.Errorf("Error connecting to client: %s", err)
 			return
 		}
 
-		log.Printf("Client joined: %s", con.RemoteAddr())
+		lib.Logger.Infof("Client joined: %s", con.RemoteAddr())
 		client := &TCPServerClient{
 			con:    con,
 			reader: bufio.NewReader(con),
@@ -96,11 +98,11 @@ func (c *TCPServerClient) listen(onMessage func([]string, PeerIT)) {
 				return
 			}
 
-			log.Printf("Malformed message from client: %s", err)
+			lib.Logger.Warnf("Malformed message from client: %s", err)
 			continue
 		}
 
-		log.Printf("message received %s\n", msg)
+		lib.Logger.Infof("message received %s\n", msg)
 		onMessage(strings.Split(msg[:len(msg)-1], ";"), c)
 	}
 }
@@ -108,13 +110,13 @@ func (c *TCPServerClient) listen(onMessage func([]string, PeerIT)) {
 func (c *TCPServerClient) Send(command []byte) error {
 	_, err := c.writer.Write(command)
 	if err != nil {
-		log.Printf("Error sending message %s", err)
+		lib.Logger.Errorf("Error sending message %s", err)
 		return err
 	}
 
 	err = c.writer.Flush()
 	if err != nil {
-		log.Printf("Error sending message %s", err)
+		lib.Logger.Errorf("Error sending message %s", err)
 		return err
 	}
 
@@ -122,16 +124,16 @@ func (c *TCPServerClient) Send(command []byte) error {
 }
 
 func (c *TCPServerClient) SendString(command string) error {
-	log.Printf("Sending %s\n", command)
+	lib.Logger.Infof("Sending %s\n", command)
 	_, err := c.writer.WriteString(command)
 	if err != nil {
-		log.Printf("Error sending message %s", err)
+		lib.Logger.Errorf("Error sending message %s", err)
 		return err
 	}
 
 	err = c.writer.Flush()
 	if err != nil {
-		log.Printf("Error sending message %s", err)
+		lib.Logger.Errorf("Error sending message %s", err)
 		return err
 	}
 

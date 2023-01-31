@@ -4,9 +4,10 @@ import (
 	"bufio"
 	"fmt"
 	"io"
-	"log"
 	"net"
 	"strings"
+
+	"github.com/t02smith/part-iii-project/toolkit/lib"
 )
 
 type TCPClient struct {
@@ -22,10 +23,10 @@ type TCPClient struct {
 }
 
 func InitTCPClient(serverHostname string, serverPort uint) (*TCPClient, error) {
-	log.Printf("Attempting to open connection to %s:%d", serverHostname, serverPort)
+	lib.Logger.Infof("Attempting to open connection to %s:%d", serverHostname, serverPort)
 	con, err := net.Dial("tcp", fmt.Sprintf("%s:%d", serverHostname, serverPort))
 	if err != nil {
-		log.Printf("Error connecting to %s:%d: %s", serverHostname, serverPort, err)
+		lib.Logger.Errorf("Error connecting to %s:%d: %s", serverHostname, serverPort, err)
 		return nil, err
 	}
 
@@ -53,11 +54,11 @@ func (c *TCPClient) listen(onMessage func([]string, PeerIT)) {
 				return
 			}
 
-			log.Printf("Malformed message from client: %s", err)
+			lib.Logger.Warnf("Malformed message from client: %s", err)
 			continue
 		}
 
-		log.Printf("message received %s\n", msg)
+		lib.Logger.Infof("message received %s\n", msg)
 		onMessage(strings.Split(msg[:len(msg)-1], ";"), c)
 	}
 }
@@ -65,13 +66,13 @@ func (c *TCPClient) listen(onMessage func([]string, PeerIT)) {
 func (c *TCPClient) Send(command []byte) error {
 	_, err := c.writer.Write(command)
 	if err != nil {
-		log.Printf("Error sending message %s", err)
+		lib.Logger.Errorf("Error sending message %s", err)
 		return err
 	}
 
 	err = c.writer.Flush()
 	if err != nil {
-		log.Printf("Error sending message %s", err)
+		lib.Logger.Errorf("Error sending message %s", err)
 		return err
 	}
 
@@ -81,13 +82,13 @@ func (c *TCPClient) Send(command []byte) error {
 func (c *TCPClient) SendString(command string) error {
 	_, err := c.writer.WriteString(command)
 	if err != nil {
-		log.Printf("Error sending message %s", err)
+		lib.Logger.Errorf("Error sending message %s", err)
 		return err
 	}
 
 	err = c.writer.Flush()
 	if err != nil {
-		log.Printf("Error sending message %s", err)
+		lib.Logger.Errorf("Error sending message %s", err)
 		return err
 	}
 

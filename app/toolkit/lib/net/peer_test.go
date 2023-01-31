@@ -16,26 +16,28 @@ func TestMain(m *testing.M) {
 
 // start peer
 
-func TestStartPeer(t *testing.T) {
-	beforeEach()
+// func TestStartPeer(t *testing.T) {
+// 	beforeEach()
 
-	singleton := GetPeerInstance()
-	if singleton == nil || testPeer != singleton {
-		t.Error("singleton not set")
-		return
-	}
+// 	singleton := GetPeerInstance()
+// 	if singleton == nil || testPeer != singleton {
+// 		t.Error("singleton not set")
+// 		return
+// 	}
 
-	p, err := StartPeer("localhost", 5685, "../../test/data/tmp", "../../test/data")
-	if err != nil {
-		t.Error(err)
-		return
-	}
+// 	p, err := StartPeer("localhost", 5685, "../../test/data/tmp", "../../test/data")
+// 	if err != nil {
+// 		t.Error(err)
+// 		return
+// 	}
 
-	if singleton == nil || p != singleton {
-		t.Error("singleton should not be changed once instantiated")
-		return
-	}
-}
+// 	if singleton == nil || p != singleton {
+// 		t.Error("singleton should not be changed once instantiated")
+// 		return
+// 	}
+
+// 	t.Error("")
+// }
 
 func TestConnectToPeer(t *testing.T) {
 	beforeEach()

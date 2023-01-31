@@ -5,9 +5,9 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"log"
 
 	"github.com/spf13/viper"
+	"github.com/t02smith/part-iii-project/toolkit/lib"
 	"github.com/t02smith/part-iii-project/toolkit/lib/games"
 )
 
@@ -18,17 +18,17 @@ func onMessage(cmd []string, client PeerIT) {
 
 	// LIBRARY => request a list of a peers games
 	case "LIBRARY":
-		log.Println("Library command called")
+		lib.Logger.Info("Library command called")
 
 		gameLs, err := games.LoadGames(viper.GetString("meta.directory"))
 		if err != nil {
-			log.Printf("Error loading games: %s\n", err)
+			lib.Logger.Errorf("Error loading games: %s\n", err)
 			return
 		}
 
 		gameStr, err := gameListToMessage(gameLs)
 		if err != nil {
-			log.Printf("Error serialising games: %s\n", err)
+			lib.Logger.Errorf("Error serialising games: %s\n", err)
 			return
 		}
 
@@ -37,16 +37,16 @@ func onMessage(cmd []string, client PeerIT) {
 
 	// GAMES => a list of users games
 	case "GAMES":
-		log.Println("Games command called")
+		lib.Logger.Infof("Games command called")
 
 		ls, err := gameMessageToGameList(cmd)
 		if err != nil {
-			log.Printf("Error reading games: %s\n", err)
+			lib.Logger.Errorf("Error reading games: %s\n", err)
 			return
 		}
 
 		if peer, ok := p.peers[client]; ok {
-			log.Println("Client found. Updating library")
+			lib.Logger.Infof("Client found. Updating library")
 			peer.Library = ls
 		}
 
@@ -54,7 +54,7 @@ func onMessage(cmd []string, client PeerIT) {
 
 	// BLOCK <hash> => Request a block of data from a user
 	case "BLOCK":
-		log.Printf("Block command called for block %s", cmd[1])
+		lib.Logger.Infof("Block command called for block %s", cmd[1])
 
 		// haveBlock, err :=
 

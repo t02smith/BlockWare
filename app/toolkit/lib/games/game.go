@@ -12,7 +12,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"log"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -20,6 +19,7 @@ import (
 	"time"
 
 	"github.com/spf13/viper"
+	"github.com/t02smith/part-iii-project/toolkit/lib"
 	hashIO "github.com/t02smith/part-iii-project/toolkit/lib/hash"
 )
 
@@ -47,26 +47,26 @@ var (
 func CreateGame(title, version, releaseDate, developer, rootDir string, shardSize uint) (*Game, error) {
 
 	if shardSize == 0 {
-		log.Println("shard size should be > 0")
+		lib.Logger.Errorf("shard size should be > 0")
 		return nil, errors.New("invalid shard size")
 	}
 
 	// check version format
 	versionMatches, err := regexp.MatchString("^(\\d+\\.)*\\d+$", version)
 	if err != nil {
-		log.Println("error matching version number to regex")
+		lib.Logger.Errorf("error matching version number to regex")
 		return nil, err
 	}
 
 	if !versionMatches {
-		log.Println("invalid version number")
+		lib.Logger.Errorf("invalid version number")
 		return nil, errors.New("invalid version number")
 	}
 
 	// check release date
 	_, err = time.Parse("2006-01-02 15:04:05 -0700 MST", releaseDate)
 	if err != nil {
-		log.Println("invalid release date given")
+		lib.Logger.Errorf("invalid release date given")
 		return nil, errors.New("invalid release date given")
 	}
 
@@ -155,7 +155,7 @@ func (g *Game) ReadHashData() error {
 
 func OutputToFile(g *Game) error {
 	gameFilename := filepath.Join(viper.GetString("meta.directory"), fmt.Sprintf("%s-%s-%s.json", g.Title, g.Version, g.Developer))
-	log.Printf("Outputting game data to %s\n", gameFilename)
+	lib.Logger.Infof("Outputting game data to %s\n", gameFilename)
 
 	// output game metadata
 	e, err := json.Marshal(g)

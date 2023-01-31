@@ -8,6 +8,11 @@ import (
 	"github.com/t02smith/part-iii-project/toolkit/test/testutil"
 )
 
+func TestMain(m *testing.M) {
+	InitLogger()
+	os.Exit(m.Run())
+}
+
 func utilTestSetup() {
 	testutil.ClearTmp("../")
 	viper.Set("meta.directory", "../test/data/tmp/.toolkit")

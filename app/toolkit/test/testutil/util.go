@@ -17,7 +17,6 @@ func SetupTmp(toRoot string) error {
 }
 
 func ClearTmp(toRoot string) {
-	log.Println("Clearing test tmp folder")
 	tmp, err := os.Open(filepath.Join(toRoot, "./test/data/tmp"))
 	if err != nil {
 		log.Println(err)

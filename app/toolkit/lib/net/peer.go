@@ -1,10 +1,10 @@
 package net
 
 import (
-	"log"
 	"sync"
 
 	"github.com/t02smith/part-iii-project/toolkit/cmd/view"
+	"github.com/t02smith/part-iii-project/toolkit/lib"
 	"github.com/t02smith/part-iii-project/toolkit/lib/games"
 )
 
@@ -59,14 +59,14 @@ func GetPeerInstance() *peer {
 
 // start a new instance of a peer
 func StartPeer(serverHostname string, serverPort uint, installFolder, gameDataLocation string) (*peer, error) {
-	log.Println("Starting peer")
+	lib.Logger.Info("Starting peer")
 	once.Do(func() {
 		gameLs, err := games.LoadGames(gameDataLocation)
 		if err != nil {
 			return
 		}
 
-		log.Printf("Found %d games\n", len(gameLs))
+		lib.Logger.Infof("Found %d games\n", len(gameLs))
 		view.OutputGamesTable(gameLs)
 
 		lib := games.NewLibrary()
@@ -100,7 +100,7 @@ func (p *peer) onConnection(hostname string, port uint, peer PeerIT) {
 
 // run this function after closing a connection to an existing peer
 func (p *peer) onClose(peer PeerIT) {
-	log.Printf("Closing connection to %s", peer.Info())
+	lib.Logger.Infof("Closing connection to %s", peer.Info())
 	delete(p.peers, peer)
 }
 

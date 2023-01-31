@@ -12,6 +12,7 @@ import (
 )
 
 func TestMain(m *testing.M) {
+	lib.InitLogger()
 	testutil.SetupTestConfig()
 	lib.SetupToolkitEnvironment()
 

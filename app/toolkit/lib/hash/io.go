@@ -4,19 +4,20 @@ import (
 	"bufio"
 	"bytes"
 	"errors"
-	"log"
 	"os"
 	"path/filepath"
+
+	"github.com/t02smith/part-iii-project/toolkit/lib"
 )
 
 func (t *HashTree) GetShard(hash [32]byte) ([]byte, error) {
-	log.Printf("Looking for shard %x in %s", hash, t.RootDirLocation)
+	lib.Logger.Infof("Looking for shard %x in %s", hash, t.RootDirLocation)
 	found, location, offset := t.FindShard(hash)
 	if !found {
 		return nil, errors.New("shard not found")
 	}
 
-	log.Printf("Shard found at %s - piece %d", location, offset)
+	lib.Logger.Infof("Shard found at %s - piece %d", location, offset)
 	return t.readShard(location, offset)
 }
 
@@ -94,7 +95,7 @@ func (t *HashTree) CreateDummyFiles(rootDir, title string, onCreate func(string,
 }
 
 func (t *HashTree) createDummyFilesFromDirectory(dir *HashTreeDir, path string, onCreate func(string, *HashTreeFile)) error {
-	log.Printf("Generating files for folder %s", filepath.Join(path, dir.Dirname))
+	lib.Logger.Infof("Generating files for folder %s", filepath.Join(path, dir.Dirname))
 
 	if len(dir.Dirname) > 0 {
 		err := os.Mkdir(filepath.Join(path, dir.Dirname), 0777)
@@ -106,7 +107,7 @@ func (t *HashTree) createDummyFilesFromDirectory(dir *HashTreeDir, path string, 
 	// generate files
 	for _, f := range dir.Files {
 		fileLocation := filepath.Join(path, dir.Dirname, f.Filename)
-		log.Printf("Creating dummy for %s", fileLocation)
+		lib.Logger.Infof("Creating dummy for %s", fileLocation)
 		err := setupFile(fileLocation, t.ShardSize, uint(len(f.Hashes)))
 		if err != nil {
 			return err
@@ -127,7 +128,7 @@ func (t *HashTree) createDummyFilesFromDirectory(dir *HashTreeDir, path string, 
 }
 
 func setupFile(filename string, shardSize, shardCount uint) error {
-	log.Printf("Creating empty file %s", filename)
+	lib.Logger.Infof("Creating empty file %s", filename)
 	file, err := os.Create(filename)
 	if err != nil {
 		return err
@@ -145,7 +146,7 @@ func setupFile(filename string, shardSize, shardCount uint) error {
 		}
 	}
 
-	log.Printf("%s created", filename)
+	lib.Logger.Infof("%s created", filename)
 	return nil
 }
 
@@ -165,7 +166,7 @@ func insertData(filename string, shardSize, offset uint, data []byte) error {
 		return err
 	}
 
-	log.Printf("Writing shard to %s:%d", filename, offset)
+	lib.Logger.Infof("Writing shard to %s:%d", filename, offset)
 	writer := bufio.NewWriter(file)
 	writer.Write(data)
 	writer.Flush()

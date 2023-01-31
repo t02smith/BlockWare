@@ -6,10 +6,12 @@ import (
 	"testing"
 
 	"github.com/spf13/viper"
+	"github.com/t02smith/part-iii-project/toolkit/lib"
 )
 
 func TestMain(m *testing.M) {
 	viper.Set("meta.hashes.workerCount", 5)
+	lib.InitLogger()
 
 	code := m.Run()
 	os.Exit(code)

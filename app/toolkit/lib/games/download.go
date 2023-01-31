@@ -17,7 +17,7 @@ import (
 type Download struct {
 
 	// The root hash of the game being downloaded
-	GameRootHash []byte
+	GameRootHash [32]byte
 
 	// progress of each file being downloaded
 	Progress map[[32]byte]FileProgress
@@ -38,7 +38,7 @@ type FileProgress struct {
 // serialisation
 
 // file -> download object
-func DeserializeDownload(gameHash []byte) (*Download, error) {
+func DeserializeDownload(gameHash [32]byte) (*Download, error) {
 	log.Printf("Deserialized download %x", gameHash)
 	dir := viper.GetString("games.tracker.directory")
 	if len(dir) == 0 {
@@ -92,7 +92,7 @@ func (d *Download) Serialise() error {
 // ? setup
 
 // create a new download for an existing game
-func SetupDownload(game *Game) (*Download, error) {
+func setupDownload(game *Game) (*Download, error) {
 
 	// read hash data if isn't already loaded
 	if game.data == nil {
@@ -153,6 +153,10 @@ func (d *Download) ContinueDownload() error {
 
 // find a new block from current peers
 func (d *Download) FindBlock(hash [32]byte) error {
+
+	// which peers have the game
+
+	// which peers have that block
 
 	return nil
 }

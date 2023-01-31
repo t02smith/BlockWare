@@ -1,6 +1,7 @@
 package games
 
 import (
+	"errors"
 	"log"
 	"os"
 	"testing"
@@ -58,6 +59,40 @@ func setupTestGame() error {
 	}
 
 	return nil
+}
+
+func fetchTestGame() (*Game, error) {
+	games, err := LoadGames("../../test/data/.toolkit")
+	if err != nil {
+		return nil, err
+	}
+
+	if len(games) == 0 {
+		return nil, errors.New("No games present in the test folder")
+	}
+
+	g := games[0]
+	err = g.ReadHashData()
+	if err != nil {
+		return nil, err
+	}
+
+	return g, nil
+}
+
+// create a test download
+func setupTestDownload() (*Download, *Game, error) {
+	g, err := fetchTestGame()
+	if err != nil {
+		return nil, nil, err
+	}
+
+	d, err := setupDownload(g)
+	if err != nil && !os.IsExist(err) {
+		return nil, nil, err
+	}
+
+	return d, g, nil
 }
 
 // setup/teardown functions

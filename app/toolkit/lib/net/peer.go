@@ -14,6 +14,9 @@ var (
 	once      sync.Once
 )
 
+// represents a peer that we are connected to
+// this is an abstraction as a peer may connect to our server socket or
+// we might connect to theirs
 type PeerIT interface {
 	Send(command []byte) error
 	SendString(command string) error
@@ -32,8 +35,7 @@ type peer struct {
 
 	// data
 	installFolder string
-	games         []*games.Game
-	downloads     []*games.Download
+	library       *games.Library
 }
 
 // Stores useful information about other peers
@@ -67,13 +69,17 @@ func StartPeer(serverHostname string, serverPort uint, installFolder, gameDataLo
 		log.Printf("Found %d games\n", len(gameLs))
 		view.OutputGamesTable(gameLs)
 
+		lib := games.NewLibrary()
+		for _, g := range gameLs {
+			lib.AddGame(g)
+		}
+
 		singleton = &peer{
 			server:        InitServer(serverHostname, serverPort),
 			clients:       []*TCPClient{},
 			peers:         make(map[PeerIT]*PeerData),
 			installFolder: installFolder,
-			games:         gameLs,
-			downloads:     []*games.Download{},
+			library:       games.NewLibrary(),
 		}
 
 		go singleton.server.Start(onMessage)

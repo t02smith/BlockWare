@@ -11,7 +11,7 @@ import (
 
 func (t *HashTree) GetShard(hash [32]byte) ([]byte, error) {
 	log.Printf("Looking for shard %x in %s", hash, t.RootDirLocation)
-	found, location, offset := t.findShard(hash)
+	found, location, offset := t.FindShard(hash)
 	if !found {
 		return nil, errors.New("shard not found")
 	}
@@ -22,7 +22,7 @@ func (t *HashTree) GetShard(hash [32]byte) ([]byte, error) {
 
 // LOCATING SHARDS
 
-func (t *HashTree) findShard(hash [32]byte) (bool, string, int) {
+func (t *HashTree) FindShard(hash [32]byte) (bool, string, int) {
 	found, path, offset := t.RootDir.findShard(hash)
 	return found, filepath.Join(t.RootDirLocation, path), offset
 }

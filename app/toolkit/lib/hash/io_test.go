@@ -30,7 +30,7 @@ func TestFindShardCorrect(t *testing.T) {
 	}
 
 	file := ht.RootDir.Files["test.txt"]
-	found, filename, offset := ht.findShard(file.Hashes[0])
+	found, filename, offset := ht.FindShard(file.Hashes[0])
 
 	if !found {
 		t.Error("Existing shard not found")
@@ -51,7 +51,7 @@ func TestFindShardIncorrect(t *testing.T) {
 		t.Errorf("%s", err)
 	}
 
-	found, _, _ := ht.findShard([32]byte{})
+	found, _, _ := ht.FindShard([32]byte{})
 	if found {
 		t.Errorf("Shard does not exist but states it is found")
 	}

@@ -69,12 +69,15 @@ func TestSerialise(t *testing.T) {
 	gamesTestSetup()
 	defer gamesTestTeardown()
 
+	var h [32]byte
+	copy(h[:], []byte("test"))
+
 	g := &Game{
 		Title:       "Test Game",
 		Version:     "1.0.2",
 		ReleaseDate: time.Now().String(),
 		Developer:   "tcs1g20",
-		RootHash:    []byte("test"),
+		RootHash:    h,
 	}
 
 	serialised, err := g.Serialise()
@@ -94,7 +97,7 @@ func TestSerialise(t *testing.T) {
 		g.Version != d.Version ||
 		g.ReleaseDate != d.ReleaseDate ||
 		g.Developer != d.Developer ||
-		!bytes.Equal(g.RootHash, d.RootHash) {
+		!bytes.Equal(g.RootHash[:], d.RootHash[:]) {
 
 		t.Error("Deserialised game not identical to original")
 	}

@@ -26,11 +26,11 @@ import (
 type Game struct {
 
 	// game metadata
-	Title       string `json:"title"`
-	Version     string `json:"version"`
-	ReleaseDate string `json:"release"`
-	Developer   string `json:"dev"`
-	RootHash    []byte `json:"rootHash"`
+	Title       string   `json:"title"`
+	Version     string   `json:"version"`
+	ReleaseDate string   `json:"release"`
+	Developer   string   `json:"dev"`
+	RootHash    [32]byte `json:"rootHash"`
 
 	// the shard data
 	data *hashIO.HashTree
@@ -96,6 +96,9 @@ func CreateGame(title, version, releaseDate, developer, rootDir string, shardSiz
 
 	hash := hasher.Sum([]byte{})
 
+	var h [32]byte
+	copy(h[:], hash)
+
 	// return value
 	game := &Game{
 		Title:       title,
@@ -103,7 +106,7 @@ func CreateGame(title, version, releaseDate, developer, rootDir string, shardSiz
 		ReleaseDate: releaseDate,
 		Developer:   developer,
 		data:        tree,
-		RootHash:    hash,
+		RootHash:    h,
 	}
 
 	return game, nil
@@ -286,15 +289,16 @@ func DeserialiseGame(data string) (*Game, error) {
 	return g, nil
 }
 
-func GamesAreEqual(g1 *Game, g2 *Game) bool {
+func (g1 *Game) Equals(g2 *Game) bool {
 	return g1.Title == g2.Title &&
 		g1.Version == g2.Version &&
 		g1.Developer == g2.Developer &&
 		g1.ReleaseDate == g2.ReleaseDate &&
-		bytes.Equal(g1.RootHash, g2.RootHash)
+		bytes.Equal(g1.RootHash[:], g2.RootHash[:])
+
 }
 
-// Find a hash for a given game
+// Fetch the shard for a given hash
 func (g *Game) FetchShard(hash [32]byte) ([]byte, error) {
 
 	// find the shards location
@@ -309,4 +313,15 @@ func (g *Game) FetchShard(hash [32]byte) ([]byte, error) {
 	}
 
 	return data, nil
+}
+
+func (g *Game) GetData() (*hashIO.HashTree, error) {
+	if g.data == nil {
+		err := g.ReadHashData()
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return g.data, nil
 }

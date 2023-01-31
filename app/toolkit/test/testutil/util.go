@@ -8,7 +8,7 @@ import (
 
 func SetupTmp(toRoot string) error {
 
-	err := os.Mkdir(filepath.Join(toRoot, "./test/data/tmp/tracker"), 0777)
+	err := os.Mkdir(filepath.Join(toRoot, "./test/data/tmp/tracker"), 0775)
 	if err != nil {
 		return err
 	}

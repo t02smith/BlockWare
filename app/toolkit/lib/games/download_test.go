@@ -3,7 +3,6 @@ package games
 import (
 	"bytes"
 	"crypto/sha256"
-	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -12,35 +11,11 @@ import (
 	"github.com/spf13/viper"
 )
 
-func setupTestDownload() (*Download, error) {
-	games, err := LoadGames("../../test/data/.toolkit")
-	if err != nil {
-		return nil, err
-	}
-
-	if len(games) == 0 {
-		return nil, errors.New("No games present in the test folder")
-	}
-
-	g := games[0]
-	err = g.ReadHashData()
-	if err != nil {
-		return nil, err
-	}
-
-	d, err := SetupDownload(g)
-	if err != nil {
-		return nil, err
-	}
-
-	return d, nil
-}
-
 func TestSetupDownload(t *testing.T) {
 	gamesTestSetup()
 	defer gamesTestTeardown()
 
-	_, err := setupTestDownload()
+	_, _, err := setupTestDownload()
 	if err != nil {
 		t.Error(err)
 	}
@@ -50,7 +25,7 @@ func TestSerialize(t *testing.T) {
 	gamesTestSetup()
 	defer gamesTestTeardown()
 
-	d, err := setupTestDownload()
+	d, _, err := setupTestDownload()
 	if err != nil {
 		t.Error(err)
 		return
@@ -78,7 +53,7 @@ func TestDeserialiseDownload(t *testing.T) {
 	gamesTestSetup()
 	defer gamesTestTeardown()
 
-	d, err := setupTestDownload()
+	d, _, err := setupTestDownload()
 	if err != nil {
 		t.Error(err)
 	}
@@ -96,7 +71,7 @@ func TestDeserialiseDownload(t *testing.T) {
 	}
 
 	// compare downloads
-	if !bytes.Equal(d.GameRootHash, d2.GameRootHash) {
+	if !bytes.Equal(d.GameRootHash[:], d2.GameRootHash[:]) {
 		t.Error("Games not the same")
 		return
 	}
@@ -107,7 +82,7 @@ func TestFindBlock(t *testing.T) {
 	gamesTestSetup()
 	defer gamesTestTeardown()
 
-	d, err := setupTestDownload()
+	d, _, err := setupTestDownload()
 	if err != nil {
 		t.Error(err)
 	}

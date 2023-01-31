@@ -2,13 +2,13 @@ package net
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"io"
 	"log"
 
 	"github.com/spf13/viper"
 	"github.com/t02smith/part-iii-project/toolkit/lib/games"
-	"github.com/t02smith/part-iii-project/toolkit/lib/hash"
 )
 
 func onMessage(cmd []string, client PeerIT) {
@@ -60,7 +60,7 @@ func onMessage(cmd []string, client PeerIT) {
 
 		return
 
-	// SEND_BLOCK <hash> <shard> => Download a shard off of a user
+	// SEND_BLOCK <game hash> <hash> <shard> => Download a shard off of a user
 	case "SEND_BLOCK":
 		return
 
@@ -108,6 +108,28 @@ func gameMessageToGameList(parts []string) ([]*games.Game, error) {
 	return gameLs, nil
 }
 
-func locateBlock(hash string) (string, *hash.HashTreeFile, error) {
-	return "", nil, nil
+// fetch a block given a game identifier and a shard
+func fetchBlock(gameHash, shardHash [32]byte) ([]byte, error) {
+	p := GetPeerInstance()
+
+	// find the game
+	g, d := p.library.GetGame(gameHash)
+	if g == nil {
+		return nil, errors.New("game not in library")
+	}
+
+	// game is being downloaded and we may not have block
+	if d != nil {
+		if _, ok := d.Progress[shardHash]; ok {
+			return nil, errors.New("shard hasn't been downloaded yet")
+		}
+	}
+
+	// fetch the block
+	b, err := g.FetchShard(shardHash)
+	if err != nil {
+		return nil, err
+	}
+
+	return b, nil
 }

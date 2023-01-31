@@ -1,6 +1,7 @@
 package net
 
 import (
+	"bytes"
 	"crypto/sha256"
 	"fmt"
 	"strings"
@@ -11,20 +12,27 @@ import (
 )
 
 func TestGameListToMessage(t *testing.T) {
+
+	var h1 [32]byte
+	copy(h1[:], []byte("test"))
+
+	var h2 [32]byte
+	copy(h2[:], []byte("tester hash"))
+
 	games := []*games.Game{
 		{
 			Title:       "Test Game",
 			Version:     "1.0.2",
 			ReleaseDate: time.Now().String(),
 			Developer:   "tcs1g20",
-			RootHash:    []byte("test"),
+			RootHash:    h1,
 		},
 		{
 			Title:       "Borderlands 3",
 			Version:     "3.4.17",
 			ReleaseDate: time.Now().String(),
 			Developer:   "Gearbox",
-			RootHash:    []byte("tester hash"),
+			RootHash:    h2,
 		},
 	}
 
@@ -49,13 +57,16 @@ func TestGameListToMessage(t *testing.T) {
 func TestOnMessageLibrary(t *testing.T) {
 	beforeEach()
 
+	var h [32]byte
+	copy(h[:], []byte("hello there"))
+
 	datetime := time.Date(2002, 01, 10, 0, 0, 0, 0, time.Local).String()
 	fakeGame := &games.Game{
 		Title:       "fake game",
 		Version:     "2.7.5",
 		ReleaseDate: datetime,
 		Developer:   "t02smith.com",
-		RootHash:    []byte("hello there"),
+		RootHash:    h,
 	}
 
 	s, err := fakeGame.Serialise()
@@ -79,7 +90,7 @@ func TestOnMessageLibrary(t *testing.T) {
 
 		fmt.Println(g)
 
-		if !games.GamesAreEqual(fakeGame, g) {
+		if !g.Equals(fakeGame) {
 			t.Error("Games not equal")
 			return
 		}
@@ -88,7 +99,7 @@ func TestOnMessageLibrary(t *testing.T) {
 	}
 }
 
-func TestOnMessageBlock(t *testing.T) {
+func TestOnMessageBlockWhenBlockExists(t *testing.T) {
 	t.Skip()
 	beforeEach()
 
@@ -107,4 +118,55 @@ func TestOnMessageBlock(t *testing.T) {
 
 	mockPeerClient.SendString(message)
 	time.Sleep(25 * time.Millisecond)
+}
+
+func TestOnMessageBlockWhenBlockDoesntExist(t *testing.T) {
+
+}
+
+// util functions
+
+func TestFetchBlock(t *testing.T) {
+	beforeEach()
+
+	// ! game doesn't exist
+	_, err := fetchBlock([32]byte{}, [32]byte{})
+	if err == nil {
+		t.Error("Missing game not identified as not existing")
+	}
+
+	// ! game exists but block does not
+
+	p := GetPeerInstance()
+	g, err := fetchTestGame()
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	p.library.AddGame(g)
+
+	_, err = fetchBlock(g.RootHash, [32]byte{})
+	if err == nil {
+		t.Error("Block should not have been identified")
+	}
+
+	// ! game and block exists and is fetched successfully
+	ht, err := g.GetData()
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	hash := ht.RootDir.Files["architecture-diagram.png"].Hashes[1]
+	data, err := fetchBlock(g.RootHash, hash)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	dataHash := sha256.Sum256(data)
+	if !bytes.Equal(dataHash[:], hash[:]) {
+		t.Error("incorrect block fetched")
+	}
 }

@@ -37,10 +37,10 @@ type HashTreeDir struct {
 	RootHash [32]byte `json:"roothash"`
 
 	// all subdirectories recursively stored
-	Subdirs []*HashTreeDir `json:"subdirs"`
+	Subdirs map[string]*HashTreeDir `json:"subdirs"`
 
 	// all files within this folder
-	Files []*HashTreeFile `json:"files"`
+	Files map[string]*HashTreeFile `json:"files"`
 }
 
 // Describes a singular tracked files
@@ -150,8 +150,8 @@ func (ht *HashTree) buildTree() (int, error) {
 
 	ht.RootDir = &HashTreeDir{
 		Dirname: "",
-		Subdirs: []*HashTreeDir{},
-		Files:   []*HashTreeFile{},
+		Subdirs: make(map[string]*HashTreeDir),
+		Files:   make(map[string]*HashTreeFile),
 	}
 
 	return ht.RootDir.traverseDirectory(ht.RootDirLocation)
@@ -182,20 +182,20 @@ func (htd *HashTreeDir) traverseDirectory(absolutePath string) (int, error) {
 
 		// the data object is a directory
 		if f.IsDir() {
-			htd.Subdirs = append(htd.Subdirs, &HashTreeDir{
+			htd.Subdirs[name] = &HashTreeDir{
 				Dirname: name,
-				Files:   []*HashTreeFile{},
-				Subdirs: []*HashTreeDir{},
-			})
+				Files:   make(map[string]*HashTreeFile),
+				Subdirs: make(map[string]*HashTreeDir),
+			}
 
 			continue
 		}
 
 		// the data object is a file
-		htd.Files = append(htd.Files, &HashTreeFile{
+		htd.Files[name] = &HashTreeFile{
 			Filename:         name,
 			AbsoluteFilename: filepath.Join(absolutePath, htd.Dirname, name),
-		})
+		}
 		counter++
 	}
 
@@ -422,30 +422,4 @@ func CalculateRootHash(hashes [][32]byte) [32]byte {
 
 	return oldLayer[0]
 
-}
-
-// Finder
-
-// find a shard from a given hash tree
-// returns file, location
-func (htd *HashTreeDir) FindShard(hash [32]byte) (*HashTreeFile, int) {
-
-	// in current dir
-	for _, f := range htd.Files {
-		for i, b := range f.Hashes {
-			if bytes.Equal(b[:], hash[:]) {
-				return f, i
-			}
-		}
-	}
-
-	// in subdirs
-	for _, sd := range htd.Subdirs {
-		htf, offset := sd.FindShard(hash)
-		if htf != nil {
-			return htf, offset
-		}
-	}
-
-	return nil, -1
 }

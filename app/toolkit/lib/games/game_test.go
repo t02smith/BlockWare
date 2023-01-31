@@ -2,6 +2,7 @@ package games
 
 import (
 	"bytes"
+	"crypto/sha256"
 	"testing"
 	"time"
 )
@@ -97,4 +98,40 @@ func TestSerialise(t *testing.T) {
 
 		t.Error("Deserialised game not identical to original")
 	}
+}
+
+func TestFetchShard(t *testing.T) {
+
+	// load game made from our test directory
+	gs, err := LoadGames("../../test/data/.toolkit")
+	if err != nil {
+		t.Errorf("games failed to load: %s", err)
+		return
+	}
+
+	if len(gs) == 0 {
+		t.Errorf("no games found. Make sure games_test:setupTestGame has been run")
+		return
+	}
+
+	g := gs[0]
+	err = g.ReadHashData()
+	if err != nil {
+		t.Errorf("Error reading hash data from game %s", err)
+		return
+	}
+
+	// fetch shard from storage and compare with expected
+	hash := g.data.RootDir.Files["architecture-diagram.png"].Hashes[0]
+	foundShard, err := g.FetchShard(hash)
+	if err != nil {
+		t.Errorf("Error fetching shard: %s", err)
+	}
+
+	foundShardHash := sha256.Sum256(foundShard)
+	if !bytes.Equal(hash[:], foundShardHash[:]) {
+		t.Errorf("Incorrect shard found")
+		return
+	}
+
 }

@@ -29,14 +29,14 @@ func TestFindShardCorrect(t *testing.T) {
 		t.Errorf("%s", err)
 	}
 
-	file := ht.RootDir.Files[0]
+	file := ht.RootDir.Files["test.txt"]
 	found, filename, offset := ht.findShard(file.Hashes[0])
 
 	if !found {
 		t.Error("Existing shard not found")
 	}
 
-	if filename != filepath.Join("../../test/data/testdir", "architecture-diagram.png") {
+	if filename != filepath.Join("../../test/data/testdir", file.Filename) {
 		t.Errorf("Incorrect filepath returned %s", filename)
 	}
 
@@ -65,7 +65,7 @@ func TestGetShardCorrect(t *testing.T) {
 		t.Errorf("%s", err)
 	}
 
-	file := ht.RootDir.Files[0]
+	file := ht.RootDir.Files["test.txt"]
 	data, err := ht.GetShard(file.Hashes[0])
 	if err != nil {
 		t.Errorf("%s", err)

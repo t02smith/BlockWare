@@ -43,7 +43,7 @@ func setupTestGame() error {
 	}
 
 	datetime := time.Date(2002, 1, 10, 0, 0, 0, 0, time.UTC).String()
-	game, err := CreateGame("toolkit", "1.0.4", datetime, "google.com", "../../test/data/testdir", 16384)
+	game, err := CreateGame("toolkit", "1.0.4", datetime, "google.com", "../../test/data/testdir", 256)
 
 	if err != nil {
 		log.Printf("Error creating game: %s\n", err)

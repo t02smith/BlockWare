@@ -101,7 +101,7 @@ func TestHashDirCorrectTree(t *testing.T) {
 		t.Errorf("incorrect number of subdirs found")
 	}
 
-	if len(rdir.Subdirs[0].Files) != 1 && rdir.Subdirs[0].Files[0].Filename != "chip8.c" {
+	if len(rdir.Subdirs["subdir"].Files) != 1 && rdir.Subdirs["subdir"].Files["chip8.c"].Filename != "chip8.c" {
 		t.Errorf("incorrect number of files or file in subdir")
 	}
 }

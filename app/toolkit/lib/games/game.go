@@ -294,6 +294,7 @@ func GamesAreEqual(g1 *Game, g2 *Game) bool {
 		bytes.Equal(g1.RootHash, g2.RootHash)
 }
 
+// Find a hash for a given game
 func (g *Game) FetchShard(hash [32]byte) ([]byte, error) {
 
 	// find the shards location
@@ -302,30 +303,10 @@ func (g *Game) FetchShard(hash [32]byte) ([]byte, error) {
 		return nil, err
 	}
 
-	htf, offset := g.data.RootDir.FindShard(hash)
-	if htf == nil {
-		return nil, errors.New("shard not found")
-	}
-
-	// get shard from file
-	f, err := os.Open(htf.AbsoluteFilename)
-	if err != nil {
-		return nil, err
-	}
-	defer f.Close()
-
-	buffer := make([]byte, g.data.ShardSize)
-	reader := bufio.NewReader(f)
-
-	_, err = f.Seek(int64(offset*int(g.data.ShardSize)), 0)
+	data, err := g.data.GetShard(hash)
 	if err != nil {
 		return nil, err
 	}
 
-	_, err = reader.Read(buffer)
-	if err != nil {
-		return nil, err
-	}
-
-	return buffer, nil
+	return data, nil
 }

@@ -1,0 +1,17 @@
+{{ define "layouts/nav.html" }}
+<nav
+  class="navbar navbar-dark bg-dark navbar-expand-lg navbar-light bg-light px-3"
+>
+  <a class="navbar-brand" href="#">🅱️ BlockWare</a>
+
+  <ul class="navbar-nav ms-auto">
+    {{ range .navOptions }}
+    <li class="nav-item active">
+      <a class="nav-link" href="{{ .Link }}">{{ .Text }}</a>
+    </li>
+
+    {{ end }}
+  </ul>
+</nav>
+
+{{ end }}

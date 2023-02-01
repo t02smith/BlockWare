@@ -140,6 +140,10 @@ func (p *peer) Broadcast(message string) {
 	}
 }
 
+func (p *peer) GetLibrary() *games.Library {
+	return p.library
+}
+
 // shutdown the peer
 func (p *peer) Close() {
 	p.server.Close()

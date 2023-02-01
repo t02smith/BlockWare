@@ -1,0 +1,28 @@
+{{ define "layouts/user.html" }}
+
+<div class="px-4 py-2 rounded shadow-xl bg-dark">
+  <h4>🧑 Your Info</h4>
+  <hr />
+  <table class="table table-borderless table-sm text-light">
+    <tr scope="row">
+      <td scope="col" class="p-0 text-success text-bold">
+        <strong>server </strong>
+      </td>
+      <td class="p-0">{{ .Server }}</td>
+    </tr>
+    <tr scope="row">
+      <td scope="col" class="p-0 text-success text-bold">
+        <strong>peers</strong>
+      </td>
+      <td class="p-0">{{ .PeerCount }}</td>
+    </tr>
+    <tr>
+      <td scope="col" class="p-0 text-success text-bold">
+        <strong>Games Owned</strong>
+      </td>
+      <td class="p-0">{{ .GamesInLibrary }}</td>
+    </tr>
+  </table>
+</div>
+
+{{ end }}

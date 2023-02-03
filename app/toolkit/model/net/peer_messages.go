@@ -2,6 +2,7 @@ package net
 
 import (
 	"bytes"
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"io"
@@ -52,16 +53,75 @@ func onMessage(cmd []string, client PeerIT) {
 
 		return
 
-	// BLOCK <hash> => Request a block of data from a user
+	// BLOCK <game hash> <hash> => Request a block of data from a user
 	case "BLOCK":
-		model.Logger.Infof("Block command called for block %s", cmd[1])
+		model.Logger.Infof("Block command called for block %s", cmd[2])
 
-		// haveBlock, err :=
+		gh, err := stringTo32ByteArr(cmd[1])
+		if err != nil {
+			model.Logger.Errorf("Error reading game hash on BLOCK cmd: %s", err)
+			return
+		}
 
+		sh, err := stringTo32ByteArr(cmd[2])
+		if err != nil {
+			model.Logger.Errorf("Error reading shard hash on BLOCK cmd: %s", err)
+			return
+		}
+
+		found, data, err := p.library.FindBlock(gh, sh)
+		if err != nil {
+			model.Logger.Errorf("Error finding block %s", err)
+			return
+		}
+
+		if !found {
+			model.Logger.Warnf("Block %x not found", sh)
+			client.SendStringf("ERROR;Block %x not found\n", sh)
+			return
+		}
+
+		client.SendString(fmt.Sprintf("SEND_BLOCK;%x;%x;%x\n", gh, sh, data))
 		return
 
 	// SEND_BLOCK <game hash> <hash> <shard> => Download a shard off of a user
 	case "SEND_BLOCK":
+		model.Logger.Infof("SEND_BLOCK => Block received")
+		// * parse input
+		gh, err := stringTo32ByteArr(cmd[1])
+		if err != nil {
+			model.Logger.Errorf("Error reading game hash on BLOCK cmd: %s", err)
+			return
+		}
+
+		sh, err := stringTo32ByteArr(cmd[2])
+		if err != nil {
+			model.Logger.Errorf("Error reading shard hash on BLOCK cmd: %s", err)
+			return
+		}
+
+		// * fetch game
+		game := p.library.GetGame(gh)
+		_, ok := game.GetDownload().Progress[sh]
+
+		if !ok {
+			model.Logger.Warnf("Block %x not needed for download", sh)
+			return
+		}
+
+		// * insert the shard
+		data, err := hex.DecodeString(cmd[3])
+		if err != nil {
+			model.Logger.Error(err)
+			return
+		}
+
+		game.InsertShard(sh, data)
+		return
+
+	// ERROR <msg> => used to send an error message following a command
+	case "ERROR":
+		model.Logger.Errorf("Error received %s", cmd[1])
 		return
 
 	}
@@ -74,13 +134,16 @@ func gameListToMessage(games []*games.Game) (string, error) {
 	var buf bytes.Buffer
 	buf.WriteString("GAMES;")
 
-	for _, g := range games {
+	for i, g := range games {
 		encoded, err := g.Serialise()
 		if err != nil {
 			return "", nil
 		}
 
-		buf.WriteString(fmt.Sprintf("%s;", encoded))
+		buf.WriteString(encoded)
+		if i != len(games)-1 {
+			buf.WriteString(";")
+		}
 	}
 
 	buf.WriteString("\n")
@@ -128,10 +191,25 @@ func fetchBlock(gameHash, shardHash [32]byte) ([]byte, error) {
 	}
 
 	// fetch the block
-	b, err := g.FetchShard(shardHash)
+	found, b, err := g.FetchShard(shardHash)
 	if err != nil {
 		return nil, err
 	}
 
+	if !found {
+		return nil, errors.New("block not found")
+	}
+
 	return b, nil
+}
+
+func stringTo32ByteArr(hexString string) ([32]byte, error) {
+	var arr [32]byte
+	data, err := hex.DecodeString(hexString)
+	if err != nil {
+		return arr, err
+	}
+
+	copy(arr[:], data)
+	return arr, nil
 }

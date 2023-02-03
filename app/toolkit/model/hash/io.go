@@ -10,15 +10,20 @@ import (
 	"github.com/t02smith/part-iii-project/toolkit/model"
 )
 
-func (t *HashTree) GetShard(hash [32]byte) ([]byte, error) {
+func (t *HashTree) GetShard(hash [32]byte) (bool, []byte, error) {
 	model.Logger.Infof("Looking for shard %x in %s", hash, t.RootDirLocation)
 	found, location, offset := t.FindShard(hash)
 	if !found {
-		return nil, errors.New("shard not found")
+		return false, nil, nil
 	}
 
 	model.Logger.Infof("Shard found at %s - piece %d", location, offset)
-	return t.readShard(location, offset)
+	data, err := t.readShard(location, offset)
+	if err != nil {
+		return false, nil, err
+	}
+
+	return true, data, nil
 }
 
 // LOCATING SHARDS
@@ -150,7 +155,7 @@ func setupFile(filename string, shardSize, shardCount uint) error {
 	return nil
 }
 
-func insertData(filename string, shardSize, offset uint, data []byte) error {
+func InsertData(filename string, shardSize, offset uint, data []byte) error {
 	if len(data) != int(shardSize) {
 		return errors.New("data should be the same length as the byte size")
 	}

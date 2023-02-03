@@ -3,6 +3,7 @@ package net
 import (
 	"bytes"
 	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
 	"strings"
 	"testing"
@@ -43,6 +44,7 @@ func TestGameListToMessage(t *testing.T) {
 		return
 	}
 
+	res = res[:len(res)-1]
 	parts := strings.Split(res, ";")
 	if parts[0] != "GAMES" {
 		t.Error("Wrong command")
@@ -84,7 +86,7 @@ func TestOnMessage(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		mockPeer.SetResponse("LIBRARY\n", fmt.Sprintf("GAMES;%s;\n", s))
+		mockPeer.SetResponse("LIBRARY\n", fmt.Sprintf("GAMES;%s\n", s))
 		mockPeerClient.SendString("LIBRARY\n")
 		time.Sleep(25 * time.Millisecond)
 
@@ -105,16 +107,55 @@ func TestOnMessage(t *testing.T) {
 		t.Fatal("Game not stored in peer's library")
 	})
 
+	// SETUP TEST GAME
+	l := games.NewLibrary()
+	g, err := fetchTestGame()
+	if err != nil {
+		t.Fatalf("Error generating test download %s", err)
+	}
+	l.AddGame(g)
+
 	t.Run("BLOCK", func(t *testing.T) {
-		// TODO
+
+		gData, _ := g.GetData()
+		blockHash := gData.RootDir.Files["architecture-diagram.png"].Hashes[1]
 
 		t.Run("block exists", func(t *testing.T) {
+			mockPeer.SendString("BLOCK;%x;%x\n", g.RootHash, blockHash)
+			time.Sleep(25 * time.Millisecond)
 
+			msg := mockPeer.GetLastMessage()
+			msg = msg[:len(msg)-1]
+
+			res := strings.Split(msg, ";")
+			if len(res) != 4 {
+				t.Fatalf("incorrect response received '%s'", msg)
+			}
+
+			data, err := hex.DecodeString(res[3])
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			hash := sha256.Sum256(data)
+			if !bytes.Equal(hash[:], blockHash[:]) {
+				t.Fatalf("block's hashes do not match\ngot: %x\nexpected: %x", hash, blockHash)
+			}
 		})
 
 		t.Run("block doesn't exist", func(t *testing.T) {
+			mockPeer.SendString("BLOCK;%x;%x\n", g.RootHash, [32]byte{})
+			time.Sleep(25 * time.Millisecond)
 
+			msg := mockPeer.GetLastMessage()
+			if msg != fmt.Sprintf("ERROR;Block %x not found\n", [32]byte{}) {
+				t.Fatalf("Expected an error message from peer")
+			}
 		})
+
+	})
+
+	t.Run("SEND_BLOCK", func(t *testing.T) {
 
 	})
 

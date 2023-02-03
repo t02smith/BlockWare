@@ -128,12 +128,16 @@ func TestFetchShard(t *testing.T) {
 				}
 
 				hash := dir.Files[x.filename].Hashes[x.hashNo]
-				foundShard, err := g.FetchShard(hash)
+				found, data, err := g.FetchShard(hash)
 				if err != nil {
 					t.Errorf("Error fetching shard: %s", err)
 				}
 
-				foundShardHash := sha256.Sum256(foundShard)
+				if !found {
+					t.Error("error finding shard")
+				}
+
+				foundShardHash := sha256.Sum256(data)
 				if !bytes.Equal(hash[:], foundShardHash[:]) {
 					t.Errorf("Incorrect shard found")
 					return

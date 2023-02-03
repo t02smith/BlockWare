@@ -20,7 +20,7 @@ var (
 
 func beforeAll() {
 	model.InitLogger()
-	tp, err := StartPeer("localhost", 7887, "../../test/data/tmp", "../../test/data")
+	tp, err := StartPeer("localhost", 7887, "../../test/data/tmp", "../../test/data/.toolkit")
 	if err != nil {
 		log.Printf("Error starting test peer")
 		os.Exit(1)

@@ -2,7 +2,14 @@
 <nav
   class="navbar navbar-dark bg-dark navbar-expand-lg navbar-light bg-light px-3"
 >
-  <a class="navbar-brand" href="#">🅱️ BlockWare</a>
+  <a
+    class="navbar-brand d-flex align-items-center justify-content-center flex-col gap-1"
+    href="#"
+  >
+    <img src="/img/icon.svg" alt="" width="35" height="35" />
+
+    <h2 class="flex gap-0" style="margin-top: 5px">BlockWare</h2>
+  </a>
 
   <ul class="navbar-nav ms-auto">
     {{ range .navOptions }}

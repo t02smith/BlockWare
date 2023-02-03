@@ -140,6 +140,10 @@ func (c *TCPServerClient) SendString(command string) error {
 	return nil
 }
 
+func (c *TCPServerClient) SendStringf(command string, args ...any) error {
+	return c.SendString(fmt.Sprintf(command, args...))
+}
+
 func (c *TCPServerClient) Info() string {
 	return fmt.Sprintf("%s", c.con.RemoteAddr())
 }

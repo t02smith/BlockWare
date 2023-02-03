@@ -84,3 +84,12 @@ func (l *Library) OutputGamesTable() {
 
 	t.Render()
 }
+
+func (l *Library) FindBlock(gameHash [32]byte, hash [32]byte) (bool, []byte, error) {
+	g, ok := l.games[gameHash]
+	if !ok {
+		return false, nil, nil
+	}
+
+	return g.FetchShard(hash)
+}

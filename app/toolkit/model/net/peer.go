@@ -19,6 +19,7 @@ var (
 type PeerIT interface {
 	Send(command []byte) error
 	SendString(command string) error
+	SendStringf(command string, args ...any) error
 	Info() string
 }
 

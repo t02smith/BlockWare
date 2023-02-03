@@ -101,6 +101,12 @@ func (m *MockPeer) SendBytes(bytes []byte) {
 	m.writer.Flush()
 }
 
+// send a string to the peer
+func (m *MockPeer) SendString(msg string, args ...any) {
+	m.writer.WriteString(fmt.Sprintf(msg, args...))
+	m.writer.Flush()
+}
+
 // get the last sent message to the mock peer
 func (m *MockPeer) GetLastMessage() string {
 	if len(m.msgHistory) == 0 {

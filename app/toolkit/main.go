@@ -1,5 +1,5 @@
 /*
-Copyright © 2022 NAME HERE <EMAIL ADDRESS>
+Copyright © 2022 Thomas Smith tcs1g20@soton.ac.uk
 */
 package main
 
@@ -66,6 +66,9 @@ func defaultConfig() {
 	// user info
 	viper.SetDefault("user.info.domain", "t02smith.com")
 	viper.SetDefault("user.info.name", "tom")
+
+	// web interface
+	viper.SetDefault("web.port", 8080)
 }
 
 // start gin server
@@ -82,6 +85,7 @@ func startGin() {
 	r.Use(gin.Recovery())
 
 	r.Static("/css", "static/css")
+	r.Static("/img", "static/img")
 
 	r.LoadHTMLGlob("templates/**/*.html")
 	controller.Router(r)

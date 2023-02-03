@@ -66,9 +66,13 @@ func TestGetShard(t *testing.T) {
 	file := ht.RootDir.Files["test.txt"]
 
 	t.Run("shard gotten successfully", func(t *testing.T) {
-		data, err := ht.GetShard(file.Hashes[0])
+		found, data, err := ht.GetShard(file.Hashes[0])
 		if err != nil {
 			t.Fatalf("failed to get shard %s", err)
+		}
+
+		if !found {
+			t.Error("found should be true")
 		}
 
 		hash := sha256.Sum256(data)
@@ -78,8 +82,8 @@ func TestGetShard(t *testing.T) {
 	})
 
 	t.Run("invalid shard given", func(t *testing.T) {
-		_, err := ht.GetShard([32]byte{})
-		if err == nil {
+		found, _, _ := ht.GetShard([32]byte{})
+		if found {
 			t.Fatalf("invalid shard not detected")
 		}
 
@@ -154,7 +158,7 @@ func TestInsertData(t *testing.T) {
 			newShard[i] = 255
 		}
 
-		err = insertData("../../test/data/tmp/skeleton.txt", 64, 12, newShard)
+		err = InsertData("../../test/data/tmp/skeleton.txt", 64, 12, newShard)
 		if err != nil {
 			t.Errorf("%s", err)
 		}

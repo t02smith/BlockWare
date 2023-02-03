@@ -95,6 +95,10 @@ func (c *TCPClient) SendString(command string) error {
 	return nil
 }
 
+func (c *TCPClient) SendStringf(command string, args ...any) error {
+	return c.SendString(fmt.Sprintf(command, args...))
+}
+
 func (c *TCPClient) Info() string {
 	return fmt.Sprintf("%s:%d", c.hostname, c.port)
 }

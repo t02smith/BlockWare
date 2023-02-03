@@ -306,20 +306,32 @@ func (g1 *Game) Equals(g2 *Game) bool {
 }
 
 // Fetch the shard for a given hash
-func (g *Game) FetchShard(hash [32]byte) ([]byte, error) {
+func (g *Game) FetchShard(hash [32]byte) (bool, []byte, error) {
 
-	// find the shards location
 	err := g.ReadHashData()
 	if err != nil {
-		return nil, err
+		return false, nil, err
 	}
 
-	data, err := g.data.GetShard(hash)
+	found, data, err := g.data.GetShard(hash)
 	if err != nil {
-		return nil, err
+		return false, nil, err
 	}
 
-	return data, nil
+	if !found {
+		return false, nil, nil
+	}
+
+	return true, data, nil
+}
+
+func (g *Game) InsertShard(shardHash [32]byte, data []byte) error {
+	found, filename, offset := g.data.FindShard(shardHash)
+	if !found {
+		return nil
+	}
+
+	return hashIO.InsertData(filename, g.data.ShardSize, uint(offset), data)
 }
 
 func (g *Game) GetData() (*hashIO.HashTree, error) {

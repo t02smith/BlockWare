@@ -46,7 +46,7 @@ func index(c *gin.Context) {
 			"user": UserInfo{
 				Server:         fmt.Sprintf("%s:%d", host, port),
 				PeerCount:      len(p.GetPeers()),
-				GamesInLibrary: 0,
+				GamesInLibrary: len(p.GetLibrary().GetGames()),
 			},
 			"games": p.GetLibrary().GetGames(),
 		},

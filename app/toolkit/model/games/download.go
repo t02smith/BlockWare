@@ -161,6 +161,6 @@ func (d *Download) FindBlock(hash [32]byte) error {
 // ? misc functions
 
 // get the total download progress as a percent
-func (d *Download) GetProgress() (float32, error) {
-	return 1 - float32(len(d.Progress))/float32(d.TotalBlocks), nil
+func (d *Download) GetProgress() float32 {
+	return 1 - float32(len(d.Progress))/float32(d.TotalBlocks)
 }

@@ -19,6 +19,11 @@ The goal of this project is to implement a large-scale distribution platform tha
 
 \section{Scope}
 
-This project will look at how the Ethereum blockchain and smart contracts can be used to create a large-scale distribution platform for video games. This will be deployed to a `testnet', where Ether has no value and applications can be tested in a live environment. Whilst the focus on this application is on video games, this should be a valid solution for software of all types.
-\x
-The application will consist of a set of smart contracts, written in Solidity, with tests and a basic GUI to be written using TypeScript and React.js. Tools like Ganache and Truffle will also be useful for blockchain development.
+This project will be broken down into two distinct components:
+
+\begin{enumerate}
+  \item \textbf{On-Chain} This component will consist of a set of Solidity Smart Contracts written for the Ethereum blockchain that will allow users to view metadata about and purchase games. It will be tested using a local test-net like Ganache using TypeScript. It will later be deployed to the Ethereum test-net to showcase the application in a live network.
+  \item \textbf{Off-Chain} This component will be what users will actually run. Each user will join a peer-to-peer network in which they can upload and download games off of other users. This will interface with the blockchain to allow users access to game metadata. See Section~\ref{} for details about how this will be tested.
+\end{enumerate}
+
+For both of these, a series of acceptance tests, that directly correlate to individual requirements, will be run and include a series of integration tests to show that my application can meet the requirements and goals I set out. A more detailed description is given in Section~\ref{}.

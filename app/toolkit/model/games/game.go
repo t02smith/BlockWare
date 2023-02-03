@@ -307,7 +307,6 @@ func (g1 *Game) Equals(g2 *Game) bool {
 
 // Fetch the shard for a given hash
 func (g *Game) FetchShard(hash [32]byte) (bool, []byte, error) {
-
 	err := g.ReadHashData()
 	if err != nil {
 		return false, nil, err

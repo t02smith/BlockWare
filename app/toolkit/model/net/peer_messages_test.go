@@ -121,8 +121,7 @@ func TestOnMessage(t *testing.T) {
 		blockHash := gData.RootDir.Files["architecture-diagram.png"].Hashes[1]
 
 		t.Run("block exists", func(t *testing.T) {
-			mockPeer.SendString("BLOCK;%x;%x\n", g.RootHash, blockHash)
-			time.Sleep(25 * time.Millisecond)
+			mockPeer.SendStringAndWait(25, "BLOCK;%x;%x\n", g.RootHash, blockHash)
 
 			msg := mockPeer.GetLastMessage()
 			msg = msg[:len(msg)-1]
@@ -144,8 +143,7 @@ func TestOnMessage(t *testing.T) {
 		})
 
 		t.Run("block doesn't exist", func(t *testing.T) {
-			mockPeer.SendString("BLOCK;%x;%x\n", g.RootHash, [32]byte{})
-			time.Sleep(25 * time.Millisecond)
+			mockPeer.SendStringAndWait(25, "BLOCK;%x;%x\n", g.RootHash, [32]byte{})
 
 			msg := mockPeer.GetLastMessage()
 			if msg != fmt.Sprintf("ERROR;Block %x not found\n", [32]byte{}) {
@@ -156,6 +154,10 @@ func TestOnMessage(t *testing.T) {
 	})
 
 	t.Run("SEND_BLOCK", func(t *testing.T) {
+
+		t.Run("success", func(t *testing.T) {
+
+		})
 
 	})
 

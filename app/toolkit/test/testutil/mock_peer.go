@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"time"
 )
 
 // a mock peer will form a connection with a peer for testing
@@ -105,6 +106,12 @@ func (m *MockPeer) SendBytes(bytes []byte) {
 func (m *MockPeer) SendString(msg string, args ...any) {
 	m.writer.WriteString(fmt.Sprintf(msg, args...))
 	m.writer.Flush()
+}
+
+// send a string and wait a given amount of time
+func (m *MockPeer) SendStringAndWait(delay int, msg string, args ...any) {
+	m.SendString(msg, args...)
+	time.Sleep(time.Duration(delay) * time.Millisecond)
 }
 
 // get the last sent message to the mock peer

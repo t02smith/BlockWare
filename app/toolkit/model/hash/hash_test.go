@@ -89,7 +89,6 @@ func TestShardFile(t *testing.T) {
 			t.Errorf("Incorrect hash")
 		}
 	})
-
 }
 
 // hashDir

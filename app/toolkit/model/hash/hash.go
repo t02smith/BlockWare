@@ -221,7 +221,6 @@ func (htd *HashTreeDir) traverseDirectory(absolutePath string) (int, error) {
 // hashing
 
 func (htd *HashTreeDir) shardData(fileIn chan *HashTreeFile, shardSize uint) error {
-
 	for _, f := range htd.Files {
 		fileIn <- f
 	}
@@ -260,6 +259,9 @@ func (htf *HashTreeFile) shardFile(shardSize uint) error {
 
 		hash := sha256.Sum256(buffer)
 		htf.Hashes = append(htf.Hashes, hash)
+		for i := range buffer {
+			buffer[i] = 0
+		}
 	}
 
 	htf.RootHash = CalculateRootHash(htf.Hashes)
@@ -397,6 +399,9 @@ func (ht *HashTree) verifyFile(htf *HashTreeFile, currentDirectory string, filen
 		}
 
 		counter++
+		for i := range buffer {
+			buffer[i] = 0
+		}
 	}
 
 	return true, nil
@@ -405,7 +410,6 @@ func (ht *HashTree) verifyFile(htf *HashTreeFile, currentDirectory string, filen
 // Utility
 
 func CalculateRootHash(hashes [][32]byte) [32]byte {
-
 	oldLayer, newLayer := hashes, [][32]byte{}
 
 	for len(oldLayer) != 1 {
@@ -418,7 +422,6 @@ func CalculateRootHash(hashes [][32]byte) [32]byte {
 		// hash each pair
 		for i := 0; i < len(oldLayer); i += 2 {
 			newLayer = append(newLayer, sha256.Sum256(append(oldLayer[i][:], oldLayer[i+1][:]...)))
-
 		}
 
 		oldLayer = newLayer

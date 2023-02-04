@@ -213,8 +213,6 @@ func TestOnMessage(t *testing.T) {
 			})
 
 			t.Run("entire file", func(t *testing.T) {
-				// TODO bug where last shard of file is not being hashed correctly
-
 				file := gameData.RootDir.Subdirs["subdir"].Files["chip8.c"]
 				buffer := make([]byte, gameData.ShardSize)
 
@@ -242,13 +240,18 @@ func TestOnMessage(t *testing.T) {
 						t.Errorf("Unable to verify whether shard was inserted %s", err)
 					}
 
-					_, err = f.Seek(int64(gameData.ShardSize)*int64(i), 0)
+					n, err := f.Seek(int64(gameData.ShardSize)*int64(i), 0)
+					fmt.Println(n)
 					if err != nil {
 						t.Errorf("Unable to verify whether shard was inserted %s", err)
 					}
 
 					reader := bufio.NewReader(f)
-					reader.Read(buffer)
+					_, err = reader.Read(buffer)
+					if err != nil {
+						t.Fatalf("error reading shard %s", err)
+					}
+
 					if !bytes.Equal(buffer, data) {
 						t.Errorf("incorrect shard inserted\ngot %x\nexpected %x", buffer, data)
 					}

@@ -349,7 +349,7 @@ func (g *Game) GetData() (*hashIO.HashTree, error) {
 func (g *Game) GetDownload() *Download {
 	d, err := DeserializeDownload(g.RootHash)
 	if err != nil {
-		model.Logger.Warnf("Download for game %x not present", g.RootHash)
+		model.Logger.Infof("Download for game %x not present", g.RootHash)
 		return nil
 	}
 

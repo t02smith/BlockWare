@@ -135,6 +135,9 @@ func onMessage(cmd []string, client PeerIT) {
 		if err != nil {
 			model.Logger.Errorf("error inserting shard %x: %s", sh, err)
 		}
+
+		delete(game.GetDownload().Progress[file.RootHash].BlocksRemaining, sh)
+		game.GetDownload().Serialise(fmt.Sprintf("%x", game.RootHash))
 		return
 
 	// ERROR <msg> => used to send an error message following a command

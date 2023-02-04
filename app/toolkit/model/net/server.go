@@ -2,6 +2,7 @@ package net
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"io"
 	"net"
@@ -63,6 +64,10 @@ func (s *TCPServer) listen(onMessage func([]string, PeerIT)) {
 	for {
 		con, err := s.listener.Accept()
 		if err != nil {
+			if errors.Is(err, net.ErrClosed) {
+				return
+			}
+
 			model.Logger.Errorf("Error connecting to client: %s", err)
 			return
 		}

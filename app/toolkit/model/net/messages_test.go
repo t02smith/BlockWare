@@ -1,10 +1,12 @@
 package net
 
 import (
+	"bufio"
 	"bytes"
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
+	"os"
 	"strings"
 	"testing"
 	"time"
@@ -66,6 +68,8 @@ func TestOnMessage(t *testing.T) {
 
 	t.Cleanup(func() {
 		mp.Clear()
+		testutil.ClearTmp("../../")
+		testutil.SetupTmp("../../")
 	})
 
 	t.Run("LIBRARY", func(t *testing.T) {
@@ -156,6 +160,109 @@ func TestOnMessage(t *testing.T) {
 	t.Run("SEND_BLOCK", func(t *testing.T) {
 
 		t.Run("success", func(t *testing.T) {
+
+			err := l.CreateDownload(g)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			// * SETUP
+			gameData, err := g.GetData()
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			t.Run("single shard", func(t *testing.T) {
+				shard := gameData.RootDir.Files["architecture-diagram.png"].Hashes[2]
+				found, data, err := g.FetchShard(shard)
+				if err != nil {
+					t.Fatal(err)
+				}
+
+				if !found {
+					t.Fatal("Test shard not found")
+				}
+
+				mockPeer.SetResponse(
+					fmt.Sprintf("BLOCK;%x;%x\n", g.RootHash, shard),
+					fmt.Sprintf("SEND_BLOCK;%x;%x;%x\n", g.RootHash, shard, data),
+				)
+
+				mockPeerClient.SendStringf("BLOCK;%x;%x\n", g.RootHash, shard)
+				time.Sleep(25 * time.Millisecond)
+
+				// ? was the shard inserted
+				buffer := make([]byte, gameData.ShardSize)
+
+				f, err := os.Open("../../test/data/tmp/toolkit/architecture-diagram.png")
+				if err != nil {
+					t.Errorf("Unable to verify whether shard was inserted %s", err)
+				}
+				defer f.Close()
+
+				_, err = f.Seek(int64(gameData.ShardSize)*int64(2), 0)
+				if err != nil {
+					t.Errorf("Unable to verify whether shard was inserted %s", err)
+				}
+
+				reader := bufio.NewReader(f)
+				reader.Read(buffer)
+				if !bytes.Equal(buffer, data) {
+					t.Fatalf("incorrect shard inserted\ngot %x\nexpected %x", buffer, data)
+				}
+			})
+
+			t.Run("entire file", func(t *testing.T) {
+				// TODO bug where last shard of file is not being hashed correctly
+
+				file := gameData.RootDir.Subdirs["subdir"].Files["chip8.c"]
+				buffer := make([]byte, gameData.ShardSize)
+
+				for i, shard := range file.Hashes {
+					found, data, err := g.FetchShard(shard)
+					if err != nil {
+						t.Fatal(err)
+					}
+
+					if !found {
+						t.Fatal("Test shard not found")
+					}
+
+					mockPeer.SetResponse(
+						fmt.Sprintf("BLOCK;%x;%x\n", g.RootHash, shard),
+						fmt.Sprintf("SEND_BLOCK;%x;%x;%x\n", g.RootHash, shard, data),
+					)
+
+					mockPeerClient.SendStringf("BLOCK;%x;%x\n", g.RootHash, shard)
+					time.Sleep(10 * time.Millisecond)
+
+					// ? was the shard inserted
+					f, err := os.Open("../../test/data/tmp/toolkit/subdir/chip8.c")
+					if err != nil {
+						t.Errorf("Unable to verify whether shard was inserted %s", err)
+					}
+
+					_, err = f.Seek(int64(gameData.ShardSize)*int64(i), 0)
+					if err != nil {
+						t.Errorf("Unable to verify whether shard was inserted %s", err)
+					}
+
+					reader := bufio.NewReader(f)
+					reader.Read(buffer)
+					if !bytes.Equal(buffer, data) {
+						t.Errorf("incorrect shard inserted\ngot %x\nexpected %x", buffer, data)
+					}
+
+					f.Close()
+				}
+			})
+		})
+
+		t.Run("failure", func(t *testing.T) {
+
+			t.Run("sending incorrect data", func(t *testing.T) {
+
+			})
 
 		})
 

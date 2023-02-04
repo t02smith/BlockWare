@@ -89,7 +89,7 @@ func (d *Download) Serialise(filename string) error {
 // ? setup
 
 // create a new download for an existing game
-func setupDownload(game *Game) error {
+func (game *Game) setupDownload() error {
 
 	// read hash data if isn't already loaded
 	if game.data == nil {

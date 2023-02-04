@@ -32,13 +32,13 @@ func NewLibrary() *Library {
 	}
 }
 
-func (l *Library) createDownload(g *Game) error {
+func (l *Library) CreateDownload(g *Game) error {
 	model.Logger.Infof("Creating download for %s:%x", g.Title, g.RootHash)
 	if _, ok := l.games[g.RootHash]; !ok {
 		return errors.New("game not found in library, cannot add download")
 	}
 
-	err := setupDownload(g)
+	err := g.setupDownload()
 	if err != nil {
 		return err
 	}

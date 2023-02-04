@@ -40,6 +40,10 @@ func beforeAll() {
 	// config
 	viper.Set("meta.directory", "../../test/data/.toolkit")
 	viper.Set("meta.hashes.directory", "../../test/data/.toolkit/hashes")
+	viper.Set("games.installFolder", "../../test/data/tmp")
+	viper.Set("games.tracker.directory", "../../test/data/tmp/tracker")
+
+	testutil.SetupTmp("../../")
 }
 
 func beforeEach() {

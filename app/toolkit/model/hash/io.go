@@ -12,13 +12,13 @@ import (
 
 func (t *HashTree) GetShard(hash [32]byte) (bool, []byte, error) {
 	model.Logger.Infof("Looking for shard %x in %s", hash, t.RootDirLocation)
-	found, location, offset := t.FindShard(hash)
+	found, _, location, offset := t.FindShard(hash)
 	if !found {
 		return false, nil, nil
 	}
 
 	model.Logger.Infof("Shard found at %s - piece %d", location, offset)
-	data, err := t.readShard(location, offset)
+	data, err := t.readShard(filepath.Join(t.RootDirLocation, location), offset)
 	if err != nil {
 		return false, nil, err
 	}
@@ -28,34 +28,37 @@ func (t *HashTree) GetShard(hash [32]byte) (bool, []byte, error) {
 
 // LOCATING SHARDS
 
-func (t *HashTree) FindShard(hash [32]byte) (bool, string, int) {
-	found, path, offset := t.RootDir.findShard(hash)
-	return found, filepath.Join(t.RootDirLocation, path), offset
+// looks for a given shard in the entire hash tree
+// return <hashFound> <file struct> <relative filename> <shard position in file>
+func (t *HashTree) FindShard(hash [32]byte) (bool, *HashTreeFile, string, int) {
+	return t.RootDir.findShard(hash)
 }
 
-func (td *HashTreeDir) findShard(hash [32]byte) (bool, string, int) {
+// auxillary function for FindShard => looks in particular directory
+func (td *HashTreeDir) findShard(hash [32]byte) (bool, *HashTreeFile, string, int) {
 	for _, f := range td.Files {
 		for i, h := range f.Hashes {
 			if bytes.Equal(hash[:], h[:]) {
-				return true, filepath.Join(td.Dirname, f.Filename), i
+				return true, f, filepath.Join(td.Dirname, f.Filename), i
 			}
 		}
 	}
 
 	for _, sd := range td.Subdirs {
-		found, filename, offset := sd.findShard(hash)
+		found, htf, filename, offset := sd.findShard(hash)
 		if found {
-			return true, filepath.Join(td.Dirname, filename), offset
+			return true, htf, filepath.Join(td.Dirname, filename), offset
 		}
 
 	}
 
-	return false, "", -1
+	return false, nil, "", -1
 
 }
 
 // READING SHARD
 
+// Reads a shard from a given file
 func (t *HashTree) readShard(filename string, offset int) ([]byte, error) {
 
 	file, err := os.Open(filename)
@@ -173,7 +176,11 @@ func InsertData(filename string, shardSize, offset uint, data []byte) error {
 
 	model.Logger.Infof("Writing shard to %s:%d", filename, offset)
 	writer := bufio.NewWriter(file)
-	writer.Write(data)
+	_, err = writer.Write(data)
+	if err != nil {
+		model.Logger.Error(err)
+	}
+
 	writer.Flush()
 
 	return nil

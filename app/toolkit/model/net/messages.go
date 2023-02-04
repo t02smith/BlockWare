@@ -2,6 +2,7 @@ package net
 
 import (
 	"bytes"
+	"crypto/sha256"
 	"encoding/hex"
 	"errors"
 	"fmt"
@@ -100,9 +101,16 @@ func onMessage(cmd []string, client PeerIT) {
 			return
 		}
 
-		// * fetch game
+		// * fetch game and find location
 		game := p.library.GetGame(gh)
-		_, ok := game.GetDownload().Progress[sh]
+		gameTree, err := game.GetData()
+		if err != nil {
+			model.Logger.Errorf("Error loading game data %s", err)
+			return
+		}
+
+		_, file, _, _ := gameTree.FindShard(sh)
+		_, ok := game.GetDownload().Progress[file.RootHash].BlocksRemaining[sh]
 
 		if !ok {
 			model.Logger.Warnf("Block %x not needed for download", sh)
@@ -116,7 +124,17 @@ func onMessage(cmd []string, client PeerIT) {
 			return
 		}
 
-		game.InsertShard(sh, data)
+		// * verify shard
+		dataHash := sha256.Sum256(data)
+		if !bytes.Equal(dataHash[:], sh[:]) {
+			model.Logger.Errorf("Data given does not match expected hash\ngot %x\nexpected %x", dataHash, sh)
+			return
+		}
+
+		err = game.InsertShard(sh, data)
+		if err != nil {
+			model.Logger.Errorf("error inserting shard %x: %s", sh, err)
+		}
 		return
 
 	// ERROR <msg> => used to send an error message following a command

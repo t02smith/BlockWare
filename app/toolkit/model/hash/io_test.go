@@ -5,7 +5,6 @@ import (
 	"bytes"
 	"crypto/sha256"
 	"os"
-	"path/filepath"
 	"testing"
 )
 
@@ -31,13 +30,13 @@ func TestFindShard(t *testing.T) {
 
 	t.Run("valid shard", func(t *testing.T) {
 		file := ht.RootDir.Files["test.txt"]
-		found, filename, offset := ht.FindShard(file.Hashes[0])
+		found, _, filename, offset := ht.FindShard(file.Hashes[0])
 
 		if !found {
 			t.Error("Existing shard not found")
 		}
 
-		if filename != filepath.Join("../../test/data/testdir", file.Filename) {
+		if filename != file.Filename {
 			t.Errorf("Incorrect filepath returned %s", filename)
 		}
 
@@ -47,7 +46,7 @@ func TestFindShard(t *testing.T) {
 	})
 
 	t.Run("invalid shard", func(t *testing.T) {
-		found, _, _ := ht.FindShard([32]byte{})
+		found, _, _, _ := ht.FindShard([32]byte{})
 		if found {
 			t.Errorf("Shard does not exist but states it is found")
 		}

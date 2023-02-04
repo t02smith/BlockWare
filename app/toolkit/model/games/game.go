@@ -325,12 +325,14 @@ func (g *Game) FetchShard(hash [32]byte) (bool, []byte, error) {
 }
 
 func (g *Game) InsertShard(shardHash [32]byte, data []byte) error {
-	found, filename, offset := g.data.FindShard(shardHash)
+	found, _, filename, offset := g.data.FindShard(shardHash)
 	if !found {
 		return nil
 	}
 
-	return hashIO.InsertData(filename, g.data.ShardSize, uint(offset), data)
+	dir := viper.GetString("games.installFolder")
+
+	return hashIO.InsertData(filepath.Join(dir, g.Title, filename), g.data.ShardSize, uint(offset), data)
 }
 
 func (g *Game) GetData() (*hashIO.HashTree, error) {
@@ -345,5 +347,12 @@ func (g *Game) GetData() (*hashIO.HashTree, error) {
 }
 
 func (g *Game) GetDownload() *Download {
+	d, err := DeserializeDownload(g.RootHash)
+	if err != nil {
+		model.Logger.Warnf("Download for game %x not present", g.RootHash)
+		return nil
+	}
+
+	g.download = d
 	return g.download
 }

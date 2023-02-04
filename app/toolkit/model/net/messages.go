@@ -109,8 +109,10 @@ func onMessage(cmd []string, client PeerIT) {
 			return
 		}
 
+		download := game.GetDownload()
+
 		_, file, _, _ := gameTree.FindShard(sh)
-		_, ok := game.GetDownload().Progress[file.RootHash].BlocksRemaining[sh]
+		_, ok := download.Progress[file.RootHash].BlocksRemaining[sh]
 
 		if !ok {
 			model.Logger.Warnf("Block %x not needed for download", sh)
@@ -136,8 +138,8 @@ func onMessage(cmd []string, client PeerIT) {
 			model.Logger.Errorf("error inserting shard %x: %s", sh, err)
 		}
 
-		delete(game.GetDownload().Progress[file.RootHash].BlocksRemaining, sh)
-		game.GetDownload().Serialise(fmt.Sprintf("%x", game.RootHash))
+		delete(download.Progress[file.RootHash].BlocksRemaining, sh)
+		download.Serialise(fmt.Sprintf("%x", game.RootHash))
 		return
 
 	// ERROR <msg> => used to send an error message following a command

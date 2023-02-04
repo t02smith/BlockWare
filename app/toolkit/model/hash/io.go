@@ -179,9 +179,15 @@ func InsertData(filename string, shardSize, offset uint, data []byte) error {
 	_, err = writer.Write(data)
 	if err != nil {
 		model.Logger.Error(err)
+		return err
 	}
 
-	writer.Flush()
+	err = writer.Flush()
+	if err != nil {
+		model.Logger.Error(err)
+		return err
+	}
 
+	model.Logger.Infof("shard %s:%d written successfully", filename, offset)
 	return nil
 }

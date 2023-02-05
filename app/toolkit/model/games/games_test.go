@@ -9,10 +9,11 @@ import (
 
 	"github.com/t02smith/part-iii-project/toolkit/model"
 	"github.com/t02smith/part-iii-project/toolkit/test/testutil"
+	"github.com/t02smith/part-iii-project/toolkit/util"
 )
 
 func TestMain(m *testing.M) {
-	model.InitLogger()
+	util.InitLogger()
 	testutil.SetupTestConfig()
 	model.SetupToolkitEnvironment()
 

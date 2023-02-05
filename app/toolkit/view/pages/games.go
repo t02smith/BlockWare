@@ -1,0 +1,46 @@
+package pages
+
+import (
+	"image/color"
+
+	"fyne.io/fyne/v2"
+	"fyne.io/fyne/v2/canvas"
+	"fyne.io/fyne/v2/data/binding"
+	"fyne.io/fyne/v2/widget"
+	model "github.com/t02smith/part-iii-project/toolkit/model/net"
+)
+
+func GamesPage() fyne.CanvasObject {
+
+	header := canvas.NewText("Your Library:", color.White)
+	header.TextSize = 20
+
+	gs := [][]string{}
+
+	// watch for changes in the game
+
+	lib := model.GetPeerInstance().GetLibrary()
+	libBinding := binding.BindStruct(lib)
+	libBinding.AddListener(binding.NewDataListener(func() {
+		gamesLs := lib.GetGames()
+
+		gs = [][]string{}
+		for _, g := range gamesLs {
+			gs = append(gs, []string{g.Title, g.Version, g.Developer, g.ReleaseDate})
+		}
+	}))
+
+	games := widget.NewTable(
+		func() (int, int) {
+			return len(gs), 4
+		},
+		func() fyne.CanvasObject {
+			return widget.NewLabel("template")
+		},
+		func(tci widget.TableCellID, co fyne.CanvasObject) {
+			co.(*widget.Label).SetText(gs[tci.Row][tci.Col])
+		},
+	)
+
+	return widget.NewCard("Your Library", "these are the games that are available to you", games)
+}

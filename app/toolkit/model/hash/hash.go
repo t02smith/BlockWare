@@ -12,7 +12,7 @@ import (
 	"path/filepath"
 
 	"github.com/spf13/viper"
-	"github.com/t02smith/part-iii-project/toolkit/model"
+	"github.com/t02smith/part-iii-project/toolkit/util"
 )
 
 // Describes a directory in terms of its files hashes
@@ -84,7 +84,7 @@ func NewHashTree(rootDir string, shardSize uint) (*HashTree, error) {
 
 // output a hash tree to a json file
 func (ht *HashTree) OutputToFile(filename string) error {
-	model.Logger.Infof("outputting to file %s\n", filename)
+	util.Logger.Infof("outputting to file %s\n", filename)
 	e, err := json.Marshal(ht)
 	if err != nil {
 		log.Println(err)
@@ -105,7 +105,7 @@ func (ht *HashTree) OutputToFile(filename string) error {
 
 // read a hash tree from a json file
 func ReadHashTreeFromFile(filename string) (*HashTree, error) {
-	model.Logger.Infof("Attempting to read hash data from %s", filename)
+	util.Logger.Infof("Attempting to read hash data from %s", filename)
 	file, err := os.Open(filename)
 	if err != nil {
 		return nil, err
@@ -125,7 +125,7 @@ func ReadHashTreeFromFile(filename string) (*HashTree, error) {
 		return nil, err
 	}
 
-	model.Logger.Infof("Hash data read from %s successfully", filename)
+	util.Logger.Infof("Hash data read from %s successfully", filename)
 	return ht, nil
 }
 
@@ -152,7 +152,7 @@ func (ht *HashTree) Hash() error {
 
 // build a directory tree and count the number of files
 func (ht *HashTree) buildTree() (int, error) {
-	model.Logger.Infof("Building tree of directory %s\n", ht.RootDirLocation)
+	util.Logger.Infof("Building tree of directory %s\n", ht.RootDirLocation)
 
 	ht.RootDir = &HashTreeDir{
 		Dirname: "",
@@ -165,7 +165,7 @@ func (ht *HashTree) buildTree() (int, error) {
 
 // perform a search to build a directory tree
 func (htd *HashTreeDir) traverseDirectory(absolutePath string) (int, error) {
-	model.Logger.Infof("Hashing directory %s\n", htd.Dirname)
+	util.Logger.Infof("Hashing directory %s\n", htd.Dirname)
 
 	counter := 0
 	dir, err := os.Open(filepath.Join(absolutePath, htd.Dirname))
@@ -273,12 +273,12 @@ func (ht *HashTree) VerifyTree(config *VerifyHashTreeConfig, chosenDirectory str
 		return false, errors.New("hash tree not found to compare given directory to")
 	}
 
-	model.Logger.Infof("Verifying directory %s\n", chosenDirectory)
+	util.Logger.Infof("Verifying directory %s\n", chosenDirectory)
 	return ht.verifyDir(config, chosenDirectory, "", ht.RootDir)
 }
 
 func (ht *HashTree) verifyDir(config *VerifyHashTreeConfig, currentDir string, directoryBeingVerified string, htDir *HashTreeDir) (bool, error) {
-	model.Logger.Infof("verifying directory %s/%s\n", currentDir, directoryBeingVerified)
+	util.Logger.Infof("verifying directory %s/%s\n", currentDir, directoryBeingVerified)
 	file, err := os.Open(filepath.Join(currentDir, directoryBeingVerified))
 	if err != nil {
 		return false, err
@@ -313,7 +313,7 @@ func (ht *HashTree) verifyDir(config *VerifyHashTreeConfig, currentDir string, d
 					continue
 				}
 
-				model.Logger.Warnf("Unexpected directory %s/%s/%s\n", currentDir, directoryBeingVerified, name)
+				util.Logger.Warnf("Unexpected directory %s/%s/%s\n", currentDir, directoryBeingVerified, name)
 				if !config.ContinueAfterError {
 					return false, nil
 				}
@@ -347,7 +347,7 @@ func (ht *HashTree) verifyDir(config *VerifyHashTreeConfig, currentDir string, d
 					continue
 				}
 
-				model.Logger.Warnf("Unexpected file %s/%s/%s\n", currentDir, directoryBeingVerified, name)
+				util.Logger.Warnf("Unexpected file %s/%s/%s\n", currentDir, directoryBeingVerified, name)
 				if !config.ContinueAfterError {
 					return false, nil
 				}
@@ -381,7 +381,7 @@ func (ht *HashTree) verifyFile(htf *HashTreeFile, currentDirectory string, filen
 	reader := bufio.NewReader(file)
 	counter := 0
 
-	model.Logger.Infof("\tSharding file '%s'\n", filename)
+	util.Logger.Infof("\tSharding file '%s'\n", filename)
 	for {
 		_, err := reader.Read(buffer)
 		if err == io.EOF {
@@ -394,7 +394,7 @@ func (ht *HashTree) verifyFile(htf *HashTreeFile, currentDirectory string, filen
 
 		hash := sha256.Sum256(buffer)
 		if !bytes.Equal(hash[:], htf.Hashes[counter][:]) {
-			model.Logger.Errorf("Incorrect hash found in file %s/%s at block %d\n", currentDirectory, filename, counter)
+			util.Logger.Errorf("Incorrect hash found in file %s/%s at block %d\n", currentDirectory, filename, counter)
 			return false, nil
 		}
 

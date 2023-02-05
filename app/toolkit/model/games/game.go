@@ -19,8 +19,8 @@ import (
 	"time"
 
 	"github.com/spf13/viper"
-	"github.com/t02smith/part-iii-project/toolkit/model"
 	hashIO "github.com/t02smith/part-iii-project/toolkit/model/hash"
+	"github.com/t02smith/part-iii-project/toolkit/util"
 )
 
 type Game struct {
@@ -49,26 +49,26 @@ var (
 func CreateGame(title, version, releaseDate, developer, rootDir string, shardSize uint) (*Game, error) {
 
 	if shardSize == 0 {
-		model.Logger.Errorf("shard size should be > 0")
+		util.Logger.Errorf("shard size should be > 0")
 		return nil, errors.New("invalid shard size")
 	}
 
 	// check version format
 	versionMatches, err := regexp.MatchString("^(\\d+\\.)*\\d+$", version)
 	if err != nil {
-		model.Logger.Errorf("error matching version number to regex")
+		util.Logger.Errorf("error matching version number to regex")
 		return nil, err
 	}
 
 	if !versionMatches {
-		model.Logger.Errorf("invalid version number")
+		util.Logger.Errorf("invalid version number")
 		return nil, errors.New("invalid version number")
 	}
 
 	// check release date
 	_, err = time.Parse("2006-01-02 15:04:05 -0700 MST", releaseDate)
 	if err != nil {
-		model.Logger.Errorf("invalid release date given")
+		util.Logger.Errorf("invalid release date given")
 		return nil, errors.New("invalid release date given")
 	}
 
@@ -157,7 +157,7 @@ func (g *Game) ReadHashData() error {
 
 func OutputToFile(g *Game) error {
 	gameFilename := filepath.Join(viper.GetString("meta.directory"), fmt.Sprintf("%s-%s-%s.json", g.Title, g.Version, g.Developer))
-	model.Logger.Infof("Outputting game data to %s\n", gameFilename)
+	util.Logger.Infof("Outputting game data to %s\n", gameFilename)
 
 	// output game metadata
 	e, err := json.Marshal(g)
@@ -349,7 +349,7 @@ func (g *Game) GetData() (*hashIO.HashTree, error) {
 func (g *Game) GetDownload() *Download {
 	d, err := DeserializeDownload(g.RootHash)
 	if err != nil {
-		model.Logger.Infof("Download for game %x not present", g.RootHash)
+		util.Logger.Infof("Download for game %x not present", g.RootHash)
 		return nil
 	}
 

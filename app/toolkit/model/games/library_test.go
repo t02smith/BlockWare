@@ -45,7 +45,7 @@ func TestAddGame(t *testing.T) {
 
 	t.Run("success", func(t *testing.T) {
 		l.AddGame(g)
-		if _, ok := l.games[g.RootHash]; !ok {
+		if _, ok := l.Games[g.RootHash]; !ok {
 			t.Errorf("Game not added")
 		}
 	})

@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"github.com/jedib0t/go-pretty/v6/table"
-	"github.com/t02smith/part-iii-project/toolkit/model"
+	"github.com/t02smith/part-iii-project/toolkit/util"
 )
 
 /*
@@ -21,20 +21,20 @@ both of them.
 // stores user's game information on owned and downloading games
 type Library struct {
 
-	// a user's owned games
-	games map[[32]byte]*Game
+	// a user's owned Games
+	Games map[[32]byte]*Game
 }
 
 // create a new library
 func NewLibrary() *Library {
 	return &Library{
-		games: make(map[[32]byte]*Game),
+		Games: make(map[[32]byte]*Game),
 	}
 }
 
 func (l *Library) CreateDownload(g *Game) error {
-	model.Logger.Infof("Creating download for %s:%x", g.Title, g.RootHash)
-	if _, ok := l.games[g.RootHash]; !ok {
+	util.Logger.Infof("Creating download for %s:%x", g.Title, g.RootHash)
+	if _, ok := l.Games[g.RootHash]; !ok {
 		return errors.New("game not found in library, cannot add download")
 	}
 
@@ -43,22 +43,22 @@ func (l *Library) CreateDownload(g *Game) error {
 		return err
 	}
 
-	model.Logger.Infof("Download created for %s:%x", g.Title, g.RootHash)
+	util.Logger.Infof("Download created for %s:%x", g.Title, g.RootHash)
 	return nil
 }
 
 // get a game and its download if they exist
 func (l *Library) GetGame(rootHash [32]byte) *Game {
-	if _, ok := l.games[rootHash]; !ok {
+	if _, ok := l.Games[rootHash]; !ok {
 		return nil
 	}
 
-	return l.games[rootHash]
+	return l.Games[rootHash]
 }
 
 func (l *Library) GetGames() []*Game {
 	gs := []*Game{}
-	for _, g := range l.games {
+	for _, g := range l.Games {
 		gs = append(gs, g)
 	}
 	return gs
@@ -68,7 +68,7 @@ func (l *Library) GetGames() []*Game {
 
 // add a game to the library
 func (l *Library) AddGame(g *Game) {
-	l.games[g.RootHash] = g
+	l.Games[g.RootHash] = g
 }
 
 func (l *Library) OutputGamesTable() {
@@ -77,7 +77,7 @@ func (l *Library) OutputGamesTable() {
 	t.AppendHeader(table.Row{"#", "Title", "Version", "Release"})
 
 	counter := 1
-	for _, g := range l.games {
+	for _, g := range l.Games {
 		t.AppendRow(table.Row{fmt.Sprint(counter), g.Title, g.Version, g.ReleaseDate})
 		counter++
 	}
@@ -86,7 +86,7 @@ func (l *Library) OutputGamesTable() {
 }
 
 func (l *Library) FindBlock(gameHash [32]byte, hash [32]byte) (bool, []byte, error) {
-	g, ok := l.games[gameHash]
+	g, ok := l.Games[gameHash]
 	if !ok {
 		return false, nil, nil
 	}

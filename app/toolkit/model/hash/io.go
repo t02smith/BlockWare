@@ -7,17 +7,17 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/t02smith/part-iii-project/toolkit/model"
+	"github.com/t02smith/part-iii-project/toolkit/util"
 )
 
 func (t *HashTree) GetShard(hash [32]byte) (bool, []byte, error) {
-	model.Logger.Infof("Looking for shard %x in %s", hash, t.RootDirLocation)
+	util.Logger.Infof("Looking for shard %x in %s", hash, t.RootDirLocation)
 	found, _, location, offset := t.FindShard(hash)
 	if !found {
 		return false, nil, nil
 	}
 
-	model.Logger.Infof("Shard found at %s - piece %d", location, offset)
+	util.Logger.Infof("Shard found at %s - piece %d", location, offset)
 	data, err := t.readShard(filepath.Join(t.RootDirLocation, location), offset)
 	if err != nil {
 		return false, nil, err
@@ -103,7 +103,7 @@ func (t *HashTree) CreateDummyFiles(rootDir, title string, onCreate func(string,
 }
 
 func (t *HashTree) createDummyFilesFromDirectory(dir *HashTreeDir, path string, onCreate func(string, *HashTreeFile)) error {
-	model.Logger.Infof("Generating files for folder %s", filepath.Join(path, dir.Dirname))
+	util.Logger.Infof("Generating files for folder %s", filepath.Join(path, dir.Dirname))
 
 	if len(dir.Dirname) > 0 {
 		err := os.Mkdir(filepath.Join(path, dir.Dirname), 0777)
@@ -115,7 +115,7 @@ func (t *HashTree) createDummyFilesFromDirectory(dir *HashTreeDir, path string, 
 	// generate files
 	for _, f := range dir.Files {
 		fileLocation := filepath.Join(path, dir.Dirname, f.Filename)
-		model.Logger.Infof("Creating dummy for %s", fileLocation)
+		util.Logger.Infof("Creating dummy for %s", fileLocation)
 		err := setupFile(fileLocation, t.ShardSize, uint(len(f.Hashes)))
 		if err != nil {
 			return err
@@ -136,7 +136,7 @@ func (t *HashTree) createDummyFilesFromDirectory(dir *HashTreeDir, path string, 
 }
 
 func setupFile(filename string, shardSize, shardCount uint) error {
-	model.Logger.Infof("Creating empty file %s", filename)
+	util.Logger.Infof("Creating empty file %s", filename)
 	file, err := os.Create(filename)
 	if err != nil {
 		return err
@@ -154,7 +154,7 @@ func setupFile(filename string, shardSize, shardCount uint) error {
 		}
 	}
 
-	model.Logger.Infof("%s created", filename)
+	util.Logger.Infof("%s created", filename)
 	return nil
 }
 
@@ -174,20 +174,20 @@ func InsertData(filename string, shardSize, offset uint, data []byte) error {
 		return err
 	}
 
-	model.Logger.Infof("Writing shard to %s:%d", filename, offset)
+	util.Logger.Infof("Writing shard to %s:%d", filename, offset)
 	writer := bufio.NewWriter(file)
 	_, err = writer.Write(data)
 	if err != nil {
-		model.Logger.Error(err)
+		util.Logger.Error(err)
 		return err
 	}
 
 	err = writer.Flush()
 	if err != nil {
-		model.Logger.Error(err)
+		util.Logger.Error(err)
 		return err
 	}
 
-	model.Logger.Infof("shard %s:%d written successfully", filename, offset)
+	util.Logger.Infof("shard %s:%d written successfully", filename, offset)
 	return nil
 }

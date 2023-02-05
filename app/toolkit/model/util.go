@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 
 	"github.com/spf13/viper"
+	u "github.com/t02smith/part-iii-project/toolkit/util"
 )
 
 func SetupToolkitEnvironment() error {
@@ -53,7 +54,7 @@ func createDirectoryIfNotExist(dir string) error {
 	}
 
 	if os.IsNotExist(err) {
-		Logger.Infof("Directory %s not found. Creating directory", dir)
+		u.Logger.Infof("Directory %s not found. Creating directory", dir)
 		err = os.Mkdir(dir, 0775)
 
 		if err != nil {

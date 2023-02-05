@@ -6,20 +6,28 @@ package main
 import (
 	"log"
 
-	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
-	"github.com/t02smith/part-iii-project/toolkit/controller"
 	"github.com/t02smith/part-iii-project/toolkit/model"
 	"github.com/t02smith/part-iii-project/toolkit/model/net"
+	"github.com/t02smith/part-iii-project/toolkit/util"
+	"github.com/t02smith/part-iii-project/toolkit/view"
 )
 
 func main() {
 	SetupConfig()
-	model.InitLogger()
+	util.InitLogger()
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 
 	model.SetupToolkitEnvironment()
-	startGin()
+
+	// model setup
+	err := startPeer()
+	if err != nil {
+		log.Fatalf("Error starting peer %s", err)
+	}
+
+	//
+	view.StartApp()
 }
 
 // VIPER CONFIG
@@ -71,30 +79,8 @@ func defaultConfig() {
 	viper.SetDefault("web.port", 8080)
 }
 
-// start gin server
-
-func startGin() {
-	err := startPeer()
-	if err != nil {
-		model.Logger.Panicf("Failed to start peer %s", err)
-	}
-
-	r := gin.New()
-
-	r.Use(gin.Logger())
-	r.Use(gin.Recovery())
-
-	r.Static("/css", "static/css")
-	r.Static("/img", "static/img")
-
-	r.LoadHTMLGlob("templates/**/*.html")
-	controller.Router(r)
-
-	model.Logger.Info("server started")
-	r.Run()
-}
-
 func startPeer() error {
+	util.Logger.Info("Attempting to start peer")
 	_, err := net.StartPeer(
 		"localhost",
 		6748,

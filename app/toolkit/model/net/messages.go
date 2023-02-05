@@ -9,8 +9,8 @@ import (
 	"io"
 
 	"github.com/spf13/viper"
-	"github.com/t02smith/part-iii-project/toolkit/model"
 	"github.com/t02smith/part-iii-project/toolkit/model/games"
+	"github.com/t02smith/part-iii-project/toolkit/util"
 )
 
 func onMessage(cmd []string, client PeerIT) {
@@ -20,17 +20,17 @@ func onMessage(cmd []string, client PeerIT) {
 
 	// LIBRARY => request a list of a peers games
 	case "LIBRARY":
-		model.Logger.Info("Library command called")
+		util.Logger.Info("Library command called")
 
 		gameLs, err := games.LoadGames(viper.GetString("meta.directory"))
 		if err != nil {
-			model.Logger.Errorf("Error loading games: %s\n", err)
+			util.Logger.Errorf("Error loading games: %s\n", err)
 			return
 		}
 
 		gameStr, err := gameListToMessage(gameLs)
 		if err != nil {
-			model.Logger.Errorf("Error serialising games: %s\n", err)
+			util.Logger.Errorf("Error serialising games: %s\n", err)
 			return
 		}
 
@@ -39,16 +39,16 @@ func onMessage(cmd []string, client PeerIT) {
 
 	// GAMES => a list of users games
 	case "GAMES":
-		model.Logger.Infof("Games command called")
+		util.Logger.Infof("Games command called")
 
 		ls, err := gameMessageToGameList(cmd)
 		if err != nil {
-			model.Logger.Errorf("Error reading games: %s\n", err)
+			util.Logger.Errorf("Error reading games: %s\n", err)
 			return
 		}
 
 		if peer, ok := p.peers[client]; ok {
-			model.Logger.Infof("Client found. Updating library")
+			util.Logger.Infof("Client found. Updating library")
 			peer.Library = ls
 		}
 
@@ -56,28 +56,28 @@ func onMessage(cmd []string, client PeerIT) {
 
 	// BLOCK <game hash> <hash> => Request a block of data from a user
 	case "BLOCK":
-		model.Logger.Infof("Block command called for block %s", cmd[2])
+		util.Logger.Infof("Block command called for block %s", cmd[2])
 
 		gh, err := stringTo32ByteArr(cmd[1])
 		if err != nil {
-			model.Logger.Errorf("Error reading game hash on BLOCK cmd: %s", err)
+			util.Logger.Errorf("Error reading game hash on BLOCK cmd: %s", err)
 			return
 		}
 
 		sh, err := stringTo32ByteArr(cmd[2])
 		if err != nil {
-			model.Logger.Errorf("Error reading shard hash on BLOCK cmd: %s", err)
+			util.Logger.Errorf("Error reading shard hash on BLOCK cmd: %s", err)
 			return
 		}
 
 		found, data, err := p.library.FindBlock(gh, sh)
 		if err != nil {
-			model.Logger.Errorf("Error finding block %s", err)
+			util.Logger.Errorf("Error finding block %s", err)
 			return
 		}
 
 		if !found {
-			model.Logger.Warnf("Block %x not found", sh)
+			util.Logger.Warnf("Block %x not found", sh)
 			client.SendStringf("ERROR;Block %x not found\n", sh)
 			return
 		}
@@ -87,17 +87,17 @@ func onMessage(cmd []string, client PeerIT) {
 
 	// SEND_BLOCK <game hash> <hash> <shard> => Download a shard off of a user
 	case "SEND_BLOCK":
-		model.Logger.Infof("SEND_BLOCK => Block received")
+		util.Logger.Infof("SEND_BLOCK => Block received")
 		// * parse input
 		gh, err := stringTo32ByteArr(cmd[1])
 		if err != nil {
-			model.Logger.Errorf("Error reading game hash on BLOCK cmd: %s", err)
+			util.Logger.Errorf("Error reading game hash on BLOCK cmd: %s", err)
 			return
 		}
 
 		sh, err := stringTo32ByteArr(cmd[2])
 		if err != nil {
-			model.Logger.Errorf("Error reading shard hash on BLOCK cmd: %s", err)
+			util.Logger.Errorf("Error reading shard hash on BLOCK cmd: %s", err)
 			return
 		}
 
@@ -105,7 +105,7 @@ func onMessage(cmd []string, client PeerIT) {
 		game := p.library.GetGame(gh)
 		gameTree, err := game.GetData()
 		if err != nil {
-			model.Logger.Errorf("Error loading game data %s", err)
+			util.Logger.Errorf("Error loading game data %s", err)
 			return
 		}
 
@@ -115,27 +115,27 @@ func onMessage(cmd []string, client PeerIT) {
 		_, ok := download.Progress[file.RootHash].BlocksRemaining[sh]
 
 		if !ok {
-			model.Logger.Warnf("Block %x not needed for download", sh)
+			util.Logger.Warnf("Block %x not needed for download", sh)
 			return
 		}
 
 		// * insert the shard
 		data, err := hex.DecodeString(cmd[3])
 		if err != nil {
-			model.Logger.Error(err)
+			util.Logger.Error(err)
 			return
 		}
 
 		// * verify shard
 		dataHash := sha256.Sum256(data)
 		if !bytes.Equal(dataHash[:], sh[:]) {
-			model.Logger.Errorf("Data given does not match expected hash\ngot %x\nexpected %x", dataHash, sh)
+			util.Logger.Errorf("Data given does not match expected hash\ngot %x\nexpected %x", dataHash, sh)
 			return
 		}
 
 		err = game.InsertShard(sh, data)
 		if err != nil {
-			model.Logger.Errorf("error inserting shard %x: %s", sh, err)
+			util.Logger.Errorf("error inserting shard %x: %s", sh, err)
 		}
 
 		delete(download.Progress[file.RootHash].BlocksRemaining, sh)
@@ -144,7 +144,7 @@ func onMessage(cmd []string, client PeerIT) {
 
 	// ERROR <msg> => used to send an error message following a command
 	case "ERROR":
-		model.Logger.Errorf("Error received %s", cmd[1])
+		util.Logger.Errorf("Error received %s", cmd[1])
 		return
 
 	}

@@ -6,10 +6,11 @@ import (
 
 	"github.com/spf13/viper"
 	"github.com/t02smith/part-iii-project/toolkit/test/testutil"
+	u "github.com/t02smith/part-iii-project/toolkit/util"
 )
 
 func TestMain(m *testing.M) {
-	InitLogger()
+	u.InitLogger()
 	os.Exit(m.Run())
 }
 

@@ -7,9 +7,9 @@ import (
 	"time"
 
 	"github.com/spf13/viper"
-	"github.com/t02smith/part-iii-project/toolkit/model"
 	"github.com/t02smith/part-iii-project/toolkit/model/games"
 	"github.com/t02smith/part-iii-project/toolkit/test/testutil"
+	"github.com/t02smith/part-iii-project/toolkit/util"
 )
 
 var (
@@ -19,7 +19,7 @@ var (
 )
 
 func beforeAll() {
-	model.InitLogger()
+	util.InitLogger()
 	tp, err := StartPeer("localhost", 7887, "../../test/data/tmp", "../../test/data/.toolkit")
 	if err != nil {
 		log.Printf("Error starting test peer")

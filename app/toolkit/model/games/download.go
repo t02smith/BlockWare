@@ -10,8 +10,8 @@ import (
 	"path/filepath"
 
 	"github.com/spf13/viper"
-	"github.com/t02smith/part-iii-project/toolkit/model"
 	"github.com/t02smith/part-iii-project/toolkit/model/hash"
+	"github.com/t02smith/part-iii-project/toolkit/util"
 )
 
 type Download struct {
@@ -36,7 +36,7 @@ type FileProgress struct {
 
 // file -> download object
 func DeserializeDownload(gameHash [32]byte) (*Download, error) {
-	model.Logger.Infof("Deserialized download %x", gameHash)
+	util.Logger.Infof("Deserialized download %x", gameHash)
 	dir := viper.GetString("games.tracker.directory")
 	if len(dir) == 0 {
 		return nil, errors.New("tracker directory not found")
@@ -61,7 +61,7 @@ func DeserializeDownload(gameHash [32]byte) (*Download, error) {
 
 // download obj -> file
 func (d *Download) Serialise(filename string) error {
-	model.Logger.Infof("Serialising download %s", filename)
+	util.Logger.Infof("Serialising download %s", filename)
 	dir := viper.GetString("games.tracker.directory")
 	if len(dir) == 0 {
 		return errors.New("tracker directory not found")
@@ -82,7 +82,7 @@ func (d *Download) Serialise(filename string) error {
 
 	writer.Flush()
 
-	model.Logger.Infof("%s serialised successfully", filename)
+	util.Logger.Infof("%s serialised successfully", filename)
 	return nil
 }
 
@@ -111,7 +111,7 @@ func (game *Game) setupDownload() error {
 		return errors.New("game install folder not found")
 	}
 
-	model.Logger.Infof("Generating dummy files for %s-%s", game.Title, game.Version)
+	util.Logger.Infof("Generating dummy files for %s-%s", game.Title, game.Version)
 	err := game.data.CreateDummyFiles(dir, game.Title, func(path string, htf *hash.HashTreeFile) {
 		p := FileProgress{
 			AbsolutePath:    path,
@@ -133,7 +133,7 @@ func (game *Game) setupDownload() error {
 
 	err = d.Serialise(fmt.Sprintf("%x", game.RootHash))
 	if err != nil {
-		model.Logger.Errorf("Error saving download to file: %s", err)
+		util.Logger.Errorf("Error saving download to file: %s", err)
 		return err
 	}
 

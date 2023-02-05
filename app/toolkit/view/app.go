@@ -38,6 +38,10 @@ func setupWindow(app fyne.App) fyne.Window {
 			Content: pages.GamesPage(),
 		},
 		&components.NavbarTab{
+			Name:    "Upload",
+			Content: pages.UploadPage(),
+		},
+		&components.NavbarTab{
 			Name:    "Peers",
 			Content: pages.PeersPage(),
 		},

@@ -10,6 +10,9 @@ import (
 	model "github.com/t02smith/part-iii-project/toolkit/model/net"
 )
 
+var libBinding binding.ExternalBool
+var libUpdated bool = false
+
 func GamesPage() fyne.CanvasObject {
 
 	header := canvas.NewText("Your Library:", color.White)
@@ -20,14 +23,20 @@ func GamesPage() fyne.CanvasObject {
 	// watch for changes in the game
 
 	lib := model.GetPeerInstance().GetLibrary()
-	libBinding := binding.BindStruct(lib)
+	libBinding = binding.BindBool(&libUpdated)
 	libBinding.AddListener(binding.NewDataListener(func() {
+		if changed, err := libBinding.Get(); !changed || err != nil {
+			return
+		}
+
 		gamesLs := lib.GetGames()
 
 		gs = [][]string{}
 		for _, g := range gamesLs {
 			gs = append(gs, []string{g.Title, g.Version, g.Developer, g.ReleaseDate})
 		}
+
+		libBinding.Set(false)
 	}))
 
 	games := widget.NewTable(

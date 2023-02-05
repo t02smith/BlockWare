@@ -10,6 +10,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/spf13/viper"
 	"github.com/t02smith/part-iii-project/toolkit/util"
@@ -132,6 +133,7 @@ func ReadHashTreeFromFile(filename string) (*HashTree, error) {
 // Hashing functions
 
 func (ht *HashTree) Hash() error {
+	startTime := time.Now()
 	fileCount, err := ht.buildTree()
 	if err != nil {
 		return err
@@ -145,6 +147,9 @@ func (ht *HashTree) Hash() error {
 	wg, fileIn, _ := hasherPool(wc, fileCount, ht.ShardSize)
 	_ = ht.RootDir.shardData(fileIn, ht.ShardSize)
 	wg.Wait()
+
+	endTime := time.Now()
+	util.Logger.Infof("Directory %s hashed in %dms", ht.RootDirLocation, endTime.Sub(startTime).Milliseconds())
 	return nil
 }
 

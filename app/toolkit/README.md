@@ -3,13 +3,12 @@
 ## How to run
 
 ```bash
-# frontend web server
-fresh # w/ hot reload
-go run main.go # w/o hot reload
+# run using go
+go run main.go
 
-# cmd line (maybe depractated)
-go install
-toolkit --help
+# create an executable
+make # windows
+make package-lin # linux
 ```
 
 ## Testing

@@ -27,7 +27,7 @@ func TestCreateGame(t *testing.T) {
 
 		for _, x := range table {
 			t.Run(x.name, func(t *testing.T) {
-				_, err := CreateGame(x.name, x.version, x.releaseDate, x.developer, x.rootDir, x.shardSize)
+				_, err := CreateGame(x.name, x.version, x.releaseDate, x.developer, x.rootDir, x.shardSize, nil)
 				if err == nil {
 					t.Fatalf("Failed to detect illegal argument: %s", x.name)
 				}
@@ -38,7 +38,7 @@ func TestCreateGame(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		datetime := time.Date(2002, 1, 10, 0, 0, 0, 0, time.UTC).String()
 
-		game, err := CreateGame("test-game", "1.1.1", datetime, "google.com", "../../test/data/testdir", 64)
+		game, err := CreateGame("test-game", "1.1.1", datetime, "google.com", "../../test/data/testdir", 64, nil)
 		if err != nil {
 			t.Errorf("Error creating game: %s", err)
 			return

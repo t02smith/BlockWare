@@ -7,7 +7,7 @@ meta:
   hashes:
     directory: ./test/data/.toolkit/hashes
     shardsize: 16384
-    workercount: 5
+    workercount: 10
   log: stdout
   threadpoolsize: 10
 user:

@@ -23,14 +23,14 @@ func TestNewHashTree(t *testing.T) {
 
 	t.Run("illegal arguments", func(t *testing.T) {
 		t.Run("invalid shard size", func(t *testing.T) {
-			_, err := NewHashTree(".", 0)
+			_, err := NewHashTree(".", 0, nil)
 			if err == nil {
 				t.Errorf("shard size of 0 should not be accepted")
 			}
 		})
 
 		t.Run("invalid directory", func(t *testing.T) {
-			_, err := NewHashTree("./test/data/fake", 1024)
+			_, err := NewHashTree("./test/data/fake", 1024, nil)
 			if err == nil {
 				t.Errorf("invalid directories shouldn't be accepted")
 			}
@@ -38,7 +38,7 @@ func TestNewHashTree(t *testing.T) {
 	})
 
 	t.Run("correct input", func(t *testing.T) {
-		tree, err := NewHashTree(".", 1024)
+		tree, err := NewHashTree(".", 1024, nil)
 		if err != nil {
 			t.Errorf("error creating hash tree")
 		}
@@ -96,7 +96,7 @@ func TestShardFile(t *testing.T) {
 func TestHash(t *testing.T) {
 
 	t.Run("valid input", func(t *testing.T) {
-		ht, err := NewHashTree("../../test/data/testdir", 1024)
+		ht, err := NewHashTree("../../test/data/testdir", 1024, nil)
 		if err != nil {
 			t.Fatalf("NewHashTree failed on valid input")
 		}
@@ -125,7 +125,7 @@ func TestHash(t *testing.T) {
 	})
 
 	t.Run("vary worker count", func(t *testing.T) {
-		ht, err := NewHashTree("../../test/data/testdir", 1024)
+		ht, err := NewHashTree("../../test/data/testdir", 1024, nil)
 		if err != nil {
 			t.Fatalf("NewHashTree failed on valid input")
 		}
@@ -147,7 +147,7 @@ func TestHash(t *testing.T) {
 
 func TestVerifyDir(t *testing.T) {
 
-	ht1, err := NewHashTree("../../test/data/testdir", 256)
+	ht1, err := NewHashTree("../../test/data/testdir", 256, nil)
 	if err != nil {
 		t.Fatalf("error creating new hash tree %s", err)
 	}

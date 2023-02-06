@@ -1,6 +1,7 @@
 package pages
 
 import (
+	"fmt"
 	"image/color"
 	"strconv"
 	"time"
@@ -8,7 +9,9 @@ import (
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
+	"fyne.io/fyne/v2/data/binding"
 	"fyne.io/fyne/v2/dialog"
+	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/widget"
 	"github.com/t02smith/part-iii-project/toolkit/model/games"
 	model "github.com/t02smith/part-iii-project/toolkit/model/net"
@@ -37,8 +40,23 @@ func UploadPage() fyne.CanvasObject {
 	day := widget.NewEntry()
 	month := widget.NewEntry()
 	year := widget.NewEntry()
-
 	date := container.NewHBox(day, canvas.NewText("/", color.White), month, canvas.NewText("/", color.White), year)
+
+	progressBar := widget.NewProgressBar()
+	count, countText, total, totalText, status, statusText := 0, widget.NewLabel("0"), 0, widget.NewLabel("0"), "waiting...", widget.NewLabel("waiting...")
+
+	progressContainer := container.NewHBox(countText, canvas.NewText("/", color.White), totalText, layout.NewSpacer(), statusText)
+
+	countBind, totalBind, statusBind := binding.BindInt(&count), binding.BindInt(&total), binding.BindString(&status)
+	countBind.AddListener(binding.NewDataListener(func() {
+		countText.SetText(fmt.Sprint(count))
+	}))
+	totalBind.AddListener(binding.NewDataListener(func() {
+		totalText.SetText(fmt.Sprint(total))
+	}))
+	statusBind.AddListener(binding.NewDataListener(func() {
+		statusText.SetText(status)
+	}))
 
 	form := &widget.Form{
 		Items: []*widget.FormItem{
@@ -50,6 +68,15 @@ func UploadPage() fyne.CanvasObject {
 			{Text: "Shard size", Widget: shardSize},
 		},
 		OnSubmit: func() {
+
+			for _, x := range []*widget.Entry{title, version, domain, day, month, year, shardSize} {
+				x.Disable()
+				defer x.Enable()
+				defer x.SetText("")
+			}
+
+			rootDirBtn.Disable()
+			defer rootDirBtn.Enable()
 
 			ss, err := strconv.ParseUint(shardSize.Text, 10, 32)
 			if err != nil {
@@ -74,14 +101,31 @@ func UploadPage() fyne.CanvasObject {
 
 			date := time.Date(int(y), time.Month(m), int(d), 0, 0, 0, 0, time.UTC).String()
 
+			progress := make(chan int)
+			go func() {
+				totalBind.Set(<-progress)
+				count = 0
+
+				statusText.SetText("Sharding directory...")
+				for count < total {
+					<-progress
+					countBind.Set(count + 1)
+
+					progressBar.SetValue(float64(count) / float64(total))
+				}
+				statusText.SetText("Outputting to file...")
+
+			}()
+
 			p := model.GetPeerInstance()
-			g, err := games.CreateGame(title.Text, version.Text, date, domain.Text, rootDir, uint(ss))
+			g, err := games.CreateGame(title.Text, version.Text, date, domain.Text, rootDir, uint(ss), progress)
 			if err != nil {
 				return
 			}
 
 			p.GetLibrary().AddGame(g)
 			games.OutputToFile(g)
+			statusText.SetText("Complete")
 
 			libBinding.Set(true)
 		},
@@ -90,7 +134,7 @@ func UploadPage() fyne.CanvasObject {
 	content := widget.NewCard(
 		"Upload a new game",
 		"Fill in the details below and hit upload to share your game",
-		form,
+		container.NewVBox(form, progressContainer, progressBar),
 	)
 
 	return content

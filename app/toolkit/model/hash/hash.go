@@ -27,6 +27,9 @@ type HashTree struct {
 
 	// the local physical location of the root directory
 	RootDirLocation string `json:"location"`
+
+	// a channel for viewing the progress of a hash
+	progress chan int
 }
 
 // Describes a directory with tracked files
@@ -65,7 +68,7 @@ type VerifyHashTreeConfig struct {
 }
 
 // create a new hash tree of a directory
-func NewHashTree(rootDir string, shardSize uint) (*HashTree, error) {
+func NewHashTree(rootDir string, shardSize uint, progress chan int) (*HashTree, error) {
 	if shardSize == 0 {
 		return nil, errors.New("shard size must be greater than 0")
 	}
@@ -78,6 +81,7 @@ func NewHashTree(rootDir string, shardSize uint) (*HashTree, error) {
 		RootDir:         nil,
 		RootDirLocation: rootDir,
 		ShardSize:       shardSize,
+		progress:        progress,
 	}, nil
 }
 
@@ -139,12 +143,17 @@ func (ht *HashTree) Hash() error {
 		return err
 	}
 
+	if ht.progress != nil {
+		ht.progress <- fileCount
+
+	}
+
 	wc := viper.GetInt("meta.hashes.workercount")
 	if wc <= 0 {
 		wc = 1
 	}
 
-	wg, fileIn, _ := hasherPool(wc, fileCount, ht.ShardSize)
+	wg, fileIn, _ := hasherPool(wc, fileCount, ht.ShardSize, ht.progress)
 	_ = ht.RootDir.shardData(fileIn, ht.ShardSize)
 	wg.Wait()
 
@@ -435,4 +444,8 @@ func CalculateRootHash(hashes [][32]byte) [32]byte {
 
 	return oldLayer[0]
 
+}
+
+func (ht *HashTree) GetProgress() chan int {
+	return ht.progress
 }

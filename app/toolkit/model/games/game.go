@@ -46,7 +46,7 @@ var (
 
 // Creator
 
-func CreateGame(title, version, releaseDate, developer, rootDir string, shardSize uint) (*Game, error) {
+func CreateGame(title, version, releaseDate, developer, rootDir string, shardSize uint, progress chan int) (*Game, error) {
 
 	if shardSize == 0 {
 		util.Logger.Errorf("shard size should be > 0")
@@ -83,7 +83,7 @@ func CreateGame(title, version, releaseDate, developer, rootDir string, shardSiz
 	}
 
 	// hash data
-	tree, err := hashIO.NewHashTree(rootDir, shardSize)
+	tree, err := hashIO.NewHashTree(rootDir, shardSize, progress)
 	if err != nil {
 		return nil, err
 	}

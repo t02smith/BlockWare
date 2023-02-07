@@ -7,13 +7,25 @@ import (
 	"fmt"
 	"math/big"
 
+	"github.com/ethereum/go-ethereum/accounts"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
+	"github.com/ethereum/go-ethereum/accounts/keystore"
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
 
-	"github.com/t02smith/part-iii-project/toolkit/build/contracts"
+	"github.com/t02smith/part-iii-project/toolkit/build/contracts/store"
 	"github.com/t02smith/part-iii-project/toolkit/util"
 )
+
+// types
+
+type Wallet struct {
+	address    common.Address
+	privateKey *ecdsa.PrivateKey
+}
+
+// functions
 
 func StartClient(addr string) (*ethclient.Client, error) {
 	client, err := ethclient.Dial(addr)
@@ -66,14 +78,39 @@ func DeployContracts(client *ethclient.Client, privateKey string) error {
 	auth.GasPrice = gasPrice
 
 	input := "1.0"
-	address, tx, instance, err := contracts.DeployContracts(auth, client, input)
+	address, tx, instance, err := store.DeployStore(auth, client, input)
 	if err != nil {
 		return err
 	}
 
 	fmt.Println(address.Hex())
 	fmt.Println(tx.Hash().Hex())
+	fmt.Println(instance.Version(nil))
 	_ = instance
 
 	return nil
+}
+
+func NewWallet() (*Wallet, error) {
+	privateKey, err := crypto.GenerateKey()
+	if err != nil {
+		return nil, err
+	}
+
+	return &Wallet{
+		address:    crypto.PubkeyToAddress(privateKey.PublicKey),
+		privateKey: privateKey,
+	}, nil
+}
+
+// key store
+
+func CreateKeyStore(keyStorePath string, password string) (*accounts.Account, error) {
+	ks := keystore.NewKeyStore(keyStorePath, keystore.StandardScryptN, keystore.StandardScryptP)
+	account, err := ks.NewAccount(password)
+	if err != nil {
+		return nil, err
+	}
+
+	return &account, nil
 }

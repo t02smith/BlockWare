@@ -29,7 +29,7 @@ func TestCreateDirectoryIfNotExistCorrect(t *testing.T) {
 	utilTestSetup()
 	defer utilTestTeardown()
 
-	err := createDirectoryIfNotExist("../test/data/tmp/hellothere")
+	err := CreateDirectoryIfNotExist("../test/data/tmp/hellothere")
 	if err != nil {
 		t.Error(err)
 		return

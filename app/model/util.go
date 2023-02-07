@@ -16,7 +16,7 @@ func SetupToolkitEnvironment() error {
 		toolkitDir = ".toolkit"
 	}
 
-	err := createDirectoryIfNotExist(toolkitDir)
+	err := CreateDirectoryIfNotExist(toolkitDir)
 	if err != nil {
 		return err
 	}
@@ -27,7 +27,7 @@ func SetupToolkitEnvironment() error {
 		hashDir = filepath.Join(toolkitDir, "hashes")
 	}
 
-	err = createDirectoryIfNotExist(hashDir)
+	err = CreateDirectoryIfNotExist(hashDir)
 	if err != nil {
 		return err
 	}
@@ -38,7 +38,7 @@ func SetupToolkitEnvironment() error {
 		trackerDir = filepath.Join(toolkitDir, "tracker")
 	}
 
-	err = createDirectoryIfNotExist(trackerDir)
+	err = CreateDirectoryIfNotExist(trackerDir)
 	if err != nil {
 		return err
 	}
@@ -46,7 +46,7 @@ func SetupToolkitEnvironment() error {
 	return nil
 }
 
-func createDirectoryIfNotExist(dir string) error {
+func CreateDirectoryIfNotExist(dir string) error {
 	_, err := os.Stat(dir)
 
 	if err != nil && !os.IsNotExist(err) {

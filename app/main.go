@@ -4,40 +4,29 @@ Copyright © 2022 Thomas Smith tcs1g20@soton.ac.uk
 package main
 
 import (
+	"log"
+
 	"github.com/spf13/viper"
-	"github.com/t02smith/part-iii-project/toolkit/model/ethereum"
+	"github.com/t02smith/part-iii-project/toolkit/model"
 	"github.com/t02smith/part-iii-project/toolkit/model/net"
-	"github.com/t02smith/part-iii-project/toolkit/test/testutil"
 	"github.com/t02smith/part-iii-project/toolkit/util"
+	"github.com/t02smith/part-iii-project/toolkit/view"
 )
 
 func main() {
 	SetupConfig()
 	util.InitLogger()
 
-	client, err := ethereum.StartClient("http://localhost:8545")
+	model.SetupToolkitEnvironment()
+
+	// model setup
+	err := startPeer()
 	if err != nil {
-		util.Logger.Fatal(err)
+		log.Fatalf("Error starting peer %s", err)
 	}
 
-	err = ethereum.DeployContracts(client, testutil.Accounts[0][1])
-	if err != nil {
-		util.Logger.Fatal(err)
-	}
-
-	return
-	// log.SetFlags(log.LstdFlags | log.Lshortfile)
-
-	// model.SetupToolkitEnvironment()
-
-	// // model setup
-	// err := startPeer()
-	// if err != nil {
-	// 	log.Fatalf("Error starting peer %s", err)
-	// }
-
-	// //
-	// view.StartApp()
+	//
+	view.StartApp()
 }
 
 // VIPER CONFIG

@@ -37,6 +37,7 @@ func worker(id int, wg *sync.WaitGroup, shardSize uint, files <-chan *HashTreeFi
 			errors <- err
 		}
 		wg.Done()
+		util.Logger.Infof("WORKER %d: Completed sharding %s\n", id, f.AbsoluteFilename)
 
 		if progress != nil {
 			progress <- 1

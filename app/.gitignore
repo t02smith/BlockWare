@@ -3,6 +3,5 @@
 *.json
 ./test/data/.toolkit
 
-**/tmp/*
 !**/tmp/.gitkeep
 *.txt

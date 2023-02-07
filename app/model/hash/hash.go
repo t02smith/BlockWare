@@ -85,6 +85,11 @@ func NewHashTree(rootDir string, shardSize uint, progress chan int) (*HashTree, 
 	}, nil
 }
 
+func (ht1 *HashTree) Equals(ht2 *HashTree) bool {
+	return ht1.ShardSize == ht2.ShardSize &&
+		ht1.RootDir.Equals(ht2.RootDir)
+}
+
 // IO
 
 // output a hash tree to a json file
@@ -448,4 +453,52 @@ func CalculateRootHash(hashes [][32]byte) [32]byte {
 
 func (ht *HashTree) GetProgress() chan int {
 	return ht.progress
+}
+
+func (htd1 *HashTreeDir) Equals(htd2 *HashTreeDir) bool {
+	if len(htd1.Files) != len(htd2.Files) ||
+		len(htd1.Subdirs) != len(htd2.Subdirs) ||
+		!bytes.Equal(htd1.RootHash[:], htd2.RootHash[:]) ||
+		htd1.Dirname != htd2.Dirname {
+		return false
+	}
+
+	for filename, htf1 := range htd1.Files {
+		if htf2, ok := htd2.Files[filename]; ok {
+			if !htf1.Equals(htf2) {
+				return false
+			}
+
+		} else {
+			return false
+		}
+	}
+
+	for subdir, sd1 := range htd1.Subdirs {
+		if sd2, ok := htd2.Subdirs[subdir]; ok {
+			if !sd1.Equals(sd2) {
+				return false
+			}
+		} else {
+			return false
+		}
+	}
+
+	return true
+}
+
+func (htf1 *HashTreeFile) Equals(htf2 *HashTreeFile) bool {
+	if !bytes.Equal(htf1.RootHash[:], htf2.RootHash[:]) ||
+		htf1.Filename != htf2.Filename ||
+		len(htf1.Hashes) != len(htf2.Hashes) {
+		return false
+	}
+
+	for i, h1 := range htf1.Hashes {
+		if !bytes.Equal(h1[:], htf2.Hashes[i][:]) {
+			return false
+		}
+	}
+
+	return true
 }

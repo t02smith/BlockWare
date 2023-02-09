@@ -4,4 +4,3 @@
 ./test/data/.toolkit
 
 !**/tmp/.gitkeep
-*.txt

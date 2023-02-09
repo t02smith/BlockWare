@@ -8,6 +8,7 @@ import (
 )
 
 func TestUploadAndDownloadDataToIPFS(t *testing.T) {
+	t.Skip() // TODO setup IPFS daemon on github workflow
 
 	g, err := fetchTestGame()
 	if err != nil {

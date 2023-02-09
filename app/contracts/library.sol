@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: SEE LICENSE IN LICENSE
 pragma solidity ^0.8.18;
 
-contract Game {
+contract Library {
     // triggered every time a game is uploaded
     event NewGame(bytes32 hash, GameEntry game);
 
     // game root hash => entry
-    mapping(bytes32 => GameEntry) games;
+    mapping(bytes32 => GameEntry) public games;
 
     // details about each game
     struct GameEntry {

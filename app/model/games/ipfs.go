@@ -37,6 +37,7 @@ func (g *Game) UploadDataToIPFS() error {
 	return nil
 }
 
+// read game data from IPFS network
 func (g *Game) ReadDataFromIPFS() error {
 	if g.IPFSId == "" {
 		return errors.New("ipfs id not stored")

@@ -18,6 +18,7 @@ contract Library {
         string version;
         string releaseDate;
         string developer;
+        address uploader;
         bytes32 rootHash;
         // address to download hash data from IPFS
         string ipfsAddress;
@@ -30,6 +31,7 @@ contract Library {
      * @param _game the details about the game
      */
     function uploadGame(GameEntry memory _game) external {
+        _game.uploader = msg.sender;
         games[_game.rootHash] = _game;
         gameHashes.push(_game.rootHash);
         emit NewGame(_game.rootHash, _game);

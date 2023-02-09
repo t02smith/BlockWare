@@ -1,0 +1,37 @@
+
+\subsection{Blockchain}
+
+\subsubsection*{Type of Blockchain}
+
+To satisfy \textbf{NF\_M1} and \textbf{NF\_M2}, we will need to use a public blockchain, which will benefit our project by:
+\vspace{2mm}
+\begin{itemize}
+  \item being accessible to a larger user-base, which should boost availability and scalability (\textbf{NF\_S1}),
+  \item reducing the risk of censorship (\textbf{NF\_M1}), and
+  \item providing greater data integrity (\textbf{NF\_M4})
+\end{itemize}
+
+\vspace{2mm}\noindent Ethereum is a public blockchain that allows developers to publish their own distributed applications to it. It comes with an extensive development toolchain so is an obvious choice for this project (\textbf{F\_M8}).
+
+\subsubsection*{Data to Store}
+\label{subsubsec:eth-data}
+
+Like mentioned in Section~\ref{subsec:design-data}, the data stored on the blockchain is used for the identification of each game and will consist of the following fields, where \textit{italic} fields will be automatically-generated:
+
+\begin{longtable}{ p{.2\textwidth} p{.75\textwidth} }
+  \toprule
+  \textbf{Name} & \textbf{Description}
+  \\\midrule\midrule
+  title & The name of the game.\\
+  version & A version number of the game.\\
+  release date & When the game was released.\\
+  developer & The name of the developer releasing the game.\\
+  \textit{uploader} & The Ethereum address of the developer.\\
+  \textit{root hash} & The root hash of the game that uniquely identifies it and is based upon its contents.\\
+  \textit{IPFS address} & The ID of the hash tree of IPFS that can be used to download the hash tree before starting a download of a game.
+  \\\bottomrule\bottomrule
+\end{longtable}
+
+\subsubsection*{Purchasing Content}
+
+Users will purchase content from developers over Ethereum using Ether (\textbf{F\_M9}) and this will be recorded on the blockchain (\textbf{F\_M10}). Any user can see which other users have purchased the game users can prove this between each other using their public/private keys.

@@ -1,0 +1,34 @@
+\subsection*{Data}
+\label{subsec:design-data}
+
+The first consideration is what kind of data we are going to be storing and where is it going to be stored.
+
+\begin{longtable}{ p{.12\textwidth} p{.1\textwidth} p{.1\textwidth} p{.63\textwidth} }
+  \toprule
+  \textbf{Data} & \textbf{Size} & \textbf{Location} & \textbf{Explanation}\\
+  \midrule\midrule
+  Game Metadata
+  &
+  & Ethereum
+  & This data represents information about the game that help identify it, such as its title, developer, version, root hash, etc. This information should allow for the unique identification of every game uploaded, whilst remaining minimal.
+  
+  \vspace{1mm}
+  Due to the minimal amount of storage required and the fact that every user should be able to discover every game, this data is best stored on the blockchain.
+  \x
+  Game Hash Data
+  &
+  & IPFS
+  & This data will be the hash tree of a given game and will be used by a player to verify the contents of each block of data they download as well as the expected structure of the applications contents.
+
+  \vspace{1mm}
+  Due to this data's moderate size and the fact that not every user will need to view every game's hash tree, there is no need to upload this to the blockchain as this will add an unnecessary expense in publishing games. IPFS is ideal for this as we do not need to restrict access to the data but still need to easily share it and we can simply include the IPFS ID within our game metadata stored on the blockchain.
+  \x
+  Game Data
+  & avg. 60GB
+  & Peers
+  & This will be the actual data for the game that is used to run it. To play a game, a user will need access to all of its data. More information about this is in Section~\ref{subsec:upload-content}.
+
+  \vspace{1mm}
+  An important property for uploaded games is that all users do not have access to all games without having payed for them first so we shouldn't store them on public platforms like the blockchain or IPFS. Section~\ref{subsec:overview-offchain} will discuss how this can be achieved using a distributed peer-to-peer file sharing model. 
+  \\\bottomrule\bottomrule
+\end{longtable}

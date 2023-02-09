@@ -8,6 +8,9 @@ contract Library {
     // game root hash => entry
     mapping(bytes32 => GameEntry) public games;
 
+    // a list of all hashes
+    bytes32[] public gameHashes;
+
     // details about each game
     struct GameEntry {
         // game meta data
@@ -28,6 +31,14 @@ contract Library {
      */
     function uploadGame(GameEntry memory _game) external {
         games[_game.rootHash] = _game;
+        gameHashes.push(_game.rootHash);
         emit NewGame(_game.rootHash, _game);
+    }
+
+    /**
+     *
+     */
+    function libSize() public view returns (uint) {
+        return gameHashes.length;
     }
 }

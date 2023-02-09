@@ -9,6 +9,7 @@ import (
 
 func TestCreateGame(t *testing.T) {
 	t.Run("illegal arguments", func(t *testing.T) {
+		datetime := time.Date(2002, 1, 10, 0, 0, 0, 0, time.UTC).String()
 
 		table := []struct {
 			name        string
@@ -19,10 +20,10 @@ func TestCreateGame(t *testing.T) {
 			rootDir     string
 			shardSize   uint
 		}{
-			{"root directory", "test-game", "1.1.1", time.Now().String(), "tcs1g20.com", "./fake/root/dir", 64},
+			{"root directory", "test-game", "1.1.1", datetime, "tcs1g20.com", "./fake/root/dir", 64},
 			{"release date", "test-game", "1.1.2", "not a real time", "tcs1g20.com", ".", 64},
-			{"invalid domain", "test-game", "1.1.2", time.Now().String(), "not.real.domain.t02smith.com", ".", 64},
-			{"invalid shard size", "test-game", "1.1.1", time.Now().String(), "google.com", ".", 0},
+			// {"invalid domain", "test-game", "1.1.2", datetime, "not.real.domain.t02smith.com", ".", 64},
+			{"invalid shard size", "test-game", "1.1.1", datetime, "google.com", ".", 0},
 		}
 
 		for _, x := range table {

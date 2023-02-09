@@ -31,7 +31,7 @@ type Game struct {
 	ReleaseDate string   `json:"release"`
 	Developer   string   `json:"dev"`
 	RootHash    [32]byte `json:"rootHash"`
-	IPFSId      string   `json:IPFSId`
+	IPFSId      string   `json:"IPFSId"`
 
 	// the shard data
 	data *hashIO.HashTree
@@ -122,7 +122,6 @@ func CreateGame(title, version, releaseDate, developer, rootDir string, shardSiz
 }
 
 func verifyDomain(domain string) (bool, error) {
-
 	conf := &tls.Config{}
 
 	conn, err := tls.Dial("tcp", fmt.Sprintf("%s:443", domain), conf)

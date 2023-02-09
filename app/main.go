@@ -8,6 +8,7 @@ import (
 
 	"github.com/spf13/viper"
 	"github.com/t02smith/part-iii-project/toolkit/model"
+	"github.com/t02smith/part-iii-project/toolkit/model/ethereum"
 	"github.com/t02smith/part-iii-project/toolkit/model/net"
 	"github.com/t02smith/part-iii-project/toolkit/util"
 	"github.com/t02smith/part-iii-project/toolkit/view"
@@ -23,6 +24,11 @@ func main() {
 	err := startPeer()
 	if err != nil {
 		log.Fatalf("Error starting peer %s", err)
+	}
+
+	_, _, err = ethereum.StartClient(viper.GetString("eth.address"))
+	if err != nil {
+		util.Logger.Fatalf("Error starting eth client %s", err)
 	}
 
 	//
@@ -74,8 +80,10 @@ func defaultConfig() {
 	viper.SetDefault("user.info.domain", "t02smith.com")
 	viper.SetDefault("user.info.name", "tom")
 
-	// web interface
-	viper.SetDefault("web.port", 8080)
+	// eth
+	viper.SetDefault("eth.keystore.directory", "./test/data/.toolkit")
+	viper.SetDefault("eth.keystore.password", "password")
+	viper.SetDefault("eth.address", "http://localhost:8545")
 }
 
 func startPeer() error {

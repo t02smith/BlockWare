@@ -5,6 +5,7 @@ go 1.19
 require (
 	fyne.io/fyne/v2 v2.3.0
 	github.com/ethereum/go-ethereum v1.10.26
+	github.com/ipfs/go-ipfs-api v0.3.0
 	github.com/jedib0t/go-pretty/v6 v6.4.4
 	github.com/spf13/viper v1.14.0
 	go.uber.org/zap v1.24.0
@@ -38,7 +39,6 @@ require (
 	github.com/gorilla/websocket v1.4.2 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/ipfs/go-cid v0.0.7 // indirect
-	github.com/ipfs/go-ipfs-api v0.3.0 // indirect
 	github.com/ipfs/go-ipfs-files v0.0.9 // indirect
 	github.com/jsummers/gobmp v0.0.0-20151104160322-e2ba15ffa76e // indirect
 	github.com/libp2p/go-buffer-pool v0.0.2 // indirect

@@ -65,7 +65,6 @@ func TestLibraryFindBlock(t *testing.T) {
 	l.AddGame(g)
 
 	t.Run("success", func(t *testing.T) {
-
 		shardHash := g.data.RootDir.Files["test.txt"].RootHash
 
 		found, data, err := l.FindBlock(g.RootHash, shardHash)

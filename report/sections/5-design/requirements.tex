@@ -16,23 +16,37 @@ Tables~\ref{tab:functional-requirements} and~\ref{tab:non-functional-requirement
   \textbf{ID} & \textbf{Description}
   \\\midrule\midrule
   \multicolumn{2}{c}{\cellcolor{red!70}\textit{Must}}                                              \\\midrule
-  F\_M1       & Store game metadata on a blockchain                                                \\
-  F\_M2       & A node must download data as constant-sized shards from its peers                  \\
-  F\_M3       & A node must be able to discover peers who have their desired game installed        \\
-  F\_M4       & Games must be updatable through the blockchain                                     \\
-  F\_M5       & A node must be able to upload games                                                \\
-  F\_M6       & A node must be able to download games in their entirety from nodes in the network. \\
-  F\_M7       & A node must be able to verify the integrity of each block it downloads             \\
-  F\_M8       & The application should run on the Ethereum network                                 \\
-  F\_M9       & Users must be able to purchase games from developers over the network              \\
-  F\_M10      & Users must be able to prove they have purchased a game                             \\
-  \midrule\multicolumn{2}{c}{\cellcolor{orange!70}\textit{Should}}                                 \\\midrule
-  F\_S1       & Seeders should have a way to prove how much data they have seeded                  \\
-  F\_S2       & Seeders will only upload content to users who have a valid proof of purchase       \\
-  F\_S3       & Allow for the distribution of Downloadable Content (DLC) for games                 \\
-  \midrule\multicolumn{2}{c}{\cellcolor{green}\textit{Could}}                                      \\\midrule
-  F\_C1       & Allow users to request specific game versions                                      \\
-  F\_C2       & Provide a simple GUI for interacting with the blockchain                           \\
+  \req{F-M1}
+  & Store game metadata on a blockchain\\
+  \req{F-M2}
+  & A node must download data as constant-sized shards from its peers\\
+  \req{F-M3}
+  & A node must be able to discover peers who have their desired game installed\\
+  \req{F-M4}
+  & Games must be updatable through the blockchain\\
+  \req{F-M5}
+  & A node must be able to upload games\\
+  \req{F-M6}
+  & A node must be able to download games in their entirety from nodes in the network\\
+  \req{F-M7}
+  & A node must be able to verify the integrity of each block it downloads\\
+  \req{F-M8}
+  & The application should run on the Ethereum network\\
+  \req{F-M9}
+  & Users must be able to purchase games from developers over the network\\
+  \req{F-M10}
+  & Users must be able to prove they have purchased a game\\
+  \midrule\multicolumn{2}{c}{\cellcolor{orange!70}\textit{Should}}\\\midrule
+  \req{F-S1}
+  & Seeders should have a way to prove how much data they have seeded\\
+  \req{F-S2}
+  & Seeders will only upload content to users who have a valid proof of purchase\\
+  \req{F-S3}
+  & Allow for the distribution of Downloadable Content (DLC) for games\\
+  \midrule\multicolumn{2}{c}{\cellcolor{green}\textit{Could}}\\\midrule
+  \req{F-C1}
+  & Allow users to request specific game versions\\
+  \req{F-C2}& Provide a simple GUI for interacting with the blockchain\\
   \midrule
   \bottomrule
   \caption{These requirements define the functions of the application in terms of a behavioural specification }
@@ -45,17 +59,25 @@ Tables~\ref{tab:functional-requirements} and~\ref{tab:non-functional-requirement
   \toprule
   \textbf{ID} & \textbf{Description}
   \\\midrule\midrule
-  \multicolumn{2}{c}{\cellcolor{red!70}\textit{Must}}                                                                           \\\midrule
-  NF\_M1      & The application is decentralized and cannot be controlled by any one party                                      \\
-  NF\_M2      & Any user must be able to join and contribute to the network                                                     \\
-  NF\_M3      & Game uploaders should be publicly identifiable                                                                  \\
-  NF\_M4      & Metadata required to download the game should be immutable                                                      \\
-  \midrule\multicolumn{2}{c}{\cellcolor{orange!70}\textit{Should}}                                                              \\\midrule
-  NF\_S1      & This application must be scalable, such that many users can upload and download the same game at the same time. \\
-  NF\_S2      & Only the original uploader can upload an update to their game                                                   \\
-  NF\_S3      & Only the original uploader can upload a DLC for their game                                                      \\
-  \midrule\multicolumn{2}{c}{\cellcolor{green}\textit{Could}}                                                                   \\\midrule
-  NF\_C1      & The application could have an intuitive GUI                                                                     \\
+  \multicolumn{2}{c}{\cellcolor{red!70}\textit{Must}}\\\midrule
+  \req{NF-M1}
+  & The application is decentralized and cannot be controlled by any one party\\
+  \req{NF-M2}
+  & Any user must be able to join and contribute to the network\\
+  \req{NF-M3}
+  & Game uploaders should be publicly identifiable\\
+  \req{NF-M4}
+  & Metadata required to download the game should be immutable\\
+  \midrule\multicolumn{2}{c}{\cellcolor{orange!70}\textit{Should}}\\\midrule
+  \req{NF-S1}
+  & This application must be scalable, such that many users can upload and download the same game at the same time. \\
+  \req{NF-S2}
+  & Only the original uploader can upload an update to their game\\
+  \req{NF-S3}
+  & Only the original uploader can upload a DLC for their game\\
+  \midrule\multicolumn{2}{c}{\cellcolor{green}\textit{Could}}\\\midrule
+  \req{NF-C1}
+  & The application could have an intuitive GUI\\
   \midrule
   \bottomrule
   \caption{Requirements that specify the criteria used to judge the operation of this application}

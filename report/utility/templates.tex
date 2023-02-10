@@ -29,3 +29,8 @@
 }
 
 \newcommand{\tbd}{\hlc{red}{ UNFINISHED }}
+
+% requirement title (e.g. F\_M1)
+\newcommand{\req}[1]{#1\label{req:#1}}
+
+\newcommand{\reqref}[1]{(\hyperref[req:#1]{\textbf{#1}})}

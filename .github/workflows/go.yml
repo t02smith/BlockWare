@@ -31,7 +31,7 @@ jobs:
           tar -xvzf kubo_v0.18.1_linux-amd64.tar.gz && \
           sudo bash kubo/install.sh && \
           ipfs init && \
-          ipfs daemon
+          ipfs daemon &
 
       - name: Build
         run: cd app && go build -v ./...

@@ -3,35 +3,46 @@
 
 \subsubsection*{Type of Blockchain}
 
-To satisfy \textbf{NF\_M1} and \textbf{NF\_M2}, we will need to use a public blockchain, which will benefit our project by:
+To satisfy \reqref{NF-M1} and \reqref{NF-M2}, we will need to use a public blockchain, which will benefit our project by:
 \vspace{2mm}
 \begin{itemize}
-  \item being accessible to a larger user-base, which should boost availability and scalability (\textbf{NF\_S1}),
-  \item reducing the risk of censorship (\textbf{NF\_M1}), and
-  \item providing greater data integrity (\textbf{NF\_M4})
+  \item being accessible to a larger user-base, which should boost availability and scalability \reqref{NF-S1},
+  \item reducing the risk of censorship \reqref{NF-M1}, and
+  \item providing greater data integrity \reqref{NF-M4}
 \end{itemize}
 
-\vspace{2mm}\noindent Ethereum is a public blockchain that allows developers to publish their own distributed applications to it. It comes with an extensive development toolchain so is an obvious choice for this project (\textbf{F\_M8}).
+\vspace{2mm}\noindent Ethereum is a public blockchain that allows developers to publish their own distributed applications to it. It comes with an extensive development toolchain so is an obvious choice for this project \reqref{F-M8}.
 
 \subsubsection*{Data to Store}
 \label{subsubsec:eth-data}
 
-Like mentioned in Section~\ref{subsec:design-data}, the data stored on the blockchain is used for the identification of each game and will consist of the following fields, where \textit{italic} fields will be automatically-generated:
+To satisfy \reqref{F-M1}, the data stored on the blockchain will be used for the identification games and will consist of the following fields, where \textit{italic} fields will be automatically-generated for the user:
 
 \begin{longtable}{ p{.2\textwidth} p{.75\textwidth} }
   \toprule
   \textbf{Name} & \textbf{Description}
   \\\midrule\midrule
+  \multicolumn{2}{c}{\cellcolor{red!70}\textit{For each game}} 
+  \\\midrule
   title & The name of the game.\\
   version & A version number of the game.\\
   release date & When the game was released.\\
   developer & The name of the developer releasing the game.\\
+  previousVersion & The root hash of the most previous version of the game if it exists.\\
+  price & The price of the game in Wei\\
   \textit{uploader} & The Ethereum address of the developer.\\
   \textit{root hash} & The root hash of the game that uniquely identifies it and is based upon its contents.\\
-  \textit{IPFS address} & The ID of the hash tree of IPFS that can be used to download the hash tree before starting a download of a game.
+  \textit{IPFS address} & The ID of the hash tree of IPFS that can be used to download the hash tree before starting a download of a game.\\
+  \textit{purchased} & A list of Ethereum addresses of all users who have purchased the game;\\\midrule
+  \multicolumn{2}{c}{\cellcolor{green}\textit{Other}} 
+  \\\midrule
+  \textit{library} & A mapping for storing all games uploaded to the network, where a game's root hash is the key used to find its information.\\
+  \textit{gameHashes} & Solidity doesn't allow us to enumerate maps so we will also store a list of hashes for all games uploaded. 
   \\\bottomrule\bottomrule
+  \caption{All the data to be stored on the Ethereum blockchain}
 \end{longtable}
+
 
 \subsubsection*{Purchasing Content}
 
-Users will purchase content from developers over Ethereum using Ether (\textbf{F\_M9}) and this will be recorded on the blockchain (\textbf{F\_M10}). Any user can see which other users have purchased the game users can prove this between each other using their public/private keys.
+Users will purchase content from developers over Ethereum using Ether \reqref{F-M9} and this will be recorded on the blockchain \reqref{F-M10}. Any user can see which other users have purchased the game users can prove this between each other using their public/private keys.

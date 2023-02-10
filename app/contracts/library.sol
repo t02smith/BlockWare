@@ -13,18 +13,21 @@ contract Library {
 
     // details about each game
     struct GameEntry {
+
         // game meta data
         string title;
         string version;
         string releaseDate;
         string developer;
+        bytes32 rootHash;
+
+        // purchasing
         uint price;
         address payable uploader;
-        bytes32 rootHash;
+        address[] purchased;
+
         // address to download hash data from IPFS
         string ipfsAddress;
-
-        address[] purchased;
     }
 
     constructor() {}

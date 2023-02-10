@@ -110,6 +110,10 @@ func onMessage(cmd []string, client PeerIT) {
 		}
 
 		download := game.GetDownload()
+		if download == nil {
+			util.Logger.Errorf("Download not found for %x", game.RootHash)
+			return
+		}
 
 		_, file, _, _ := gameTree.FindShard(sh)
 		_, ok := download.Progress[file.RootHash].BlocksRemaining[sh]
@@ -139,7 +143,10 @@ func onMessage(cmd []string, client PeerIT) {
 		}
 
 		delete(download.Progress[file.RootHash].BlocksRemaining, sh)
-		download.Serialise(fmt.Sprintf("%x", game.RootHash))
+		err = download.Serialise(fmt.Sprintf("%x", game.RootHash))
+		if err != nil {
+			util.Logger.Errorf("Error serialising download %s", err)
+		}
 		return
 
 	// ERROR <msg> => used to send an error message following a command

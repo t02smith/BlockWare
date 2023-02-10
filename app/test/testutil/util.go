@@ -4,6 +4,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"testing"
 )
 
 func SetupTmp(toRoot string) error {
@@ -36,5 +37,17 @@ func ClearTmp(toRoot string) {
 				log.Println(err)
 			}
 		}
+	}
+}
+
+func ShortTest(t *testing.T) {
+	if testing.Short() {
+		t.Skip()
+	}
+}
+
+func LongTest(t *testing.T) {
+	if !testing.Short() {
+		t.Skip()
 	}
 }

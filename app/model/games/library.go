@@ -4,8 +4,10 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/jedib0t/go-pretty/v6/table"
+	"github.com/spf13/viper"
 	"github.com/t02smith/part-iii-project/toolkit/util"
 )
 
@@ -43,6 +45,7 @@ func (l *Library) CreateDownload(g *Game) error {
 		return err
 	}
 
+	g.download.Serialise(filepath.Join(viper.GetString("games.installFolder"), fmt.Sprintf("%x", g.RootHash)))
 	util.Logger.Infof("Download created for %s:%x", g.Title, g.RootHash)
 	return nil
 }

@@ -9,6 +9,7 @@ import (
 )
 
 func TestGetGame(t *testing.T) {
+	testutil.ShortTest(t)
 	l := NewLibrary()
 	g, err := setupTestDownload()
 	if err != nil {
@@ -36,6 +37,7 @@ func TestGetGame(t *testing.T) {
 }
 
 func TestAddGame(t *testing.T) {
+	testutil.ShortTest(t)
 	l := NewLibrary()
 	g, err := setupTestDownload()
 	if err != nil {
@@ -56,7 +58,7 @@ func TestAddGame(t *testing.T) {
 }
 
 func TestLibraryFindBlock(t *testing.T) {
-
+	testutil.ShortTest(t)
 	l := NewLibrary()
 	g, err := setupTestDownload()
 	if err != nil {

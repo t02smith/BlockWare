@@ -6,6 +6,8 @@ import (
 	"crypto/sha256"
 	"os"
 	"testing"
+
+	"github.com/t02smith/part-iii-project/toolkit/test/testutil"
 )
 
 func produceTestHashTree() (*HashTree, error) {
@@ -23,6 +25,8 @@ func produceTestHashTree() (*HashTree, error) {
 }
 
 func TestFindShard(t *testing.T) {
+	testutil.ShortTest(t)
+
 	ht, err := produceTestHashTree()
 	if err != nil {
 		t.Fatalf("error making test hash tree %s", err)
@@ -57,6 +61,8 @@ func TestFindShard(t *testing.T) {
 // Test getting a shard
 
 func TestGetShard(t *testing.T) {
+	testutil.ShortTest(t)
+
 	ht, err := produceTestHashTree()
 	if err != nil {
 		t.Fatalf("error making test hash tree %s", err)
@@ -81,6 +87,7 @@ func TestGetShard(t *testing.T) {
 	})
 
 	t.Run("invalid shard given", func(t *testing.T) {
+
 		found, _, _ := ht.GetShard([32]byte{})
 		if found {
 			t.Fatalf("invalid shard not detected")

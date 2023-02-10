@@ -5,9 +5,13 @@ import (
 	"crypto/sha256"
 	"testing"
 	"time"
+
+	"github.com/t02smith/part-iii-project/toolkit/test/testutil"
 )
 
 func TestCreateGame(t *testing.T) {
+	testutil.ShortTest(t)
+
 	t.Run("illegal arguments", func(t *testing.T) {
 		datetime := time.Date(2002, 1, 10, 0, 0, 0, 0, time.UTC).String()
 
@@ -68,6 +72,8 @@ func TestCreateGame(t *testing.T) {
 }
 
 func TestSerialise(t *testing.T) {
+	testutil.ShortTest(t)
+
 	t.Run("success", func(t *testing.T) {
 		gamesTestSetup()
 		defer gamesTestTeardown()
@@ -102,6 +108,7 @@ func TestSerialise(t *testing.T) {
 }
 
 func TestFetchShard(t *testing.T) {
+	testutil.ShortTest(t)
 
 	g, err := fetchTestGame()
 	if err != nil {

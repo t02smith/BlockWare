@@ -7,9 +7,11 @@ import (
 	"testing"
 
 	"github.com/spf13/viper"
+	"github.com/t02smith/part-iii-project/toolkit/test/testutil"
 )
 
 func TestSetupDownload(t *testing.T) {
+	testutil.ShortTest(t)
 	gamesTestSetup()
 	defer gamesTestTeardown()
 
@@ -20,6 +22,7 @@ func TestSetupDownload(t *testing.T) {
 }
 
 func TestSerialization(t *testing.T) {
+	testutil.ShortTest(t)
 	t.Cleanup(gamesTestTeardown)
 
 	t.Run("serialize", func(t *testing.T) {
@@ -82,6 +85,7 @@ func TestSerialization(t *testing.T) {
 }
 
 func TestFindBlock(t *testing.T) {
+	testutil.ShortTest(t)
 
 	t.Cleanup(gamesTestTeardown)
 
@@ -91,31 +95,3 @@ func TestFindBlock(t *testing.T) {
 	})
 
 }
-
-// func TestFindBlock2(t *testing.T) {
-// 	t.SkipNow()
-// 	gamesTestSetup()
-// 	defer gamesTestTeardown()
-
-// 	d, _, err := setupTestDownload()
-// 	if err != nil {
-// 		t.Error(err)
-// 	}
-
-// 	missingHash := sha256.Sum256([]byte("hello"))
-
-// 	// request with no peers connected
-// 	err = d.FindBlock(missingHash)
-// 	if err == nil {
-// 		t.Error("This function should error if no peers are connected")
-// 	}
-
-// 	// * connect a new peer
-
-// 	// request an unknown hash
-// 	err = d.FindBlock(missingHash)
-// 	if err == nil {
-// 		t.Error("This block doesn't exist and should error")
-// 	}
-
-// }

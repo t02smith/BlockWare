@@ -26,6 +26,7 @@ func utilTestTeardown() {
 }
 
 func TestCreateDirectoryIfNotExistCorrect(t *testing.T) {
+	testutil.ShortTest(t)
 	utilTestSetup()
 	defer utilTestTeardown()
 
@@ -48,6 +49,7 @@ func TestCreateDirectoryIfNotExistCorrect(t *testing.T) {
 }
 
 func TestSetupToolkitEnvironment(t *testing.T) {
+	testutil.ShortTest(t)
 	utilTestSetup()
 	defer utilTestTeardown()
 

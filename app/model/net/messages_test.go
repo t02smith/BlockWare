@@ -18,6 +18,7 @@ import (
 )
 
 func TestGameListToMessage(t *testing.T) {
+	testutil.ShortTest(t)
 
 	var h1 [32]byte
 	copy(h1[:], []byte("test"))
@@ -62,6 +63,7 @@ func TestGameListToMessage(t *testing.T) {
 }
 
 func TestOnMessage(t *testing.T) {
+	testutil.ShortTest(t)
 
 	mp, err := testutil.StartMockPeer(7887)
 	if err != nil {
@@ -127,7 +129,7 @@ func TestOnMessage(t *testing.T) {
 		blockHash := gData.RootDir.Files["architecture-diagram.png"].Hashes[1]
 
 		t.Run("block exists", func(t *testing.T) {
-			mockPeer.SendStringAndWait(5, "BLOCK;%x;%x\n", g.RootHash, blockHash)
+			mockPeer.SendStringAndWait(25, "BLOCK;%x;%x\n", g.RootHash, blockHash)
 
 			msg := mockPeer.GetLastMessage()
 			msg = msg[:len(msg)-1]
@@ -149,7 +151,7 @@ func TestOnMessage(t *testing.T) {
 		})
 
 		t.Run("block doesn't exist", func(t *testing.T) {
-			mockPeer.SendStringAndWait(5, "BLOCK;%x;%x\n", g.RootHash, [32]byte{})
+			mockPeer.SendStringAndWait(25, "BLOCK;%x;%x\n", g.RootHash, [32]byte{})
 
 			msg := mockPeer.GetLastMessage()
 			if msg != fmt.Sprintf("ERROR;Block %x not found\n", [32]byte{}) {
@@ -160,6 +162,7 @@ func TestOnMessage(t *testing.T) {
 	})
 
 	t.Run("SEND_BLOCK", func(t *testing.T) {
+		testutil.SetupTmp("../../")
 
 		t.Run("success", func(t *testing.T) {
 
@@ -179,10 +182,10 @@ func TestOnMessage(t *testing.T) {
 				buffer := make([]byte, gameData.ShardSize)
 
 				err := sendBlock("../../test/data/tmp/toolkit/architecture-diagram.png", g, gameData, shard, 1, buffer)
-
 				if err != nil {
 					t.Fatal(err)
 				}
+
 			})
 
 			if !smoke {
@@ -198,7 +201,9 @@ func TestOnMessage(t *testing.T) {
 					if err != nil {
 						t.Error(err)
 					}
+					time.Sleep(100 * time.Millisecond)
 				}
+				// fmt.Println()
 			})
 		})
 
@@ -210,6 +215,8 @@ func TestOnMessage(t *testing.T) {
 
 		})
 
+		testutil.ClearTmp("../../")
+
 	})
 
 	mp.Close()
@@ -218,6 +225,7 @@ func TestOnMessage(t *testing.T) {
 // util functions
 
 func TestFetchBlock(t *testing.T) {
+	testutil.ShortTest(t)
 
 	t.Run("game doesn't exist", func(t *testing.T) {
 		_, err := fetchBlock([32]byte{}, [32]byte{})

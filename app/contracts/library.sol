@@ -20,6 +20,7 @@ contract Library {
         string releaseDate;
         string developer;
         bytes32 rootHash;
+        bytes32 previousVersion;
 
         // purchasing
         uint price;
@@ -37,6 +38,20 @@ contract Library {
      * @param _game the details about the game
      */
     function uploadGame(GameEntry memory _game) external {
+        // check input data
+        require(_game.rootHash.length > 0, "no root hash given");
+        require(bytes(_game.ipfsAddress).length > 0, "no IPFS address given for hash treee");
+
+        // look for previous version
+        if (_game.previousVersion.length != 0) {
+          require(bytes(games[_game.previousVersion].title).length > 0, "previous version of game not found");
+
+          GameEntry memory g = games[_game.previousVersion];
+          require(g.uploader == msg.sender, "only the original uploader can update their game");
+          _game.purchased = g.purchased;
+        }
+
+        // upload game
         _game.uploader = payable(msg.sender);
         games[_game.rootHash] = _game;
         gameHashes.push(_game.rootHash);

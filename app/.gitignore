@@ -2,5 +2,5 @@
 .vscode
 *.json
 ./test/data/.toolkit
-
-!**/tmp/.gitkeep
+**/tmp/*
+!**/**/tmp/.gitkeep

@@ -4,6 +4,8 @@ import (
 	"os"
 	"testing"
 	"time"
+
+	"github.com/t02smith/part-iii-project/toolkit/test/testutil"
 )
 
 func TestMain(m *testing.M) {
@@ -16,30 +18,8 @@ func TestMain(m *testing.M) {
 
 // start peer
 
-// func TestStartPeer(t *testing.T) {
-// 	beforeEach()
-
-// 	singleton := GetPeerInstance()
-// 	if singleton == nil || testPeer != singleton {
-// 		t.Error("singleton not set")
-// 		return
-// 	}
-
-// 	p, err := StartPeer("localhost", 5685, "../../test/data/tmp", "../../test/data")
-// 	if err != nil {
-// 		t.Error(err)
-// 		return
-// 	}
-
-// 	if singleton == nil || p != singleton {
-// 		t.Error("singleton should not be changed once instantiated")
-// 		return
-// 	}
-
-// 	t.Error("")
-// }
-
 func TestConnectToPeer(t *testing.T) {
+	testutil.ShortTest(t)
 	beforeEach()
 
 	if len(testPeer.peers) == 0 {

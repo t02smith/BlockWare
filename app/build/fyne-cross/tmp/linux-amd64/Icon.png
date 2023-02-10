@@ -1,0 +1,18 @@
+<svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="100" height="100" rx="10" fill="#0669DD" />
+  <circle cx="14.5" cy="15.5" r="7.5" fill="white" />
+  <circle cx="29.5" cy="42.5" r="7.5" fill="white" />
+  <circle cx="18.5" cy="75.5" r="7.5" fill="white" />
+  <circle cx="57.5" cy="64.5" r="7.5" fill="white" />
+  <circle cx="83.5" cy="82.5" r="7.5" fill="white" />
+  <circle cx="50.5" cy="20.5" r="7.5" fill="white" />
+  <circle cx="79.5" cy="45.5" r="7.5" fill="white" />
+  <circle cx="83.5" cy="15.5" r="7.5" fill="white" />
+  <line x1="14.8742" y1="14.5144" x2="29.8742" y2="41.5144" stroke="white" stroke-width="2" />
+  <line x1="17.0513" y1="74.6838" x2="28.0513" y2="41.6838" stroke="white" stroke-width="2" />
+  <line x1="18.1055" y1="74.0056" x2="84.1055" y2="81.0056" stroke="white" stroke-width="2" />
+  <line x1="79.991" y1="44.8661" x2="84.991" y2="81.8661" stroke="white" stroke-width="2" />
+  <line x1="79.6709" y1="45.7415" x2="58.6709" y2="64.7415" stroke="white" stroke-width="2" />
+  <line x1="78.3471" y1="45.7574" x2="49.3471" y2="20.7574" stroke="white" stroke-width="2" />
+  <line x1="84.1455" y1="15.9894" x2="50.1455" y2="20.9894" stroke="white" stroke-width="2" />
+</svg>

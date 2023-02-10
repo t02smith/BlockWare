@@ -21,15 +21,16 @@ jobs:
           go-version: 1.19
 
       - name: Fyne dependencies
-        run: sudo apt-get update &&
+        run: |
+          sudo apt-get update && \
           sudo apt-get install golang gcc libgl1-mesa-dev xorg-dev
 
       - name: IPFS
-        run:
-          wget https://dist.ipfs.tech/kubo/v0.18.1/kubo_v0.18.1_linux-amd64.tar.gz &&
-          tar -xvzf kubo_v0.18.1_linux-amd64.tar.gz &&
-          sudo bash kubo/install.sh &&
-          ipfs init &&
+        run: |
+          wget https://dist.ipfs.tech/kubo/v0.18.1/kubo_v0.18.1_linux-amd64.tar.gz && \
+          tar -xvzf kubo_v0.18.1_linux-amd64.tar.gz && \
+          sudo bash kubo/install.sh && \
+          ipfs init && \
           ipfs daemon
 
       - name: Build

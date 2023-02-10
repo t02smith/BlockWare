@@ -18,10 +18,13 @@ contract Library {
         string version;
         string releaseDate;
         string developer;
-        address uploader;
+        uint price;
+        address payable uploader;
         bytes32 rootHash;
         // address to download hash data from IPFS
         string ipfsAddress;
+
+        address[] purchased;
     }
 
     constructor() {}
@@ -31,16 +34,48 @@ contract Library {
      * @param _game the details about the game
      */
     function uploadGame(GameEntry memory _game) external {
-        _game.uploader = msg.sender;
+        _game.uploader = payable(msg.sender);
         games[_game.rootHash] = _game;
         gameHashes.push(_game.rootHash);
         emit NewGame(_game.rootHash, _game);
     }
 
     /**
-     *
+     * Purchase a new game
+     * @param _game the root hash of the game
+     */
+    function purchaseGame(bytes32 _game) public payable {
+      require(bytes(games[_game].title).length > 0, "game not found");
+      
+      GameEntry storage game = games[_game];
+      require(msg.value >= game.price, "user cannot afford game");
+
+      bool found = false;
+      for (uint i=0; i<game.purchased.length; i++) {
+        if (game.purchased[i] == msg.sender) {
+          found = true;
+          break;
+        }
+      }
+      require(!found, "user already owns game");
+
+      game.uploader.transfer(game.price);
+      game.purchased.push(msg.sender);
+    }
+
+    /**
+     * How many games exist in the current library
      */
     function libSize() public view returns (uint) {
         return gameHashes.length;
+    }
+
+    /**
+     * How many people have purchased a given game
+     * @param _game the root hash of the game
+     */
+    function purchasedSize(bytes32 _game) public view returns (uint) {
+      require(bytes(games[_game].title).length > 0, "game not found");
+      return games[_game].purchased.length;
     }
 }

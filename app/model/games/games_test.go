@@ -3,6 +3,7 @@ package games
 import (
 	"errors"
 	"log"
+	"math/big"
 	"os"
 	"testing"
 	"time"
@@ -46,7 +47,7 @@ func setupTestGame() error {
 	}
 
 	datetime := time.Date(2002, 1, 10, 0, 0, 0, 0, time.UTC).String()
-	game, err := CreateGame("toolkit", "1.0.4", datetime, "google.com", "../../test/data/testdir", 256, nil)
+	game, err := CreateGame("toolkit", "1.0.4", datetime, "google.com", "../../test/data/testdir", big.NewInt(0), 256, nil)
 
 	if err != nil {
 		log.Printf("Error creating game: %s\n", err)

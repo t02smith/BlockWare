@@ -8,6 +8,7 @@ require (
 	github.com/ipfs/go-ipfs-api v0.3.0
 	github.com/jedib0t/go-pretty/v6 v6.4.4
 	github.com/spf13/viper v1.14.0
+	github.com/stretchr/testify v1.8.1
 	go.uber.org/zap v1.24.0
 )
 
@@ -73,7 +74,6 @@ require (
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/srwiley/oksvg v0.0.0-20220731023508-a61f04f16b76 // indirect
 	github.com/srwiley/rasterx v0.0.0-20210519020934-456a8d69b780 // indirect
-	github.com/stretchr/testify v1.8.1 // indirect
 	github.com/subosito/gotenv v1.4.1 // indirect
 	github.com/tevino/abool v1.2.0 // indirect
 	github.com/tklauser/go-sysconf v0.3.5 // indirect

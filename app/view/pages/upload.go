@@ -3,6 +3,7 @@ package pages
 import (
 	"fmt"
 	"image/color"
+	"math/big"
 	"strconv"
 	"time"
 
@@ -124,12 +125,14 @@ func UploadPage() fyne.CanvasObject {
 
 			// * create game
 			p := model.GetPeerInstance()
-			g, err := games.CreateGame(title.Text, version.Text, date, domain.Text, rootDir, uint(ss), progress)
+
+			// TODO PRICE
+			g, err := games.CreateGame(title.Text, version.Text, date, domain.Text, rootDir, big.NewInt(0), uint(ss), progress)
 			if err != nil {
 				return
 			}
 
-			p.GetLibrary().AddGame(g)
+			p.GetLibrary().AddOwnedGame(g)
 			games.OutputToFile(g)
 			statusText.SetText("Complete")
 

@@ -57,3 +57,5 @@ func CreateKeyStore(keyStorePath string, password string) (*accounts.Account, er
 
 	return &account, nil
 }
+
+// func GetKeyStore()

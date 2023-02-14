@@ -46,7 +46,11 @@ func SetupConfig() {
 	viper.AddConfigPath(".")
 
 	defaultConfig()
-	viper.SafeWriteConfig()
+
+	err := viper.SafeWriteConfig()
+	if err != nil {
+		util.Logger.Warnf("Error creating config file %s", err)
+	}
 
 	viper.ReadInConfig()
 }

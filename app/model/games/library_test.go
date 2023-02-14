@@ -17,15 +17,15 @@ func TestGetGame(t *testing.T) {
 	}
 
 	t.Run("game not found", func(t *testing.T) {
-		g1 := l.GetGame(g.RootHash)
+		g1 := l.GetOwnedGame(g.RootHash)
 		if g1 != nil {
 			t.Error("expected nil pointers for missing game & download")
 		}
 	})
 
 	t.Run("success", func(t *testing.T) {
-		l.AddGame(g)
-		g1 := l.GetGame(g.RootHash)
+		l.AddOwnedGame(g)
+		g1 := l.GetOwnedGame(g.RootHash)
 		if g1 == nil {
 			t.Error("Incorrect GetGame after adding single game")
 		}
@@ -46,8 +46,8 @@ func TestAddGame(t *testing.T) {
 	}
 
 	t.Run("success", func(t *testing.T) {
-		l.AddGame(g)
-		if _, ok := l.Games[g.RootHash]; !ok {
+		l.AddOwnedGame(g)
+		if _, ok := l.ownedGames[g.RootHash]; !ok {
 			t.Errorf("Game not added")
 		}
 	})
@@ -64,7 +64,7 @@ func TestLibraryFindBlock(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Error generating test download %s", err)
 	}
-	l.AddGame(g)
+	l.AddOwnedGame(g)
 
 	t.Run("success", func(t *testing.T) {
 		shardHash := g.data.RootDir.Files["test.txt"].RootHash

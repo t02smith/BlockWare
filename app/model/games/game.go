@@ -12,12 +12,14 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"math/big"
 	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
 	"time"
 
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/spf13/viper"
 	hashIO "github.com/t02smith/part-iii-project/toolkit/model/hash"
 	"github.com/t02smith/part-iii-project/toolkit/util"
@@ -26,12 +28,17 @@ import (
 type Game struct {
 
 	// game metadata
-	Title       string   `json:"title"`
-	Version     string   `json:"version"`
-	ReleaseDate string   `json:"release"`
-	Developer   string   `json:"dev"`
-	RootHash    [32]byte `json:"rootHash"`
-	IPFSId      string   `json:"IPFSId"`
+	Title           string   `json:"title"`
+	Version         string   `json:"version"`
+	ReleaseDate     string   `json:"release"`
+	Developer       string   `json:"dev"`
+	RootHash        [32]byte `json:"rootHash"`
+	PreviousVersion [32]byte `json:"previousVersion"`
+
+	// blockchain related
+	IPFSId   string         `json:"IPFSId"`
+	Price    *big.Int       `json:"price"`
+	Uploader common.Address `json:"uploader"`
 
 	// the shard data
 	data *hashIO.HashTree
@@ -47,7 +54,7 @@ var (
 
 // Creator
 
-func CreateGame(title, version, releaseDate, developer, rootDir string, shardSize uint, progress chan int) (*Game, error) {
+func CreateGame(title, version, releaseDate, developer, rootDir string, price *big.Int, shardSize uint, progress chan int) (*Game, error) {
 
 	if shardSize == 0 {
 		util.Logger.Errorf("shard size should be > 0")
@@ -116,6 +123,7 @@ func CreateGame(title, version, releaseDate, developer, rootDir string, shardSiz
 		data:        tree,
 		RootHash:    h,
 		IPFSId:      "",
+		Price:       price,
 	}
 
 	return game, nil

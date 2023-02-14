@@ -23,20 +23,25 @@ both of them.
 // stores user's game information on owned and downloading games
 type Library struct {
 
-	// a user's owned Games
-	Games map[[32]byte]*Game
+	// a user's owned games
+	ownedGames map[[32]byte]*Game
+
+	// games present on the blockchain
+	blockchainGames map[[32]byte]*Game
 }
 
 // create a new library
 func NewLibrary() *Library {
 	return &Library{
-		Games: make(map[[32]byte]*Game),
+		ownedGames:      make(map[[32]byte]*Game),
+		blockchainGames: make(map[[32]byte]*Game),
 	}
 }
 
+// create a download for a given game
 func (l *Library) CreateDownload(g *Game) error {
 	util.Logger.Infof("Creating download for %s:%x", g.Title, g.RootHash)
-	if _, ok := l.Games[g.RootHash]; !ok {
+	if _, ok := l.ownedGames[g.RootHash]; !ok {
 		return errors.New("game not found in library, cannot add download")
 	}
 
@@ -51,17 +56,18 @@ func (l *Library) CreateDownload(g *Game) error {
 }
 
 // get a game and its download if they exist
-func (l *Library) GetGame(rootHash [32]byte) *Game {
-	if _, ok := l.Games[rootHash]; !ok {
+func (l *Library) GetOwnedGame(rootHash [32]byte) *Game {
+	if _, ok := l.ownedGames[rootHash]; !ok {
 		return nil
 	}
 
-	return l.Games[rootHash]
+	return l.ownedGames[rootHash]
 }
 
-func (l *Library) GetGames() []*Game {
+// get all games stored in the library
+func (l *Library) GetOwnedGames() []*Game {
 	gs := []*Game{}
-	for _, g := range l.Games {
+	for _, g := range l.ownedGames {
 		gs = append(gs, g)
 	}
 	return gs
@@ -70,17 +76,18 @@ func (l *Library) GetGames() []*Game {
 //
 
 // add a game to the library
-func (l *Library) AddGame(g *Game) {
-	l.Games[g.RootHash] = g
+func (l *Library) AddOwnedGame(g *Game) {
+	l.ownedGames[g.RootHash] = g
 }
 
+// output a table representation of the games list to the console
 func (l *Library) OutputGamesTable() {
 	t := table.NewWriter()
 	t.SetOutputMirror(os.Stdout)
 	t.AppendHeader(table.Row{"#", "Title", "Version", "Release"})
 
 	counter := 1
-	for _, g := range l.Games {
+	for _, g := range l.ownedGames {
 		t.AppendRow(table.Row{fmt.Sprint(counter), g.Title, g.Version, g.ReleaseDate})
 		counter++
 	}
@@ -89,10 +96,34 @@ func (l *Library) OutputGamesTable() {
 }
 
 func (l *Library) FindBlock(gameHash [32]byte, hash [32]byte) (bool, []byte, error) {
-	g, ok := l.Games[gameHash]
+	g, ok := l.ownedGames[gameHash]
 	if !ok {
 		return false, nil, nil
 	}
 
 	return g.FetchShard(hash)
+}
+
+//
+
+func (l *Library) SetBlockchainGame(rootHash [32]byte, game *Game) {
+	l.blockchainGames[rootHash] = game
+}
+
+// get a game and its download if they exist
+func (l *Library) GetBlockchainGame(rootHash [32]byte) *Game {
+	if _, ok := l.blockchainGames[rootHash]; !ok {
+		return nil
+	}
+
+	return l.blockchainGames[rootHash]
+}
+
+// get all games stored in the library
+func (l *Library) GetBlockchainGames() []*Game {
+	gs := []*Game{}
+	for _, g := range l.blockchainGames {
+		gs = append(gs, g)
+	}
+	return gs
 }

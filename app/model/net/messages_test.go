@@ -121,7 +121,7 @@ func TestOnMessage(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Error generating test download %s", err)
 	}
-	l.AddGame(g)
+	l.AddOwnedGame(g)
 
 	t.Run("BLOCK", func(t *testing.T) {
 
@@ -240,7 +240,7 @@ func TestFetchBlock(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	p.library.AddGame(g)
+	p.library.AddOwnedGame(g)
 
 	t.Run("game exists but block does not", func(t *testing.T) {
 		_, err = fetchBlock(g.RootHash, [32]byte{})

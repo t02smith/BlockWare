@@ -101,13 +101,33 @@ func isGameOnBlockchain(rootHash [32]byte) (bool, error) {
 	return false, nil
 }
 
+// populate a library with games from the blockchain
+func FillLibraryBlockchainGames(lib *games.Library) error {
+	util.Logger.Info("Filling library with game metadata from ethereum")
+	gs, err := fetchGamesFromEthereum()
+	if err != nil {
+		return err
+	}
+
+	util.Logger.Infof("Populating library with %d games", len(gs))
+	for _, g := range gs {
+		lib.SetBlockchainGame(g.RootHash, g)
+	}
+	util.Logger.Infof("Library populated with %d games", len(gs))
+
+	return nil
+}
+
+// fetch a list of games from ethereum
 func fetchGamesFromEthereum() ([]*games.Game, error) {
+	util.Logger.Info("Fetching games from ethereum")
 	gs := []*games.Game{}
 
 	gameSize, err := lib_instance.LibSize(nil)
 	if err != nil {
 		return nil, err
 	}
+	util.Logger.Infof("Found %d games. Fetching game metadata.", gameSize)
 
 	one := big.NewInt(1)
 	for i := big.NewInt(0); i.Cmp(gameSize) < 0; i.Add(i, one) {
@@ -124,18 +144,23 @@ func fetchGamesFromEthereum() ([]*games.Game, error) {
 		}
 
 		gs = append(gs, &games.Game{
-			Title:       game.Title,
-			Version:     game.Version,
-			ReleaseDate: game.ReleaseDate,
-			Developer:   game.Developer,
-			RootHash:    game.RootHash,
-			IPFSId:      game.IpfsAddress,
+			Title:           game.Title,
+			Version:         game.Version,
+			ReleaseDate:     game.ReleaseDate,
+			Developer:       game.Developer,
+			RootHash:        game.RootHash,
+			IPFSId:          game.IpfsAddress,
+			Uploader:        game.Uploader,
+			Price:           game.Price,
+			PreviousVersion: game.PreviousVersion,
 		})
 	}
 
+	util.Logger.Infof("Fetched %d games from ethereum", len(gs))
 	return gs, nil
 }
 
+// upload a new game to ethereum as well as its data from IPFS
 func uploadToEthereum(g *games.Game) error {
 
 	// upload data to IPFS
@@ -165,6 +190,7 @@ func uploadToEthereum(g *games.Game) error {
 	return nil
 }
 
+// upload a new game to ethereum as well as its data from IPFS with some checks
 func Upload(g *games.Game) error {
 	if lib_instance == nil || auth_instance == nil {
 		return errors.New("lib or auth instance are nil => run DeployLibraryContract first to initialise them")

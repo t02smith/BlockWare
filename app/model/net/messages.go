@@ -102,7 +102,7 @@ func onMessage(cmd []string, client PeerIT) {
 		}
 
 		// * fetch game and find location
-		game := p.library.GetGame(gh)
+		game := p.library.GetOwnedGame(gh)
 		gameTree, err := game.GetData()
 		if err != nil {
 			util.Logger.Errorf("Error loading game data %s", err)
@@ -206,7 +206,7 @@ func fetchBlock(gameHash, shardHash [32]byte) ([]byte, error) {
 	p := GetPeerInstance()
 
 	// find the game
-	g := p.library.GetGame(gameHash)
+	g := p.library.GetOwnedGame(gameHash)
 	if g == nil {
 		return nil, errors.New("game not in library")
 	}

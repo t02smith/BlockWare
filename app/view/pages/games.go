@@ -21,7 +21,7 @@ func GamesPage() fyne.CanvasObject {
 			return
 		}
 
-		gamesLs := lib.GetGames()
+		gamesLs := lib.GetOwnedGames()
 
 		gs = [][]string{}
 		for _, g := range gamesLs {

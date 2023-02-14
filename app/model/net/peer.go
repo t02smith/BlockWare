@@ -70,7 +70,7 @@ func StartPeer(serverHostname string, serverPort uint, installFolder, gameDataLo
 
 		lib := games.NewLibrary()
 		for _, g := range gameLs {
-			lib.AddGame(g)
+			lib.AddOwnedGame(g)
 		}
 
 		lib.OutputGamesTable()

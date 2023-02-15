@@ -5,7 +5,6 @@ import (
 	"bytes"
 	"compress/gzip"
 	"crypto/sha256"
-	"crypto/tls"
 	"encoding/base64"
 	"encoding/gob"
 	"encoding/json"
@@ -22,6 +21,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/spf13/viper"
 	hashIO "github.com/t02smith/part-iii-project/toolkit/model/hash"
+	"github.com/t02smith/part-iii-project/toolkit/test/testutil"
 	"github.com/t02smith/part-iii-project/toolkit/util"
 )
 
@@ -46,12 +46,6 @@ type Game struct {
 	download *Download
 }
 
-// mocked functions
-
-var (
-	mockVerifyDomain = verifyDomain
-)
-
 // Creator
 
 func CreateGame(title, version, releaseDate, developer, rootDir string, price *big.Int, shardSize uint, progress chan int) (*Game, error) {
@@ -74,20 +68,10 @@ func CreateGame(title, version, releaseDate, developer, rootDir string, price *b
 	}
 
 	// check release date
-	_, err = time.Parse("2006-01-02 15:04:05 -0700 MST", releaseDate)
+	_, err = time.Parse("2006-01-02 15:04:05.999999999 -0700 MST", strings.Split(releaseDate, " m=")[0])
 	if err != nil {
-		util.Logger.Errorf("invalid release date given")
+		util.Logger.Errorf("invalid release date given got %s", releaseDate)
 		return nil, errors.New("invalid release date given")
-	}
-
-	// check domain has SSL certificate
-	domainCorrect, err := mockVerifyDomain(developer)
-	if err != nil {
-		return nil, err
-	}
-
-	if !domainCorrect {
-		return nil, errors.New("invalid domain specified")
 	}
 
 	// hash data
@@ -116,34 +100,19 @@ func CreateGame(title, version, releaseDate, developer, rootDir string, price *b
 
 	// return value
 	game := &Game{
-		Title:       title,
-		Version:     version,
-		ReleaseDate: releaseDate,
-		Developer:   developer,
-		data:        tree,
-		RootHash:    h,
-		IPFSId:      "",
-		Price:       price,
+		Title:           title,
+		Version:         version,
+		ReleaseDate:     releaseDate,
+		Developer:       developer,
+		data:            tree,
+		RootHash:        h,
+		IPFSId:          "",
+		Price:           price,
+		PreviousVersion: [32]byte{},
+		Uploader:        common.HexToAddress(testutil.Accounts[0][0]),
 	}
 
 	return game, nil
-}
-
-func verifyDomain(domain string) (bool, error) {
-	conf := &tls.Config{}
-
-	conn, err := tls.Dial("tcp", fmt.Sprintf("%s:443", domain), conf)
-	if err != nil {
-		return false, err
-	}
-	defer conn.Close()
-
-	certs := conn.ConnectionState().PeerCertificates
-	if len(certs) == 0 {
-		return false, nil
-	}
-
-	return true, nil
 }
 
 // IO
@@ -166,7 +135,7 @@ func (g *Game) ReadHashData() error {
 
 func OutputToFile(g *Game) error {
 	gameFilename := filepath.Join(viper.GetString("meta.directory"), fmt.Sprintf("%s-%s-%s.json", g.Title, g.Version, g.Developer))
-	util.Logger.Infof("Outputting game data to %s\n", gameFilename)
+	util.Logger.Infof("Outputting game data to %s", gameFilename)
 
 	// output game metadata
 	e, err := json.Marshal(g)
@@ -190,6 +159,7 @@ func OutputToFile(g *Game) error {
 		return err
 	}
 
+	util.Logger.Infof("Outputted game data to %s", gameFilename)
 	return nil
 }
 

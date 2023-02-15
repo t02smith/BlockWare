@@ -25,16 +25,10 @@ func TestMain(m *testing.M) {
 		os.Exit(1)
 	}
 
-	old := verifyDomain
-	mockVerifyDomain = func(domain string) (bool, error) {
-		return true, nil
-	}
-
 	gamesTestSetup()
 	code := m.Run()
 	gamesTestTeardown()
 
-	mockVerifyDomain = old
 	os.Exit(code)
 }
 

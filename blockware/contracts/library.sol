@@ -43,7 +43,7 @@ contract Library {
         require(bytes(_game.ipfsAddress).length > 0, "no IPFS address given for hash treee");
 
         // look for previous version
-        if (_game.previousVersion.length != 0) {
+        if (_game.previousVersion != 0) {
           require(bytes(games[_game.previousVersion].title).length > 0, "previous version of game not found");
 
           GameEntry memory g = games[_game.previousVersion];

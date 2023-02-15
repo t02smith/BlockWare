@@ -14,7 +14,7 @@ A worker pool for sharding and hashing files
 
 // starts a worker pool with N workers awaiting instructions
 func hasherPool(capacity int, fileCount int, shardSize uint, progress chan int) (*sync.WaitGroup, chan *HashTreeFile, chan error) {
-
+	util.Logger.Infof("Creating hasher pool with %d workers fir %d files", capacity, fileCount)
 	files := make(chan *HashTreeFile, fileCount)
 	errors := make(chan error, fileCount)
 
@@ -25,6 +25,7 @@ func hasherPool(capacity int, fileCount int, shardSize uint, progress chan int) 
 		go worker(w, &wg, shardSize, files, errors, progress)
 	}
 
+	util.Logger.Info("Hasher pool generated")
 	return &wg, files, errors
 }
 

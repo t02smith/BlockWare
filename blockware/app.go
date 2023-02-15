@@ -2,10 +2,14 @@ package main
 
 import (
 	"context"
-	"fmt"
+	"math/big"
+	"time"
 
+	"github.com/t02smith/part-iii-project/toolkit/model/ethereum"
 	"github.com/t02smith/part-iii-project/toolkit/model/games"
 	"github.com/t02smith/part-iii-project/toolkit/model/net"
+	"github.com/t02smith/part-iii-project/toolkit/util"
+	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
 type App struct {
@@ -27,7 +31,48 @@ func (a *App) GetOwnedGames() []*games.Game {
 	return net.GetPeerInstance().GetLibrary().GetOwnedGames()
 }
 
-// Greet returns a greeting for the given name
-func (a *App) Greet(name string) string {
-	return fmt.Sprintf("Hello %s, It's show time!", name)
+func (a *App) UploadGame(title, version, dev, rootDir string, shardSize, price uint) string {
+	release := time.Now().String()
+	progress := make(chan int)
+
+	go func() {
+		fileCount, current := <-progress, 0
+		runtime.EventsEmit(a.ctx, "file-count", fileCount)
+
+		for current < fileCount {
+			<-progress
+			current++
+			runtime.EventsEmit(a.ctx, "file-progress", current)
+		}
+	}()
+
+	g, err := games.CreateGame(title, version, release, dev, rootDir, big.NewInt(int64(price)), shardSize, progress)
+	if err != nil {
+		util.Logger.Errorf("Error creating game %s", err)
+		return err.Error()
+	}
+
+	err = ethereum.Upload(g)
+	if err != nil {
+		util.Logger.Errorf("Error uploading game %s", err)
+		return err.Error()
+	}
+
+	err = games.OutputToFile(g)
+	if err != nil {
+		util.Logger.Errorf("Error saving game to file %s", err)
+		return err.Error()
+	}
+
+	return ""
+
+}
+
+func (a *App) DeployLibraryInstance(privateKey string) string {
+	_, _, err := ethereum.DeployLibraryContract(privateKey)
+	if err == nil {
+		return ""
+	}
+
+	return err.Error()
 }

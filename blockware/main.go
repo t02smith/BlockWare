@@ -5,9 +5,7 @@ package main
 
 import (
 	"embed"
-	"fmt"
 	"log"
-	"os"
 
 	"github.com/spf13/viper"
 	"github.com/t02smith/part-iii-project/toolkit/model"
@@ -37,8 +35,6 @@ func main() {
 	if err != nil {
 		util.Logger.Fatalf("Error starting eth client %s", err)
 	}
-
-	fmt.Println(os.Getwd())
 
 	app := NewApp()
 

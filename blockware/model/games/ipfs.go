@@ -36,7 +36,7 @@ func (g *Game) UploadDataToIPFS() error {
 	}
 
 	g.IPFSId = cid
-	util.Logger.Info("Uploaded game %s data to IPFS. CID = %s", g.Title, cid)
+	util.Logger.Infof("Uploaded game %s data to IPFS. CID = %s", g.Title, cid)
 	return nil
 }
 

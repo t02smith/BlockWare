@@ -21,7 +21,6 @@ func beforeAll() {
 
 	viper.Set("eth.keystore.directory", "../../test/data/tmp")
 	viper.Set("eth.keystore.password", "test")
-	return
 
 	err := setupTestGame()
 	if err != nil {

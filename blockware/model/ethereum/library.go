@@ -5,11 +5,11 @@ import (
 	"context"
 	"crypto/ecdsa"
 	"errors"
-	"fmt"
 	"math/big"
 	"sync"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/t02smith/part-iii-project/toolkit/build/contracts/library"
 	"github.com/t02smith/part-iii-project/toolkit/model/games"
@@ -28,6 +28,7 @@ func DeployLibraryContract(privateKey string) (*bind.TransactOpts, *library.Libr
 	}
 
 	lib_auth_once.Do(func() {
+		util.Logger.Info("Starting library deployment")
 		privKeyECDSA, err := crypto.HexToECDSA(privateKey)
 		if err != nil {
 			util.Logger.Panic(err)
@@ -44,11 +45,13 @@ func DeployLibraryContract(privateKey string) (*bind.TransactOpts, *library.Libr
 			util.Logger.Panic(err)
 		}
 
-		chainID, err := eth_client.ChainID(context.Background())
+		util.Logger.Info("Getting chain ID")
+		chainID, err := eth_client.ChainID(context.TODO())
 		if err != nil {
 			util.Logger.Panic(err)
 		}
 
+		util.Logger.Info("Getting gas price")
 		gasPrice, err := eth_client.SuggestGasPrice(context.Background())
 		if err != nil {
 			util.Logger.Panic(err)
@@ -72,7 +75,7 @@ func DeployLibraryContract(privateKey string) (*bind.TransactOpts, *library.Libr
 		}
 
 		lib_instance = instance
-
+		util.Logger.Info("Deployed library ")
 	})
 
 	return auth_instance, lib_instance, nil
@@ -174,12 +177,16 @@ func uploadToEthereum(g *games.Game) error {
 	// upload metadata to blockchain
 	util.Logger.Infof("Uploading game metadata for %s to Ethereum", g.Title)
 	_, err = lib_instance.UploadGame(auth_instance, library.LibraryGameEntry{
-		Title:       g.Title,
-		Version:     g.Version,
-		ReleaseDate: g.ReleaseDate,
-		Developer:   g.Developer,
-		RootHash:    g.RootHash,
-		IpfsAddress: g.IPFSId,
+		Title:           g.Title,
+		Version:         g.Version,
+		ReleaseDate:     g.ReleaseDate,
+		Developer:       g.Developer,
+		RootHash:        g.RootHash,
+		IpfsAddress:     g.IPFSId,
+		PreviousVersion: g.PreviousVersion,
+		Price:           g.Price,
+		Uploader:        g.Uploader,
+		Purchased:       []common.Address{},
 	})
 
 	if err != nil {
@@ -194,15 +201,6 @@ func uploadToEthereum(g *games.Game) error {
 func Upload(g *games.Game) error {
 	if lib_instance == nil || auth_instance == nil {
 		return errors.New("lib or auth instance are nil => run DeployLibraryContract first to initialise them")
-	}
-
-	// ? is game already on eth
-	onChain, err := isGameOnBlockchain(g.RootHash)
-	if err != nil {
-		return err
-	}
-	if onChain {
-		return fmt.Errorf("game %s with hash %x already present on blockchain", g.Title, g.RootHash)
 	}
 
 	// * upload

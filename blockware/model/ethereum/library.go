@@ -13,6 +13,7 @@ import (
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/t02smith/part-iii-project/toolkit/build/contracts/library"
 	"github.com/t02smith/part-iii-project/toolkit/model/games"
+	"github.com/t02smith/part-iii-project/toolkit/model/net"
 	"github.com/t02smith/part-iii-project/toolkit/util"
 )
 
@@ -22,11 +23,13 @@ var (
 	lib_auth_once sync.Once
 )
 
+// setup instance of smart contract to interact with blockchain
 func DeployLibraryContract(privateKey string) (*bind.TransactOpts, *library.Library, error) {
 	if eth_client == nil {
 		return nil, nil, errors.New("you need to instantiate the Eth Client => run StartClient")
 	}
 
+	// run setup functions at most once
 	lib_auth_once.Do(func() {
 		util.Logger.Info("Starting library deployment")
 		privKeyECDSA, err := crypto.HexToECDSA(privateKey)
@@ -75,7 +78,17 @@ func DeployLibraryContract(privateKey string) (*bind.TransactOpts, *library.Libr
 		}
 
 		lib_instance = instance
-		util.Logger.Info("Deployed library ")
+		util.Logger.Info("Deployed library")
+
+		err = readPreviousGameEvents()
+		if err != nil {
+			util.Logger.Errorf("Error reading previous games: %s", err)
+		}
+
+		err = watchNewGameEvent()
+		if err != nil {
+			util.Logger.Errorf("Error watching for new games: %s", err)
+		}
 	})
 
 	return auth_instance, lib_instance, nil
@@ -205,4 +218,80 @@ func Upload(g *games.Game) error {
 
 	// * upload
 	return uploadToEthereum(g)
+}
+
+// Will listen for NewGame events emitted on ethereum
+func watchNewGameEvent() error {
+	newGameChannel := make(chan *library.LibraryNewGame)
+
+	sub, err := lib_instance.WatchNewGame(&bind.WatchOpts{
+		Start:   nil,
+		Context: nil,
+	}, newGameChannel)
+
+	if err != nil {
+		return err
+	}
+
+	util.Logger.Info("Watching for new games")
+	go func() {
+		p := net.GetPeerInstance()
+		defer util.Logger.Info("Stopped watching for new games")
+
+		for {
+			select {
+			case err := <-sub.Err():
+				if err != nil {
+					util.Logger.Error(err)
+				}
+			case newGame := <-newGameChannel:
+				util.Logger.Infof("New game received with hash %x. Adding to library.", newGame.Hash)
+				p.GetLibrary().SetBlockchainGame(newGame.Hash, gameEntryToGame(&newGame.Game))
+			}
+		}
+
+	}()
+
+	return nil
+}
+
+// Will look at previous GameEntry events to fill store games
+func readPreviousGameEvents() error {
+	util.Logger.Info("Reading previous games from eth")
+	newGameIterator, err := lib_instance.FilterNewGame(&bind.FilterOpts{
+		End:     nil,
+		Start:   0,
+		Context: nil,
+	})
+	if err != nil {
+		return err
+	}
+
+	lib := net.GetPeerInstance().GetLibrary()
+	count := 0
+	for newGameIterator.Next() {
+		g := newGameIterator.Event.Game
+		util.Logger.Infof("Found game %s", g.Title)
+		lib.SetBlockchainGame(g.RootHash, gameEntryToGame(&g))
+		count++
+	}
+
+	util.Logger.Infof("Finished reading previous games from eth. Found %d games.", count)
+	return nil
+}
+
+// translates from the ethereum version to the locally used struct
+func gameEntryToGame(game *library.LibraryGameEntry) *games.Game {
+	return &games.Game{
+		Title:           game.Title,
+		Version:         game.Version,
+		ReleaseDate:     game.ReleaseDate,
+		Developer:       game.Developer,
+		RootHash:        game.RootHash,
+		IPFSId:          game.IpfsAddress,
+		Uploader:        game.Uploader,
+		Price:           game.Price,
+		PreviousVersion: game.PreviousVersion,
+	}
+
 }

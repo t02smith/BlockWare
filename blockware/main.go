@@ -35,6 +35,7 @@ func main() {
 	if err != nil {
 		util.Logger.Fatalf("Error starting eth client %s", err)
 	}
+	defer ethereum.CloseEthClient()
 
 	app := NewApp()
 
@@ -109,7 +110,7 @@ func defaultConfig() {
 	// eth
 	viper.SetDefault("eth.keystore.directory", "./test/data/.toolkit")
 	viper.SetDefault("eth.keystore.password", "password")
-	viper.SetDefault("eth.address", "http://localhost:8545")
+	viper.SetDefault("eth.address", "ws://localhost:8545")
 }
 
 func startPeer() error {

@@ -38,6 +38,10 @@ func StartClient(addr string) (*ethclient.Client, *accounts.Account, error) {
 	return eth_client, acc, nil
 }
 
+func CloseEthClient() {
+	eth_client.Close()
+}
+
 // key store
 
 // create a new keystore

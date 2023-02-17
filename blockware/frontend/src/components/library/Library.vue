@@ -5,10 +5,11 @@
 
       <div class="right">
         <h2 class="game-count">
-          🕹️{{ games.length }} {{ games.length === 1 ? "Game" : "Games" }}
+          🕹️{{ games.ownedGames.length }}
+          {{ games.ownedGames.length === 1 ? "Game" : "Games" }}
         </h2>
 
-        <button class="refresh" @click="refreshLibrary">
+        <button class="refresh" @click="games.refreshOwnedGames">
           <h2>♻️Refresh</h2>
         </button>
       </div>
@@ -16,7 +17,7 @@
     <div class="games">
       <AddGames />
       <Game
-        v-for="g in games"
+        v-for="g in games.ownedGames.slice(0, 4)"
         :title="g.title"
         :version="g.version"
         :dev="g.dev"
@@ -25,18 +26,11 @@
   </div>
 </template>
 <script setup>
-import { onMounted, ref } from "vue";
 import Game from "./Game.vue";
-import { GetOwnedGames } from "../../../wailsjs/go/main/App.js";
 import AddGames from "./AddGames.vue";
+import { useGamesStore } from "../../stores/games";
 
-const games = ref([]);
-
-onMounted(() => refreshLibrary());
-
-async function refreshLibrary() {
-  games.value = await GetOwnedGames();
-}
+const games = useGamesStore();
 </script>
 <style scoped lang="scss">
 .library {

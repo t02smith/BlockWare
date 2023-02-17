@@ -29,7 +29,7 @@ async function submit() {
   const e = await DeployLibraryInstance(key.value);
   if (e.length === 0) {
     key.value = "";
-    router.push("/library");
+    router.push("/home");
   }
 }
 </script>

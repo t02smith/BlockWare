@@ -5,6 +5,7 @@
     </div>
 
     <div class="links">
+      <router-link to="/home">🏡 Home</router-link>
       <router-link to="/library">🕹️ Library</router-link>
       <router-link to="/upload">🆕 Upload</router-link>
       <router-link to="/store">💵 Store</router-link>

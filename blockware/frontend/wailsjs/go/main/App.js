@@ -6,10 +6,14 @@ export function DeployLibraryInstance(arg1) {
   return window['go']['main']['App']['DeployLibraryInstance'](arg1);
 }
 
+export function GetAllGames() {
+  return window['go']['main']['App']['GetAllGames']();
+}
+
 export function GetOwnedGames() {
   return window['go']['main']['App']['GetOwnedGames']();
 }
 
-export function UploadGame(arg1, arg2, arg3, arg4, arg5, arg6) {
-  return window['go']['main']['App']['UploadGame'](arg1, arg2, arg3, arg4, arg5, arg6);
+export function UploadGame(arg1, arg2, arg3, arg4, arg5, arg6, arg7) {
+  return window['go']['main']['App']['UploadGame'](arg1, arg2, arg3, arg4, arg5, arg6, arg7);
 }

@@ -80,7 +80,7 @@ func DeployLibraryContract(privateKey string) (*bind.TransactOpts, *library.Libr
 		lib_instance = instance
 		util.Logger.Info("Deployed library")
 
-		err = readPreviousGameEvents()
+		err = ReadPreviousGameEvents()
 		if err != nil {
 			util.Logger.Errorf("Error reading previous games: %s", err)
 		}
@@ -237,6 +237,7 @@ func watchNewGameEvent() error {
 	go func() {
 		p := net.GetPeerInstance()
 		defer util.Logger.Info("Stopped watching for new games")
+		defer sub.Unsubscribe()
 
 		for {
 			select {
@@ -256,11 +257,11 @@ func watchNewGameEvent() error {
 }
 
 // Will look at previous GameEntry events to fill store games
-func readPreviousGameEvents() error {
+func ReadPreviousGameEvents() error {
 	util.Logger.Info("Reading previous games from eth")
 	newGameIterator, err := lib_instance.FilterNewGame(&bind.FilterOpts{
 		End:     nil,
-		Start:   0,
+		Start:   1,
 		Context: nil,
 	})
 	if err != nil {

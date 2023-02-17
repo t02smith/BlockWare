@@ -22,6 +22,7 @@ var assets embed.FS
 func main() {
 	util.InitLogger()
 	SetupConfig()
+	defer viper.WriteConfig()
 
 	model.SetupToolkitEnvironment()
 
@@ -42,8 +43,8 @@ func main() {
 	// Create application with options
 	err = wails.Run(&options.App{
 		Title:  "blockware",
-		Width:  1024,
-		Height: 768,
+		Width:  1300,
+		Height: 850,
 		AssetServer: &assetserver.Options{
 			Assets: assets,
 		},

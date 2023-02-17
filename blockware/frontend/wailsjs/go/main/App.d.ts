@@ -4,6 +4,8 @@ import {games} from '../models';
 
 export function DeployLibraryInstance(arg1:string):Promise<string>;
 
+export function GetAllGames():Promise<void>;
+
 export function GetOwnedGames():Promise<Array<games.Game>>;
 
-export function UploadGame(arg1:string,arg2:string,arg3:string,arg4:string,arg5:number,arg6:number):Promise<string>;
+export function UploadGame(arg1:string,arg2:string,arg3:string,arg4:string,arg5:number,arg6:number,arg7:number):Promise<string>;

@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 import { ref, onMounted } from "vue";
-import { GetOwnedGames } from "../../wailsjs/go/main/App.js";
+import { GetOwnedGames, GetAllGames } from "../../wailsjs/go/main/App.js";
 
 export const useGamesStore = defineStore("games", () => {
   const ownedGames = ref([]);
@@ -11,6 +11,7 @@ export const useGamesStore = defineStore("games", () => {
 
   async function refreshOwnedGames() {
     ownedGames.value = await GetOwnedGames();
+    await GetAllGames();
   }
 
   return { ownedGames, refreshOwnedGames };

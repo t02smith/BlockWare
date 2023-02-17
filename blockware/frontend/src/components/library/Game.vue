@@ -1,13 +1,13 @@
 <template>
-  <div class="game">
+  <router-link :to="`/library?game=${props.hash}`" class="game">
     <div class="gradient"></div>
-    <h5>{{ props.version }}</h5>
+    <h5 class="version">v{{ props.version }}</h5>
 
     <div class="content">
       <h3>{{ props.title }}</h3>
       <h4>{{ props.dev }}</h4>
     </div>
-  </div>
+  </router-link>
 </template>
 <script setup>
 const props = defineProps({
@@ -20,6 +20,10 @@ const props = defineProps({
     required: true,
   },
   version: {
+    type: String,
+    required: true,
+  },
+  hash: {
     type: String,
     required: true,
   },
@@ -48,11 +52,16 @@ const props = defineProps({
     scale: 0.99;
   }
 
-  > h5 {
+  > .version {
     position: absolute;
     top: 1rem;
     right: 1rem;
-    font-size: 1.2rem;
+    font-size: 1rem;
+    color: white;
+    background-color: rgb(0, 88, 219);
+    border-radius: 7px;
+    padding: 1px 7px;
+    opacity: 0.8;
   }
 
   > .gradient {
@@ -67,6 +76,7 @@ const props = defineProps({
     bottom: 1rem;
     left: 1rem;
     line-height: 1.2rem;
+    color: white;
 
     h3 {
       font-size: 1.5rem;

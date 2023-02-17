@@ -5,6 +5,7 @@ import (
 	"math/big"
 	"time"
 
+	"github.com/spf13/viper"
 	"github.com/t02smith/part-iii-project/toolkit/model/ethereum"
 	"github.com/t02smith/part-iii-project/toolkit/model/games"
 	"github.com/t02smith/part-iii-project/toolkit/model/net"
@@ -31,7 +32,11 @@ func (a *App) GetOwnedGames() []*games.Game {
 	return net.GetPeerInstance().GetLibrary().GetOwnedGames()
 }
 
-func (a *App) UploadGame(title, version, dev, rootDir string, shardSize, price uint) string {
+func (a *App) GetAllGames() {
+	ethereum.ReadPreviousGameEvents()
+}
+
+func (a *App) UploadGame(title, version, dev, rootDir string, shardSize, price, workerCount uint) string {
 	release := time.Now().String()
 	progress := make(chan int)
 
@@ -46,11 +51,13 @@ func (a *App) UploadGame(title, version, dev, rootDir string, shardSize, price u
 		}
 	}()
 
+	viper.Set("meta.hashes.workerCount", workerCount)
 	g, err := games.CreateGame(title, version, release, dev, rootDir, big.NewInt(int64(price)), shardSize, progress)
 	if err != nil {
 		util.Logger.Errorf("Error creating game %s", err)
 		return err.Error()
 	}
+	close(progress)
 
 	err = ethereum.Upload(g)
 	if err != nil {

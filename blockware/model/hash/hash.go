@@ -158,9 +158,15 @@ func (ht *HashTree) Hash() error {
 		wc = 1
 	}
 
-	wg, fileIn, _ := hasherPool(wc, fileCount, ht.ShardSize, ht.progress)
-	_ = ht.RootDir.shardData(fileIn, ht.ShardSize)
+	wg, fileIn, errors := hasherPool(wc, fileCount, ht.ShardSize, ht.progress)
+	err = ht.RootDir.shardData(fileIn, ht.ShardSize)
+	if err != nil {
+		util.Logger.Error(err)
+	}
+
 	wg.Wait()
+	close(fileIn)
+	close(errors)
 
 	endTime := time.Now()
 	util.Logger.Infof("Directory %s hashed in %dms", ht.RootDirLocation, endTime.Sub(startTime).Milliseconds())
@@ -257,10 +263,22 @@ func (htd *HashTreeDir) shardData(fileIn chan *HashTreeFile, shardSize uint) err
 func (htf *HashTreeFile) shardFile(shardSize uint) error {
 	htf.Hashes = [][32]byte{}
 
+	stat, err := os.Stat(htf.AbsoluteFilename)
+	if err != nil {
+		return err
+	}
+
+	if stat.Size() == 0 {
+		htf.Hashes = append(htf.Hashes, [32]byte{})
+		htf.RootHash = CalculateRootHash(htf.Hashes)
+		return nil
+	}
+
 	file, err := os.Open(htf.AbsoluteFilename)
 	if err != nil {
 		return err
 	}
+
 	defer file.Close()
 
 	buffer := make([]byte, shardSize)

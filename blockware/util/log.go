@@ -18,6 +18,10 @@ func InitLogger() *zap.SugaredLogger {
 		config.EncoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
 		config.EncoderConfig.ConsoleSeparator = "\t"
 
+		// config.OutputPaths = []string{
+		// 	"./zap.log",
+		// }
+
 		l, _ := config.Build()
 		Logger = l.Sugar()
 

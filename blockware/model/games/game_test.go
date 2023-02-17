@@ -148,7 +148,7 @@ func TestFetchShard(t *testing.T) {
 
 				foundShardHash := sha256.Sum256(data)
 				if !bytes.Equal(hash[:], foundShardHash[:]) {
-					t.Errorf("Incorrect shard found")
+					t.Errorf("Incorrect shard found. expected %x, got %x", hash, foundShardHash)
 					return
 				}
 			})

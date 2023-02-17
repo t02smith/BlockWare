@@ -30,19 +30,20 @@ func hasherPool(capacity int, fileCount int, shardSize uint, progress chan int) 
 }
 
 func worker(id int, wg *sync.WaitGroup, shardSize uint, files <-chan *HashTreeFile, errors chan<- error, progress chan int) {
-
 	for f := range files {
-		util.Logger.Infof("WORKER %d: Sharding file %s\n", id, f.AbsoluteFilename)
+		util.Logger.Infof("WORKER %d: Sharding file %s", id, f.AbsoluteFilename)
 		err := f.shardFile(shardSize)
 		if err != nil {
-			errors <- err
+			util.Logger.Errorf("WORKER %d: Error sharding file %s: %s", id, f.AbsoluteFilename, err)
+			// errors <- err
 		}
 		wg.Done()
-		util.Logger.Infof("WORKER %d: Completed sharding %s\n", id, f.AbsoluteFilename)
+		util.Logger.Infof("WORKER %d: Completed sharding %s", id, f.AbsoluteFilename)
 
 		if progress != nil {
 			progress <- 1
-
 		}
 	}
+
+	util.Logger.Infof("WORKER %d: FINISHED", id)
 }

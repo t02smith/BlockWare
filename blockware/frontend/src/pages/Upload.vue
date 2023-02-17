@@ -32,7 +32,9 @@
               id=""
               placeholder="Enter your game's title"
               v-model="title"
+              :disabled="submitted"
             />
+            <p>What is your game called?</p>
           </div>
 
           <!-- version -->
@@ -44,7 +46,9 @@
               id=""
               placeholder="Enter your game's version"
               v-model="version"
+              :disabled="submitted"
             />
+            <p>What is the current version number?</p>
           </div>
 
           <!-- Developer -->
@@ -56,21 +60,25 @@
               id=""
               placeholder="Enter your name"
               v-model="dev"
+              :disabled="submitted"
             />
+            <p>What is your name?</p>
           </div>
 
           <!-- TODO release => auto generate? -->
 
           <!-- Price -->
           <div class="form-group">
-            <h3>Price (Wei)</h3>
+            <h3>Price (in Wei)</h3>
             <input
               type="number"
               name=""
               id=""
               placeholder="in Wei"
               v-model="price"
+              :disabled="submitted"
             />
+            <p>What is the current price? (in Wei)</p>
           </div>
         </div>
       </div>
@@ -85,32 +93,66 @@
           <!-- Shard size -->
           <div class="form-group">
             <h3>Shard Size (in Bytes)</h3>
+
             <input
               type="number"
               name=""
               id=""
               placeholder="in bytes"
               v-model="shardSize"
+              :disabled="submitted"
             />
+            <p>
+              What size blocks should each file be broken down into. A smaller
+              size means greater precision at the cost of performance and
+              file-size.
+            </p>
           </div>
 
           <!-- Root Directory -->
           <div class="form-group">
             <h3>Root Directory of Game</h3>
+
             <input
               type="text"
               name=""
               id=""
               placeholder="absolute path"
               v-model="file"
+              :disabled="submitted"
             />
+            <p>
+              Enter the root directory of your game. Each sub-folder will be
+              traversed and each file will be split into shards and hashed.
+            </p>
+          </div>
+
+          <!-- Worker count -->
+          <div class="form-group">
+            <h3>Hashing Workers</h3>
+
+            <input
+              type="number"
+              min="1"
+              name=""
+              id=""
+              v-model="workers"
+              :disabled="submitted"
+            />
+            <p>
+              Workers allow you to shard many files at the same time. However, a
+              large amount of workers will cause performance issues.
+            </p>
           </div>
         </div>
       </div>
     </div>
 
     <footer>
-      <button :disabled="submitted" type="submit">Upload Now!</button>
+      <button :disabled="submitted" v-if="!submitted" type="submit">
+        Upload Now!
+      </button>
+      <button disabled v-else>Loading...</button>
 
       <!-- progress -->
       <div class="file-counter">
@@ -140,6 +182,7 @@ const dev = ref("");
 const price = ref(0);
 const shardSize = ref(16384);
 const file = ref("");
+const workers = ref(5);
 
 // upload progress
 const fileCount = ref(0);
@@ -160,6 +203,9 @@ onMounted(async () => {
 });
 
 async function submit() {
+  if (workers.value <= 0) workers.value = 1;
+  if (shardSize.value <= 0) shardSize.value = 16384;
+
   submitted.value = true;
   err.value = await UploadGame(
     title.value,
@@ -167,7 +213,8 @@ async function submit() {
     dev.value,
     file.value,
     shardSize.value,
-    price.value
+    price.value,
+    workers.value
   );
 
   if (err.value.length > 0) {
@@ -177,6 +224,8 @@ async function submit() {
     file.value = "";
     shardSize.value = 16384;
     price.value = 0;
+    workers.value = 5;
+  } else {
     success.value = true;
   }
 
@@ -205,7 +254,7 @@ async function submit() {
     }
   }
 
-  button[type="submit"] {
+  button {
     background-color: rgb(0, 90, 170);
     padding: 0.8rem 1.75rem;
     border-radius: 10px;
@@ -266,6 +315,15 @@ async function submit() {
           border-radius: 5px;
           outline: none;
           border: none;
+        }
+
+        > p {
+          font-size: 0.9rem;
+          font-style: italic;
+          color: rgb(218, 218, 218);
+          margin-top: 2px;
+          width: 95%;
+          padding: 0 3px;
         }
       }
     }

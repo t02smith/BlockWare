@@ -1,8 +1,8 @@
-//go:build unit
-
 package hash
 
 import (
+	"bytes"
+	"crypto/sha256"
 	"fmt"
 	"testing"
 
@@ -67,19 +67,44 @@ func TestShardFile(t *testing.T) {
 	})
 
 	t.Run("valid input", func(t *testing.T) {
-		htf := &HashTreeFile{
-			Filename:         "test.txt",
-			AbsoluteFilename: "../../test/data/testdir/test.txt",
+		empty := [256]byte{}
+
+		table := []struct {
+			name     string
+			htf      *HashTreeFile
+			expected [32]byte
+		}{
+			{
+				"normal file",
+				&HashTreeFile{
+					Filename:         "test.txt",
+					AbsoluteFilename: "../../test/data/testdir/test.txt",
+				},
+				[32]byte{2, 96, 221, 220, 74, 251, 255, 33, 146, 79, 118, 176, 189, 239, 210, 55, 87, 12, 16, 175, 90, 116, 199, 69, 81, 247, 149, 65, 223, 135, 190, 163},
+			},
+			{
+				"empty file",
+				&HashTreeFile{
+					Filename:         "EMPTY",
+					AbsoluteFilename: "../../test/data/testfiles/EMPTY",
+				},
+				sha256.Sum256(empty[:]),
+			},
 		}
 
-		err := htf.shardFile(11)
-		if err != nil {
-			t.Errorf("error sharding file %s", err)
+		for _, x := range table {
+			t.Run(x.name, func(t *testing.T) {
+				err := x.htf.shardFile(256)
+				if err != nil {
+					t.Errorf("error sharding file %s", err)
+				}
+
+				if !bytes.Equal(x.htf.Hashes[0][:], x.expected[:]) {
+					t.Errorf("Incorrect hash for %s. expected %x, got %x", x.name, x.expected, x.htf.Hashes[0])
+				}
+			})
 		}
 
-		if fmt.Sprintf("%x", htf.Hashes[0]) != "12998c017066eb0d2a70b94e6ed3192985855ce390f321bbdb832022888bd251" {
-			t.Errorf("Incorrect hash")
-		}
 	})
 }
 

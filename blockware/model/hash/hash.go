@@ -269,7 +269,8 @@ func (htf *HashTreeFile) shardFile(shardSize uint) error {
 	}
 
 	if stat.Size() == 0 {
-		htf.Hashes = append(htf.Hashes, [32]byte{})
+		empty := make([]byte, shardSize)
+		htf.Hashes = append(htf.Hashes, sha256.Sum256(empty))
 		htf.RootHash = CalculateRootHash(htf.Hashes)
 		return nil
 	}

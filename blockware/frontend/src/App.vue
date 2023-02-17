@@ -20,9 +20,11 @@ const route = computed(() => router.path);
 .main {
   display: flex;
   flex-direction: column;
+  height: 100vh;
 
   > .router-view {
     width: 100vw;
+    height: 100%;
   }
 }
 </style>

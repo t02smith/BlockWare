@@ -1,6 +1,7 @@
 <template>
   <nav>
     <div class="title">
+      <img src="../assets/images/icon.png" alt="" />
       <h4>BlockWare</h4>
     </div>
 
@@ -30,6 +31,14 @@ nav {
 
   > .title {
     font-size: 1.5rem;
+    display: flex;
+    gap: 0.4rem;
+    align-items: center;
+
+    > img {
+      width: 30px;
+      height: 30px;
+    }
   }
 
   > .links {

@@ -1,24 +1,88 @@
 <template>
-  <div>
-    <Library />
+  <div class="home">
+    <div class="title">
+      <h1><strong>Block</strong>Ware</h1>
+      <h2>by Tom Smith</h2>
+    </div>
+
+    <div class="quick-links">
+      <Icon
+        v-for="i in icons"
+        :colorA="i.colorA"
+        :colorB="i.colorB"
+        :name="i.name"
+        :icon="i.icon"
+        :link="i.link"
+      />
+    </div>
   </div>
 </template>
 <script setup>
-import Library from "../components/library/Library.vue";
+import Icon from "../components/home/Icon.vue";
+
+const icons = [
+  {
+    name: "Library",
+    icon: "🎮",
+    colorA: "#790953",
+    colorB: "#ff6464",
+    link: "/library",
+  },
+  {
+    name: "Downloads",
+    icon: "🎁",
+    colorA: "#8810d2",
+    colorB: "#00ff2e",
+    link: "/downloads",
+  },
+  {
+    name: "Store",
+    icon: "🏪",
+    colorA: "#ffbf64",
+    colorB: "#ff6474",
+    link: "/store",
+  },
+  {
+    name: "Upload",
+    icon: "🌍",
+    colorA: "#6472ff",
+    colorB: "#ffa264",
+    link: "/upload",
+  },
+];
 </script>
 <style scoped lang="scss">
-.title {
-  background-color: #131313;
-  display: flex;
-  flex-direction: column;
-  gap: 0;
+.home {
+  height: 100%;
+  display: grid;
+  place-items: center;
 
-  > h1 {
-    font-size: 5rem;
+  > .title {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    > h1 {
+      font-size: 10rem;
+
+      > strong {
+        color: rgb(0, 106, 206);
+      }
+    }
+
+    > h2 {
+      margin-top: -1.75rem;
+      color: darken(white, 20%);
+    }
   }
 
-  > p {
-    font-size: 2rem;
+  > .quick-links {
+    margin: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2.5rem;
   }
 }
 </style>

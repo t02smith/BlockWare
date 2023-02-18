@@ -67,7 +67,11 @@ const icons = [
       font-size: 10rem;
 
       > strong {
-        color: rgb(0, 106, 206);
+        background: url("../assets/images/icon.png");
+        background-attachment: fixed;
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
       }
     }
 

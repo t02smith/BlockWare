@@ -11,11 +11,8 @@
             <h3>{{ props.game.dev }}</h3>
           </div>
 
-          <div class="buy" v-if="props.store">
-            <h3>
-              Buy today for <strong>{{ props.game.price }} ETH</strong>
-            </h3>
-            <button>🔒 Checkout now!</button>
+          <div class="slot">
+            <slot />
           </div>
         </div>
       </div>
@@ -47,10 +44,6 @@ const props = defineProps({
   game: {
     type: Object,
     required: true,
-  },
-  store: {
-    type: Boolean,
-    default: false,
   },
 });
 </script>
@@ -111,7 +104,7 @@ const props = defineProps({
           }
         }
 
-        > .buy {
+        > .slot {
           margin-left: auto;
           display: flex;
           flex-direction: column;
@@ -140,9 +133,6 @@ const props = defineProps({
         }
       }
     }
-  }
-
-  > .buy {
   }
 
   > p {

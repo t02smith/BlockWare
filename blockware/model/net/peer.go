@@ -1,6 +1,7 @@
 package net
 
 import (
+	"os"
 	"sync"
 
 	"github.com/t02smith/part-iii-project/toolkit/model/games"
@@ -70,7 +71,10 @@ func StartPeer(serverHostname string, serverPort uint, installFolder, gameDataLo
 
 		lib := games.NewLibrary()
 		for _, g := range gameLs {
-			lib.AddOwnedGame(g)
+			err = lib.AddOwnedGame(g)
+			if err != nil && !os.IsNotExist(err) {
+				util.Logger.Error(err)
+			}
 		}
 
 		lib.OutputGamesTable()
@@ -147,6 +151,8 @@ func (p *peer) GetLibrary() *games.Library {
 
 // shutdown the peer
 func (p *peer) Close() {
+	util.Logger.Info("Closing down peer")
+	p.library.Close()
 	p.server.Close()
 	for _, c := range p.clients {
 		c.Close()

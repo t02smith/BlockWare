@@ -13,13 +13,34 @@
     </ul>
 
     <!-- game details -->
-    <GameEntry :game="selected" v-if="selected" />
+    <GameEntry :game="selected" v-if="selected">
+      <button
+        @click="() => games.createDownload(selected.rootHash)"
+        v-if="selectedIsDownloading === 0"
+        class="download new"
+      >
+        <h3>💡 Download now</h3>
+      </button>
+
+      <div v-else-if="selectedIsDownloading === 1" class="download finished">
+        <h3>✅ Downloaded</h3>
+      </div>
+
+      <router-link
+        :to="`/downloads`"
+        v-else-if="selectedIsDownloading === 2"
+        class="download downloading"
+      >
+        <h3>⌛ Downloading...</h3>
+      </router-link>
+    </GameEntry>
   </div>
 </template>
 <script setup>
 import { ref, watch, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import GameEntry from "../components/store/GameEntry.vue";
+import { IsDownloading } from "../../wailsjs/go/main/App";
 import { useGamesStore } from "../stores/games";
 import { toHexString } from "../util/util";
 
@@ -30,18 +51,28 @@ const props = defineProps({
   },
 });
 
+// setup
 const games = useGamesStore();
 const router = useRouter();
 const route = useRoute();
 
+// The game currently being viewed
 const selected = ref(null);
-watch(selected, () => {
+const selectedIsDownloading = ref(0);
+
+watch(selected, async () => {
   if (!selected.value) return;
 
+  // update route
   router.replace({
     path: route.path,
     query: { game: toHexString(selected.value.rootHash) },
   });
+
+  // check download status
+  selectedIsDownloading.value = await IsDownloading(
+    toHexString(selected.rootHash)
+  );
 });
 
 onMounted(() => {
@@ -103,6 +134,33 @@ onMounted(() => {
         background-color: rgba(0, 132, 255, 0.24);
       }
     }
+  }
+}
+
+.download {
+  padding: 0.5rem 1rem;
+  font-weight: bold;
+  color: white;
+  border-radius: 5px;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  cursor: pointer;
+  transform-origin: 150ms;
+
+  &:hover {
+    scale: 1.02;
+  }
+
+  &:active {
+    scale: 0.99;
+  }
+
+  &.new,
+  &.downloading {
+    background-color: rgb(1, 129, 189);
+  }
+
+  &.finished {
+    background-color: green;
   }
 }
 </style>

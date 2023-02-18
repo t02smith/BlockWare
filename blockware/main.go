@@ -31,6 +31,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("Error starting peer %s", err)
 	}
+	defer net.GetPeerInstance().Close()
 
 	_, _, err = ethereum.StartClient(viper.GetString("eth.address"))
 	if err != nil {

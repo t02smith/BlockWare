@@ -2,7 +2,6 @@ package net
 
 import (
 	"bytes"
-	"crypto/sha256"
 	"encoding/hex"
 	"errors"
 	"fmt"
@@ -108,6 +107,7 @@ func onMessage(cmd []string, client PeerIT) {
 			util.Logger.Errorf("Error loading game data %s", err)
 			return
 		}
+		_, file, _, _ := gameTree.FindShard(sh)
 
 		download := game.GetDownload()
 		if download == nil {
@@ -115,38 +115,28 @@ func onMessage(cmd []string, client PeerIT) {
 			return
 		}
 
-		_, file, _, _ := gameTree.FindShard(sh)
-		_, ok := download.Progress[file.RootHash].BlocksRemaining[sh]
-
-		if !ok {
-			util.Logger.Warnf("Block %x not needed for download", sh)
-			return
-		}
-
-		// * insert the shard
 		data, err := hex.DecodeString(cmd[3])
 		if err != nil {
 			util.Logger.Error(err)
 			return
 		}
 
-		// * verify shard
-		dataHash := sha256.Sum256(data)
-		if !bytes.Equal(dataHash[:], sh[:]) {
-			util.Logger.Errorf("Data given does not match expected hash\ngot %x\nexpected %x", dataHash, sh)
+		err = download.InsertData(file.RootHash, sh, data)
+		if err != nil {
+			util.Logger.Error(err)
 			return
 		}
 
-		err = game.InsertShard(sh, data)
-		if err != nil {
-			util.Logger.Errorf("error inserting shard %x: %s", sh, err)
+		// send message as confirmation
+		p.library.DownloadProgress <- &struct {
+			GameHash  [32]byte
+			BlockHash [32]byte
+		}{
+			GameHash:  gh,
+			BlockHash: sh,
 		}
 
-		delete(download.Progress[file.RootHash].BlocksRemaining, sh)
-		err = download.Serialise(fmt.Sprintf("%x", game.RootHash))
-		if err != nil {
-			util.Logger.Errorf("Error serialising download %s", err)
-		}
+		util.Logger.Infof("Successfully inserted shard %x", sh)
 		return
 
 	// ERROR <msg> => used to send an error message following a command
@@ -233,6 +223,7 @@ func fetchBlock(gameHash, shardHash [32]byte) ([]byte, error) {
 	return b, nil
 }
 
+// turn a hex string (from a hash) into a 32 byte array
 func stringTo32ByteArr(hexString string) ([32]byte, error) {
 	var arr [32]byte
 	data, err := hex.DecodeString(hexString)

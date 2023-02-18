@@ -23,11 +23,17 @@ both of them.
 // stores user's game information on owned and downloading games
 type Library struct {
 
-	// a user's owned games
+	// a user's owned games (includes downloads)
 	ownedGames map[[32]byte]*Game
 
 	// games present on the blockchain
 	blockchainGames map[[32]byte]*Game
+
+	// used to send messages about download progress
+	DownloadProgress chan *struct {
+		GameHash  [32]byte
+		BlockHash [32]byte
+	}
 }
 
 // create a new library
@@ -35,6 +41,10 @@ func NewLibrary() *Library {
 	return &Library{
 		ownedGames:      make(map[[32]byte]*Game),
 		blockchainGames: make(map[[32]byte]*Game),
+		DownloadProgress: make(chan *struct {
+			GameHash  [32]byte
+			BlockHash [32]byte
+		}),
 	}
 }
 
@@ -76,8 +86,17 @@ func (l *Library) GetOwnedGames() []*Game {
 //
 
 // add a game to the library
-func (l *Library) AddOwnedGame(g *Game) {
+func (l *Library) AddOwnedGame(g *Game) error {
 	l.ownedGames[g.RootHash] = g
+
+	// fetch download if it exists
+	d, err := DeserializeDownload(g.RootHash)
+	if err != nil {
+		return err
+	}
+
+	g.download = d
+	return nil
 }
 
 // output a table representation of the games list to the console
@@ -126,4 +145,33 @@ func (l *Library) GetBlockchainGames() []*Game {
 		gs = append(gs, g)
 	}
 	return gs
+}
+
+// get the games being downloaded
+func (l *Library) GetDownloads() map[[32]byte]*Download {
+	ds := make(map[[32]byte]*Download)
+
+	for hash, g := range l.ownedGames {
+		if g.download != nil {
+			ds[hash] = g.download
+		}
+	}
+
+	return ds
+}
+
+func (l *Library) Close() {
+	close(l.DownloadProgress)
+
+	// serialise downloads
+	for _, g := range l.ownedGames {
+		if g.download == nil {
+			continue
+		}
+
+		err := g.download.Serialise(fmt.Sprintf("%x", g.RootHash))
+		if err != nil {
+			util.Logger.Error(err)
+		}
+	}
 }

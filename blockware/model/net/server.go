@@ -107,7 +107,7 @@ func (c *TCPServerClient) listen(onMessage func([]string, PeerIT)) {
 			continue
 		}
 
-		util.Logger.Infof("message received %s\n", msg)
+		util.Logger.Infof("message received %s", msg)
 		onMessage(strings.Split(msg[:len(msg)-1], ";"), c)
 	}
 }
@@ -129,7 +129,7 @@ func (c *TCPServerClient) Send(command []byte) error {
 }
 
 func (c *TCPServerClient) SendString(command string) error {
-	util.Logger.Infof("Sending %s\n", command)
+	util.Logger.Infof("Sending %s", command)
 	_, err := c.writer.WriteString(command)
 	if err != nil {
 		util.Logger.Errorf("Error sending message %s", err)

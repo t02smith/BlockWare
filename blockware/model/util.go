@@ -22,23 +22,8 @@ func SetupToolkitEnvironment() error {
 	}
 
 	// look for hash directory
-	hashDir := viper.GetString("meta.hashes.directory")
-	if len(toolkitDir) == 0 {
-		hashDir = filepath.Join(toolkitDir, "hashes")
-	}
-
+	hashDir := filepath.Join(toolkitDir, "hashes")
 	err = CreateDirectoryIfNotExist(hashDir)
-	if err != nil {
-		return err
-	}
-
-	// tracker dir
-	trackerDir := viper.GetString("games.tracker.directory")
-	if len(trackerDir) == 0 {
-		trackerDir = filepath.Join(toolkitDir, "tracker")
-	}
-
-	err = CreateDirectoryIfNotExist(trackerDir)
 	if err != nil {
 		return err
 	}

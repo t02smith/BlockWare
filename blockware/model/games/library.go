@@ -4,10 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"path/filepath"
 
 	"github.com/jedib0t/go-pretty/v6/table"
-	"github.com/spf13/viper"
 	"github.com/t02smith/part-iii-project/toolkit/util"
 )
 
@@ -38,6 +36,7 @@ type Library struct {
 
 // create a new library
 func NewLibrary() *Library {
+	util.Logger.Info("Creating new library")
 	return &Library{
 		ownedGames:      make(map[[32]byte]*Game),
 		blockchainGames: make(map[[32]byte]*Game),
@@ -60,7 +59,6 @@ func (l *Library) CreateDownload(g *Game) error {
 		return err
 	}
 
-	g.download.Serialise(filepath.Join(viper.GetString("games.installFolder"), fmt.Sprintf("%x", g.RootHash)))
 	util.Logger.Infof("Download created for %s:%x", g.Title, g.RootHash)
 	return nil
 }
@@ -88,14 +86,6 @@ func (l *Library) GetOwnedGames() []*Game {
 // add a game to the library
 func (l *Library) AddOwnedGame(g *Game) error {
 	l.ownedGames[g.RootHash] = g
-
-	// fetch download if it exists
-	d, err := DeserializeDownload(g.RootHash)
-	if err != nil {
-		return err
-	}
-
-	g.download = d
 	return nil
 }
 
@@ -152,8 +142,8 @@ func (l *Library) GetDownloads() map[[32]byte]*Download {
 	ds := make(map[[32]byte]*Download)
 
 	for hash, g := range l.ownedGames {
-		if g.download != nil {
-			ds[hash] = g.download
+		if g.Download != nil {
+			ds[hash] = g.Download
 		}
 	}
 
@@ -163,15 +153,7 @@ func (l *Library) GetDownloads() map[[32]byte]*Download {
 func (l *Library) Close() {
 	close(l.DownloadProgress)
 
-	// serialise downloads
-	for _, g := range l.ownedGames {
-		if g.download == nil {
-			continue
-		}
-
-		err := g.download.Serialise(fmt.Sprintf("%x", g.RootHash))
-		if err != nil {
-			util.Logger.Error(err)
-		}
+	for _, g := range l.GetOwnedGames() {
+		OutputToFile(g)
 	}
 }

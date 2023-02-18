@@ -8,7 +8,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/spf13/viper"
 	"github.com/t02smith/part-iii-project/toolkit/model/games"
 	"github.com/t02smith/part-iii-project/toolkit/test/testutil"
 	"github.com/t02smith/part-iii-project/toolkit/util"
@@ -18,9 +17,6 @@ func beforeAll() {
 	util.InitLogger()
 	testutil.SetupTestConfig()
 	testutil.SetupTmp("../../")
-
-	viper.Set("eth.keystore.directory", "../../test/data/tmp")
-	viper.Set("eth.keystore.password", "test")
 
 	err := setupTestGame()
 	if err != nil {

@@ -1,13 +1,11 @@
 package net
 
 import (
-	"errors"
 	"log"
 	"os"
 	"time"
 
 	"github.com/spf13/viper"
-	"github.com/t02smith/part-iii-project/toolkit/model/games"
 	"github.com/t02smith/part-iii-project/toolkit/test/testutil"
 	"github.com/t02smith/part-iii-project/toolkit/util"
 )
@@ -39,9 +37,7 @@ func beforeAll() {
 
 	// config
 	viper.Set("meta.directory", "../../test/data/.toolkit")
-	viper.Set("meta.hashes.directory", "../../test/data/.toolkit/hashes")
 	viper.Set("games.installFolder", "../../test/data/tmp")
-	viper.Set("games.tracker.directory", "../../test/data/tmp/tracker")
 
 	testutil.SetupTmp("../../")
 }
@@ -53,25 +49,4 @@ func beforeEach() {
 func afterAll() {
 	mockPeer.Close()
 	testPeer.Close()
-}
-
-//
-
-func fetchTestGame() (*games.Game, error) {
-	games, err := games.LoadGames("../../test/data/.toolkit")
-	if err != nil {
-		return nil, err
-	}
-
-	if len(games) == 0 {
-		return nil, errors.New("no games present in the test folder")
-	}
-
-	g := games[0]
-	err = g.ReadHashData()
-	if err != nil {
-		return nil, err
-	}
-
-	return g, nil
 }

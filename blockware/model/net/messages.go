@@ -107,7 +107,10 @@ func onMessage(cmd []string, client PeerIT) {
 			util.Logger.Errorf("Error loading game data %s", err)
 			return
 		}
-		_, file, _, _ := gameTree.FindShard(sh)
+		found, file, _, _ := gameTree.FindShard(sh)
+		if !found {
+			util.Logger.Errorf("Shard %x not found", sh)
+		}
 
 		download := game.GetDownload()
 		if download == nil {
@@ -128,13 +131,13 @@ func onMessage(cmd []string, client PeerIT) {
 		}
 
 		// send message as confirmation
-		p.library.DownloadProgress <- &struct {
-			GameHash  [32]byte
-			BlockHash [32]byte
-		}{
-			GameHash:  gh,
-			BlockHash: sh,
-		}
+		// p.library.DownloadProgress <- &struct {
+		// 	GameHash  [32]byte
+		// 	BlockHash [32]byte
+		// }{
+		// 	GameHash:  gh,
+		// 	BlockHash: sh,
+		// }
 
 		util.Logger.Infof("Successfully inserted shard %x", sh)
 		return

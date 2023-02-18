@@ -67,7 +67,7 @@ func StartPeer(serverHostname string, serverPort uint, installFolder, gameDataLo
 			return
 		}
 
-		util.Logger.Infof("Found %d games\n", len(gameLs))
+		util.Logger.Infof("Found %d games", len(gameLs))
 
 		lib := games.NewLibrary()
 		for _, g := range gameLs {

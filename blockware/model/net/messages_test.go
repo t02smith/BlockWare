@@ -116,12 +116,7 @@ func TestOnMessage(t *testing.T) {
 	})
 
 	// SETUP TEST GAME
-	l := games.NewLibrary()
-	g, err := fetchTestGame()
-	if err != nil {
-		t.Fatalf("Error generating test download %s", err)
-	}
-	l.AddOwnedGame(g)
+	g := GetPeerInstance().GetLibrary().GetOwnedGame([32]byte{15, 158, 115, 2, 196, 26, 32, 86, 37, 148, 142, 89, 228, 208, 228, 199, 218, 164, 63, 61, 130, 248, 52, 193, 143, 10, 154, 1, 176, 67, 9, 239})
 
 	t.Run("BLOCK", func(t *testing.T) {
 
@@ -166,7 +161,7 @@ func TestOnMessage(t *testing.T) {
 
 		t.Run("success", func(t *testing.T) {
 
-			err := l.CreateDownload(g)
+			err := GetPeerInstance().GetLibrary().CreateDownload(g)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -235,15 +230,10 @@ func TestFetchBlock(t *testing.T) {
 	})
 
 	p := GetPeerInstance()
-	g, err := fetchTestGame()
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	p.library.AddOwnedGame(g)
+	g := p.GetLibrary().GetOwnedGame([32]byte{15, 158, 115, 2, 196, 26, 32, 86, 37, 148, 142, 89, 228, 208, 228, 199, 218, 164, 63, 61, 130, 248, 52, 193, 143, 10, 154, 1, 176, 67, 9, 239})
 
 	t.Run("game exists but block does not", func(t *testing.T) {
-		_, err = fetchBlock(g.RootHash, [32]byte{})
+		_, err := fetchBlock(g.RootHash, [32]byte{})
 		if err == nil {
 			t.Error("Block should not have been identified")
 		}
@@ -287,7 +277,7 @@ func sendBlock(filename string, g *games.Game, gameData *hash.HashTree, hash [32
 	)
 
 	mockPeerClient.SendStringf("BLOCK;%x;%x\n", g.RootHash, hash)
-	time.Sleep(5 * time.Millisecond)
+	time.Sleep(25 * time.Millisecond)
 
 	// ? was the shard inserted
 	f, err := os.Open(filename)

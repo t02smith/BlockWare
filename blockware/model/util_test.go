@@ -17,7 +17,6 @@ func TestMain(m *testing.M) {
 func utilTestSetup() {
 	testutil.ClearTmp("../")
 	viper.Set("meta.directory", "../test/data/tmp/.toolkit")
-	viper.Set("meta.hashes.directory", "../test/data/tmp/.toolkit/hashes")
 
 }
 
@@ -68,12 +67,6 @@ func TestSetupToolkitEnvironment(t *testing.T) {
 	}
 
 	_, err = os.Stat("../test/data/tmp/.toolkit/hashes")
-	if err != nil {
-		t.Error(err)
-		return
-	}
-
-	_, err = os.Stat("../test/data/tmp/.toolkit/tracker")
 	if err != nil {
 		t.Error(err)
 		return

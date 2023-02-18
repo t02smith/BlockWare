@@ -43,7 +43,7 @@ type Game struct {
 	// the shard data
 	data *hashIO.HashTree
 
-	download *Download
+	Download *Download
 }
 
 // Creator
@@ -118,7 +118,7 @@ func CreateGame(title, version, releaseDate, developer, rootDir string, price *b
 // IO
 
 func (g *Game) ReadHashData() error {
-	dir := viper.GetString("meta.hashes.directory")
+	dir := filepath.Join(viper.GetString("meta.directory"), "hashes")
 	if len(dir) == 0 {
 		return errors.New(".toolkit directory not specified")
 	}
@@ -154,7 +154,7 @@ func OutputToFile(g *Game) error {
 	writer.Flush()
 
 	// output game data
-	err = g.data.OutputToFile(filepath.Join(viper.GetString("meta.hashes.directory"), fmt.Sprintf("%s-%s-%s.hash.json", g.Title, g.Version, g.Developer)))
+	err = g.data.OutputToFile(filepath.Join(viper.GetString("meta.directory"), "hashes", fmt.Sprintf("%s-%s-%s.hash.json", g.Title, g.Version, g.Developer)))
 	if err != nil {
 		return err
 	}
@@ -316,5 +316,5 @@ func (g *Game) GetData() (*hashIO.HashTree, error) {
 
 // Get a games download
 func (g *Game) GetDownload() *Download {
-	return g.download
+	return g.Download
 }

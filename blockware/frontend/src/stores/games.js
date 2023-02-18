@@ -6,6 +6,7 @@ import {
   GetDownloads,
   CreateDownload,
 } from "../../wailsjs/go/main/App.js";
+import { toHexString } from "../util/util";
 
 export const useGamesStore = defineStore("games", () => {
   // what games do they own
@@ -48,5 +49,6 @@ export const useGamesStore = defineStore("games", () => {
     createDownload,
     refreshDownloads,
     refreshOwnedGames,
+    getGameByHash,
   };
 });

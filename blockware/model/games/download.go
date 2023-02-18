@@ -1,15 +1,10 @@
 package games
 
 import (
-	"bufio"
 	"bytes"
 	"crypto/sha256"
-	"encoding/gob"
 	"errors"
 	"fmt"
-	"io"
-	"os"
-	"path/filepath"
 
 	"github.com/spf13/viper"
 	"github.com/t02smith/part-iii-project/toolkit/model/hash"
@@ -32,60 +27,6 @@ type FileProgress struct {
 
 	// block hash => position in file
 	BlocksRemaining map[[32]byte]uint
-}
-
-// serialisation
-
-// file -> download object
-func DeserializeDownload(gameHash [32]byte) (*Download, error) {
-	util.Logger.Infof("Deserialized download %x", gameHash)
-	dir := viper.GetString("games.tracker.directory")
-	if len(dir) == 0 {
-		return nil, errors.New("tracker directory not found")
-	}
-
-	f, err := os.Open(filepath.Join(dir, fmt.Sprintf("%x", gameHash)))
-	if err != nil {
-		return nil, err
-	}
-	defer f.Close()
-
-	decoder := gob.NewDecoder(bufio.NewReader(f))
-	d := &Download{}
-
-	err = decoder.Decode(d)
-	if err != nil && err != io.EOF {
-		return nil, err
-	}
-
-	return d, nil
-}
-
-// download obj -> file
-func (d *Download) Serialise(filename string) error {
-	util.Logger.Infof("Serialising download %s", filename)
-	dir := viper.GetString("games.tracker.directory")
-	if len(dir) == 0 {
-		return errors.New("tracker directory not found")
-	}
-
-	f, err := os.Create(filepath.Join(dir, filename))
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-
-	writer := bufio.NewWriter(f)
-	encoder := gob.NewEncoder(writer)
-	err = encoder.Encode(d)
-	if err != nil {
-		return err
-	}
-
-	writer.Flush()
-
-	util.Logger.Infof("%s serialised successfully", filename)
-	return nil
 }
 
 // ? setup
@@ -132,14 +73,7 @@ func (game *Game) setupDownload() error {
 	}
 
 	d.TotalBlocks = len(d.Progress)
-
-	err = d.Serialise(fmt.Sprintf("%x", game.RootHash))
-	if err != nil {
-		util.Logger.Errorf("Error saving download to file: %s", err)
-		return err
-	}
-
-	game.download = d
+	game.Download = d
 	return nil
 }
 

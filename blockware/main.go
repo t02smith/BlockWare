@@ -93,7 +93,6 @@ func defaultConfig() {
 	viper.SetDefault("meta.threadPoolSize", 10)
 
 	// where hashes are stored inside the toolkit folder
-	viper.SetDefault("meta.hashes.directory", "./test/data/.toolkit/hashes")
 
 	// default shard size when hashing
 	viper.SetDefault("meta.hashes.shardSize", 16384)
@@ -103,15 +102,12 @@ func defaultConfig() {
 
 	// game info
 	viper.SetDefault("games.installFolder", "./test/data/tmp")
-	viper.SetDefault("games.tracker.directory", "./test/data/.toolkit/tracker")
 
 	// user info
 	viper.SetDefault("user.info.domain", "t02smith.com")
 	viper.SetDefault("user.info.name", "tom")
 
 	// eth
-	viper.SetDefault("eth.keystore.directory", "./test/data/.toolkit")
-	viper.SetDefault("eth.keystore.password", "password")
 	viper.SetDefault("eth.address", "ws://localhost:8545")
 }
 

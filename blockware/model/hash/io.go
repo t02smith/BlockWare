@@ -89,7 +89,7 @@ func (t *HashTree) readShard(filename string, offset int) ([]byte, error) {
 func (t *HashTree) CreateDummyFiles(rootDir, title string, onCreate func(string, *HashTreeFile)) error {
 
 	err := os.Mkdir(filepath.Join(rootDir, title), 0777)
-	if err != nil {
+	if err != nil && !os.IsExist(err) {
 		return err
 	}
 

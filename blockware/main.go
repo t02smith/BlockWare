@@ -39,6 +39,7 @@ func main() {
 	}
 	defer ethereum.CloseEthClient()
 
+	util.Logger.Info("Starting GUI")
 	app := NewApp()
 
 	// Create application with options
@@ -49,15 +50,17 @@ func main() {
 		AssetServer: &assetserver.Options{
 			Assets: assets,
 		},
-		OnStartup: app.startup,
+		BackgroundColour: &options.RGBA{R: 27, G: 38, B: 54, A: 1},
+		OnStartup:        app.startup,
 		Bind: []interface{}{
 			app,
 		},
 	})
 
 	if err != nil {
-		println("Error:", err.Error())
+		util.Logger.Error("Error:", err.Error())
 	}
+
 }
 
 // VIPER CONFIG
@@ -71,13 +74,16 @@ func SetupConfig() {
 	viper.AddConfigPath(".")
 
 	defaultConfig()
+	err := viper.ReadInConfig()
+	if err != nil {
+		util.Logger.Warnf("Error reading config file %s", err)
+	}
 
-	err := viper.SafeWriteConfig()
+	err = viper.SafeWriteConfig()
 	if err != nil {
 		util.Logger.Warnf("Error creating config file %s", err)
 	}
 
-	viper.ReadInConfig()
 }
 
 func defaultConfig() {

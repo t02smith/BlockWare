@@ -21,7 +21,7 @@
         :title="g.title"
         :version="g.version"
         :dev="g.dev"
-        :hash="toHexString(g.rootHash)"
+        :hash="g.rootHash"
       />
     </div>
   </div>
@@ -30,7 +30,6 @@
 import Game from "./Game.vue";
 import AddGames from "./AddGames.vue";
 import { useGamesStore } from "../../stores/games";
-import { toHexString } from "../../util/util";
 
 const games = useGamesStore();
 </script>

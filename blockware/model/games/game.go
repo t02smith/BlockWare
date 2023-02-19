@@ -1,13 +1,11 @@
 package games
 
 import (
-	"bufio"
 	"bytes"
 	"compress/gzip"
 	"crypto/sha256"
 	"encoding/base64"
 	"encoding/gob"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -123,7 +121,7 @@ func (g *Game) ReadHashData() error {
 		return errors.New(".toolkit directory not specified")
 	}
 
-	hashFileName := fmt.Sprintf("%s-%s-%s.hash.json", g.Title, g.Version, g.Developer)
+	hashFileName := fmt.Sprintf("%x.hash", g.RootHash)
 	data, err := hashIO.ReadHashTreeFromFile(filepath.Join(dir, hashFileName))
 	if err != nil {
 		return err
@@ -133,33 +131,43 @@ func (g *Game) ReadHashData() error {
 	return nil
 }
 
-func OutputToFile(g *Game) error {
-	gameFilename := filepath.Join(viper.GetString("meta.directory"), fmt.Sprintf("%s-%s-%s.json", g.Title, g.Version, g.Developer))
-	util.Logger.Infof("Outputting game data to %s", gameFilename)
-
-	// output game metadata
-	e, err := json.Marshal(g)
+// output data to file
+func OutputAllGameDataToFile(g *Game) error {
+	gameFilename := filepath.Join(viper.GetString("meta.directory"), "games", fmt.Sprintf("%x", g.RootHash))
+	err := g.OutputToFile(gameFilename)
 	if err != nil {
 		return err
 	}
-
-	file, err := os.Create(gameFilename)
-	if err != nil {
-		return err
-	}
-	defer file.Close()
-
-	writer := bufio.NewWriter(file)
-	writer.WriteString(string(e))
-	writer.Flush()
 
 	// output game data
-	err = g.data.OutputToFile(filepath.Join(viper.GetString("meta.directory"), "hashes", fmt.Sprintf("%s-%s-%s.hash.json", g.Title, g.Version, g.Developer)))
+	err = g.data.OutputToFile(filepath.Join(viper.GetString("meta.directory"), "hashes", fmt.Sprintf("%x.hash", g.RootHash)))
 	if err != nil {
 		return err
 	}
 
 	util.Logger.Infof("Outputted game data to %s", gameFilename)
+	return nil
+}
+
+func (g *Game) OutputToFile(filename string) error {
+	util.Logger.Infof("Outputting game data to %s", filename)
+
+	f, err := os.Create(filename)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	writer := gzip.NewWriter(f)
+	encoder := gob.NewEncoder(writer)
+	err = encoder.Encode(g)
+	if err != nil {
+		return err
+	}
+
+	writer.Flush()
+	util.Logger.Infof("Successfully outputted game data to %s", filename)
+
 	return nil
 }
 
@@ -189,9 +197,7 @@ func LoadGames(gameDataLocation string) ([]*Game, error) {
 
 	for _, game := range gameList {
 		f, err := os.Stat(filepath.Join(gameDataLocation, game))
-
-		// we only care about json files
-		if err != nil || f.IsDir() || !strings.HasSuffix(game, ".json") {
+		if err != nil || f.IsDir() {
 			continue
 		}
 
@@ -200,16 +206,22 @@ func LoadGames(gameDataLocation string) ([]*Game, error) {
 			continue
 		}
 
-		data, err := io.ReadAll(gameFile)
+		reader, err := gzip.NewReader(gameFile)
 		if err != nil {
+			gameFile.Close()
 			continue
 		}
 
+		decoder := gob.NewDecoder(reader)
+
 		var gm Game
-		err = json.Unmarshal(data, &gm)
-		if err == nil {
-			games = append(games, &gm)
+		err = decoder.Decode(&gm)
+		if err != nil {
+			gameFile.Close()
+			continue
 		}
+
+		games = append(games, &gm)
 	}
 
 	return games, nil

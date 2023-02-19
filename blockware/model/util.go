@@ -16,7 +16,15 @@ func SetupToolkitEnvironment() error {
 		toolkitDir = ".toolkit"
 	}
 
+	// toolkit root directory
 	err := CreateDirectoryIfNotExist(toolkitDir)
+	if err != nil {
+		return err
+	}
+
+	// look for games directory
+	gamesDir := filepath.Join(toolkitDir, "games")
+	err = CreateDirectoryIfNotExist(gamesDir)
 	if err != nil {
 		return err
 	}

@@ -13,17 +13,22 @@ import (
 	"github.com/t02smith/part-iii-project/toolkit/util"
 )
 
+/**
+
+Hash data for each game will be uploaded to IPFS so
+that it can be easily accessed by anyone, anywhere.
+
+*/
+
+// Upload game data to IPFS
 func (g *Game) UploadDataToIPFS() error {
 	sh := shell.NewShell("localhost:5001")
-
-	if g.data == nil {
-		err := g.ReadHashData()
-		if err != nil {
-			return err
-		}
+	data, err := g.GetData()
+	if err != nil {
+		return err
 	}
 
-	json, err := json.Marshal(g.data)
+	json, err := json.Marshal(data)
 	if err != nil {
 		return err
 	}

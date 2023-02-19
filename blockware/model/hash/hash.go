@@ -3,11 +3,11 @@ package hash
 import (
 	"bufio"
 	"bytes"
+	"compress/gzip"
 	"crypto/sha256"
-	"encoding/json"
+	"encoding/gob"
 	"errors"
 	"io"
-	"log"
 	"os"
 	"path/filepath"
 	"time"
@@ -94,12 +94,7 @@ func (ht1 *HashTree) Equals(ht2 *HashTree) bool {
 
 // output a hash tree to a json file
 func (ht *HashTree) OutputToFile(filename string) error {
-	util.Logger.Infof("outputting to file %s\n", filename)
-	e, err := json.Marshal(ht)
-	if err != nil {
-		log.Println(err)
-		return err
-	}
+	util.Logger.Infof("Outputting hash tree to file %s\n", filename)
 
 	file, err := os.Create(filename)
 	if err != nil {
@@ -107,9 +102,16 @@ func (ht *HashTree) OutputToFile(filename string) error {
 	}
 	defer file.Close()
 
-	writer := bufio.NewWriter(file)
-	writer.WriteString(string(e))
+	writer := gzip.NewWriter(file)
+	encoder := gob.NewEncoder(writer)
+	err = encoder.Encode(ht)
+	if err != nil {
+		return err
+	}
+
 	writer.Flush()
+	util.Logger.Infof("Successfully outputted hash tree to file %s\n", filename)
+
 	return nil
 }
 
@@ -122,16 +124,18 @@ func ReadHashTreeFromFile(filename string) (*HashTree, error) {
 	}
 	defer file.Close()
 
-	data, err := io.ReadAll(file)
-	if err != nil {
-		return nil, err
-	}
-
 	ht := &HashTree{
 		RootDirLocation: filename,
 	}
 
-	if err := json.Unmarshal(data, &ht); err != nil {
+	reader, err := gzip.NewReader(file)
+	if err != nil {
+		return nil, err
+	}
+	decoder := gob.NewDecoder(reader)
+
+	err = decoder.Decode(&ht)
+	if err != nil {
 		return nil, err
 	}
 

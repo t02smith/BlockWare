@@ -2,6 +2,7 @@ package net
 
 import (
 	"os"
+	"path/filepath"
 	"sync"
 
 	"github.com/t02smith/part-iii-project/toolkit/model/games"
@@ -59,10 +60,10 @@ func GetPeerInstance() *peer {
 }
 
 // start a new instance of a peer
-func StartPeer(serverHostname string, serverPort uint, installFolder, gameDataLocation string) (*peer, error) {
+func StartPeer(serverHostname string, serverPort uint, installFolder, toolkitFolder string) (*peer, error) {
 	util.Logger.Info("Starting peer")
 	once.Do(func() {
-		gameLs, err := games.LoadGames(gameDataLocation)
+		gameLs, err := games.LoadGames(filepath.Join(toolkitFolder, "games"))
 		if err != nil {
 			return
 		}

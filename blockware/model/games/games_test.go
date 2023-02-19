@@ -34,12 +34,6 @@ func TestMain(m *testing.M) {
 
 // create a test game and store it in long term storage
 func setupTestGame() error {
-
-	_, err := os.Stat("../../test/data/.toolkit/toolkit-1.0.4-google.com.json")
-	if err == nil {
-		return nil
-	}
-
 	datetime := time.Date(2002, 1, 10, 0, 0, 0, 0, time.UTC).String()
 	game, err := CreateGame("toolkit", "1.0.4", datetime, "google.com", "../../test/data/testdir", big.NewInt(0), 256, nil)
 
@@ -49,7 +43,7 @@ func setupTestGame() error {
 	}
 
 	// write game to file
-	err = OutputToFile(game)
+	err = OutputAllGameDataToFile(game)
 	if err != nil {
 		log.Printf("Error writing game to file: %s\n", err)
 		return err
@@ -59,7 +53,7 @@ func setupTestGame() error {
 }
 
 func fetchTestGame() (*Game, error) {
-	games, err := LoadGames("../../test/data/.toolkit")
+	games, err := LoadGames("../../test/data/.toolkit/games")
 	if err != nil {
 		return nil, err
 	}

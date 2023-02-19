@@ -42,7 +42,6 @@ import { useRoute, useRouter } from "vue-router";
 import GameEntry from "../components/store/GameEntry.vue";
 import { IsDownloading } from "../../wailsjs/go/main/App";
 import { useGamesStore } from "../stores/games";
-import { toHexString } from "../util/util";
 
 const props = defineProps({
   store: {
@@ -66,13 +65,11 @@ watch(selected, async () => {
   // update route
   router.replace({
     path: route.path,
-    query: { game: toHexString(selected.value.rootHash) },
+    query: { game: selected.value.rootHash },
   });
 
   // check download status
-  selectedIsDownloading.value = await IsDownloading(
-    toHexString(selected.rootHash)
-  );
+  selectedIsDownloading.value = await IsDownloading(selected.value.rootHash);
 });
 
 onMounted(() => {
@@ -84,9 +81,7 @@ onMounted(() => {
     return;
   }
 
-  selected.value = games.ownedGames.find(
-    (g) => gameHash === toHexString(g.rootHash)
-  );
+  selected.value = games.ownedGames.find((g) => gameHash === g.rootHash);
 });
 </script>
 <style scoped lang="scss">
@@ -145,6 +140,7 @@ onMounted(() => {
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
   cursor: pointer;
   transform-origin: 150ms;
+  text-decoration: none;
 
   &:hover {
     scale: 1.02;
@@ -154,9 +150,12 @@ onMounted(() => {
     scale: 0.99;
   }
 
-  &.new,
-  &.downloading {
+  &.new {
     background-color: rgb(1, 129, 189);
+  }
+
+  &.downloading {
+    background-color: orangered;
   }
 
   &.finished {

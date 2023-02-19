@@ -4,8 +4,10 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/jedib0t/go-pretty/v6/table"
+	"github.com/spf13/viper"
 	"github.com/t02smith/part-iii-project/toolkit/util"
 )
 
@@ -28,6 +30,8 @@ type Library struct {
 	blockchainGames map[[32]byte]*Game
 
 	// used to send messages about download progress
+	// when a block is downloaded a message containinf its hash and
+	// the hash of the game it's in will be sent down this channel
 	DownloadProgress chan *struct {
 		GameHash  [32]byte
 		BlockHash [32]byte
@@ -104,6 +108,7 @@ func (l *Library) OutputGamesTable() {
 	t.Render()
 }
 
+// find a given block within a game in a player's library
 func (l *Library) FindBlock(gameHash [32]byte, hash [32]byte) (bool, []byte, error) {
 	g, ok := l.ownedGames[gameHash]
 	if !ok {
@@ -150,10 +155,15 @@ func (l *Library) GetDownloads() map[[32]byte]*Download {
 	return ds
 }
 
+// close down a current library instance
 func (l *Library) Close() {
 	close(l.DownloadProgress)
 
-	for _, g := range l.GetOwnedGames() {
-		OutputToFile(g)
+	metaDir := viper.GetString("meta.directory")
+	for _, g := range l.ownedGames {
+		err := g.OutputToFile(filepath.Join(metaDir, "games", fmt.Sprintf("%x", g.RootHash)))
+		if err != nil {
+			util.Logger.Warnf("Error outputting game %x to file: %s", g.RootHash, err)
+		}
 	}
 }

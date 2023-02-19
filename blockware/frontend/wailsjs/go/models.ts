@@ -1,19 +1,21 @@
-export namespace games {
+export namespace main {
 	
-	export class Game {
+	export class AppGame {
 	    title: string;
 	    version: string;
 	    release: string;
 	    dev: string;
-	    rootHash: number[];
-	    previousVersion: number[];
+	    rootHash: string;
+	    previousVersion: string;
 	    IPFSId: string;
 	    // Go type: big.Int
 	    price?: any;
 	    uploader: number[];
+	    // Go type: AppDownload
+	    download?: any;
 	
 	    static createFrom(source: any = {}) {
-	        return new Game(source);
+	        return new AppGame(source);
 	    }
 	
 	    constructor(source: any = {}) {
@@ -27,6 +29,7 @@ export namespace games {
 	        this.IPFSId = source["IPFSId"];
 	        this.price = this.convertValues(source["price"], null);
 	        this.uploader = source["uploader"];
+	        this.download = this.convertValues(source["download"], null);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {

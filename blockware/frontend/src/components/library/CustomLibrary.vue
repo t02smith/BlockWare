@@ -17,7 +17,7 @@
         :title="g.title"
         :version="g.version"
         :dev="g.dev"
-        :hash="toHexString(g.rootHash)"
+        :hash="g.rootHash"
       />
       <div v-else class="no-games">
         <h3>Ooops no games here...</h3>
@@ -27,7 +27,6 @@
 </template>
 <script setup>
 import Game from "./Game.vue";
-import { toHexString } from "../../util/util";
 
 const props = defineProps({
   games: {

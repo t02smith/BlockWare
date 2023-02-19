@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"path/filepath"
 
 	"github.com/spf13/viper"
 	"github.com/t02smith/part-iii-project/toolkit/model/games"
@@ -21,7 +22,7 @@ func onMessage(cmd []string, client PeerIT) {
 	case "LIBRARY":
 		util.Logger.Info("Library command called")
 
-		gameLs, err := games.LoadGames(viper.GetString("meta.directory"))
+		gameLs, err := games.LoadGames(filepath.Join(viper.GetString("meta.directory"), "games"))
 		if err != nil {
 			util.Logger.Errorf("Error loading games: %s\n", err)
 			return

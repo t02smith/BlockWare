@@ -2,10 +2,12 @@ package main
 
 import (
 	"context"
+	"encoding/hex"
 	"fmt"
 	"math/big"
 	"time"
 
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/spf13/viper"
 	"github.com/t02smith/part-iii-project/toolkit/model/ethereum"
 	"github.com/t02smith/part-iii-project/toolkit/model/games"
@@ -15,6 +17,24 @@ import (
 )
 
 // utility types
+
+type AppGame struct {
+
+	// game metadata
+	Title           string `json:"title"`
+	Version         string `json:"version"`
+	ReleaseDate     string `json:"release"`
+	Developer       string `json:"dev"`
+	RootHash        string `json:"rootHash"`
+	PreviousVersion string `json:"previousVersion"`
+
+	// blockchain related
+	IPFSId   string         `json:"IPFSId"`
+	Price    *big.Int       `json:"price"`
+	Uploader common.Address `json:"uploader"`
+
+	Download *AppDownload `json:"download"`
+}
 
 type AppDownload struct {
 	Progress    map[string]AppFileProgress
@@ -40,14 +60,33 @@ func NewApp() *App {
 // startup is called when the app starts. The context is saved
 // so we can call the runtime methods
 func (a *App) startup(ctx context.Context) {
+	util.Logger.Info("Starting app context")
 	a.ctx = ctx
 }
 
 // ? Interface functions
 
 // get a list of owned games
-func (a *App) GetOwnedGames() []*games.Game {
-	return net.GetPeerInstance().GetLibrary().GetOwnedGames()
+func (a *App) GetOwnedGames() []*AppGame {
+	gs := net.GetPeerInstance().GetLibrary().GetOwnedGames()
+	out := []*AppGame{}
+
+	for _, g := range gs {
+		out = append(out, &AppGame{
+			Title:           g.Title,
+			Version:         g.Version,
+			ReleaseDate:     g.ReleaseDate,
+			Developer:       g.Developer,
+			RootHash:        fmt.Sprintf("%x", g.RootHash),
+			PreviousVersion: fmt.Sprintf("%x", g.PreviousVersion),
+			IPFSId:          g.IPFSId,
+			Price:           g.Price,
+			Uploader:        g.Uploader,
+			Download:        downloadToAppDownload(g.Download),
+		})
+	}
+
+	return out
 }
 
 // get a list of games from the eth store
@@ -58,53 +97,43 @@ func (a *App) GetAllGames() {
 // get a list of downloads
 func (a *App) GetDownloads() map[string]*AppDownload {
 	ds := net.GetPeerInstance().GetLibrary().GetDownloads()
-	out := make(map[string]*AppDownload)
-
-	for hash, d := range ds {
-		x := &AppDownload{
-			TotalBlocks: d.TotalBlocks,
-			Progress:    make(map[string]AppFileProgress),
-		}
-
-		for fHash, f := range d.Progress {
-			fProgress := &AppFileProgress{
-				AbsolutePath:    f.AbsolutePath,
-				BlocksRemaining: []string{},
-			}
-
-			for b := range f.BlocksRemaining {
-				fProgress.BlocksRemaining = append(fProgress.BlocksRemaining, fmt.Sprintf("%x", b))
-			}
-
-			x.Progress[fmt.Sprintf("%x", fHash)] = *fProgress
-		}
-
-		out[fmt.Sprintf("%x", hash)] = x
-	}
-
-	return out
+	return downloadToGameDownloads(ds)
 }
 
-func (a *App) IsDownloading(gameHash [32]byte) int {
+func (a *App) IsDownloading(gh string) int {
+	gh_tmp, err := hex.DecodeString(gh)
+	if err != nil {
+		util.Logger.Warnf("Error decoding hash string %s", err)
+		return -1
+	}
+
+	gameHash := [32]byte{}
+	copy(gameHash[:], gh_tmp[:])
+
 	lib := net.GetPeerInstance().GetLibrary()
 	g := lib.GetOwnedGame(gameHash)
 
 	// ? game exists
 	if g == nil {
+		util.Logger.Warnf("Game %s doesn't exist", gh)
 		return -1
 	}
 
 	// ? download not started
 	if g.GetDownload() == nil {
+		util.Logger.Info("download for game %s not started", gh)
 		return 0
 	}
 
 	// ? download finished
 	if g.GetDownload().Finished() {
+		util.Logger.Info("download for game %s finished", gh)
+
 		return 1
 	}
 
 	// ? download in progress
+	util.Logger.Info("download for game %s in progress", gh)
 	return 2
 }
 
@@ -119,22 +148,33 @@ func (a *App) StartDownloadListener() {
 	}()
 }
 
-func (a *App) CreateDownload(gameHash [32]byte) bool {
-	util.Logger.Infof("Initiated download for %x", gameHash)
+func (a *App) CreateDownload(gh string) bool {
+	util.Logger.Infof("Initiated download for %s", gh)
+
+	gh_tmp, err := hex.DecodeString(gh)
+	if err != nil {
+		util.Logger.Error("Error creating download %s", err)
+		return false
+	}
+	gameHash := [32]byte{}
+	copy(gameHash[:], gh_tmp[:])
+
 	lib := net.GetPeerInstance().GetLibrary()
 	g := lib.GetOwnedGame(gameHash)
 
 	// ? game exists
 	if g == nil {
+		util.Logger.Warnf("game %s doesn't exist", gh)
 		return false
 	}
 
-	// ? game doesn't already have download
+	// ? game already has download
 	if g.GetDownload() != nil {
+		util.Logger.Warnf("Download for %s already exists", gh)
 		return false
 	}
 
-	err := lib.CreateDownload(g)
+	err = lib.CreateDownload(g)
 	if err != nil {
 		util.Logger.Errorf("Error creating download for game %x: %s", gameHash, err)
 		return false
@@ -173,7 +213,7 @@ func (a *App) UploadGame(title, version, dev, rootDir string, shardSize, price, 
 		return err.Error()
 	}
 
-	err = games.OutputToFile(g)
+	err = games.OutputAllGameDataToFile(g)
 	if err != nil {
 		util.Logger.Errorf("Error saving game to file %s", err)
 		return err.Error()

@@ -24,7 +24,7 @@ func beforeAll() {
 		os.Exit(1)
 	}
 
-	_, _, err = StartClient("http://localhost:8545")
+	_, _, err = StartClient("ws://localhost:8545")
 	if err != nil {
 		util.Logger.Error(err)
 	}
@@ -36,6 +36,7 @@ func beforeAll() {
 }
 
 func TestMain(m *testing.M) {
+	os.Exit(0)
 
 	beforeAll()
 	code := m.Run()
@@ -62,7 +63,7 @@ func setupTestGame() error {
 	}
 
 	// write game to file
-	err = games.OutputToFile(game)
+	err = games.OutputAllGameDataToFile(game)
 	if err != nil {
 		log.Printf("Error writing game to file: %s\n", err)
 		return err

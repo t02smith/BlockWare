@@ -90,8 +90,32 @@ func (a *App) GetOwnedGames() []*AppGame {
 }
 
 // get a list of games from the eth store
-func (a *App) GetAllGames() {
-	ethereum.ReadPreviousGameEvents()
+func (a *App) GetStoreGames() []*AppGame {
+	lib := net.GetPeerInstance().GetLibrary()
+	err := ethereum.FillLibraryBlockchainGames(lib)
+	if err != nil {
+		return []*AppGame{}
+	}
+
+	gs := lib.GetBlockchainGames()
+	out := []*AppGame{}
+
+	for _, g := range gs {
+		out = append(out, &AppGame{
+			Title:           g.Title,
+			Version:         g.Version,
+			ReleaseDate:     g.ReleaseDate,
+			Developer:       g.Developer,
+			RootHash:        fmt.Sprintf("%x", g.RootHash),
+			PreviousVersion: fmt.Sprintf("%x", g.PreviousVersion),
+			IPFSId:          g.IPFSId,
+			Price:           g.Price,
+			Uploader:        g.Uploader,
+			Download:        downloadToAppDownload(g.Download),
+		})
+	}
+
+	return out
 }
 
 // get a list of downloads
@@ -226,9 +250,17 @@ func (a *App) UploadGame(title, version, dev, rootDir string, shardSize, price, 
 // deploy a new instance of the library contract
 func (a *App) DeployLibraryInstance(privateKey string) string {
 	_, _, err := ethereum.DeployLibraryContract(privateKey)
-	if err == nil {
+	if err != nil {
 		return ""
 	}
 
-	return err.Error()
+	return ethereum.GetContractAddress().Hex()
+}
+
+func (a *App) JoinLibraryInstance(address string) {
+	addr := common.HexToAddress(address)
+	err := ethereum.ConnectToLibraryInstance(addr)
+	if err != nil {
+		util.Logger.Errorf("Error joining lib instance %s", err)
+	}
 }

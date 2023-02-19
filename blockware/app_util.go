@@ -17,6 +17,10 @@ func downloadToGameDownloads(ds map[[32]byte]*games.Download) map[string]*AppDow
 }
 
 func downloadToAppDownload(d *games.Download) *AppDownload {
+	if d == nil {
+		return nil
+	}
+
 	x := &AppDownload{
 		TotalBlocks: d.TotalBlocks,
 		Progress:    make(map[string]AppFileProgress),

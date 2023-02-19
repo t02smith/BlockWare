@@ -121,7 +121,7 @@ func startPeer() error {
 	util.Logger.Info("Attempting to start peer")
 	_, err := net.StartPeer(
 		"localhost",
-		6748,
+		6749,
 		viper.GetString("games.installFolder"),
 		viper.GetString("meta.directory"),
 	)

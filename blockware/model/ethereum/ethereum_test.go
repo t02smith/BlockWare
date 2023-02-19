@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/t02smith/part-iii-project/toolkit/model/games"
+	"github.com/t02smith/part-iii-project/toolkit/model/net"
 	"github.com/t02smith/part-iii-project/toolkit/test/testutil"
 	"github.com/t02smith/part-iii-project/toolkit/util"
 )
@@ -19,6 +20,17 @@ func beforeAll() {
 	testutil.SetupTmp("../../")
 
 	err := setupTestGame()
+	if err != nil {
+		util.Logger.Error(err)
+		os.Exit(1)
+	}
+
+	_, err = net.StartPeer(
+		"localhost",
+		6749,
+		"../../test/data/tmp",
+		"../../test/data/.toolkit",
+	)
 	if err != nil {
 		util.Logger.Error(err)
 		os.Exit(1)
@@ -36,8 +48,6 @@ func beforeAll() {
 }
 
 func TestMain(m *testing.M) {
-	os.Exit(0)
-
 	beforeAll()
 	code := m.Run()
 	testutil.ClearTmp("../../")
@@ -73,7 +83,7 @@ func setupTestGame() error {
 }
 
 func fetchTestGame() (*games.Game, error) {
-	games, err := games.LoadGames("../../test/data/.toolkit")
+	games, err := games.LoadGames("../../test/data/.toolkit/games")
 	if err != nil {
 		return nil, err
 	}

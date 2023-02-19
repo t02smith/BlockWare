@@ -2,7 +2,7 @@ import { defineStore } from "pinia";
 import { ref, onMounted } from "vue";
 import {
   GetOwnedGames,
-  GetAllGames,
+  GetStoreGames,
   GetDownloads,
   CreateDownload,
 } from "../../wailsjs/go/main/App.js";
@@ -14,6 +14,9 @@ export const useGamesStore = defineStore("games", () => {
   // what games are being downloaded
   const downloads = ref([]);
 
+  //
+  const storeGames = ref([]);
+
   // setup
   onMounted(() => {
     refreshOwnedGames();
@@ -23,7 +26,6 @@ export const useGamesStore = defineStore("games", () => {
   // get an updated list of owned games
   async function refreshOwnedGames() {
     ownedGames.value = await GetOwnedGames();
-    await GetAllGames();
   }
 
   // get an updated list of downloads
@@ -42,11 +44,17 @@ export const useGamesStore = defineStore("games", () => {
   // add listeners for the progress of downloads
   async function setupDownloadListeners() {}
 
+  async function getStoreGames() {
+    storeGames.value = await GetStoreGames();
+  }
+
   return {
     ownedGames,
     downloads,
+    storeGames,
     createDownload,
     refreshDownloads,
     refreshOwnedGames,
+    getStoreGames,
   };
 });

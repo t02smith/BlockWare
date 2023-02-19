@@ -6,6 +6,8 @@
     </div>
 
     <div class="links">
+      <h3 class="address">🌍 Connected to {{ eth.contractAddress }}</h3>
+
       <router-link to="/home">🏡 Home</router-link>
       <router-link to="/library">🕹️ Library</router-link>
       <router-link to="/upload">🆕 Upload</router-link>
@@ -13,7 +15,11 @@
     </div>
   </nav>
 </template>
-<script setup></script>
+<script setup>
+import { useEthStore } from "../stores/eth";
+
+const eth = useEthStore();
+</script>
 <style scoped lang="scss">
 nav {
   width: 100vw;
@@ -45,6 +51,13 @@ nav {
     margin-left: auto;
     display: flex;
     gap: 1rem;
+
+    > .address {
+      background-color: #303030;
+      padding: 3px 15px;
+      border-radius: 10px;
+      font-size: 0.9rem;
+    }
 
     a {
       color: rgb(181, 181, 181);

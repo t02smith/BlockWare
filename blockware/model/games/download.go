@@ -109,6 +109,9 @@ func (d *Download) InsertData(fileHash, blockHash [32]byte, data []byte) error {
 
 // start up an existing download
 func (d *Download) ContinueDownload() error {
+
+	// which peers have the desired game
+
 	return nil
 }
 

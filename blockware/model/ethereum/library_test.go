@@ -7,8 +7,11 @@ import (
 )
 
 func TestEthereum(t *testing.T) {
-	t.Skip()
 	lib := lib_instance
+	testGame, err := fetchTestGame()
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	t.Run("fetch games => no games", func(t *testing.T) {
 		t.Run("no games", func(t *testing.T) {
@@ -21,11 +24,6 @@ func TestEthereum(t *testing.T) {
 				t.Fatal("No games expected")
 			}
 		})
-
-		testGame, err := fetchTestGame()
-		if err != nil {
-			t.Fatal(err)
-		}
 
 		// upload game
 		t.Run("upload game", func(t *testing.T) {
@@ -58,6 +56,31 @@ func TestEthereum(t *testing.T) {
 			}
 
 			// check contents
+		})
+	})
+
+	t.Run("join existing network", func(t *testing.T) {
+		addr := contract_address
+		err := ConnectToLibraryInstance(addr)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		t.Run("Games exist", func(t *testing.T) {
+			gs, err := fetchGamesFromEthereum()
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			assert.Equal(t, 1, len(gs), "game found")
+
+			g := gs[0]
+			assert.Equal(t, testGame.Title, g.Title, "game names not equal")
+			assert.Equal(t, testGame.Version, g.Version, "game versions not equal")
+			assert.Equal(t, testGame.ReleaseDate, g.ReleaseDate, "game release date not equal")
+			assert.Equal(t, testGame.Developer, g.Developer, "game dev not equal")
+			assert.Equal(t, testGame.IPFSId, g.IPFSId, "game IPFS data id not equal")
+
 		})
 	})
 

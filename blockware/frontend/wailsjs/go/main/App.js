@@ -10,10 +10,6 @@ export function DeployLibraryInstance(arg1) {
   return window['go']['main']['App']['DeployLibraryInstance'](arg1);
 }
 
-export function GetAllGames() {
-  return window['go']['main']['App']['GetAllGames']();
-}
-
 export function GetDownloads() {
   return window['go']['main']['App']['GetDownloads']();
 }
@@ -22,8 +18,16 @@ export function GetOwnedGames() {
   return window['go']['main']['App']['GetOwnedGames']();
 }
 
+export function GetStoreGames() {
+  return window['go']['main']['App']['GetStoreGames']();
+}
+
 export function IsDownloading(arg1) {
   return window['go']['main']['App']['IsDownloading'](arg1);
+}
+
+export function JoinLibraryInstance(arg1) {
+  return window['go']['main']['App']['JoinLibraryInstance'](arg1);
 }
 
 export function StartDownloadListener() {

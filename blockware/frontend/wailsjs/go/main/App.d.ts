@@ -7,13 +7,15 @@ export function CreateDownload(arg1:string):Promise<boolean>;
 
 export function DeployLibraryInstance(arg1:string):Promise<string>;
 
-export function GetAllGames():Promise<void>;
-
 export function GetDownloads():Promise<map[string]main.AppDownload>;
 
 export function GetOwnedGames():Promise<Array<main.AppGame>>;
 
+export function GetStoreGames():Promise<Array<main.AppGame>>;
+
 export function IsDownloading(arg1:string):Promise<number>;
+
+export function JoinLibraryInstance(arg1:string):Promise<void>;
 
 export function StartDownloadListener():Promise<void>;
 

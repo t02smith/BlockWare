@@ -9,31 +9,56 @@
       </p>
     </div>
 
-    <div class="featured">
-      <CustomLibrary :games="[]" name="Featured" />
+    <div class="search">
+      <h3>Search for a game:</h3>
+      <input
+        disabled
+        type="text"
+        name=""
+        id=""
+        placeholder="The game's root hash"
+      />
     </div>
 
-    <div class="search">
-      <input type="text" name="" id="" placeholder="Search for a game" />
+    <div class="featured">
+      <CustomLibrary :games="games.storeGames" name="Featured" />
     </div>
   </div>
 </template>
 <script setup>
+import { onMounted } from "vue";
 import CustomLibrary from "../components/library/CustomLibrary.vue";
+import { useGamesStore } from "../stores/games";
+
+const games = useGamesStore();
+
+onMounted(async () => {
+  games.getStoreGames();
+});
 </script>
 <style scoped lang="scss">
 .store {
-  strong {
-    color: rgb(0, 132, 255);
-  }
+  display: flex;
+  flex-direction: column;
+  padding: 2rem;
 
-  > * {
-    margin: 2rem;
+  > .search {
+    align-self: center;
+    display: grid;
+    place-items: center;
+
+    > input {
+      padding: 5px 10px;
+      width: 500px;
+      border-radius: 4px;
+      outline: none;
+    }
   }
 
   > .title {
     display: flex;
     flex-direction: column;
+    margin-bottom: 2rem;
 
     > * {
       max-width: 700px;

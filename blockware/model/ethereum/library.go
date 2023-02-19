@@ -18,10 +18,15 @@ import (
 )
 
 var (
-	lib_instance  *library.Library
-	auth_instance *bind.TransactOpts
-	lib_auth_once sync.Once
+	lib_instance     *library.Library
+	auth_instance    *bind.TransactOpts
+	lib_auth_once    sync.Once
+	contract_address common.Address
 )
+
+func GetContractAddress() common.Address {
+	return contract_address
+}
 
 // setup instance of smart contract to interact with blockchain
 func DeployLibraryContract(privateKey string) (*bind.TransactOpts, *library.Library, error) {
@@ -72,10 +77,11 @@ func DeployLibraryContract(privateKey string) (*bind.TransactOpts, *library.Libr
 
 		auth_instance = auth
 
-		_, _, instance, err := library.DeployLibrary(auth, eth_client)
+		addr, _, instance, err := library.DeployLibrary(auth, eth_client)
 		if err != nil {
 			util.Logger.Panic(err)
 		}
+		contract_address = addr
 
 		lib_instance = instance
 		util.Logger.Info("Deployed library")
@@ -92,6 +98,20 @@ func DeployLibraryContract(privateKey string) (*bind.TransactOpts, *library.Libr
 	})
 
 	return auth_instance, lib_instance, nil
+}
+
+// Connect to an existing contract
+func ConnectToLibraryInstance(address common.Address) error {
+	util.Logger.Infof("Connecting to addr %s", address)
+	lib, err := library.NewLibrary(address, eth_client)
+	if err != nil {
+		util.Logger.Errorf("Error connecting to library instance: %s", err)
+	}
+
+	contract_address = address
+	lib_instance = lib
+	util.Logger.Infof("Connected to %s", address)
+	return nil
 }
 
 // checks if a game has already been uploaded to the blockchain

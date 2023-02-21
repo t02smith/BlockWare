@@ -117,6 +117,7 @@ func StartPeer(serverHostname string, serverPort uint, installFolder, toolkitFol
 		}
 
 		go singleton.server.Start(onMessage)
+		singleton.listenToDownloadRequests()
 	})
 
 	return singleton, nil

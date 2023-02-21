@@ -5,6 +5,7 @@ import (
 	"crypto/sha256"
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/spf13/viper"
 	"github.com/t02smith/part-iii-project/toolkit/model/hash"
@@ -27,6 +28,11 @@ type FileProgress struct {
 
 	// block hash => position in file
 	BlocksRemaining map[[32]byte]uint
+}
+
+type DownloadRequest struct {
+	GameHash  [32]byte
+	BlockHash [32]byte
 }
 
 // ? setup
@@ -107,22 +113,58 @@ func (d *Download) InsertData(fileHash, blockHash [32]byte, data []byte) error {
 	return nil
 }
 
-// start up an existing download
-func (d *Download) ContinueDownload() error {
+// continue/start a download where the desired blocks are already known
+// this function will make requests down the libraries download request
+// channel
+func (d *Download) ContinueDownload(gameHash [32]byte, newRequest chan DownloadRequest) {
 
-	// which peers have the desired game
+	// TODO
+	/**
+	Currently, this function will go through files sequentially and request
+	individual blocks at a time and will block until that block is received
 
-	return nil
-}
+	Just for simplicity :)
+	*/
 
-// find a new block from current peers
-func (d *Download) FindBlockFromPeers(hash [32]byte) error {
+	util.Logger.Infof("Continuing download for game %x", gameHash)
+	go func() {
+		if d.Finished() {
+			return
+		}
 
-	// which peers have the game
+		for _, file := range d.Progress {
+			util.Logger.Infof("Requesting file %s for game %x", file.AbsolutePath, gameHash)
 
-	// which peers have that block
+			shards := [][32]byte{}
+			for sh := range file.BlocksRemaining {
+				shards = append(shards, sh)
+			}
 
-	return nil
+			for _, shard := range shards {
+				util.Logger.Infof("Requesting shard %x for file %s in game %x", shard, file.AbsolutePath, gameHash)
+				newRequest <- DownloadRequest{
+					GameHash:  gameHash,
+					BlockHash: shard,
+				}
+
+				for {
+					if _, ok := d.Progress[shard]; ok {
+						time.Sleep(time.Second)
+					} else {
+						util.Logger.Infof("Shard %x downloaded for game %x", shard, gameHash)
+						break
+					}
+				}
+			}
+
+		}
+	}()
+
+	if d.Finished() {
+		util.Logger.Infof("Download complete for game %x", gameHash)
+	} else {
+		util.Logger.Infof("Download paused for game %x", gameHash)
+	}
 }
 
 // ? misc functions

@@ -29,25 +29,29 @@ type Library struct {
 	// games present on the blockchain
 	blockchainGames map[[32]byte]*Game
 
-	// used to send messages about download progress
-	// when a block is downloaded a message containinf its hash and
-	// the hash of the game it's in will be sent down this channel
-	DownloadProgress chan *struct {
-		GameHash  [32]byte
-		BlockHash [32]byte
-	}
+	/**
+	Download manager threads will send requests down this channel
+	to prompt a peer listener to attempt to download the block
+	*/
+	RequestDownload chan DownloadRequest
+
+	/**
+	Once a block has been downloaded a message will be sent down
+	this channel.
+	This can be used to signal to the UI that a download has been
+	completed
+	*/
+	DownloadProgress chan DownloadRequest
 }
 
 // create a new library
 func NewLibrary() *Library {
 	util.Logger.Info("Creating new library")
 	return &Library{
-		ownedGames:      make(map[[32]byte]*Game),
-		blockchainGames: make(map[[32]byte]*Game),
-		DownloadProgress: make(chan *struct {
-			GameHash  [32]byte
-			BlockHash [32]byte
-		}),
+		ownedGames:       make(map[[32]byte]*Game),
+		blockchainGames:  make(map[[32]byte]*Game),
+		RequestDownload:  make(chan DownloadRequest),
+		DownloadProgress: make(chan DownloadRequest),
 	}
 }
 
@@ -157,6 +161,7 @@ func (l *Library) GetDownloads() map[[32]byte]*Download {
 // close down a current library instance
 func (l *Library) Close() {
 	close(l.DownloadProgress)
+	close(l.RequestDownload)
 
 	metaDir := viper.GetString("meta.directory")
 	for _, g := range l.ownedGames {

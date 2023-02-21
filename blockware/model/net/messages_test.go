@@ -43,7 +43,7 @@ func TestGameListToMessage(t *testing.T) {
 		},
 	}
 
-	res, err := gameListToMessage(games)
+	res, err := generateGAMES(games)
 	if err != nil {
 		t.Error(err)
 		return
@@ -221,7 +221,7 @@ func TestFetchBlock(t *testing.T) {
 	testutil.ShortTest(t)
 
 	t.Run("game doesn't exist", func(t *testing.T) {
-		_, err := fetchBlock([32]byte{}, [32]byte{})
+		_, err := fetchBlockFromLibrary([32]byte{}, [32]byte{})
 		if err == nil {
 			t.Error("Missing game not identified as not existing")
 		}
@@ -231,7 +231,7 @@ func TestFetchBlock(t *testing.T) {
 	g := p.GetLibrary().GetOwnedGame([32]byte{15, 158, 115, 2, 196, 26, 32, 86, 37, 148, 142, 89, 228, 208, 228, 199, 218, 164, 63, 61, 130, 248, 52, 193, 143, 10, 154, 1, 176, 67, 9, 239})
 
 	t.Run("game exists but block does not", func(t *testing.T) {
-		_, err := fetchBlock(g.RootHash, [32]byte{})
+		_, err := fetchBlockFromLibrary(g.RootHash, [32]byte{})
 		if err == nil {
 			t.Error("Block should not have been identified")
 		}
@@ -244,7 +244,7 @@ func TestFetchBlock(t *testing.T) {
 		}
 
 		hash := ht.RootDir.Files["architecture-diagram.png"].Hashes[1]
-		data, err := fetchBlock(g.RootHash, hash)
+		data, err := fetchBlockFromLibrary(g.RootHash, hash)
 		if err != nil {
 			t.Fatal(err)
 		}

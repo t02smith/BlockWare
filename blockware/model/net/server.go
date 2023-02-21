@@ -150,7 +150,7 @@ func (c *TCPServerClient) SendStringf(command string, args ...any) error {
 }
 
 func (c *TCPServerClient) Info() string {
-	return fmt.Sprintf("%s", c.con.RemoteAddr())
+	return c.con.RemoteAddr().String()
 }
 
 func (c *TCPServerClient) Close() {

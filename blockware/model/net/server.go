@@ -80,7 +80,7 @@ func (s *TCPServer) listen(onMessage func([]string, PeerIT)) {
 		}
 		s.clients = append(s.clients, client)
 
-		p := GetPeerInstance()
+		p := Peer()
 		p.onConnection(con.RemoteAddr().String(), 0000, client)
 
 		go client.listen(onMessage)
@@ -99,7 +99,7 @@ func (c *TCPServerClient) listen(onMessage func([]string, PeerIT)) {
 		msg, err := c.reader.ReadString('\n')
 		if err != nil {
 			if err == io.EOF {
-				GetPeerInstance().onClose(c)
+				Peer().onClose(c)
 				return
 			}
 

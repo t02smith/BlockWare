@@ -14,7 +14,7 @@ import (
 )
 
 func onMessage(cmd []string, client PeerIT) {
-	p := GetPeerInstance()
+	p := Peer()
 
 	switch cmd[0] {
 
@@ -197,7 +197,7 @@ func gameMessageToGameList(parts []string) ([]*games.Game, error) {
 
 // fetch a block given a game identifier and a shard
 func fetchBlock(gameHash, shardHash [32]byte) ([]byte, error) {
-	p := GetPeerInstance()
+	p := Peer()
 
 	// find the game
 	g := p.library.GetOwnedGame(gameHash)

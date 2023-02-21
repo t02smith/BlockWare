@@ -26,8 +26,8 @@ export function IsDownloading(arg1) {
   return window['go']['main']['App']['IsDownloading'](arg1);
 }
 
-export function JoinLibraryInstance(arg1) {
-  return window['go']['main']['App']['JoinLibraryInstance'](arg1);
+export function JoinLibraryInstance(arg1, arg2) {
+  return window['go']['main']['App']['JoinLibraryInstance'](arg1, arg2);
 }
 
 export function StartDownloadListener() {

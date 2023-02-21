@@ -1,0 +1,18 @@
+eth:
+  address: ws://localhost:8545
+games:
+  installfolder: ./test/data/tmp
+meta:
+  directory: ./test/data/.toolkit
+  hashes:
+    shardsize: 16384
+    workercount: 5
+  log: stdout
+  threadpoolsize: 10
+net:
+  port: 6749
+  useKnownPeers: false
+user:
+  info:
+    domain: t02smith.com
+    name: tom

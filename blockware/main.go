@@ -32,7 +32,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("Error starting peer %s", err)
 	}
-	defer net.GetPeerInstance().Close()
+	defer net.Peer().Close()
 
 	_, _, err = ethereum.StartClient(viper.GetString("eth.address"))
 	if err != nil {
@@ -115,13 +115,17 @@ func defaultConfig() {
 
 	// eth
 	viper.SetDefault("eth.address", "ws://localhost:8545")
+
+	// net
+	viper.SetDefault("net.port", 6749)
+	viper.SetDefault("net.useKnownPeers", false)
 }
 
 func startPeer() error {
 	util.Logger.Info("Attempting to start peer")
 	_, err := net.StartPeer(
 		"localhost",
-		6749,
+		viper.GetUint("net.port"),
 		viper.GetString("games.installFolder"),
 		viper.GetString("meta.directory"),
 	)

@@ -65,7 +65,7 @@ func TestGameListToMessage(t *testing.T) {
 func TestOnMessage(t *testing.T) {
 	testutil.ShortTest(t)
 
-	mp, err := testutil.StartMockPeer(7887)
+	mp, err := testutil.StartMockPeer(7887, true)
 	if err != nil {
 		t.Fatalf("Failed to start mock peer %s", err)
 	}
@@ -73,7 +73,6 @@ func TestOnMessage(t *testing.T) {
 	t.Cleanup(func() {
 		mp.Clear()
 		testutil.ClearTmp("../../")
-		testutil.SetupTmp("../../")
 	})
 
 	t.Run("LIBRARY", func(t *testing.T) {
@@ -116,7 +115,7 @@ func TestOnMessage(t *testing.T) {
 	})
 
 	// SETUP TEST GAME
-	g := GetPeerInstance().GetLibrary().GetOwnedGame([32]byte{15, 158, 115, 2, 196, 26, 32, 86, 37, 148, 142, 89, 228, 208, 228, 199, 218, 164, 63, 61, 130, 248, 52, 193, 143, 10, 154, 1, 176, 67, 9, 239})
+	g := Peer().GetLibrary().GetOwnedGame([32]byte{15, 158, 115, 2, 196, 26, 32, 86, 37, 148, 142, 89, 228, 208, 228, 199, 218, 164, 63, 61, 130, 248, 52, 193, 143, 10, 154, 1, 176, 67, 9, 239})
 
 	t.Run("BLOCK", func(t *testing.T) {
 
@@ -157,11 +156,10 @@ func TestOnMessage(t *testing.T) {
 	})
 
 	t.Run("SEND_BLOCK", func(t *testing.T) {
-		testutil.SetupTmp("../../")
 
 		t.Run("success", func(t *testing.T) {
 
-			err := GetPeerInstance().GetLibrary().CreateDownload(g)
+			err := Peer().GetLibrary().CreateDownload(g)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -229,7 +227,7 @@ func TestFetchBlock(t *testing.T) {
 		}
 	})
 
-	p := GetPeerInstance()
+	p := Peer()
 	g := p.GetLibrary().GetOwnedGame([32]byte{15, 158, 115, 2, 196, 26, 32, 86, 37, 148, 142, 89, 228, 208, 228, 199, 218, 164, 63, 61, 130, 248, 52, 193, 143, 10, 154, 1, 176, 67, 9, 239})
 
 	t.Run("game exists but block does not", func(t *testing.T) {

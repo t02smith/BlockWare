@@ -8,10 +8,14 @@ contract Library {
     // game root hash => entry
     mapping(bytes32 => GameEntry) public games;
 
+    // game root hash => address => purchased
+    // addresses are only included when a user has purchased
+    mapping(bytes32 => mapping(address => bool)) purchases;
+
     // a list of all hashes
     bytes32[] public gameHashes;
 
-    // details about each game
+    // metadata about each game
     struct GameEntry {
 
         // game meta data
@@ -25,7 +29,6 @@ contract Library {
         // purchasing
         uint price;
         address payable uploader;
-        address[] purchased;
 
         // address to download hash data from IPFS
         string ipfsAddress;
@@ -48,7 +51,7 @@ contract Library {
 
           GameEntry memory g = games[_game.previousVersion];
           require(g.uploader == msg.sender, "only the original uploader can update their game");
-          _game.purchased = g.purchased;
+          purchases[_game.rootHash][msg.sender] = true;
         }
 
         // upload game
@@ -68,17 +71,10 @@ contract Library {
       GameEntry storage game = games[_game];
       require(msg.value >= game.price, "user cannot afford game");
 
-      bool found = false;
-      for (uint i=0; i<game.purchased.length; i++) {
-        if (game.purchased[i] == msg.sender) {
-          found = true;
-          break;
-        }
-      }
-      require(!found, "user already owns game");
+      require(purchases[_game][msg.sender], "user already owns game");
 
       game.uploader.transfer(game.price);
-      game.purchased.push(msg.sender);
+      purchases[_game][msg.sender] = true;
     }
 
     /**
@@ -89,11 +85,11 @@ contract Library {
     }
 
     /**
-     * How many people have purchased a given game
-     * @param _game the root hash of the game
+     * Has a given user purchased a game
+     * @param _game The root hash of the chosen game
+     * @param _addr The address of the person to check
      */
-    function purchasedSize(bytes32 _game) public view returns (uint) {
-      require(bytes(games[_game].title).length > 0, "game not found");
-      return games[_game].purchased.length;
+    function hasPurchased(bytes32 _game, address _addr) public view returns (bool) {
+      return purchases[_game][_addr];
     }
 }

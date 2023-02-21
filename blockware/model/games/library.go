@@ -118,8 +118,7 @@ func (l *Library) FindBlock(gameHash [32]byte, hash [32]byte) (bool, []byte, err
 	return g.FetchShard(hash)
 }
 
-//
-
+// store a details from a game on the blockchain store
 func (l *Library) SetBlockchainGame(rootHash [32]byte, game *Game) {
 	l.blockchainGames[rootHash] = game
 }

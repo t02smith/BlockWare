@@ -32,8 +32,6 @@ func TestGetGame(t *testing.T) {
 	})
 
 	testutil.ClearTmp("../../")
-	testutil.SetupTmp("../../")
-
 }
 
 func TestAddGame(t *testing.T) {
@@ -53,7 +51,6 @@ func TestAddGame(t *testing.T) {
 	})
 
 	testutil.ClearTmp("../../")
-	testutil.SetupTmp("../../")
 
 }
 

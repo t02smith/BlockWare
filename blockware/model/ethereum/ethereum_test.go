@@ -17,7 +17,6 @@ import (
 func beforeAll() {
 	util.InitLogger()
 	testutil.SetupTestConfig()
-	testutil.SetupTmp("../../")
 
 	err := setupTestGame()
 	if err != nil {

@@ -12,8 +12,8 @@ export const useEthStore = defineStore("eth", () => {
     contractAddress.value = await DeployLibraryInstance(privKey);
   }
 
-  async function joinLibInstance(address) {
-    await JoinLibraryInstance(address);
+  async function joinLibInstance(address, privKey) {
+    await JoinLibraryInstance(address, privKey);
     contractAddress.value = address;
   }
 

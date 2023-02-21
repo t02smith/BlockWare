@@ -15,7 +15,7 @@ export function GetStoreGames():Promise<Array<main.AppGame>>;
 
 export function IsDownloading(arg1:string):Promise<number>;
 
-export function JoinLibraryInstance(arg1:string):Promise<void>;
+export function JoinLibraryInstance(arg1:string,arg2:string):Promise<void>;
 
 export function StartDownloadListener():Promise<void>;
 

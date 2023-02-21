@@ -90,7 +90,6 @@ func setupTestDownload() (*Game, error) {
 
 func gamesTestSetup() {
 	testutil.ClearTmp("../../")
-	testutil.SetupTmp("../../")
 }
 
 func gamesTestTeardown() {

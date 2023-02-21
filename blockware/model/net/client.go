@@ -22,6 +22,7 @@ type TCPClient struct {
 	writer *bufio.Writer
 }
 
+// generate a new TCP client to conenct to a server
 func InitTCPClient(serverHostname string, serverPort uint) (*TCPClient, error) {
 	util.Logger.Infof("Attempting to open connection to %s:%d", serverHostname, serverPort)
 	con, err := net.Dial("tcp", fmt.Sprintf("%s:%d", serverHostname, serverPort))
@@ -38,19 +39,20 @@ func InitTCPClient(serverHostname string, serverPort uint) (*TCPClient, error) {
 		writer:   bufio.NewWriter(con),
 	}
 
-	p := GetPeerInstance()
+	p := Peer()
 	p.onConnection(serverHostname, serverPort, client)
 
 	go client.listen(onMessage)
 	return client, nil
 }
 
+// listen for messages from the server
 func (c *TCPClient) listen(onMessage func([]string, PeerIT)) {
 	for {
 		msg, err := c.reader.ReadString('\n')
 		if err != nil {
 			if err == io.EOF {
-				GetPeerInstance().onClose(c)
+				Peer().onClose(c)
 				return
 			}
 
@@ -63,6 +65,7 @@ func (c *TCPClient) listen(onMessage func([]string, PeerIT)) {
 	}
 }
 
+// Send a message in bytes to the server
 func (c *TCPClient) Send(command []byte) error {
 	_, err := c.writer.Write(command)
 	if err != nil {
@@ -79,6 +82,7 @@ func (c *TCPClient) Send(command []byte) error {
 	return nil
 }
 
+// Send a string message to the server
 func (c *TCPClient) SendString(command string) error {
 	_, err := c.writer.WriteString(command)
 	if err != nil {
@@ -95,14 +99,18 @@ func (c *TCPClient) SendString(command string) error {
 	return nil
 }
 
+// Send a string message with parameters
+// wrapper function using fmt.Sprintf
 func (c *TCPClient) SendStringf(command string, args ...any) error {
 	return c.SendString(fmt.Sprintf(command, args...))
 }
 
+// get information about the server connection
 func (c *TCPClient) Info() string {
 	return fmt.Sprintf("%s:%d", c.hostname, c.port)
 }
 
+// close the tcp client
 func (c *TCPClient) Close() {
 	c.con.Close()
 }

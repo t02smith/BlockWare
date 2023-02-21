@@ -7,16 +7,6 @@ import (
 	"testing"
 )
 
-func SetupTmp(toRoot string) error {
-
-	err := os.Mkdir(filepath.Join(toRoot, "./test/data/tmp/tracker"), 0775)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
 func ClearTmp(toRoot string) {
 	tmp, err := os.Open(filepath.Join(toRoot, "./test/data/tmp"))
 	if err != nil {

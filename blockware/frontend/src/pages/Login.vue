@@ -5,29 +5,54 @@
       <h1>BlockWare</h1>
     </div>
 
-    <div class="forms">
-      <form @submit.prevent="join">
-        <input
-          type="text"
-          name=""
-          id=""
-          placeholder="Contract address"
-          v-model="addr"
-        />
+    <div class="form">
+      <form @submit.prevent="join" v-if="isJoining">
+        <div class="form-group">
+          <p>The address of your chosen BlockWare instance</p>
+          <input
+            type="text"
+            name=""
+            id=""
+            placeholder="Contract Address"
+            v-model="addr"
+          />
+        </div>
+
+        <div class="form-group">
+          <p>Your ETH private key for uploading and buying</p>
+          <input
+            type="password"
+            name=""
+            id=""
+            placeholder="Private Key"
+            v-model="key"
+          />
+        </div>
+
         <button type="submit">Join</button>
       </form>
 
-      <form @submit.prevent="create">
-        <p>Or</p>
-        <input
-          type="password"
-          name=""
-          id=""
-          placeholder="Your ETH private key"
-          v-model="key"
-        />
-        <button type="submit">Create</button>
+      <form @submit.prevent="create" v-else>
+        <div class="form-group">
+          <p>Your ETH private key for deploying</p>
+          <input
+            type="password"
+            name=""
+            id=""
+            placeholder="Private Key"
+            v-model="key"
+          />
+        </div>
+
+        <button type="submit">Deploy</button>
       </form>
+
+      <p @click="() => (isJoining = !isJoining)">
+        Click here to
+        {{
+          isJoining ? "deploy your own instance" : "join an existing instance"
+        }}
+      </p>
     </div>
   </div>
 </template>
@@ -38,8 +63,10 @@ import { useEthStore } from "../stores/eth";
 
 const key = ref("");
 const addr = ref("");
-const router = useRouter();
+const isJoining = ref(true);
+
 const eth = useEthStore();
+const router = useRouter();
 
 async function create() {
   await eth.deployNewLibInstance(key.value);
@@ -48,7 +75,7 @@ async function create() {
 }
 
 async function join() {
-  await eth.joinLibInstance(addr.value);
+  await eth.joinLibInstance(addr.value, key.value);
   addr.value = "";
   router.push("/home");
 }
@@ -78,50 +105,53 @@ async function join() {
     }
   }
 
-  > .forms {
+  > .form {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    align-items: center;
 
     > form {
-      font-size: 1.25rem;
-      border-radius: 10px;
       display: flex;
-      align-items: center;
+      flex-direction: column;
 
-      > * {
-        outline: none;
-        border: none;
-      }
+      > .form-group {
+        margin-bottom: 1rem;
 
-      > p {
-        color: darken(white, 20%);
-        margin-right: 1rem;
-      }
+        > p {
+          color: darken(white, 20%);
+          font-style: italic;
+        }
 
-      > input {
-        padding: 0.5rem 1rem;
-        border-radius: 5px 0 0 5px;
-        width: 300px;
-      }
-
-      > button {
-        padding: 0.5rem 1rem;
-        border-radius: 0 5px 5px 0;
-        background-color: rgb(0, 130, 206);
-        color: white;
-        font-weight: bold;
-        cursor: pointer;
-
-        &:active {
-          background-color: lighten(rgb(0, 130, 206), 10%);
+        > input {
+          width: 100%;
+          padding: 5px 6px;
+          border-radius: 4px;
+          outline: none;
+          min-width: 400px;
         }
       }
 
-      .contract {
-        display: flex;
-        justify-content: center;
-        gap: 1.5rem;
+      > button {
+        background-color: rgb(18, 141, 18);
+        font-weight: bold;
+        width: fit-content;
+        place-self: center;
+        padding: 4px 30px;
+        border-radius: 4px;
+        color: white;
+        margin-top: 1rem;
+        cursor: pointer;
+      }
+    }
+
+    > p {
+      font-size: 0.9rem;
+      color: darken(white, 20%);
+      font-style: italic;
+      cursor: pointer;
+
+      &:hover {
+        text-decoration: underline;
       }
     }
   }

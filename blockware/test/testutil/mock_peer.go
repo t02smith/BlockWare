@@ -26,26 +26,38 @@ type MockPeer struct {
 	msgHistory []string
 }
 
+var (
+	MockPeers []*MockPeer = []*MockPeer{}
+)
+
 // create a new mock peer
-func StartMockPeer(peerPort uint) (*MockPeer, error) {
-
-	con, err := net.Dial("tcp", fmt.Sprintf("localhost:%d", peerPort))
-	if err != nil {
-		return nil, err
-	}
-
+func StartMockPeer(peerPort uint, connect bool) (*MockPeer, error) {
 	mp := &MockPeer{
-		con:             con,
-		reader:          bufio.NewReader(con),
-		writer:          bufio.NewWriter(con),
 		responses:       make(map[string]string),
 		onReceive:       make(map[string]func()),
 		defaultResponse: "",
 		msgHistory:      []string{},
 	}
+	if connect {
+		mp.Connect(peerPort)
+	}
 
-	go mp.listen()
+	MockPeers = append(MockPeers, mp)
 	return mp, nil
+}
+
+func (m *MockPeer) Connect(peerPort uint) error {
+	con, err := net.Dial("tcp", fmt.Sprintf("localhost:%d", peerPort))
+	if err != nil {
+		return err
+	}
+
+	m.con = con
+	m.reader = bufio.NewReader(con)
+	m.writer = bufio.NewWriter(con)
+
+	go m.listen()
+	return nil
 }
 
 // listen for incoming messages

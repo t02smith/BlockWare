@@ -8,6 +8,7 @@ import (
 	u "github.com/t02smith/part-iii-project/toolkit/util"
 )
 
+// creates the required directories for toolkit
 func SetupToolkitEnvironment() error {
 
 	// check for .toolkit directory
@@ -39,6 +40,7 @@ func SetupToolkitEnvironment() error {
 	return nil
 }
 
+// create a directory if it doesn't exist
 func CreateDirectoryIfNotExist(dir string) error {
 	_, err := os.Stat(dir)
 

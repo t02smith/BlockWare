@@ -3,14 +3,13 @@ package ethereum
 import (
 	"bytes"
 	"context"
-	"crypto/ecdsa"
 	"errors"
+	"fmt"
 	"math/big"
 	"sync"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/t02smith/part-iii-project/toolkit/build/contracts/library"
 	"github.com/t02smith/part-iii-project/toolkit/model/games"
 	"github.com/t02smith/part-iii-project/toolkit/model/net"
@@ -37,49 +36,16 @@ func DeployLibraryContract(privateKey string) (*bind.TransactOpts, *library.Libr
 	// run setup functions at most once
 	lib_auth_once.Do(func() {
 		util.Logger.Info("Starting library deployment")
-		privKeyECDSA, err := crypto.HexToECDSA(privateKey)
+		auth, err := generateAuthInstance(privateKey)
 		if err != nil {
-			util.Logger.Panic(err)
+			util.Logger.Error(err)
+			return
 		}
-
-		pubKeyECDSA, ok := privKeyECDSA.Public().(*ecdsa.PublicKey)
-		if !ok {
-			util.Logger.Panic("public key of incorrect type")
-		}
-
-		fromAddress := crypto.PubkeyToAddress(*pubKeyECDSA)
-		nonce, err := eth_client.PendingNonceAt(context.Background(), fromAddress)
-		if err != nil {
-			util.Logger.Panic(err)
-		}
-
-		util.Logger.Info("Getting chain ID")
-		chainID, err := eth_client.ChainID(context.TODO())
-		if err != nil {
-			util.Logger.Panic(err)
-		}
-
-		util.Logger.Info("Getting gas price")
-		gasPrice, err := eth_client.SuggestGasPrice(context.Background())
-		if err != nil {
-			util.Logger.Panic(err)
-		}
-
-		auth, err := bind.NewKeyedTransactorWithChainID(privKeyECDSA, chainID)
-		if err != nil {
-			util.Logger.Panic(err)
-		}
-
-		auth.Nonce = big.NewInt(int64(nonce))
-		auth.Value = big.NewInt(0)
-		auth.GasLimit = uint64(3000000)
-		auth.GasPrice = gasPrice
-
-		auth_instance = auth
 
 		addr, _, instance, err := library.DeployLibrary(auth, eth_client)
 		if err != nil {
-			util.Logger.Panic(err)
+			util.Logger.Error(err)
+			return
 		}
 		contract_address = addr
 
@@ -94,6 +60,7 @@ func DeployLibraryContract(privateKey string) (*bind.TransactOpts, *library.Libr
 		err = watchNewGameEvent()
 		if err != nil {
 			util.Logger.Errorf("Error watching for new games: %s", err)
+			return
 		}
 	})
 
@@ -101,7 +68,7 @@ func DeployLibraryContract(privateKey string) (*bind.TransactOpts, *library.Libr
 }
 
 // Connect to an existing contract
-func ConnectToLibraryInstance(address common.Address) error {
+func ConnectToLibraryInstance(address common.Address, privateKey string) error {
 	util.Logger.Infof("Connecting to addr %s", address)
 	lib, err := library.NewLibrary(address, eth_client)
 	if err != nil {
@@ -111,6 +78,11 @@ func ConnectToLibraryInstance(address common.Address) error {
 	contract_address = address
 	lib_instance = lib
 	util.Logger.Infof("Connected to %s", address)
+	_, err = generateAuthInstance(privateKey)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -219,7 +191,6 @@ func uploadToEthereum(g *games.Game) error {
 		PreviousVersion: g.PreviousVersion,
 		Price:           g.Price,
 		Uploader:        g.Uploader,
-		Purchased:       []common.Address{},
 	})
 
 	if err != nil {
@@ -255,7 +226,7 @@ func watchNewGameEvent() error {
 
 	util.Logger.Info("Watching for new games")
 	go func() {
-		p := net.GetPeerInstance()
+		p := net.Peer()
 		defer util.Logger.Info("Stopped watching for new games")
 		defer sub.Unsubscribe()
 
@@ -288,7 +259,7 @@ func ReadPreviousGameEvents() error {
 		return err
 	}
 
-	lib := net.GetPeerInstance().GetLibrary()
+	lib := net.Peer().GetLibrary()
 	count := 0
 	for newGameIterator.Next() {
 		g := newGameIterator.Event.Game
@@ -314,5 +285,64 @@ func gameEntryToGame(game *library.LibraryGameEntry) *games.Game {
 		Price:           game.Price,
 		PreviousVersion: game.PreviousVersion,
 	}
+}
 
+// purchase a new game off the blockchain
+func Purchase(l *games.Library, rootHash [32]byte) error {
+	var g *games.Game
+	util.Logger.Infof("Attempting to purchase game %x", rootHash)
+
+	// ? do they already own the game
+	if game := l.GetOwnedGame(rootHash); game != nil {
+		return fmt.Errorf("game %x already purchased", rootHash)
+	}
+
+	// ? does the game exist
+	util.Logger.Infof("Looking for game %x", rootHash)
+	if g = l.GetBlockchainGame(rootHash); g == nil {
+
+		// ! doesn't exist locally => check blockchain again
+		util.Logger.Infof("Game not found locally, looking for game %x on eth", rootHash)
+		gx, err := lib_instance.Games(&bind.CallOpts{}, rootHash)
+		if err != nil {
+			return err
+		}
+
+		g = gameEntryToGame(&library.LibraryGameEntry{
+			Title:           gx.Title,
+			Version:         gx.Version,
+			ReleaseDate:     gx.ReleaseDate,
+			Developer:       gx.Developer,
+			RootHash:        gx.RootHash,
+			PreviousVersion: gx.PreviousVersion,
+			Price:           gx.Price,
+			Uploader:        gx.Uploader,
+			IpfsAddress:     gx.IpfsAddress,
+		})
+
+		l.SetBlockchainGame(g.RootHash, g)
+	}
+
+	// * purchase the game
+	util.Logger.Infof("Game %x found => proceeding to purchase", rootHash)
+	txn, err := lib_instance.PurchaseGame(auth_instance, rootHash)
+	if err != nil {
+		return err
+	}
+
+	receipt, err := bind.WaitMined(context.Background(), eth_client, txn)
+	if err != nil {
+		return err
+	}
+
+	if receipt.Status == 0 {
+		return fmt.Errorf("transaction failed")
+	}
+
+	err = l.AddOwnedGame(g)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

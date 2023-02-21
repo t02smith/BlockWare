@@ -1,10 +1,13 @@
 package net
 
 import (
+	"bufio"
 	"os"
 	"testing"
 	"time"
 
+	"github.com/spf13/viper"
+	"github.com/stretchr/testify/assert"
 	"github.com/t02smith/part-iii-project/toolkit/test/testutil"
 )
 
@@ -22,17 +25,104 @@ func TestConnectToPeer(t *testing.T) {
 	testutil.ShortTest(t)
 	beforeEach()
 
-	if len(testPeer.peers) == 0 {
-		t.Error("Peer not tracked/connected")
-		return
-	}
+	assert.Equal(t, 1, len(testPeer.peers), "Peer not tracked/connected")
 
 	mpClient := testPeer.server.clients[0]
 	mpClient.SendString("test message\n")
 	time.Sleep(25 * time.Millisecond)
 
-	if mockPeer.GetLastMessage() != "test message\n" {
-		t.Error("Test message not received")
-		return
+	assert.NotEqual(t, "test message", mockPeer.GetLastMessage(), "Test message not received got "+mockPeer.GetLastMessage())
+}
+
+func TestLoadPeersFromFile(t *testing.T) {
+	beforeEach()
+	viper.Set("meta.directory", "../../test/data/tmp")
+
+	t.Run("file not found", func(t *testing.T) {
+		_, err := loadPeersFromFile()
+		assert.NotNil(t, err, "file not found error expected")
+	})
+
+	f, err := os.Create("../../test/data/tmp/peers.txt")
+	if err != nil {
+		t.Fatal(err)
 	}
+
+	writer := bufio.NewWriter(f)
+	writer.WriteString("192.168.0.4:1234\n100.40.68.8:5000\n")
+	writer.Flush()
+
+	f.Close()
+
+	t.Run("success", func(t *testing.T) {
+		ps, err := loadPeersFromFile()
+		assert.Nil(t, err, "no error expected loading peers")
+
+		assert.Equal(t, 2, len(ps), "incorrect number of peers found")
+		assert.Equal(t, "192.168.0.4:1234", ps[0], "incorrect peer #1")
+		assert.Equal(t, "100.40.68.8:5000", ps[1], "incorrect peer #2")
+
+	})
+
+	viper.Set("meta.directory", "../../test/data/.toolkit")
+	testutil.ClearTmp("../../")
+}
+
+func TestSavePeersToFile(t *testing.T) {
+	beforeEach()
+	viper.Set("meta.directory", "../../test/data/tmp")
+
+	t.Run("success", func(t *testing.T) {
+		err := Peer().savePeersToFile()
+		assert.Nil(t, err, "no error expected")
+
+		ps, err := loadPeersFromFile()
+		assert.Nil(t, err, "no error expected")
+
+		assert.Equal(t, 1, len(ps), "only mock peer expected")
+	})
+
+	viper.Set("meta.directory", "../../test/data/.toolkit")
+	testutil.ClearTmp("../../")
+}
+
+func TestConnectToKnownPeers(t *testing.T) {
+	beforeEach()
+
+	t.Run("success", func(t *testing.T) {
+		ports := []uint{6750, 6751, 6752}
+
+		// * create test file
+		f, err := os.Create("../../test/data/.toolkit/peers.txt")
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		f.WriteString("192.168.0.1:6750\n192.168.0.1:6751\n192.168.0.1:6752\n")
+		f.Close()
+
+		// * start mock servers
+		err = testutil.StartMockServers(ports)
+		assert.Nil(t, err, "mock servers should start succesffuly")
+		time.Sleep(50 * time.Millisecond)
+
+		p := Peer()
+		p.connectToKnownPeers()
+
+		assert.Equal(t, 3, len(p.clients), "connected to all mock servers")
+		p.Broadcast("TEST_CONNECT_TO_KNOWN_PEERS\n")
+		time.Sleep(100 * time.Millisecond)
+
+		for _, port := range ports {
+			ms, ok := testutil.MockServers[port]
+			if !ok {
+				t.Fatal("Mock server not stored => can't test")
+			}
+
+			assert.Equal(t, "TEST_CONNECT_TO_KNOWN_PEERS\n", ms.GetLastMessage(), "received test message")
+		}
+
+		testutil.CloseAllMockServers()
+	})
+
 }

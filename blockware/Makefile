@@ -14,3 +14,8 @@ compile-library:
 	solc --abi ./contracts/library.sol -o build/abi --overwrite
 	solc --bin ./contracts/library.sol -o build/bin --overwrite
 	abigen --bin=./build/bin/Library.bin --abi=./build/abi/Library.abi --pkg=library --out=./build/contracts/library/library.go
+
+setup-profiles:
+	cp ./build/bin/blockware.exe ./test/profiles/1
+	cp ./build/bin/blockware.exe ./test/profiles/2
+	cp ./build/bin/blockware.exe ./test/profiles/3

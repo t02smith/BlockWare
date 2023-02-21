@@ -68,7 +68,7 @@ func (a *App) startup(ctx context.Context) {
 
 // get a list of owned games
 func (a *App) GetOwnedGames() []*AppGame {
-	gs := net.GetPeerInstance().GetLibrary().GetOwnedGames()
+	gs := net.Peer().GetLibrary().GetOwnedGames()
 	out := []*AppGame{}
 
 	for _, g := range gs {
@@ -91,7 +91,7 @@ func (a *App) GetOwnedGames() []*AppGame {
 
 // get a list of games from the eth store
 func (a *App) GetStoreGames() []*AppGame {
-	lib := net.GetPeerInstance().GetLibrary()
+	lib := net.Peer().GetLibrary()
 	err := ethereum.FillLibraryBlockchainGames(lib)
 	if err != nil {
 		return []*AppGame{}
@@ -120,7 +120,7 @@ func (a *App) GetStoreGames() []*AppGame {
 
 // get a list of downloads
 func (a *App) GetDownloads() map[string]*AppDownload {
-	ds := net.GetPeerInstance().GetLibrary().GetDownloads()
+	ds := net.Peer().GetLibrary().GetDownloads()
 	return downloadToGameDownloads(ds)
 }
 
@@ -134,7 +134,7 @@ func (a *App) IsDownloading(gh string) int {
 	gameHash := [32]byte{}
 	copy(gameHash[:], gh_tmp[:])
 
-	lib := net.GetPeerInstance().GetLibrary()
+	lib := net.Peer().GetLibrary()
 	g := lib.GetOwnedGame(gameHash)
 
 	// ? game exists
@@ -164,7 +164,7 @@ func (a *App) IsDownloading(gh string) int {
 // listen for incoming download progress alerts
 func (a *App) StartDownloadListener() {
 	go func() {
-		downloadChannel := net.GetPeerInstance().GetLibrary().DownloadProgress
+		downloadChannel := net.Peer().GetLibrary().DownloadProgress
 		for progress := range downloadChannel {
 			util.Logger.Infof("Download event received %x-%x", progress.GameHash, progress.BlockHash)
 			runtime.EventsEmit(a.ctx, fmt.Sprintf("%x", progress.GameHash), fmt.Sprintf("%x", progress.BlockHash))
@@ -183,7 +183,7 @@ func (a *App) CreateDownload(gh string) bool {
 	gameHash := [32]byte{}
 	copy(gameHash[:], gh_tmp[:])
 
-	lib := net.GetPeerInstance().GetLibrary()
+	lib := net.Peer().GetLibrary()
 	g := lib.GetOwnedGame(gameHash)
 
 	// ? game exists
@@ -257,9 +257,9 @@ func (a *App) DeployLibraryInstance(privateKey string) string {
 	return ethereum.GetContractAddress().Hex()
 }
 
-func (a *App) JoinLibraryInstance(address string) {
+func (a *App) JoinLibraryInstance(address, privateKey string) {
 	addr := common.HexToAddress(address)
-	err := ethereum.ConnectToLibraryInstance(addr)
+	err := ethereum.ConnectToLibraryInstance(addr, privateKey)
 	if err != nil {
 		util.Logger.Errorf("Error joining lib instance %s", err)
 	}

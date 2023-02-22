@@ -43,11 +43,7 @@ func TestGameListToMessage(t *testing.T) {
 		},
 	}
 
-	res, err := generateGAMES(games)
-	if err != nil {
-		t.Error(err)
-		return
-	}
+	res := generateGAMES(games...)
 
 	res = res[:len(res)-1]
 	parts := strings.Split(res, ";")
@@ -56,7 +52,7 @@ func TestGameListToMessage(t *testing.T) {
 	}
 
 	for i, g := range games {
-		if serialised, err := g.Serialise(); err != nil || serialised != parts[i+1] {
+		if fmt.Sprintf("%x", g.RootHash) != parts[i+1] {
 			t.Errorf("Incorrect serialised game in pos %d", i)
 		}
 	}
@@ -64,16 +60,6 @@ func TestGameListToMessage(t *testing.T) {
 
 func TestOnMessage(t *testing.T) {
 	testutil.ShortTest(t)
-
-	mp, err := testutil.StartMockPeer(7887, true)
-	if err != nil {
-		t.Fatalf("Failed to start mock peer %s", err)
-	}
-
-	t.Cleanup(func() {
-		mp.Clear()
-		testutil.ClearTmp("../../")
-	})
 
 	t.Run("LIBRARY", func(t *testing.T) {
 		var h [32]byte
@@ -88,33 +74,25 @@ func TestOnMessage(t *testing.T) {
 			RootHash:    h,
 		}
 
-		s, err := fakeGame.Serialise()
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		mockPeer.SetResponse("LIBRARY\n", fmt.Sprintf("GAMES;%s\n", s))
+		mockPeer.SetResponse("LIBRARY\n", generateGAMES(fakeGame))
 		mockPeerClient.SendString("LIBRARY\n")
 		time.Sleep(5 * time.Millisecond)
 
 		if pd, ok := testPeer.peers[mockPeerClient]; ok {
-
 			if len(pd.Library) == 0 {
 				t.Fatal("Games not stored")
 			}
 
-			g := pd.Library[0]
-			if !g.Equals(fakeGame) {
-				t.Fatal("Games not equal")
+			if _, ok := pd.Library[h]; !ok {
+				t.Fatal("Game not stored in peer's library")
 			}
-
-			return
 		}
 
-		t.Fatal("Game not stored in peer's library")
 	})
 
 	// SETUP TEST GAME
+	lib := Peer().GetLibrary()
+	_ = lib
 	g := Peer().GetLibrary().GetOwnedGame([32]byte{15, 158, 115, 2, 196, 26, 32, 86, 37, 148, 142, 89, 228, 208, 228, 199, 218, 164, 63, 61, 130, 248, 52, 193, 143, 10, 154, 1, 176, 67, 9, 239})
 
 	t.Run("BLOCK", func(t *testing.T) {
@@ -192,9 +170,9 @@ func TestOnMessage(t *testing.T) {
 				for i, shard := range file.Hashes {
 					err := sendBlock("../../test/data/tmp/toolkit/subdir/chip8.c", g, gameData, shard, i, buffer)
 					if err != nil {
-						t.Error(err)
+						t.Fatal(err)
 					}
-					time.Sleep(100 * time.Millisecond)
+					time.Sleep(25 * time.Millisecond)
 				}
 				// fmt.Println()
 			})
@@ -212,7 +190,6 @@ func TestOnMessage(t *testing.T) {
 
 	})
 
-	mp.Close()
 }
 
 // util functions

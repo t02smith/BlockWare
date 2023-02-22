@@ -1,18 +1,18 @@
 eth:
-  address: ws://localhost:8545
+    address: ws://localhost:8545
 games:
-  installfolder: ./test/data/tmp
+    installfolder: ./test/data/tmp
 meta:
-  directory: ./test/data/.toolkit
-  hashes:
-    shardsize: 16384
-    workercount: 5
-  log: stdout
-  threadpoolsize: 10
+    directory: ./test/data/.toolkit
+    hashes:
+        shardsize: 16384
+        workercount: 5
+    log: stdout
+    threadpoolsize: 10
 net:
-  port: 6749
-  useKnownPeers: false
+    port: 6749
+    useknownpeers: false
 user:
-  info:
-    domain: t02smith.com
-    name: tom
+    info:
+        domain: t02smith.com
+        name: tom

@@ -98,20 +98,20 @@ func TestConnectToKnownPeers(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		f.WriteString("192.168.0.1:6750\n192.168.0.1:6751\n192.168.0.1:6752\n")
+		f.WriteString("localhost:6750\nlocalhost:6751\nlocalhost:6752\n")
 		f.Close()
 
 		// * start mock servers
 		err = testutil.StartMockServers(ports)
 		assert.Nil(t, err, "mock servers should start succesffuly")
-		time.Sleep(50 * time.Millisecond)
+		time.Sleep(200 * time.Millisecond)
 
 		p := Peer()
 		p.connectToKnownPeers()
 
 		assert.Equal(t, 3, len(p.clients), "connected to all mock servers")
 		p.Broadcast("TEST_CONNECT_TO_KNOWN_PEERS\n")
-		time.Sleep(100 * time.Millisecond)
+		time.Sleep(10 * time.Millisecond)
 
 		for _, port := range ports {
 			ms, ok := testutil.MockServers[port]

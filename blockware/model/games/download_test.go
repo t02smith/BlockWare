@@ -53,14 +53,17 @@ func TestContinueDownload(t *testing.T) {
 
 	download.Progress[fileHash] = fileProgress
 
-	// * TESTT
+	// * TESTS
 
 	t.Run("success", func(t *testing.T) {
 		download.ContinueDownload(gameHash, channel)
 
 		request := <-channel
-		assert.Equal(t, gameHash, request.GameHash, "correct game hash in request")
-		assert.Equal(t, shardHash, request.BlockHash, "correct block hash in request")
+
+		t.Run("request received", func(t *testing.T) {
+			assert.Equal(t, gameHash, request.GameHash, "correct game hash in request")
+			assert.Equal(t, shardHash, request.BlockHash, "correct block hash in request")
+		})
 
 	})
 

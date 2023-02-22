@@ -12,6 +12,34 @@ import (
 	"github.com/t02smith/part-iii-project/toolkit/util"
 )
 
+/*
+
+This file is responsible for choosing blocks from each download
+and putting a request through to the downloader thread for them.
+
+Each game may have a download struct as part of it that can be
+in three possible states:
+
+1. Download not started => value is nil
+2. Download is started but not finished => Download.Progress has at least 1 value
+3. Download is finished => Download.Progress is empty
+
+Starting a download will:
+1. Use the HashTree to generate a set of dummy files that match the names
+   and directory structure of the game. By filling these files with empty
+	 data we can test whether the user has sufficient storage.
+	 TODO remove data if they don't
+2. Each file will be allocated a FileProgress struct that will be used to
+   track its blocks. This will alllow us to easily prioritise completing a
+	 whole file first.
+3. When donwloads are activated, it will send requests down a given channel
+   that will be used to actually process the download
+	 TODO limit how many requests can be sent at once i.e. wait for a batch
+	 TODO   to be downloaded first
+
+*/
+
+// A download manager for a game
 type Download struct {
 
 	// progress of each file being downloaded
@@ -21,6 +49,7 @@ type Download struct {
 	TotalBlocks int
 }
 
+// the progress of a specific file's download
 type FileProgress struct {
 
 	// where the file is located in storage
@@ -30,9 +59,21 @@ type FileProgress struct {
 	BlocksRemaining map[[32]byte]uint
 }
 
+/*
+Stores the details about a given block to attempt
+to download it.
+*/
 type DownloadRequest struct {
+
+	// details to uniquely identify the block
 	GameHash  [32]byte
 	BlockHash [32]byte
+
+	/* how many attempts have already been made to find
+	this block. After a certain number, this block will
+	either be timed out or cancelled for this session
+	*/
+	Attempts uint8
 }
 
 // ? setup
@@ -145,6 +186,7 @@ func (d *Download) ContinueDownload(gameHash [32]byte, newRequest chan DownloadR
 				newRequest <- DownloadRequest{
 					GameHash:  gameHash,
 					BlockHash: shard,
+					Attempts:  0,
 				}
 
 				for {

@@ -25,6 +25,10 @@ func beforeAll() {
 	}
 
 	_, err = net.StartPeer(
+		net.PeerConfig{
+			ContinueDownloads: false,
+			LoadPeersFromFile: false,
+		},
 		"localhost",
 		6749,
 		"../../test/data/tmp",

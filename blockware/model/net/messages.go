@@ -2,11 +2,17 @@ package net
 
 import (
 	"errors"
-	"fmt"
-	"time"
 
 	"github.com/t02smith/part-iii-project/toolkit/util"
 )
+
+/*
+
+This file defines useful communication functions for the peer
+such as how it should respond to incoming messages and when it
+should contact other peers with messages
+
+*/
 
 // process a message received from a peer
 func onMessage(cmd []string, client PeerIT) {
@@ -59,8 +65,32 @@ func (p *peer) listenToDownloadRequests() {
 	util.Logger.Info("Listening for incoming download requests")
 	go func() {
 		for request := range p.library.RequestDownload {
-			fmt.Println(request)
+			if request.Attempts > 32 {
+				// ! limit number of attempts we can make for a given download
+				continue
+			}
+
+			util.Logger.Infof("Processing request %s", request)
+			request.Attempts++
+
+			ps := p.findPeersWhoHaveGame(request.GameHash)
+			if len(ps) == 0 {
+				// ! no peers have games
+				p.refreshLibraries()
+
+				// TODO discovery
+
+				// * requeue and attempt later
+				p.library.RequestDownload <- request
+				continue
+			}
+
+			// * at least one peer has it
+			// TODO order peers by something
+			chosen := ps[0]
+			chosen.SendString(generateBLOCK(request.GameHash, request.BlockHash))
 		}
+		util.Logger.Info("stopped listening to incoming download requests")
 	}()
 }
 
@@ -99,8 +129,7 @@ func fetchBlockFromLibrary(gameHash, shardHash [32]byte) ([]byte, error) {
 // * UTIL
 
 // refresh all known peer's game libraries
-func refreshLibraries() {
+func (p *peer) refreshLibraries() {
 	util.Logger.Info("Refreshing peer library data")
-	Peer().Broadcast(generateLIBRARY())
-	time.Sleep(50 * time.Second)
+	p.Broadcast(generateLIBRARY())
 }

@@ -124,6 +124,10 @@ func defaultConfig() {
 func startPeer() error {
 	util.Logger.Info("Attempting to start peer")
 	_, err := net.StartPeer(
+		net.PeerConfig{
+			ContinueDownloads: true,
+			LoadPeersFromFile: true,
+		},
 		"localhost",
 		viper.GetUint("net.port"),
 		viper.GetString("games.installFolder"),

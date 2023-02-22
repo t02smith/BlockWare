@@ -161,7 +161,7 @@ func (l *Library) GetDownloads() map[[32]byte]*Download {
 // close down a current library instance
 func (l *Library) Close() {
 	close(l.DownloadProgress)
-	close(l.RequestDownload)
+	l.StopDownloads()
 
 	metaDir := viper.GetString("meta.directory")
 	for _, g := range l.ownedGames {
@@ -170,4 +170,28 @@ func (l *Library) Close() {
 			util.Logger.Warnf("Error outputting game %x to file: %s", g.RootHash, err)
 		}
 	}
+}
+
+// stop downloads from making requests
+func (l *Library) StopDownloads() {
+	util.Logger.Info("Stopping download requests")
+	close(l.RequestDownload)
+	l.RequestDownload = nil
+}
+
+// continue a libraries downloads
+func (l *Library) ContinueDownloads() {
+	util.Logger.Info("Continuing downloads")
+	l.RequestDownload = make(chan DownloadRequest)
+
+	count := 0
+	for _, g := range l.ownedGames {
+		if g.Download.Finished() {
+			continue
+		}
+
+		g.Download.ContinueDownload(g.RootHash, l.RequestDownload)
+		count++
+	}
+	util.Logger.Infof("Started %d downloads", count)
 }

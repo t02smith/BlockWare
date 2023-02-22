@@ -31,7 +31,7 @@ func beforeAll() {
 	viper.Set("meta.directory", "../../test/data/.toolkit")
 	viper.Set("games.installFolder", "../../test/data/tmp")
 
-	tp, err := StartPeer("localhost", 7887, "../../test/data/tmp", "../../test/data/.toolkit")
+	tp, err := StartPeer(PeerConfig{false, false}, "localhost", 7887, "../../test/data/tmp", "../../test/data/.toolkit")
 	if err != nil {
 		log.Printf("Error starting test peer")
 		os.Exit(1)

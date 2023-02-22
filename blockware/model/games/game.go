@@ -19,7 +19,6 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/spf13/viper"
 	hashIO "github.com/t02smith/part-iii-project/toolkit/model/hash"
-	"github.com/t02smith/part-iii-project/toolkit/test/testutil"
 	"github.com/t02smith/part-iii-project/toolkit/util"
 )
 
@@ -107,7 +106,7 @@ func CreateGame(title, version, releaseDate, developer, rootDir string, price *b
 		IPFSId:          "",
 		Price:           price,
 		PreviousVersion: [32]byte{},
-		Uploader:        common.HexToAddress(testutil.Accounts[0][0]),
+		Uploader:        common.Address{},
 	}
 
 	return game, nil
@@ -131,6 +130,8 @@ func (g *Game) ReadHashData() error {
 	return nil
 }
 
+// * IO
+
 // output data to file
 func OutputAllGameDataToFile(g *Game) error {
 	gameFilename := filepath.Join(viper.GetString("meta.directory"), "games", fmt.Sprintf("%x", g.RootHash))
@@ -149,6 +150,7 @@ func OutputAllGameDataToFile(g *Game) error {
 	return nil
 }
 
+// output a game to file
 func (g *Game) OutputToFile(filename string) error {
 	util.Logger.Infof("Outputting game data to %s", filename)
 
@@ -221,6 +223,7 @@ func LoadGames(gameDataLocation string) ([]*Game, error) {
 			continue
 		}
 
+		gameFile.Close()
 		games = append(games, &gm)
 	}
 

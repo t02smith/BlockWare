@@ -75,12 +75,13 @@ func StartMockServer(port uint) (*MockServer, error) {
 	}
 
 	go func() {
-		con, err := ms.listener.Accept()
 		defer ms.Close()
+		con, err := ms.listener.Accept()
 		if err != nil {
 			util.Logger.Error(err)
 			return
 		}
+		util.Logger.Info("MOCK SERVER: connection made")
 
 		ms.con = con
 		ms.reader = bufio.NewReader(con)

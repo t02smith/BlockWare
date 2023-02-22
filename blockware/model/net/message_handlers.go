@@ -3,6 +3,7 @@ package net
 import (
 	"bytes"
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"path/filepath"
 
@@ -11,19 +12,20 @@ import (
 	"github.com/t02smith/part-iii-project/toolkit/util"
 )
 
-/**
+/*
 
-Functions that define how different messages
-should be processed and responded to.
-
-Generators are included to make creating messages
-easier from the expected set of parameters
+This file defines specific interactions/commands. For each command it:
+1. has a generator function for creating a structured message given the
+   required set of parameters. This reduces code duplication.
+2. has a handler to deal with an incoming message from another peer,
 
 Current handlers are:
 LIBRARY => request a users game library
 GAMES => receive a users game library
 BLOCK => request a block of data from a user
 SEND_BLOCK => receive a block of data from a user
+ERROR => an error message to send to a peer
+				 TODO properly deal with incoming errors
 
 */
 
@@ -41,47 +43,49 @@ func handleLIBRARY(cmd []string, client PeerIT) error {
 		return err
 	}
 
-	gameStr, err := generateGAMES(gameLs)
-	if err != nil {
-		return err
-	}
-
-	return client.SendString(gameStr)
+	return client.SendString(generateGAMES(gameLs...))
 }
 
-// GAMES <serialised game>, <serialised game>, ...
+// GAMES <game hash>, <game hash>, ...
 
-func generateGAMES(games []*games.Game) (string, error) {
+func generateGAMES(games ...*games.Game) string {
 	var buf bytes.Buffer
 	buf.WriteString("GAMES;")
 
 	for i, g := range games {
-		encoded, err := g.Serialise()
+		_, err := buf.WriteString(fmt.Sprintf("%x", g.RootHash))
 		if err != nil {
-			return "", nil
+			util.Logger.Warnf("Errors writing root hash for game %x => skipping from message", g.RootHash)
+			continue
 		}
 
-		buf.WriteString(encoded)
 		if i != len(games)-1 {
 			buf.WriteString(";")
 		}
 	}
 
 	buf.WriteString("\n")
-	return buf.String(), nil
+	return buf.String()
 }
 
 func handleGAMES(cmd []string, client PeerIT) error {
 	util.Logger.Infof("Games command called")
 
-	ls, err := gameMessageToGameList(cmd)
-	if err != nil {
-		return err
+	pData, ok := Peer().peers[client]
+	if !ok {
+		return errors.New("unknown peer")
 	}
 
-	if peer, ok := Peer().peers[client]; ok {
-		util.Logger.Infof("Client found. Updating library")
-		peer.Library = ls
+	for i := 1; i < len(cmd); i++ {
+		var hash [32]byte
+
+		receivedHash, err := hex.DecodeString(cmd[i])
+		if err != nil {
+			return err
+		}
+
+		copy(hash[:], receivedHash)
+		pData.Library[hash] = true
 	}
 
 	return nil
@@ -166,10 +170,10 @@ func handleSEND_BLOCK(cmd []string, client PeerIT) error {
 	}
 
 	// send message as confirmation
-	Peer().library.DownloadProgress <- games.DownloadRequest{
-		GameHash:  gh,
-		BlockHash: sh,
-	}
+	// Peer().library.DownloadProgress <- games.DownloadRequest{
+	// 	GameHash:  gh,
+	// 	BlockHash: sh,
+	// }
 
 	util.Logger.Infof("Successfully inserted shard %x", sh)
 	return nil

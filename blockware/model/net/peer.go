@@ -44,6 +44,9 @@ type PeerIT interface {
 // A peer represents a node in a distributed network
 type peer struct {
 
+	// config
+	config PeerConfig
+
 	// connections
 	server  *TCPServer
 	clients []*TCPClient
@@ -59,6 +62,16 @@ type peer struct {
 	knownPeerAddresses []string
 }
 
+// Runtime configuration settings for the peer
+type PeerConfig struct {
+
+	// attempt to start downloads when starting the peer
+	ContinueDownloads bool
+
+	// read and attempt to connect to peers from a file
+	LoadPeersFromFile bool
+}
+
 // Stores useful information about other peers
 type PeerData struct {
 
@@ -70,7 +83,7 @@ type PeerData struct {
 	Peer PeerIT
 
 	// what games they have installed
-	Library []*games.Game
+	Library map[[32]byte]bool
 }
 
 // Get the singleton instance of the current peer if it exists
@@ -79,14 +92,13 @@ func Peer() *peer {
 }
 
 // start a new instance of a peer
-func StartPeer(serverHostname string, serverPort uint, installFolder, toolkitFolder string) (*peer, error) {
+func StartPeer(config PeerConfig, serverHostname string, serverPort uint, installFolder, toolkitFolder string) (*peer, error) {
 	util.Logger.Info("Starting peer")
 	once.Do(func() {
 		gameLs, err := games.LoadGames(filepath.Join(toolkitFolder, "games"))
 		if err != nil {
 			return
 		}
-
 		util.Logger.Infof("Found %d games", len(gameLs))
 
 		lib := games.NewLibrary()
@@ -98,9 +110,13 @@ func StartPeer(serverHostname string, serverPort uint, installFolder, toolkitFol
 		}
 
 		lib.OutputGamesTable()
-		knownPeers, err := loadPeersFromFile()
-		if err != nil {
-			util.Logger.Warnf("Error fetching known peers from file %s", err)
+
+		var knownPeers []string = []string{}
+		if config.LoadPeersFromFile {
+			knownPeers, err = loadPeersFromFile()
+			if err != nil {
+				util.Logger.Warnf("Error fetching known peers from file %s", err)
+			}
 		}
 
 		singleton = &peer{
@@ -110,14 +126,18 @@ func StartPeer(serverHostname string, serverPort uint, installFolder, toolkitFol
 			installFolder:      installFolder,
 			library:            lib,
 			knownPeerAddresses: knownPeers,
+			config:             config,
 		}
 
-		if viper.GetBool("net.useKnownPeers") {
+		if config.LoadPeersFromFile {
 			go singleton.connectToKnownPeers()
 		}
 
+		if config.ContinueDownloads {
+			singleton.listenToDownloadRequests()
+		}
+
 		go singleton.server.Start(onMessage)
-		singleton.listenToDownloadRequests()
 	})
 
 	return singleton, nil
@@ -140,7 +160,7 @@ func (p *peer) onConnection(hostname string, port uint, peer PeerIT) {
 		Hostname: hostname,
 		Port:     port,
 		Peer:     peer,
-		Library:  []*games.Game{},
+		Library:  make(map[[32]byte]bool),
 	}
 }
 
@@ -273,5 +293,24 @@ func (p *peer) Close() {
 func (p *peer) Broadcast(message string) {
 	for peer := range p.peers {
 		peer.SendString(message)
+	}
+}
+
+// * CONFIG settings
+
+func (p *peer) SetContinueDownloads(state bool) {
+	if p.config.ContinueDownloads == state {
+		return
+	}
+
+	util.Logger.Infof("Setting continue downloads to %s", state)
+	p.config.ContinueDownloads = state
+	if state {
+		// start downloads
+		p.library.ContinueDownloads()
+		singleton.listenToDownloadRequests()
+	} else {
+		// pause downloads
+		p.library.StopDownloads()
 	}
 }

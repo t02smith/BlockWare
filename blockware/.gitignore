@@ -3,3 +3,4 @@ node_modules
 frontend/dist
 blockware.exe
 test/profiles/*/.toolkit
+./*.exe

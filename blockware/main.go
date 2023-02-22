@@ -5,12 +5,14 @@ package main
 
 import (
 	"embed"
+	"flag"
 	"log"
 
 	"github.com/spf13/viper"
 	"github.com/t02smith/part-iii-project/toolkit/model"
 	"github.com/t02smith/part-iii-project/toolkit/model/ethereum"
 	"github.com/t02smith/part-iii-project/toolkit/model/net"
+	"github.com/t02smith/part-iii-project/toolkit/test/profiles"
 	"github.com/t02smith/part-iii-project/toolkit/util"
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/options"
@@ -22,28 +24,47 @@ var assets embed.FS
 
 func main() {
 	util.InitLogger()
+
+	// * FLAGS
+	profile := flag.Uint("profile", 0, "Run the application as a profile. (default off | see profiles.go for details)")
+	flag.Parse()
+
+	// ? run a profile
+	if *profile != 0 {
+		err := profiles.RunProfile(*profile)
+		if err != nil {
+			util.Logger.Errorf("Error running profile %d: %s", *profile, err)
+		}
+		return
+	}
+
+	// * setup
+	util.Logger.Info("No profile selected => Running default application")
 	SetupConfig()
 	defer viper.WriteConfig()
 
 	model.SetupToolkitEnvironment()
 
-	// model setup
+	// * model setup
+
+	// ? start peer
 	err := startPeer()
 	if err != nil {
 		log.Fatalf("Error starting peer %s", err)
 	}
 	defer net.Peer().Close()
 
+	// ? start ETH client
 	_, _, err = ethereum.StartClient(viper.GetString("eth.address"))
 	if err != nil {
 		util.Logger.Fatalf("Error starting eth client %s", err)
 	}
 	defer ethereum.CloseEthClient()
 
+	// * Wails application
 	util.Logger.Info("Starting GUI")
 	app := NewApp()
 
-	// Create application with options
 	err = wails.Run(&options.App{
 		Title:  "blockware",
 		Width:  1300,

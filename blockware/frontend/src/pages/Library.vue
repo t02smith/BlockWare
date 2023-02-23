@@ -40,7 +40,7 @@
 import { ref, watch, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import GameEntry from "../components/store/GameEntry.vue";
-import { IsDownloading } from "../../wailsjs/go/main/App";
+import { IsDownloading } from "../../wailsjs/go/controller/Controller";
 import { useGamesStore } from "../stores/games";
 
 const props = defineProps({

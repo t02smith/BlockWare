@@ -12,6 +12,7 @@
       <router-link to="/library">🕹️ Library</router-link>
       <router-link to="/upload">🆕 Upload</router-link>
       <router-link to="/store">💵 Store</router-link>
+      <router-link to="/peers">🫂 Peers</router-link>
     </div>
   </nav>
 </template>

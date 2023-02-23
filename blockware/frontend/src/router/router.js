@@ -9,6 +9,7 @@ const router = new createRouter({
     { path: "/library", component: () => import("../pages/Library.vue") },
     { path: "/store", component: () => import("../pages/Store.vue") },
     { path: "/downloads", component: () => import("../pages/Downloads.vue") },
+    { path: "/peers", component: () => import("../pages/Peers.vue") },
   ],
 });
 

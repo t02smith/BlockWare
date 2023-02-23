@@ -19,3 +19,7 @@ setup-profiles:
 	cp ./build/bin/blockware.exe ./test/profiles/1
 	cp ./build/bin/blockware.exe ./test/profiles/2
 	cp ./build/bin/blockware.exe ./test/profiles/3
+
+build-profiles:
+	cd frontend && npm install && npm build
+	go build

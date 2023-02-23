@@ -1,6 +1,6 @@
-export namespace main {
+export namespace controller {
 	
-	export class AppGame {
+	export class ControllerGame {
 	    title: string;
 	    version: string;
 	    release: string;
@@ -11,11 +11,11 @@ export namespace main {
 	    // Go type: big.Int
 	    price?: any;
 	    uploader: number[];
-	    // Go type: AppDownload
+	    // Go type: ControllerDownload
 	    download?: any;
 	
 	    static createFrom(source: any = {}) {
-	        return new AppGame(source);
+	        return new ControllerGame(source);
 	    }
 	
 	    constructor(source: any = {}) {

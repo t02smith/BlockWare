@@ -52,7 +52,7 @@ type peer struct {
 	clients []*TCPClient
 
 	// state
-	peers map[PeerIT]*PeerData
+	peers map[PeerIT]*peerData
 
 	// data
 	installFolder string
@@ -73,7 +73,7 @@ type PeerConfig struct {
 }
 
 // Stores useful information about other peers
-type PeerData struct {
+type peerData struct {
 
 	// peer details for logging
 	Hostname string
@@ -122,7 +122,7 @@ func StartPeer(config PeerConfig, serverHostname string, serverPort uint, instal
 		singleton = &peer{
 			server:             InitServer(serverHostname, serverPort),
 			clients:            []*TCPClient{},
-			peers:              make(map[PeerIT]*PeerData),
+			peers:              make(map[PeerIT]*peerData),
 			installFolder:      installFolder,
 			library:            lib,
 			knownPeerAddresses: knownPeers,
@@ -156,7 +156,7 @@ func (p *peer) ConnectToPeer(hostname string, portNo uint) error {
 
 // run this function every time we connect to a new peer
 func (p *peer) onConnection(hostname string, port uint, peer PeerIT) {
-	p.peers[peer] = &PeerData{
+	p.peers[peer] = &peerData{
 		Hostname: hostname,
 		Port:     port,
 		Peer:     peer,
@@ -262,12 +262,12 @@ func (p *peer) savePeersToFile() error {
 // * GETTERS
 
 // get a list of peers
-func (p *peer) GetPeers() map[PeerIT]*PeerData {
+func (p *peer) GetPeers() map[PeerIT]*peerData {
 	return p.peers
 }
 
 // get an existing peer
-func (p *peer) GetPeer(peer PeerIT) *PeerData {
+func (p *peer) GetPeer(peer PeerIT) *peerData {
 	return p.peers[peer]
 }
 

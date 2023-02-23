@@ -5,7 +5,7 @@ import {
   GetStoreGames,
   GetDownloads,
   CreateDownload,
-} from "../../wailsjs/go/main/App.js";
+} from "../../wailsjs/go/controller/Controller";
 
 export const useGamesStore = defineStore("games", () => {
   // what games do they own

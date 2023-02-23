@@ -3,7 +3,7 @@ import { ref } from "vue";
 import {
   DeployLibraryInstance,
   JoinLibraryInstance,
-} from "../../wailsjs/go/main/App";
+} from "../../wailsjs/go/controller/Controller";
 
 export const useEthStore = defineStore("eth", () => {
   const contractAddress = ref("");

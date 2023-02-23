@@ -168,7 +168,7 @@
 </template>
 <script setup>
 import { onMounted, ref, computed } from "vue";
-import { UploadGame } from "../../wailsjs/go/main/App.js";
+import { UploadGame } from "../../wailsjs/go/controller/Controller";
 import { EventsOn } from "../../wailsjs/runtime/runtime";
 import Error from "../components/Error.vue";
 

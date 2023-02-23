@@ -9,6 +9,7 @@ import (
 	"log"
 
 	"github.com/spf13/viper"
+	"github.com/t02smith/part-iii-project/toolkit/controller"
 	"github.com/t02smith/part-iii-project/toolkit/model"
 	"github.com/t02smith/part-iii-project/toolkit/model/ethereum"
 	"github.com/t02smith/part-iii-project/toolkit/model/net"
@@ -19,7 +20,7 @@ import (
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
 )
 
-//go:embed all:frontend/dist
+//go:embed all:view/dist
 var assets embed.FS
 
 func main() {
@@ -27,15 +28,20 @@ func main() {
 
 	// * FLAGS
 	profile := flag.Uint("profile", 0, "Run the application as a profile. (default off | see profiles.go for details)")
+	contractAddr := flag.String("contract", "", "The address of the deployed contract")
+
 	flag.Parse()
 
 	// ? run a profile
 	if *profile != 0 {
-		err := profiles.RunProfile(*profile)
+		// if *contractAddr == "" {
+		// 	util.Logger.Fatal("invalid contract address")
+		// }
+
+		err := profiles.RunProfile(profiles.Profile(*profile), *contractAddr)
 		if err != nil {
-			util.Logger.Errorf("Error running profile %d: %s", *profile, err)
+			util.Logger.Fatalf("Error running profile %d: %s", *profile, err)
 		}
-		return
 	}
 
 	// * setup
@@ -63,7 +69,7 @@ func main() {
 
 	// * Wails application
 	util.Logger.Info("Starting GUI")
-	app := NewApp()
+	controller := controller.NewController()
 
 	err = wails.Run(&options.App{
 		Title:  "blockware",
@@ -72,9 +78,9 @@ func main() {
 		AssetServer: &assetserver.Options{
 			Assets: assets,
 		},
-		OnStartup: app.startup,
+		OnStartup: controller.Startup,
 		Bind: []interface{}{
-			app,
+			controller,
 		},
 	})
 

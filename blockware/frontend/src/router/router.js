@@ -8,6 +8,10 @@ const router = new createRouter({
     { path: "/upload", component: () => import("../pages/Upload.vue") },
     { path: "/library", component: () => import("../pages/Library.vue") },
     { path: "/store", component: () => import("../pages/Store.vue") },
+    {
+      path: "/store/entry",
+      component: () => import("../pages/StoreEntry.vue"),
+    },
     { path: "/downloads", component: () => import("../pages/Downloads.vue") },
     { path: "/peers", component: () => import("../pages/Peers.vue") },
   ],

@@ -9,32 +9,54 @@
       </p>
     </div>
 
-    <div class="search">
+    <form class="search" @submit.prevent="searchForGame">
       <h3>Search for a game:</h3>
       <input
-        disabled
+        v-model="search"
         type="text"
         name=""
         id=""
         placeholder="The game's root hash"
       />
-    </div>
+      <button type="submit">Search</button>
+    </form>
+
+    <div class="searched-game" v-if="searchedGame"></div>
 
     <div class="featured">
-      <CustomLibrary :games="games.storeGames" name="Featured" />
+      <CustomLibrary
+        gameLinkTo="store/entry"
+        :games="games.storeGames"
+        name="Featured"
+      />
     </div>
   </div>
 </template>
 <script setup>
-import { onMounted } from "vue";
+import { onMounted, ref } from "vue";
 import CustomLibrary from "../components/library/CustomLibrary.vue";
 import { useGamesStore } from "../stores/games";
+import { GetGameFromStoreByRootHash } from "../../wailsjs/go/controller/Controller";
 
 const games = useGamesStore();
 
 onMounted(async () => {
   games.getStoreGames();
 });
+
+// search
+const search = ref("");
+const searchedGame = ref(null);
+
+async function searchForGame() {
+  if (search.value.length === 0) return;
+
+  const g = GetGameFromStoreByRootHash(search.value);
+  if (g === null) return;
+
+  searchedGame.value = g;
+  search.value = null;
+}
 </script>
 <style scoped lang="scss">
 .store {

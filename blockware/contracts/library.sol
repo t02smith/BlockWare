@@ -68,10 +68,8 @@ contract Library {
     function purchaseGame(bytes32 _game) public payable {
       require(bytes(games[_game].title).length > 0, "game not found");
       
-      GameEntry storage game = games[_game];
-      require(msg.value >= game.price, "user cannot afford game");
-
-      require(purchases[_game][msg.sender], "user already owns game");
+      GameEntry memory game = games[_game];
+      require(!purchases[_game][msg.sender], "user already owns game");
 
       game.uploader.transfer(game.price);
       purchases[_game][msg.sender] = true;

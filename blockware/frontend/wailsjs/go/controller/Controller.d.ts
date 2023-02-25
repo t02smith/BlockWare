@@ -5,11 +5,13 @@ import {controller} from '../models';
 
 export function ConnectToPeer(arg1:string,arg2:number):Promise<void>;
 
-export function CreateDownload(arg1:string):Promise<boolean>;
+export function CreateDownload(arg1:string):Promise<void>;
 
 export function DeployLibraryInstance(arg1:string):Promise<string>;
 
 export function GetDownloads():Promise<map[string]controller.ControllerDownload>;
+
+export function GetGameFromStoreByRootHash(arg1:string):Promise<controller.ControllerGame>;
 
 export function GetOwnedGames():Promise<Array<controller.ControllerGame>>;
 
@@ -21,6 +23,8 @@ export function IsDownloading(arg1:string):Promise<number>;
 
 export function JoinLibraryInstance(arg1:string,arg2:string):Promise<void>;
 
+export function PurchaseGame(arg1:string):Promise<void>;
+
 export function StartDownloadListener():Promise<void>;
 
-export function UploadGame(arg1:string,arg2:string,arg3:string,arg4:string,arg5:number,arg6:number,arg7:number):Promise<string>;
+export function UploadGame(arg1:string,arg2:string,arg3:string,arg4:string,arg5:number,arg6:number,arg7:number):Promise<void>;

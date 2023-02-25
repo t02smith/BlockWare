@@ -2,6 +2,8 @@
   <div class="main">
     <Navbar v-if="route !== '/'" />
 
+    <Error />
+
     <div class="router-view">
       <router-view />
     </div>
@@ -10,6 +12,7 @@
 <script setup>
 import { computed } from "vue";
 import { useRoute } from "vue-router";
+import Error from "./components/Error.vue";
 import Navbar from "./components/Navbar.vue";
 
 const router = useRoute();

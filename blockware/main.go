@@ -20,7 +20,7 @@ import (
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
 )
 
-//go:embed all:view/dist
+//go:embed all:frontend/dist
 var assets embed.FS
 
 func main() {
@@ -38,6 +38,7 @@ func main() {
 		// 	util.Logger.Fatal("invalid contract address")
 		// }
 
+		util.Logger.Infof("profile %d selected", *profile)
 		err := profiles.RunProfile(profiles.Profile(*profile), *contractAddr)
 		if err != nil {
 			util.Logger.Fatalf("Error running profile %d: %s", *profile, err)
@@ -68,9 +69,9 @@ func main() {
 	defer ethereum.CloseEthClient()
 
 	// * Wails application
-	util.Logger.Info("Starting GUI")
 	controller := controller.NewController()
 
+	util.Logger.Info("Starting GUI")
 	err = wails.Run(&options.App{
 		Title:  "blockware",
 		Width:  1300,

@@ -16,6 +16,10 @@ should contact other peers with messages
 
 // process a message received from a peer
 func onMessage(cmd []string, client PeerIT) {
+	if cmd[0][len(cmd[0])-1] == '\r' {
+		cmd[0] = cmd[0][:len(cmd[0])-1]
+	}
+
 	switch cmd[0] {
 
 	// LIBRARY => request a list of a peers games

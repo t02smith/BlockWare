@@ -17,7 +17,7 @@ import (
 	"github.com/t02smith/part-iii-project/toolkit/test/testutil"
 )
 
-func TestGameListToMessage(t *testing.T) {
+func TestGenerateGames(t *testing.T) {
 	testutil.ShortTest(t)
 
 	var h1 [32]byte
@@ -91,9 +91,9 @@ func TestOnMessage(t *testing.T) {
 	})
 
 	// SETUP TEST GAME
-	lib := Peer().GetLibrary()
+	lib := Peer().Library()
 	_ = lib
-	g := Peer().GetLibrary().GetOwnedGame([32]byte{15, 158, 115, 2, 196, 26, 32, 86, 37, 148, 142, 89, 228, 208, 228, 199, 218, 164, 63, 61, 130, 248, 52, 193, 143, 10, 154, 1, 176, 67, 9, 239})
+	g := Peer().Library().GetOwnedGame([32]byte{15, 158, 115, 2, 196, 26, 32, 86, 37, 148, 142, 89, 228, 208, 228, 199, 218, 164, 63, 61, 130, 248, 52, 193, 143, 10, 154, 1, 176, 67, 9, 239})
 
 	t.Run("BLOCK", func(t *testing.T) {
 
@@ -137,7 +137,7 @@ func TestOnMessage(t *testing.T) {
 
 		t.Run("success", func(t *testing.T) {
 
-			err := Peer().GetLibrary().CreateDownload(g)
+			err := Peer().Library().CreateDownload(g)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -205,7 +205,7 @@ func TestFetchBlock(t *testing.T) {
 	})
 
 	p := Peer()
-	g := p.GetLibrary().GetOwnedGame([32]byte{15, 158, 115, 2, 196, 26, 32, 86, 37, 148, 142, 89, 228, 208, 228, 199, 218, 164, 63, 61, 130, 248, 52, 193, 143, 10, 154, 1, 176, 67, 9, 239})
+	g := p.Library().GetOwnedGame([32]byte{15, 158, 115, 2, 196, 26, 32, 86, 37, 148, 142, 89, 228, 208, 228, 199, 218, 164, 63, 61, 130, 248, 52, 193, 143, 10, 154, 1, 176, 67, 9, 239})
 
 	t.Run("game exists but block does not", func(t *testing.T) {
 		_, err := fetchBlockFromLibrary(g.RootHash, [32]byte{})

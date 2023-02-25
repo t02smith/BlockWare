@@ -18,6 +18,10 @@ export function GetDownloads() {
   return window['go']['controller']['Controller']['GetDownloads']();
 }
 
+export function GetGameFromStoreByRootHash(arg1) {
+  return window['go']['controller']['Controller']['GetGameFromStoreByRootHash'](arg1);
+}
+
 export function GetOwnedGames() {
   return window['go']['controller']['Controller']['GetOwnedGames']();
 }
@@ -36,6 +40,10 @@ export function IsDownloading(arg1) {
 
 export function JoinLibraryInstance(arg1, arg2) {
   return window['go']['controller']['Controller']['JoinLibraryInstance'](arg1, arg2);
+}
+
+export function PurchaseGame(arg1) {
+  return window['go']['controller']['Controller']['PurchaseGame'](arg1);
 }
 
 export function StartDownloadListener() {

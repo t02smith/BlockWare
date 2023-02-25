@@ -99,7 +99,7 @@ func SetupProfile(path, privateKey string, contractAddr common.Address, config n
 		return fmt.Errorf("error starting eth client %s", err)
 	}
 
-	err = ethereum.ConnectToLibraryInstance(contractAddr, privateKey)
+	_, _, err = ethereum.DeployLibraryContract(privateKey)
 	if err != nil {
 		return fmt.Errorf("error connecting to lib instance %s", err)
 	}

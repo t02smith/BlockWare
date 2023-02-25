@@ -29,17 +29,18 @@ func NewController() *Controller {
 
 // startup is called when the app starts. The context is saved
 // so we can call the runtime methods
-func (a *Controller) Startup(ctx context.Context) {
+func (c *Controller) Startup(ctx context.Context) {
 	util.Logger.Info("Starting app context")
-	a.ctx = ctx
+	c.ctx = ctx
 }
 
 // ? Interface functions
 
 // deploy a new instance of the library contract
-func (a *Controller) DeployLibraryInstance(privateKey string) string {
+func (c *Controller) DeployLibraryInstance(privateKey string) string {
 	_, _, err := ethereum.DeployLibraryContract(privateKey)
 	if err != nil {
+		c.controllerErrorf("Error deploying instance %s", err.Error())
 		return ""
 	}
 
@@ -47,10 +48,10 @@ func (a *Controller) DeployLibraryInstance(privateKey string) string {
 }
 
 // connect to an existing library contract
-func (a *Controller) JoinLibraryInstance(address, privateKey string) {
+func (c *Controller) JoinLibraryInstance(address, privateKey string) {
 	addr := common.HexToAddress(address)
 	err := ethereum.ConnectToLibraryInstance(addr, privateKey)
 	if err != nil {
-		util.Logger.Errorf("Error joining lib instance %s", err)
+		c.controllerErrorf("Error joining lib instance %s", err.Error())
 	}
 }

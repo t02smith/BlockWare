@@ -5,6 +5,7 @@ import {
   GetStoreGames,
   GetDownloads,
   CreateDownload,
+  PurchaseGame,
 } from "../../wailsjs/go/controller/Controller";
 
 export const useGamesStore = defineStore("games", () => {
@@ -48,6 +49,12 @@ export const useGamesStore = defineStore("games", () => {
     storeGames.value = await GetStoreGames();
   }
 
+  async function purchase(gameHash) {
+    if (ownedGames.value.find((g) => g.rootHash === gameHash)) return;
+
+    await PurchaseGame(gameHash);
+  }
+
   return {
     ownedGames,
     downloads,
@@ -56,5 +63,6 @@ export const useGamesStore = defineStore("games", () => {
     refreshDownloads,
     refreshOwnedGames,
     getStoreGames,
+    purchase,
   };
 });

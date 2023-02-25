@@ -73,10 +73,15 @@ func Run() {
 		util.Logger.Fatalf("Error creating game: %s", err)
 	}
 
-	p.GetLibrary().AddOwnedGame(g)
+	p.Library().AddOwnedGame(g)
 	err = ethereum.Upload(g)
 	if err != nil {
 		util.Logger.Fatalf("Error uploading game to ETH %s", err)
+	}
+
+	err = games.OutputAllGameDataToFile(g)
+	if err != nil {
+		util.Logger.Warnf("Error saving game to file %s", err)
 	}
 
 	// * listen for connections

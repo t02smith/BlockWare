@@ -97,7 +97,7 @@ func TestEthereum(t *testing.T) {
 		}
 
 		t.Run("game already owned", func(t *testing.T) {
-			err := Purchase(net.Peer().GetLibrary(), testGame.RootHash)
+			err := Purchase(net.Peer().Library(), testGame.RootHash)
 			if err.Error() != fmt.Sprintf("game %x already purchased", testGame.RootHash) {
 				t.Error("Already owned game not detected")
 			}

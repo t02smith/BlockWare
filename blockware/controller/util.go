@@ -1,10 +1,35 @@
 package controller
 
 import (
+	"encoding/hex"
 	"fmt"
 
 	"github.com/t02smith/part-iii-project/toolkit/model/games"
+	"github.com/t02smith/part-iii-project/toolkit/util"
+	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
+
+/*
+
+Error messages
+All error messages are emitted as events so that
+the frontend can show them on screen for the user
+to help debug
+
+*/
+
+// log and emit an error
+func (c *Controller) controllerError(err string) {
+	util.Logger.Error(err)
+	runtime.EventsEmit(c.ctx, "error", err)
+}
+
+// Controller.controllerError fmt.sprintf wrapper
+func (c *Controller) controllerErrorf(err string, args ...any) {
+	c.controllerError(fmt.Sprintf(err, args...))
+}
+
+// misc
 
 func downloadToGameDownloads(ds map[[32]byte]*games.Download) map[string]*ControllerDownload {
 	out := make(map[string]*ControllerDownload)
@@ -40,4 +65,15 @@ func downloadToAppDownload(d *games.Download) *ControllerDownload {
 	}
 
 	return x
+}
+
+// converts a hex string to a 32 byte array
+func hashStringToByte32(hash string) ([32]byte, error) {
+	gh_tmp, err := hex.DecodeString(hash)
+	if err != nil {
+		return [32]byte{}, err
+	}
+	gameHash := [32]byte{}
+	copy(gameHash[:], gh_tmp[:])
+	return gameHash, nil
 }

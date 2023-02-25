@@ -1,5 +1,5 @@
 eth:
-  address: ws://192.168.43.75:8545
+  address: ws://localhost:8545
 games:
   installfolder: .
 meta:

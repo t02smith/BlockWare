@@ -238,7 +238,7 @@ func watchNewGameEvent() error {
 				}
 			case newGame := <-newGameChannel:
 				util.Logger.Infof("New game received with hash %x. Adding to library.", newGame.Hash)
-				p.GetLibrary().SetBlockchainGame(newGame.Hash, gameEntryToGame(&newGame.Game))
+				p.Library().SetBlockchainGame(newGame.Hash, gameEntryToGame(&newGame.Game))
 			}
 		}
 
@@ -259,7 +259,7 @@ func ReadPreviousGameEvents() error {
 		return err
 	}
 
-	lib := net.Peer().GetLibrary()
+	lib := net.Peer().Library()
 	count := 0
 	for newGameIterator.Next() {
 		g := newGameIterator.Event.Game

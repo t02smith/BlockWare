@@ -7,6 +7,7 @@ import (
 	"github.com/t02smith/part-iii-project/toolkit/util"
 )
 
+// get information about peers
 func (a *Controller) GetPeerInformation() []string {
 	ps := []string{}
 
@@ -18,10 +19,13 @@ func (a *Controller) GetPeerInformation() []string {
 	return ps
 }
 
-func (a *Controller) ConnectToPeer(hostname string, port uint) {
+// form a connection with a new peer
+func (c *Controller) ConnectToPeer(hostname string, port uint) {
 	err := net.Peer().ConnectToPeer(hostname, port)
 	if err != nil {
-		util.Logger.Errorf("Error connecting to peer %s", err)
+		c.controllerErrorf("Error connecting to peer %s", err)
+		return
 	}
+
 	util.Logger.Infof("Connected to peer %s:%d", hostname, port)
 }

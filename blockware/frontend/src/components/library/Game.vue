@@ -1,5 +1,5 @@
 <template>
-  <router-link :to="`/library?game=${props.hash}`" class="game">
+  <router-link :to="`/${props.linkTo}?game=${props.hash}`" class="game">
     <div class="gradient"></div>
     <h5 class="version">v{{ props.version }}</h5>
 
@@ -26,6 +26,10 @@ const props = defineProps({
   hash: {
     type: String,
     required: true,
+  },
+  linkTo: {
+    type: String,
+    default: "library",
   },
 });
 </script>

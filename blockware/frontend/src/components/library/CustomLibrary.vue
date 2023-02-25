@@ -18,6 +18,7 @@
         :version="g.version"
         :dev="g.dev"
         :hash="g.rootHash"
+        :linkTo="props.gameLinkTo"
       />
       <div v-else class="no-games">
         <h3>Ooops no games here...</h3>
@@ -36,6 +37,10 @@ const props = defineProps({
   name: {
     type: String,
     required: true,
+  },
+  gameLinkTo: {
+    type: String,
+    default: "library",
   },
 });
 </script>

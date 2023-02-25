@@ -91,44 +91,17 @@ func Peer() *peer {
 	return singleton
 }
 
-// start a new instance of a peer
+// start a new instance of a peer and assign it to the singleton
 func StartPeer(config PeerConfig, serverHostname string, serverPort uint, installFolder, toolkitFolder string) (*peer, error) {
 	util.Logger.Info("Starting peer")
 	once.Do(func() {
-		gameLs, err := games.LoadGames(filepath.Join(toolkitFolder, "games"))
+		peer, err := newPeer(config, serverHostname, serverPort, installFolder, toolkitFolder)
 		if err != nil {
+			util.Logger.Errorf("Error creating peer %s", err)
 			return
 		}
-		util.Logger.Infof("Found %d games", len(gameLs))
 
-		lib := games.NewLibrary()
-		for _, g := range gameLs {
-			err = lib.AddOwnedGame(g)
-			if err != nil && !os.IsNotExist(err) {
-				util.Logger.Error(err)
-			}
-		}
-
-		lib.OutputGamesTable()
-
-		var knownPeers []string = []string{}
-		if config.LoadPeersFromFile {
-			knownPeers, err = loadPeersFromFile()
-			if err != nil {
-				util.Logger.Warnf("Error fetching known peers from file %s", err)
-			}
-		}
-
-		singleton = &peer{
-			server:             InitServer(serverHostname, serverPort),
-			clients:            []*TCPClient{},
-			peers:              make(map[PeerIT]*peerData),
-			installFolder:      installFolder,
-			library:            lib,
-			knownPeerAddresses: knownPeers,
-			config:             config,
-		}
-
+		singleton = peer
 		if config.LoadPeersFromFile {
 			go singleton.connectToKnownPeers()
 		}
@@ -136,11 +109,49 @@ func StartPeer(config PeerConfig, serverHostname string, serverPort uint, instal
 		if config.ContinueDownloads {
 			singleton.listenToDownloadRequests()
 		}
-
-		go singleton.server.Start(onMessage)
 	})
 
 	return singleton, nil
+}
+
+// create a new peer instance
+func newPeer(config PeerConfig, serverHostname string, serverPort uint, installFolder, toolkitFolder string) (*peer, error) {
+	gameLs, err := games.LoadGames(filepath.Join(toolkitFolder, "games"))
+	if err != nil {
+		return nil, err
+	}
+	util.Logger.Infof("Found %d games", len(gameLs))
+
+	lib := games.NewLibrary()
+	for _, g := range gameLs {
+		err = lib.AddOwnedGame(g)
+		if err != nil && !os.IsNotExist(err) {
+			util.Logger.Error(err)
+		}
+	}
+
+	lib.OutputGamesTable()
+
+	var knownPeers []string = []string{}
+	if config.LoadPeersFromFile {
+		knownPeers, err = loadPeersFromFile()
+		if err != nil {
+			util.Logger.Warnf("Error fetching known peers from file %s", err)
+		}
+	}
+
+	peer := &peer{
+		server:             InitServer(serverHostname, serverPort),
+		clients:            []*TCPClient{},
+		peers:              make(map[PeerIT]*peerData),
+		installFolder:      installFolder,
+		library:            lib,
+		knownPeerAddresses: knownPeers,
+		config:             config,
+	}
+
+	go peer.server.Start(onMessage)
+	return peer, nil
 }
 
 // form a connection to another peer
@@ -161,6 +172,11 @@ func (p *peer) onConnection(hostname string, port uint, peer PeerIT) {
 		Port:     port,
 		Peer:     peer,
 		Library:  make(map[[32]byte]bool),
+	}
+
+	err := peer.SendString(generateLIBRARY())
+	if err != nil {
+		util.Logger.Warnf("Error sending message to peer %s: %s", peer.Info(), err)
 	}
 }
 
@@ -272,7 +288,7 @@ func (p *peer) GetPeer(peer PeerIT) *peerData {
 }
 
 // Get the library of the current peer
-func (p *peer) GetLibrary() *games.Library {
+func (p *peer) Library() *games.Library {
 	return p.library
 }
 

@@ -2,9 +2,14 @@
 
 \subsection*{Strategy}
 
-Benchmarking tests will be used to demonstrate how the scalability and performance of my application in a live environment, by running `expensive' tasks given several different contexts:
+Benchmarking tests will be used to demonstrate how the scalability and performance of my application in a live environment, by tracking how it performs in a series of increasingly expensive tasks. The areas that will need to be benchmarked are:
 
 \begin{enumerate}
-  \item \textbf{Locally} A peer will interact with many other peers being run on the same device,
-  \item \textbf{Over devices} A peer will interact with other peers over the internet that have been deployed to cloud services or are running on local machines.
+  \item \textbf{Large Downloads} How does a peer fare downloading and uploading an extremely large game?
+  \item \textbf{Many Peers} How does a peer cope with having many concurrent peers all sending messages to them?
+  \item \textbf{Hashing Tree Generation} How does a peer cope with generating a large hash tree?
 \end{enumerate}
+
+\subsection*{Results}
+
+\subsubsection*{Hashing Tree Generation}

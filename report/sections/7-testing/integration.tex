@@ -1,0 +1,12 @@
+\section{Integration Testing}
+
+\subsection*{Profiles}
+
+Profiles are minimal versions of the application that can be run on external devices for the purposes of testing how my application fares in a simulated environment. The following profiles are included:
+
+\begin{itemize}
+  \item \textbf{Listen Only} A client which will fetch a repository from Git and upload it as a game to the network. Once uploaded it will listen for incoming messages and reply accordingly. This is supposed to simulate an ideal peer.
+  \item \textbf{Send Only} This client will never respond to messages but will send them periodically to the peer. This represents a selfish client.
+  \item \textbf{Spam} This client will spam the peer with expensive messages, such as requesting a block, and should trigger the client to disconnect the spammer.
+  \item \textbf{Unreliable} This client will represent an unreliable peer who will take a long time to respond to messasges and may reply with the wrong contents at random. 
+\end{itemize}

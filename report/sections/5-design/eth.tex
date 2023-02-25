@@ -32,12 +32,12 @@ To satisfy \reqref{F-M1}, the data stored on the blockchain will be used for the
   price & The price of the game in Wei\\
   \textit{uploader} & The Ethereum address of the developer.\\
   \textit{root hash} & The root hash of the game that uniquely identifies it and is based upon its contents.\\
-  \textit{IPFS address} & The ID of the hash tree of IPFS that can be used to download the hash tree before starting a download of a game.\\
-  \textit{purchased} & A list of Ethereum addresses of all users who have purchased the game;\\\midrule
+  \textit{IPFS address} & The ID of the hash tree of IPFS that can be used to download the hash tree before starting a download of a game.\\\midrule
   \multicolumn{2}{c}{\cellcolor{green}\textit{Other}} 
   \\\midrule
   \textit{library} & A mapping for storing all games uploaded to the network, where a game's root hash is the key used to find its information.\\
-  \textit{gameHashes} & Solidity doesn't allow us to enumerate maps so we will also store a list of hashes for all games uploaded. 
+  \textit{gameHashes} & Solidity doesn't allow us to enumerate maps so we will also store a list of hashes for all games uploaded.\\
+  \textit{purchased} & A mapping which allows us to easily check if a user has purchased a game.
   \\\bottomrule\bottomrule
   \caption{All the data to be stored on the Ethereum blockchain}
 \end{longtable}

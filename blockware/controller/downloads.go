@@ -48,7 +48,7 @@ func (a *Controller) IsDownloading(gh string) int {
 	}
 
 	// ? download in progress
-	util.Logger.Info("download for game %s in progress", gh)
+	util.Logger.Infof("download for game %s in progress", gh)
 	return 2
 }
 
@@ -95,4 +95,5 @@ func (c *Controller) CreateDownload(gh string) {
 		c.controllerErrorf("Error creating download for game %x: %s", gameHash, err)
 		return
 	}
+
 }

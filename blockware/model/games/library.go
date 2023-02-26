@@ -68,6 +68,7 @@ func (l *Library) CreateDownload(g *Game) error {
 	}
 
 	util.Logger.Infof("Download created for %s:%x", g.Title, g.RootHash)
+	g.Download.ContinueDownload(g.RootHash, l.RequestDownload)
 	return nil
 }
 

@@ -14,10 +14,12 @@ import { computed } from "vue";
 import { useRoute } from "vue-router";
 import Error from "./components/Error.vue";
 import Navbar from "./components/Navbar.vue";
+import { useGamesStore } from "./stores/games";
 
 const router = useRoute();
-
 const route = computed(() => router.path);
+
+useGamesStore();
 </script>
 <style scoped lang="scss">
 .main {

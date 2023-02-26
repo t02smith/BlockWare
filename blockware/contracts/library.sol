@@ -10,7 +10,7 @@ contract Library {
 
     // game root hash => address => purchased
     // addresses are only included when a user has purchased
-    mapping(bytes32 => mapping(address => bool)) purchases;
+    mapping(bytes32 => mapping(address => uint8)) purchases;
 
     // a list of all hashes
     bytes32[] public gameHashes;
@@ -28,7 +28,7 @@ contract Library {
 
         // purchasing
         uint price;
-        address payable uploader;
+        address uploader;
 
         // address to download hash data from IPFS
         string ipfsAddress;
@@ -51,7 +51,7 @@ contract Library {
 
           GameEntry memory g = games[_game.previousVersion];
           require(g.uploader == msg.sender, "only the original uploader can update their game");
-          purchases[_game.rootHash][msg.sender] = true;
+          purchases[_game.rootHash][msg.sender] = 1;
         }
 
         // upload game
@@ -65,20 +65,22 @@ contract Library {
      * Purchase a new game
      * @param _game the root hash of the game
      */
-    function purchaseGame(bytes32 _game) public payable {
+    // TODO payment always fails :/
+    function purchaseGame(bytes32 _game) external payable {
       require(bytes(games[_game].title).length > 0, "game not found");
       
-      GameEntry memory game = games[_game];
-      require(!purchases[_game][msg.sender], "user already owns game");
+      // uint gamePrice = games[_game].price;
+      // address uploader = games[_game].uploader;
+      require(purchases[_game][msg.sender] == 0, "user already owns game");
 
-      game.uploader.transfer(game.price);
-      purchases[_game][msg.sender] = true;
+      // require(payable(uploader).send(gamePrice), "payment failed");
+      purchases[_game][msg.sender] = 1;
     }
 
     /**
      * How many games exist in the current library
      */
-    function libSize() public view returns (uint) {
+    function libSize() external view returns (uint) {
         return gameHashes.length;
     }
 
@@ -87,7 +89,7 @@ contract Library {
      * @param _game The root hash of the chosen game
      * @param _addr The address of the person to check
      */
-    function hasPurchased(bytes32 _game, address _addr) public view returns (bool) {
-      return purchases[_game][_addr];
+    function hasPurchased(bytes32 _game, address _addr) external view returns (bool) {
+      return purchases[_game][_addr] == 1;
     }
 }

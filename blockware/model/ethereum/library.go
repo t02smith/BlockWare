@@ -336,13 +336,23 @@ func Purchase(l *games.Library, rootHash [32]byte) error {
 	}
 
 	if receipt.Status == 0 {
-		return fmt.Errorf("transaction failed")
+		return fmt.Errorf("transaction failed %v", receipt.Logs)
 	}
 
+	// * store game
 	err = l.AddOwnedGame(g)
 	if err != nil {
 		return err
 	}
 
+	// ? fetch hash data
+	err = g.ReadDataFromIPFS()
+	if err != nil {
+		util.Logger.Warnf("Error getting hash tree from IPFS %s", err)
+	}
+
+	games.OutputAllGameDataToFile(g)
+
+	util.Logger.Info("Game purchased successfully")
 	return nil
 }

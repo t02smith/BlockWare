@@ -4,11 +4,8 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
-	"fmt"
-	"path/filepath"
 
 	shell "github.com/ipfs/go-ipfs-api"
-	"github.com/spf13/viper"
 	"github.com/t02smith/part-iii-project/toolkit/model/hash"
 	"github.com/t02smith/part-iii-project/toolkit/util"
 )
@@ -63,10 +60,6 @@ func (g *Game) ReadDataFromIPFS() error {
 
 	g.data = &hash.HashTree{}
 	err = json.Unmarshal(buf.Bytes(), g.data)
-	if err != nil {
-		return err
-	}
-	err = g.data.OutputToFile(filepath.Join(viper.GetString("meta.directory"), "hashes", fmt.Sprintf("%s-%s-%s.hash.json", g.Title, g.Version, g.Developer)))
 	if err != nil {
 		return err
 	}

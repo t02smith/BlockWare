@@ -1,10 +1,12 @@
 package games
 
 import (
+	"bufio"
 	"bytes"
 	"crypto/sha256"
 	"errors"
 	"fmt"
+	"os"
 	"time"
 
 	"github.com/spf13/viper"
@@ -151,6 +153,14 @@ func (d *Download) InsertData(fileHash, blockHash [32]byte, data []byte) error {
 
 	delete(file.BlocksRemaining, blockHash)
 	util.Logger.Infof("successfully inserted shard %x into %x with data %x", blockHash, fileHash, data)
+
+	if len(file.BlocksRemaining) == 0 {
+		err = CleanFile(file.AbsolutePath)
+		if err != nil {
+			util.Logger.Errorf("Error cleaning file %s: %s", file.AbsolutePath, err)
+		}
+	}
+
 	return nil
 }
 
@@ -170,6 +180,7 @@ func (d *Download) ContinueDownload(gameHash [32]byte, newRequest chan DownloadR
 	util.Logger.Infof("Continuing download for game %x", gameHash)
 	go func() {
 		if d.Finished() {
+			util.Logger.Info("Download finished")
 			return
 		}
 
@@ -189,15 +200,9 @@ func (d *Download) ContinueDownload(gameHash [32]byte, newRequest chan DownloadR
 					Attempts:  0,
 				}
 
-				for {
-					if _, ok := d.Progress[shard]; ok {
-						time.Sleep(time.Second)
-					} else {
-						util.Logger.Infof("Shard %x downloaded for game %x", shard, gameHash)
-						break
-					}
-				}
 			}
+
+			time.Sleep(500 * time.Millisecond)
 
 		}
 	}()
@@ -210,6 +215,45 @@ func (d *Download) ContinueDownload(gameHash [32]byte, newRequest chan DownloadR
 }
 
 // ? misc functions
+
+/*
+It is extremely likely that files won't be multiples of
+the shard size so this will result in a trail of bytes
+that are unexepcted.
+
+This function will remove any trailing bytes from the
+end of a file
+*/
+func CleanFile(path string) error {
+	util.Logger.Infof("Cleaning file %s", path)
+	file, err := os.OpenFile(path, os.O_RDWR, 0644)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	reader := bufio.NewReader(file)
+	bytesToRemove, buf := 0, make([]byte, 1)
+	for {
+		file.Seek(int64(bytesToRemove), 0)
+		_, err := reader.Read(buf)
+		if err != nil {
+			return err
+		}
+
+		if buf[0] != 0x00 {
+			bytesToRemove++
+		} else {
+			break
+		}
+	}
+
+	if err = file.Truncate(int64(bytesToRemove)); err != nil {
+		return err
+	}
+	util.Logger.Infof("Cleaned file %s", path)
+	return nil
+}
 
 // get the total download progress as a percent
 func (d *Download) GetProgress() float32 {

@@ -41,6 +41,7 @@ import { ref, watch, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import GameEntry from "../components/store/GameEntry.vue";
 import { IsDownloading } from "../../wailsjs/go/controller/Controller";
+import { EventsOn } from "../../wailsjs/runtime/runtime";
 import { useGamesStore } from "../stores/games";
 
 const props = defineProps({
@@ -72,7 +73,9 @@ watch(selected, async () => {
   selectedIsDownloading.value = await IsDownloading(selected.value.rootHash);
 });
 
-onMounted(() => {
+onMounted(async () => {
+  EventsOn("update-owned-games", async () => await games.refreshOwnedGames());
+
   const gameHash = route.query.game;
   if (!gameHash) {
     if (games.ownedGames.length === 0) return;

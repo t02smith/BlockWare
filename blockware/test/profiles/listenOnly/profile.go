@@ -65,7 +65,7 @@ func Run() {
 		"tcs1g20",
 		"./latex-template-main",
 		big.NewInt(150),
-		16384,
+		1024,
 		nil,
 	)
 

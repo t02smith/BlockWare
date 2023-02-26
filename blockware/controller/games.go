@@ -145,4 +145,6 @@ func (c *Controller) PurchaseGame(rh string) {
 		c.controllerErrorf("Error purchasing game %s", err)
 		return
 	}
+
+	runtime.EventsEmit(c.ctx, "update-owned-games")
 }

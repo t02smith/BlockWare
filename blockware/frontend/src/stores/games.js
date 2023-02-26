@@ -7,6 +7,7 @@ import {
   CreateDownload,
   PurchaseGame,
 } from "../../wailsjs/go/controller/Controller";
+import { EventsOn } from "../../wailsjs/runtime/runtime";
 
 export const useGamesStore = defineStore("games", () => {
   // what games do they own
@@ -20,6 +21,8 @@ export const useGamesStore = defineStore("games", () => {
 
   // setup
   onMounted(() => {
+    EventsOn("update-owned-games", async () => await games.refreshOwnedGames());
+
     refreshOwnedGames();
     refreshDownloads();
   });

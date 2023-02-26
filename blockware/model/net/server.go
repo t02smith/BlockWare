@@ -104,12 +104,14 @@ func (c *TCPServerClient) listen(onMessage func([]string, PeerIT)) {
 			}
 
 			util.Logger.Warnf("Malformed message from client: %s", err)
-			continue
+			break
 		}
 
 		util.Logger.Infof("message received %s", msg)
 		onMessage(strings.Split(msg[:len(msg)-1], ";"), c)
 	}
+
+	c.Close()
 }
 
 func (c *TCPServerClient) Send(command []byte) error {

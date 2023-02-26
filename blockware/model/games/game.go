@@ -18,9 +18,20 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/spf13/viper"
-	hashIO "github.com/t02smith/part-iii-project/toolkit/model/hash"
+	hash "github.com/t02smith/part-iii-project/toolkit/model/hashtree"
 	"github.com/t02smith/part-iii-project/toolkit/util"
 )
+
+/*
+
+A game represents a single version of a game uploaded to the
+network and will include all data relevant to the unique identification
+of it.
+
+Each game should be uniquely identifiable by its root hash that takes
+into account its metadata and file contents.
+
+*/
 
 type Game struct {
 
@@ -38,13 +49,15 @@ type Game struct {
 	Uploader common.Address `json:"uploader"`
 
 	// the shard data
-	data *hashIO.HashTree
+	data *hash.HashTree
 
+	// a download if it exists
 	Download *Download
 }
 
 // Creator
 
+// create a new instance of a game and generate a hash tree for it
 func CreateGame(title, version, releaseDate, developer, rootDir string, price *big.Int, shardSize uint, progress chan int) (*Game, error) {
 
 	if shardSize == 0 {
@@ -72,7 +85,7 @@ func CreateGame(title, version, releaseDate, developer, rootDir string, price *b
 	}
 
 	// hash data
-	tree, err := hashIO.NewHashTree(rootDir, shardSize, progress)
+	tree, err := hash.NewHashTree(rootDir, shardSize, progress)
 	if err != nil {
 		return nil, err
 	}
@@ -114,14 +127,27 @@ func CreateGame(title, version, releaseDate, developer, rootDir string, price *b
 
 // IO
 
-func (g *Game) ReadHashData() error {
+// get a game's hash tree data and fetch it from a file if necessary
+func (g *Game) GetData() (*hash.HashTree, error) {
+	if g.data == nil {
+		err := g.readHashData()
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return g.data, nil
+}
+
+// read a game's hash data from a file
+func (g *Game) readHashData() error {
 	dir := filepath.Join(viper.GetString("meta.directory"), "hashes")
 	if len(dir) == 0 {
 		return errors.New(".toolkit directory not specified")
 	}
 
 	hashFileName := fmt.Sprintf("%x.hash", g.RootHash)
-	data, err := hashIO.ReadHashTreeFromFile(filepath.Join(dir, hashFileName))
+	data, err := hash.ReadHashTreeFromFile(filepath.Join(dir, hashFileName))
 	if err != nil {
 		return err
 	}
@@ -290,6 +316,7 @@ func DeserialiseGame(data string) (*Game, error) {
 	return g, nil
 }
 
+// compare two games
 func (g1 *Game) Equals(g2 *Game) bool {
 	return g1.Title == g2.Title &&
 		g1.Version == g2.Version &&
@@ -301,7 +328,7 @@ func (g1 *Game) Equals(g2 *Game) bool {
 
 // Fetch the shard for a given hash
 func (g *Game) FetchShard(hash [32]byte) (bool, []byte, error) {
-	err := g.ReadHashData()
+	err := g.readHashData()
 	if err != nil {
 		return false, nil, err
 	}
@@ -316,17 +343,6 @@ func (g *Game) FetchShard(hash [32]byte) (bool, []byte, error) {
 	}
 
 	return true, data, nil
-}
-
-func (g *Game) GetData() (*hashIO.HashTree, error) {
-	if g.data == nil {
-		err := g.ReadHashData()
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	return g.data, nil
 }
 
 // Get a games download

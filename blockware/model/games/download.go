@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/spf13/viper"
-	"github.com/t02smith/part-iii-project/toolkit/model/hash"
+	hash "github.com/t02smith/part-iii-project/toolkit/model/hashtree"
 	"github.com/t02smith/part-iii-project/toolkit/util"
 )
 
@@ -85,7 +85,7 @@ func (game *Game) setupDownload() error {
 
 	// read hash data if isn't already loaded
 	if game.data == nil {
-		err := game.ReadHashData()
+		err := game.readHashData()
 		if err != nil {
 			return err
 		}

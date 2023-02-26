@@ -1,12 +1,10 @@
 package ethereum
 
 import (
-	"bytes"
 	"context"
 	"errors"
 	"fmt"
 	"math/big"
-	"sync"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
@@ -16,13 +14,21 @@ import (
 	"github.com/t02smith/part-iii-project/toolkit/util"
 )
 
+/*
+
+This represents functions that are to interface with the Library smart contract.
+Most users will connect to an already deployed version of the contract that
+should be stored locally when officially deployed.
+
+*/
+
 var (
 	lib_instance     *library.Library
 	auth_instance    *bind.TransactOpts
-	lib_auth_once    sync.Once
 	contract_address common.Address
 )
 
+// get the address of the currently in-use Library contract
 func GetContractAddress() common.Address {
 	return contract_address
 }
@@ -34,35 +40,31 @@ func DeployLibraryContract(privateKey string) (*bind.TransactOpts, *library.Libr
 	}
 
 	// run setup functions at most once
-	lib_auth_once.Do(func() {
-		util.Logger.Info("Starting library deployment")
-		auth, err := generateAuthInstance(privateKey)
-		if err != nil {
-			util.Logger.Error(err)
-			return
-		}
+	util.Logger.Info("Starting library deployment")
+	auth, err := generateAuthInstance(privateKey)
+	if err != nil {
+		return nil, nil, err
+	}
 
-		addr, _, instance, err := library.DeployLibrary(auth, eth_client)
-		if err != nil {
-			util.Logger.Error(err)
-			return
-		}
-		contract_address = addr
+	addr, _, instance, err := library.DeployLibrary(auth, eth_client)
+	if err != nil {
+		return nil, nil, err
+	}
+	contract_address = addr
 
-		lib_instance = instance
-		util.Logger.Info("Deployed library")
+	lib_instance = instance
+	util.Logger.Info("Deployed library")
 
-		err = ReadPreviousGameEvents()
-		if err != nil {
-			util.Logger.Errorf("Error reading previous games: %s", err)
-		}
+	err = ReadPreviousGameEvents()
+	if err != nil {
+		util.Logger.Errorf("Error reading previous games: %s", err)
+	}
 
-		err = watchNewGameEvent()
-		if err != nil {
-			util.Logger.Errorf("Error watching for new games: %s", err)
-			return
-		}
-	})
+	err = watchNewGameEvent()
+	if err != nil {
+		util.Logger.Errorf("Error watching for new games: %s", err)
+		return nil, nil, err
+	}
 
 	return auth_instance, lib_instance, nil
 }
@@ -84,29 +86,6 @@ func ConnectToLibraryInstance(address common.Address, privateKey string) error {
 	}
 
 	return nil
-}
-
-// checks if a game has already been uploaded to the blockchain
-func isGameOnBlockchain(rootHash [32]byte) (bool, error) {
-	gameSize, err := lib_instance.LibSize(nil)
-	if err != nil {
-		return false, err
-	}
-
-	one := big.NewInt(1)
-	for i := big.NewInt(0); i.Cmp(gameSize) < 0; i.Add(i, one) {
-		gameHash, err := lib_instance.GameHashes(nil, i)
-		if err != nil {
-			util.Logger.Warnf("Error getting game hash %s", err)
-			continue
-		}
-
-		if bytes.Equal(gameHash[:], rootHash[:]) {
-			return true, nil
-		}
-	}
-
-	return false, nil
 }
 
 // populate a library with games from the blockchain

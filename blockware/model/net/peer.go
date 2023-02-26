@@ -31,9 +31,12 @@ var (
 	once      sync.Once
 )
 
-// represents a peer that we are connected to
-// this is an abstraction as a peer may connect to our server socket or
-// we might connect to theirs
+// * types
+
+/*
+An abstraction over any maintained connection with another peer.
+Can be managed under the TCPServer or as one of the TCPClients.
+*/
 type PeerIT interface {
 	Send(command []byte) error
 	SendString(command string) error
@@ -85,6 +88,8 @@ type peerData struct {
 	// what games they have installed
 	Library map[[32]byte]bool
 }
+
+// * functions
 
 // Get the singleton instance of the current peer if it exists
 func Peer() *peer {

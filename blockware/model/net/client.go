@@ -10,6 +10,13 @@ import (
 	"github.com/t02smith/part-iii-project/toolkit/util"
 )
 
+/*
+A TCP client will form a TCP connection with a server
+socket and listen in for incoming messages from it.
+
+TCPClient implements the PeerIT interface to allow
+for an abstraction by the Peer object.
+*/
 type TCPClient struct {
 
 	// server details
@@ -47,6 +54,7 @@ func InitTCPClient(serverHostname string, serverPort uint) (*TCPClient, error) {
 }
 
 // listen for messages from the server
+// onMessage is a handler that is called when a message is received
 func (c *TCPClient) listen(onMessage func([]string, PeerIT)) {
 	for {
 		msg, err := c.reader.ReadString('\n')
@@ -57,7 +65,7 @@ func (c *TCPClient) listen(onMessage func([]string, PeerIT)) {
 			}
 
 			util.Logger.Warnf("Malformed message from client: %s", err)
-			continue
+			break
 		}
 
 		util.Logger.Infof("message received %s\n", msg)

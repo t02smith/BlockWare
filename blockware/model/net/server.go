@@ -11,21 +11,29 @@ import (
 	"github.com/t02smith/part-iii-project/toolkit/util"
 )
 
-/**
+/*
+*
 
-Each peer will host its own TCP server for
-communicating with other peers by exchanging
-8bit commands
-
+A TCP server will manage many concurrent TCP connections made
+to it and listen in for any messages they send.
 */
-
 type TCPServer struct {
+
+	// server details
 	hostname string
 	port     uint
+
+	// incoming connection details
 	listener net.Listener
 	clients  []*TCPServerClient
 }
 
+/*
+Represents a single TCP connection maintained by the server.
+Messages from this will be listened for on their own process
+
+TCPServerClient implements the PeerIT interface
+*/
 type TCPServerClient struct {
 	con    net.Conn
 	reader *bufio.Reader
@@ -44,6 +52,7 @@ func InitServer(hostname string, port uint) *TCPServer {
 	}
 }
 
+// start a new TCP server and listen for incoming connections
 func (s *TCPServer) Start(onMessage func([]string, PeerIT)) error {
 	util.Logger.Infof("Starting server on %s:%d", s.hostname, s.port)
 
@@ -60,6 +69,8 @@ func (s *TCPServer) Start(onMessage func([]string, PeerIT)) error {
 	return nil
 }
 
+// listen for incoming connections and setup processes to listen
+// for incoming messages from them
 func (s *TCPServer) listen(onMessage func([]string, PeerIT)) {
 	for {
 		con, err := s.listener.Accept()
@@ -87,6 +98,7 @@ func (s *TCPServer) listen(onMessage func([]string, PeerIT)) {
 	}
 }
 
+// close a TCP server and all client connections
 func (s *TCPServer) Close() {
 	s.listener.Close()
 	for _, c := range s.clients {
@@ -94,6 +106,7 @@ func (s *TCPServer) Close() {
 	}
 }
 
+// listen for messages from a specific TCP connection
 func (c *TCPServerClient) listen(onMessage func([]string, PeerIT)) {
 	for {
 		msg, err := c.reader.ReadString('\n')
@@ -114,6 +127,7 @@ func (c *TCPServerClient) listen(onMessage func([]string, PeerIT)) {
 	c.Close()
 }
 
+// send a byte message to a given client
 func (c *TCPServerClient) Send(command []byte) error {
 	_, err := c.writer.Write(command)
 	if err != nil {
@@ -130,6 +144,7 @@ func (c *TCPServerClient) Send(command []byte) error {
 	return nil
 }
 
+// send a string message to a given client
 func (c *TCPServerClient) SendString(command string) error {
 	util.Logger.Infof("Sending %s", command)
 	_, err := c.writer.WriteString(command)
@@ -147,14 +162,17 @@ func (c *TCPServerClient) SendString(command string) error {
 	return nil
 }
 
+// wrapper around SendString using fmt.Sprintf
 func (c *TCPServerClient) SendStringf(command string, args ...any) error {
 	return c.SendString(fmt.Sprintf(command, args...))
 }
 
+// get information about a given TCP connection
 func (c *TCPServerClient) Info() string {
 	return c.con.RemoteAddr().String()
 }
 
+// close a connection with a TCP client
 func (c *TCPServerClient) Close() {
 	c.con.Close()
 }

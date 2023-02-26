@@ -96,7 +96,7 @@ func fetchTestGame() (*games.Game, error) {
 	}
 
 	g := games[0]
-	err = g.ReadHashData()
+	_, err = g.GetData()
 	if err != nil {
 		return nil, err
 	}

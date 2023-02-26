@@ -15,11 +15,22 @@ import (
 	"github.com/t02smith/part-iii-project/toolkit/util"
 )
 
+/*
+
+Open and maintain a connection with an ETH blockchain.
+This will be used for interacting with our smart contract.
+
+Our ETH client will be a singleton and expected to be persistent
+for the entire runtime of the application
+
+*/
+
 var (
 	eth_client *ethclient.Client
 	once       sync.Once
 )
 
+// get the current ETH client
 func GetClient() *ethclient.Client {
 	return eth_client
 }
@@ -48,7 +59,7 @@ func CloseEthClient() {
 
 //
 
-// creates a new auth instance given a private key
+// creates a new auth instance given a private key for performing non gettet actions
 func generateAuthInstance(privateKey string) (*bind.TransactOpts, error) {
 	util.Logger.Info("Generating auth instance")
 	privKeyECDSA, err := crypto.HexToECDSA(privateKey)

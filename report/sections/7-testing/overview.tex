@@ -1,0 +1,26 @@
+\section{Overview}
+
+My approach to testing will consist of the following principles:
+
+\begin{enumerate}
+  \item \textbf{Test Driven Development} Tests should be written alongside the code to reduce the risk of bugs and improve robustness.
+  \item \textbf{Fail Fast (Smoke testing)} Automated tests should be ran in a pipeline where the fastest tests are always ran first to reduce the time spent ranning tests.
+  \item \textbf{Documentation} Test cases should be well documented and group contextually.   
+\end{enumerate}
+
+\subsection*{Tools}
+
+Below are the different tools I used to test my application and a justification as to why they were included.
+
+\begin{longtable}{ | p{.2\textwidth} | p{.7\textwidth} | }
+  \hline
+  \textbf{Tool/Package} & \textbf{Justification}
+  \\\hline
+  Go testing
+  & The testing package is part of Go's standard library and will be sufficient to produce most test cases and also includes support for benchmarking and fuzzing tests.
+  \\\hline
+  testify by stretchr
+  & This package is included as it provides several useful testing features that aren't present in the standard library testing package. This includes assert functions to boost code readability, mocking tools for better unit testing, setup/teardown functionality, and more.
+  \\\hline 
+  \caption{The tools used for testing my project}
+\end{longtable}

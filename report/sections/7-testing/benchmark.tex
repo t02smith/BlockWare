@@ -2,14 +2,53 @@
 
 \subsection*{Strategy}
 
-Benchmarking tests will be used to demonstrate how the scalability and performance of my application in a live environment, by tracking how it performs in a series of increasingly expensive tasks. The areas that will need to be benchmarked are:
+Benchmarking tests will be used to demonstrate how the scalability and performance of my application in a live environment, by tracking how it performs in a series of increasingly expensive tasks, ran using a consistent set of hardware outlined in the test specification.
 
-\begin{enumerate}
-  \item \textbf{Large Downloads} How does a peer fare downloading and uploading an extremely large game?
-  \item \textbf{Many Peers} How does a peer cope with having many concurrent peers all sending messages to them?
-  \item \textbf{Hashing Tree Generation} How does a peer cope with generating a large hash tree?
-\end{enumerate}
+\subsection*{Tests \& Results}
 
-\subsection*{Results}
+\subsubsection*{Generating Hash Trees}
 
-\subsubsection*{Hashing Tree Generation}
+The generation of hash trees as described in Section~\ref{subsubsec:hash-tree}, can be an expensive computational task depending on two factors:
+
+\begin{itemize}
+  \item the number of files (or leaf nodes) present in the hash tree,
+  \item the average size of files included.
+\end{itemize}
+
+\vspace{1mm}\noindent
+Whilst varying the number of worker threads performing the algorithm affects the time it takes to complete, it will not be investigated as the same computational effort is still required regardless of the number of threads performing it.
+
+\paragraph*{Varying File Count}
+For each run, we will create a project with $N$ files of a constant size $S=TBD$ and run the hash tree algorithm using a pool of 5 workers.
+
+\begin{longtable}{ | r | r | r | r | }
+  \hline
+  \textbf{Run No.} & \textbf{File Count} & \textbf{Time (seconds)} & \textbf{Hash Tree Size (KB)}\\\hline
+  1
+  &
+  &
+  &
+  \\\hline
+  \caption{How varying file count affects hash tree generation time and size}
+\end{longtable}
+
+\paragraph*{Varying Average File Size}
+For each run, we will create a project with $N=TBD$ files all of size $S$ and run the hash tree algorithm using a pool of 5 workers.
+
+\begin{longtable}{ | r | r | r | r | }
+  \hline
+  \textbf{Run No.} & \textbf{avg. File Size (MB)} & \textbf{Time (seconds)} & \textbf{Hash Tree Size (KB)}\\\hline
+  1
+  &
+  &
+  &
+  \\\hline
+  \caption{How varying the average file size affects hash tree generation time and size}
+\end{longtable}
+
+% \begin{enumerate}
+%   \item \textbf{Large Downloads} How does a peer fare downloading and uploading an extremely large game?
+%   \item \textbf{Many Peers} How does a peer cope with having many concurrent peers all sending messages to them?
+%   \item \textbf{Hashing Tree Generation} How does a peer cope with generating a large hash tree?
+% \end{enumerate}
+ 

@@ -43,8 +43,11 @@ type Game struct {
 	RootHash        [32]byte `json:"rootHash"`
 	PreviousVersion [32]byte `json:"previousVersion"`
 
+	// IPFS
+	HashTreeIPFSAddress string     `json:"IPFSId"`
+	AssetsIPFSAddress   GameAssets `json:"assets"`
+
 	// blockchain related
-	IPFSId   string         `json:"IPFSId"`
 	Price    *big.Int       `json:"price"`
 	Uploader common.Address `json:"uploader"`
 
@@ -53,6 +56,23 @@ type Game struct {
 
 	// a download if it exists
 	Download *Download
+}
+
+/*
+Game assets will be stored on IPFS and should be fetched as
+necessary and will include things like artwork, description,
+etc.
+
+The assets should be stored in a .zip archive and use the
+following naming scheme:
+
+- "cover.png" = main piece of artwork for the game
+- "description.md" = a description of the game to be displayed on its library page
+*/
+type GameAssets struct {
+	IPFSId string
+
+	absolutePath string
 }
 
 // Creator
@@ -110,16 +130,16 @@ func CreateGame(title, version, releaseDate, developer, rootDir string, price *b
 
 	// return value
 	game := &Game{
-		Title:           title,
-		Version:         version,
-		ReleaseDate:     releaseDate,
-		Developer:       developer,
-		data:            tree,
-		RootHash:        h,
-		IPFSId:          "",
-		Price:           price,
-		PreviousVersion: [32]byte{},
-		Uploader:        common.Address{},
+		Title:               title,
+		Version:             version,
+		ReleaseDate:         releaseDate,
+		Developer:           developer,
+		data:                tree,
+		RootHash:            h,
+		HashTreeIPFSAddress: "",
+		Price:               price,
+		PreviousVersion:     [32]byte{},
+		Uploader:            common.Address{},
 	}
 
 	return game, nil

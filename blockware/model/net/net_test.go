@@ -3,6 +3,7 @@ package net
 import (
 	"log"
 	"os"
+	"testing"
 	"time"
 
 	"github.com/spf13/viper"
@@ -14,6 +15,10 @@ var (
 	testPeer       *peer
 	mockPeer       *testutil.MockPeer
 	mockPeerClient PeerIT
+)
+
+const (
+	PEER_PORT uint = 7887
 )
 
 /**
@@ -39,7 +44,7 @@ func beforeAll() {
 	testPeer = tp
 
 	time.Sleep(25 * time.Millisecond)
-	mockPeer, err = testutil.StartMockPeer(7887, true)
+	mockPeer, err = testutil.StartMockPeer(PEER_PORT, true)
 	if err != nil {
 		log.Printf("Error starting mock peer")
 		os.Exit(1)
@@ -60,4 +65,22 @@ func afterAll() {
 
 	testPeer.Close()
 	testutil.ClearTmp("../../")
+}
+
+// utility
+
+// create a new mock peer to test the peer
+func createMockPeer(t *testing.T) (*testutil.MockPeer, PeerIT) {
+	t.Helper()
+	mp, err := testutil.StartMockPeer(PEER_PORT, true)
+	if err != nil {
+		t.Fatalf("Error starting mock peer: %s", err)
+	}
+	time.Sleep(25 * time.Millisecond)
+
+	t.Cleanup(func() {
+		mp.Close()
+	})
+
+	return mp, testPeer.server.clients[len(testPeer.server.clients)-1]
 }

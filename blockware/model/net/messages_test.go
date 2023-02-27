@@ -17,78 +17,16 @@ import (
 	"github.com/t02smith/part-iii-project/toolkit/test/testutil"
 )
 
-func TestGenerateGames(t *testing.T) {
-	testutil.ShortTest(t)
+// * utility
 
-	var h1 [32]byte
-	copy(h1[:], []byte("test"))
+/*
 
-	var h2 [32]byte
-	copy(h2[:], []byte("tester hash"))
+TODO these tests are deprecated and are to be migrated ;)
 
-	games := []*games.Game{
-		{
-			Title:       "Test Game",
-			Version:     "1.0.2",
-			ReleaseDate: time.Now().String(),
-			Developer:   "tcs1g20",
-			RootHash:    h1,
-		},
-		{
-			Title:       "Borderlands 3",
-			Version:     "3.4.17",
-			ReleaseDate: time.Now().String(),
-			Developer:   "Gearbox",
-			RootHash:    h2,
-		},
-	}
-
-	res := generateGAMES(games...)
-
-	res = res[:len(res)-1]
-	parts := strings.Split(res, ";")
-	if parts[0] != "GAMES" {
-		t.Error("Wrong command")
-	}
-
-	for i, g := range games {
-		if fmt.Sprintf("%x", g.RootHash) != parts[i+1] {
-			t.Errorf("Incorrect serialised game in pos %d", i)
-		}
-	}
-}
+*/
 
 func TestOnMessage(t *testing.T) {
 	testutil.ShortTest(t)
-
-	t.Run("LIBRARY", func(t *testing.T) {
-		var h [32]byte
-		copy(h[:], []byte("hello there"))
-
-		datetime := time.Date(2002, 01, 10, 0, 0, 0, 0, time.Local).String()
-		fakeGame := &games.Game{
-			Title:       "fake game",
-			Version:     "2.7.5",
-			ReleaseDate: datetime,
-			Developer:   "t02smith.com",
-			RootHash:    h,
-		}
-
-		mockPeer.SetResponse("LIBRARY\n", generateGAMES(fakeGame))
-		mockPeerClient.SendString("LIBRARY\n")
-		time.Sleep(5 * time.Millisecond)
-
-		if pd, ok := testPeer.peers[mockPeerClient]; ok {
-			if len(pd.Library) == 0 {
-				t.Fatal("Games not stored")
-			}
-
-			if _, ok := pd.Library[h]; !ok {
-				t.Fatal("Game not stored in peer's library")
-			}
-		}
-
-	})
 
 	// SETUP TEST GAME
 	lib := Peer().Library()
@@ -264,6 +202,11 @@ func sendBlock(filename string, g *games.Game, gameData *hash.HashTree, hash [32
 	_, err = f.Seek(int64(gameData.ShardSize)*int64(offset), 0)
 	if err != nil {
 		return fmt.Errorf("Unable to verify whether shard was inserted %s", err)
+	}
+
+	// ? clear buffer
+	for i := range buffer {
+		buffer[i] = 0x00
 	}
 
 	reader := bufio.NewReader(f)

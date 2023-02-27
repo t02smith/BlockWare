@@ -5,9 +5,7 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
-	"path/filepath"
 
-	"github.com/spf13/viper"
 	"github.com/t02smith/part-iii-project/toolkit/model/games"
 	"github.com/t02smith/part-iii-project/toolkit/util"
 )
@@ -37,13 +35,7 @@ func generateLIBRARY() string {
 
 func handleLIBRARY(cmd []string, client PeerIT) error {
 	util.Logger.Info("Library command called")
-
-	gameLs, err := games.LoadGames(filepath.Join(viper.GetString("meta.directory"), "games"))
-	if err != nil {
-		return err
-	}
-
-	return client.SendString(generateGAMES(gameLs...))
+	return client.SendString(generateGAMES(Peer().library.GetOwnedGames()...))
 }
 
 // GAMES <game hash>, <game hash>, ...

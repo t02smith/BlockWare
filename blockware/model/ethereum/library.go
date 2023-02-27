@@ -131,15 +131,15 @@ func fetchGamesFromEthereum() ([]*games.Game, error) {
 		}
 
 		gs = append(gs, &games.Game{
-			Title:           game.Title,
-			Version:         game.Version,
-			ReleaseDate:     game.ReleaseDate,
-			Developer:       game.Developer,
-			RootHash:        game.RootHash,
-			IPFSId:          game.IpfsAddress,
-			Uploader:        game.Uploader,
-			Price:           game.Price,
-			PreviousVersion: game.PreviousVersion,
+			Title:               game.Title,
+			Version:             game.Version,
+			ReleaseDate:         game.ReleaseDate,
+			Developer:           game.Developer,
+			RootHash:            game.RootHash,
+			HashTreeIPFSAddress: game.IpfsAddress,
+			Uploader:            game.Uploader,
+			Price:               game.Price,
+			PreviousVersion:     game.PreviousVersion,
 		})
 	}
 
@@ -152,7 +152,7 @@ func uploadToEthereum(g *games.Game) error {
 
 	// upload data to IPFS
 	util.Logger.Infof("Uploading game data for %s to IPFS", g.Title)
-	err := g.UploadDataToIPFS()
+	err := g.UploadHashTreeToIPFS()
 	if err != nil {
 		return err
 	}
@@ -166,7 +166,7 @@ func uploadToEthereum(g *games.Game) error {
 		ReleaseDate:     g.ReleaseDate,
 		Developer:       g.Developer,
 		RootHash:        g.RootHash,
-		IpfsAddress:     g.IPFSId,
+		IpfsAddress:     g.HashTreeIPFSAddress,
 		PreviousVersion: g.PreviousVersion,
 		Price:           g.Price,
 		Uploader:        g.Uploader,
@@ -254,15 +254,15 @@ func ReadPreviousGameEvents() error {
 // translates from the ethereum version to the locally used struct
 func gameEntryToGame(game *library.LibraryGameEntry) *games.Game {
 	return &games.Game{
-		Title:           game.Title,
-		Version:         game.Version,
-		ReleaseDate:     game.ReleaseDate,
-		Developer:       game.Developer,
-		RootHash:        game.RootHash,
-		IPFSId:          game.IpfsAddress,
-		Uploader:        game.Uploader,
-		Price:           game.Price,
-		PreviousVersion: game.PreviousVersion,
+		Title:               game.Title,
+		Version:             game.Version,
+		ReleaseDate:         game.ReleaseDate,
+		Developer:           game.Developer,
+		RootHash:            game.RootHash,
+		HashTreeIPFSAddress: game.IpfsAddress,
+		Uploader:            game.Uploader,
+		Price:               game.Price,
+		PreviousVersion:     game.PreviousVersion,
 	}
 }
 
@@ -325,7 +325,7 @@ func Purchase(l *games.Library, rootHash [32]byte) error {
 	}
 
 	// ? fetch hash data
-	err = g.ReadDataFromIPFS()
+	err = g.GetHashTreeFromIPFS()
 	if err != nil {
 		util.Logger.Warnf("Error getting hash tree from IPFS %s", err)
 	}

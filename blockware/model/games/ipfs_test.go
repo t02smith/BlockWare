@@ -19,13 +19,13 @@ func TestUploadAndDownloadDataToIPFS(t *testing.T) {
 
 	smoke := t.Run("upload data", func(t *testing.T) {
 
-		err := g.UploadDataToIPFS()
+		err := g.UploadHashTreeToIPFS()
 		if err != nil {
 			t.Fatal(err)
 		}
 
 		sh := shell.NewShell("localhost:5001")
-		data, err := sh.Cat(g.IPFSId)
+		data, err := sh.Cat(g.HashTreeIPFSAddress)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -47,7 +47,7 @@ func TestUploadAndDownloadDataToIPFS(t *testing.T) {
 		cachedData := g.data
 		g.data = nil
 
-		err := g.ReadDataFromIPFS()
+		err := g.GetHashTreeFromIPFS()
 		if err != nil {
 			t.Fatal(err)
 		}

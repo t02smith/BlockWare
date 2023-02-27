@@ -196,3 +196,9 @@ func (l *Library) ContinueDownloads() {
 	}
 	util.Logger.Infof("Started %d downloads", count)
 }
+
+// clear stored owned games from memory
+func (l *Library) ClearOwnedGames() {
+	util.Logger.Info("Flushing owned games from memory")
+	l.ownedGames = make(map[[32]byte]*Game)
+}

@@ -62,7 +62,7 @@ func (l *Library) CreateDownload(g *Game) error {
 		return errors.New("game not found in library, cannot add download")
 	}
 
-	err := g.setupDownload()
+	err := g.SetupDownload()
 	if err != nil {
 		return err
 	}

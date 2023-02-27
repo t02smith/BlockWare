@@ -78,7 +78,7 @@ func setupTestDownload() (*Game, error) {
 		return nil, err
 	}
 
-	err = g.setupDownload()
+	err = g.SetupDownload()
 	if err != nil && !os.IsExist(err) {
 		return nil, err
 	}

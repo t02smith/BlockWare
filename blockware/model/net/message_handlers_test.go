@@ -1,15 +1,20 @@
 package net
 
 import (
+	"bufio"
+	"bytes"
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
+	"os"
 	"strings"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/t02smith/part-iii-project/toolkit/model/games"
+	hash "github.com/t02smith/part-iii-project/toolkit/model/hashtree"
+	"github.com/t02smith/part-iii-project/toolkit/test/testutil"
 	testenv "github.com/t02smith/part-iii-project/toolkit/test/testutil/env"
 )
 
@@ -261,14 +266,15 @@ failure
 func TestHandleBLOCK(t *testing.T) {
 	mp, _ := createMockPeer(t)
 
-	game, err := testenv.CreateTestGame(t, "../../")
-	if err != nil {
-		t.Fatalf("Error creating test game %s", err)
-	}
-	err = Peer().library.AddOwnedGame(game)
+	game := testenv.CreateTestGame(t, "../../")
+	err := Peer().library.AddOwnedGame(game)
 	if err != nil {
 		t.Fatalf("Error adding game to library: %s", err)
 	}
+
+	t.Cleanup(func() {
+		Peer().library.ClearOwnedGames()
+	})
 
 	t.Run("failure", func(t *testing.T) {
 		t.Run("illegal arguments", func(t *testing.T) {
@@ -382,5 +388,200 @@ failure
 					| #2 => does not match hash
 	| unexpected data
 			| #1 => download not started
+			| #2 => block not needed
 
 */
+
+func TestHandleSEND_BLOCK(t *testing.T) {
+	mp, _ := createMockPeer(t)
+
+	game := testenv.CreateTestGame(t, "../../")
+	err := Peer().library.AddOwnedGame(game)
+	if err != nil {
+		t.Fatalf("Error adding game to library: %s", err)
+	}
+
+	t.Cleanup(func() {
+		Peer().library.ClearOwnedGames()
+	})
+
+	t.Run("failure", func(t *testing.T) {
+		t.Run("illegal arguments", func(t *testing.T) {
+			t.Run("invalid game hash", func(t *testing.T) {
+				mp.SendStringAndWait(25,
+					"SEND_BLOCK;12313123124123;%x;%x\n", sha256.Sum256([]byte("hello")), []byte("shashduiashid"))
+
+				res := mp.GetLastMessage()
+				assert.Equal(t,
+					"ERROR;error reading game hash on BLOCK cmd: invalid hash length for hash 12313123124123\n",
+					res,
+					"invalid err message",
+				)
+			})
+
+			t.Run("invalid shard hash", func(t *testing.T) {
+				mp.SendStringAndWait(25, "SEND_BLOCK;%x;29381209382;%x\n", game.RootHash, []byte("shashduiashid"))
+
+				res := mp.GetLastMessage()
+				assert.Equal(t,
+					"ERROR;error reading shard hash on BLOCK cmd: invalid hash length for hash 29381209382\n",
+					res,
+					"invalid err message",
+				)
+			})
+
+			t.Run("invalid data", func(t *testing.T) {
+				testenv.SetupTestDownload(t, game, "../../")
+
+				gData, err := game.GetData()
+				if err != nil {
+					t.Fatal(err)
+				}
+
+				blockHash := gData.RootDir.Files["architecture-diagram.png"].Hashes[1]
+
+				t.Run("invalid length", func(t *testing.T) {
+					mp.SendStringAndWait(25, generateSEND_BLOCK(game.RootHash, blockHash, []byte("123")))
+
+					res := mp.GetLastMessage()
+					assert.Equal(t,
+						fmt.Sprintf("ERROR;incorrect data length. expected %d, got %d\n", gData.ShardSize, len([]byte("123"))),
+						res,
+						"invalid err msessage",
+					)
+				})
+
+				t.Run("doesn't match hash", func(t *testing.T) {
+					data := make([]byte, gData.ShardSize)
+					copy(data[:], []byte("hello world"))
+
+					mp.SendStringAndWait(25, generateSEND_BLOCK(game.RootHash, blockHash, data))
+
+					res := mp.GetLastMessage()
+					assert.Equal(t,
+						fmt.Sprintf("ERROR;block %x data does not match expected content\n", blockHash),
+						res,
+						"invalid err message",
+					)
+				})
+			})
+		})
+
+		t.Run("unexpected data", func(t *testing.T) {
+			gData, err := game.GetData()
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			blockHash := gData.RootDir.Files["architecture-diagram.png"].Hashes[1]
+
+			t.Run("download not started", func(t *testing.T) {
+				mp.SendStringAndWait(25, generateSEND_BLOCK(game.RootHash, blockHash, []byte("hello")))
+
+				res := mp.GetLastMessage()
+				assert.Equal(t,
+					fmt.Sprintf("ERROR;download not found for %x\n", game.RootHash),
+					res,
+					"invalid err message",
+				)
+			})
+
+			testenv.SetupTestDownload(t, game, "../../")
+
+			t.Run("block not needed", func(t *testing.T) {
+				fileHash := gData.RootDir.Files["architecture-diagram.png"].RootHash
+				delete(game.Download.Progress[fileHash].BlocksRemaining, blockHash)
+
+				data := make([]byte, gData.ShardSize)
+				mp.SendStringAndWait(25, generateSEND_BLOCK(game.RootHash, blockHash, data))
+
+				res := mp.GetLastMessage()
+				assert.Equal(t,
+					fmt.Sprintf("ERROR;block %x not in download queue\n", blockHash),
+					res,
+					"invalid err message",
+				)
+			})
+		})
+	})
+
+	t.Run("success", func(t *testing.T) {
+		game := testenv.CreateTestGame(t, "../../")
+		testenv.SetupTestDownload(t, game, "../../")
+
+		Peer().library.AddOwnedGame(game)
+		t.Cleanup(func() {
+			Peer().library.ClearOwnedGames()
+		})
+
+		gData, err := game.GetData()
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		smoke := t.Run("single shard", func(t *testing.T) {
+			shardHash := gData.RootDir.Files["architecture-diagram.png"].Hashes[1]
+			buffer := make([]byte, gData.ShardSize)
+
+			_sendBlock(t, "../../test/data/tmp/toolkit/architecture-diagram.png", mp, game, gData, shardHash, 1, buffer)
+
+		})
+
+		if !smoke {
+			t.FailNow()
+		}
+
+		t.Run("whole file", func(t *testing.T) {
+			file := gData.RootDir.Subdirs["subdir"].Files["chip8.c"]
+			buffer := make([]byte, gData.ShardSize)
+
+			for i, shard := range file.Hashes {
+				_sendBlock(t, "../../test/data/tmp/toolkit/subdir/chip8.c", mp, game, gData, shard, uint(i), buffer)
+				time.Sleep(25 * time.Millisecond)
+			}
+		})
+	})
+}
+
+// test whether a user stores a required block after being sent it
+func _sendBlock(t *testing.T, filename string, mp *testutil.MockPeer, g *games.Game, gData *hash.HashTree, blockHash [32]byte, offset uint, buffer []byte) {
+	t.Helper()
+
+	found, data, err := g.FetchShard(blockHash)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if !found {
+		t.Fatalf("block %x not found", blockHash)
+	}
+
+	mp.SendStringAndWait(25, generateSEND_BLOCK(g.RootHash, blockHash, data))
+
+	// ? was the shard inserted
+	f, err := os.Open(filename)
+	if err != nil {
+		t.Fatalf("Unable to verify whether shard was inserted %s", err)
+	}
+	defer f.Close()
+
+	_, err = f.Seek(int64(gData.ShardSize)*int64(offset), 0)
+	if err != nil {
+		t.Fatalf("Unable to verify whether shard was inserted %s", err)
+	}
+
+	// ? clear buffer
+	for i := range buffer {
+		buffer[i] = 0x00
+	}
+
+	reader := bufio.NewReader(f)
+	_, err = reader.Read(buffer)
+	if err != nil {
+		t.Fatalf("error reading shard %s", err)
+	}
+
+	if !bytes.Equal(buffer, data) {
+		t.Fatalf("incorrect shard inserted\ngot %x\nexpected %x", buffer, data)
+	}
+}

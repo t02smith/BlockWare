@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/spf13/viper"
@@ -49,6 +50,9 @@ type Download struct {
 
 	// total number of blocks to install
 	TotalBlocks int
+
+	// absolute path of root directory
+	AbsolutePath string
 }
 
 // the progress of a specific file's download
@@ -81,14 +85,12 @@ type DownloadRequest struct {
 // ? setup
 
 // create a new download for an existing game
-func (game *Game) setupDownload() error {
+func (game *Game) SetupDownload() error {
 
 	// read hash data if isn't already loaded
-	if game.data == nil {
-		err := game.readHashData()
-		if err != nil {
-			return err
-		}
+	data, err := game.GetData()
+	if err != nil {
+		return err
 	}
 
 	// create download obj
@@ -103,8 +105,10 @@ func (game *Game) setupDownload() error {
 		return errors.New("game install folder not found")
 	}
 
+	d.AbsolutePath = filepath.Join(dir, game.Title)
+
 	util.Logger.Infof("Generating dummy files for %s-%s", game.Title, game.Version)
-	err := game.data.CreateDummyFiles(dir, game.Title, func(path string, htf *hash.HashTreeFile) {
+	err = data.CreateDummyFiles(dir, game.Title, func(path string, htf *hash.HashTreeFile) {
 		p := FileProgress{
 			AbsolutePath:    path,
 			BlocksRemaining: make(map[[32]byte]uint),
@@ -114,6 +118,7 @@ func (game *Game) setupDownload() error {
 			p.BlocksRemaining[b] = uint(i)
 		}
 
+		d.TotalBlocks += len(p.BlocksRemaining)
 		d.Progress[htf.RootHash] = p
 	})
 
@@ -121,8 +126,29 @@ func (game *Game) setupDownload() error {
 		return err
 	}
 
-	d.TotalBlocks = len(d.Progress)
 	game.Download = d
+	return nil
+}
+
+// cancel an existing download
+func (g *Game) CancelDownload() error {
+	if g.Download == nil {
+		util.Logger.Warnf("Download not found for game %x", g.RootHash)
+		return nil
+	}
+
+	util.Logger.Infof("Cancelling download for game %x", g.RootHash)
+
+	// * remove dummy files
+	util.Logger.Infof("Clearing dummy files from game %x", g.RootHash)
+
+	err := os.RemoveAll(g.Download.AbsolutePath)
+	if err != nil {
+		return err
+	}
+
+	util.Logger.Infof("Download cancelled for game %x", g.RootHash)
+	g.Download = nil
 	return nil
 }
 
@@ -138,12 +164,12 @@ func (d *Download) InsertData(fileHash, blockHash [32]byte, data []byte) error {
 
 	offset, ok := file.BlocksRemaining[blockHash]
 	if !ok {
-		return fmt.Errorf("block %x in File %x not in download queue", blockHash, fileHash)
+		return fmt.Errorf("block %x not in download queue", blockHash)
 	}
 
 	dataHash := sha256.Sum256(data)
 	if !bytes.Equal(blockHash[:], dataHash[:]) {
-		return fmt.Errorf("block %x data for File %x given does not match expected content", blockHash, fileHash)
+		return fmt.Errorf("block %x data does not match expected content", blockHash)
 	}
 
 	err := hash.InsertData(file.AbsolutePath, uint(len(data)), uint(offset), data)

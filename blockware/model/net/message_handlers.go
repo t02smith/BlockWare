@@ -145,23 +145,30 @@ func handleSEND_BLOCK(cmd []string, client PeerIT) error {
 		return fmt.Errorf("user does not own game with hash %x", gh)
 	}
 
-	gameTree, err := game.GetData()
-	if err != nil {
-		return fmt.Errorf("error loading game data %s", err)
-	}
-	found, file, _, _ := gameTree.FindShard(sh)
-	if !found {
-		return fmt.Errorf("shard %x not found", sh)
-	}
-
 	download := game.GetDownload()
 	if download == nil {
 		return fmt.Errorf("download not found for %x", game.RootHash)
 	}
 
+	gameTree, err := game.GetData()
+	if err != nil {
+		return fmt.Errorf("error loading game data %s", err)
+	}
+
 	data, err := hex.DecodeString(cmd[3])
 	if err != nil {
 		return err
+	}
+
+	// ? data correct length
+	if uint(len(data)) != gameTree.ShardSize {
+		return fmt.Errorf("incorrect data length. expected %d, got %d", gameTree.ShardSize, len(data))
+	}
+
+	// ? find file
+	found, file, _, _ := gameTree.FindShard(sh)
+	if !found {
+		return fmt.Errorf("shard %x not found", sh)
 	}
 
 	err = download.InsertData(file.RootHash, sh, data)

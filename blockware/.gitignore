@@ -5,3 +5,5 @@ toolkit.exe
 
 # profile data
 latex-template-main
+**/tmp/**
+!**/tmp/.gitkeep

@@ -1,184 +1,78 @@
 package net
 
 import (
-	"bufio"
-	"bytes"
 	"crypto/sha256"
-	"errors"
-	"fmt"
-	"os"
 	"testing"
-	"time"
 
-	"github.com/t02smith/part-iii-project/toolkit/model/games"
-	hash "github.com/t02smith/part-iii-project/toolkit/model/hashtree"
-	"github.com/t02smith/part-iii-project/toolkit/test/testutil"
+	"github.com/stretchr/testify/assert"
+	testenv "github.com/t02smith/part-iii-project/toolkit/test/testutil/env"
 )
-
-// * utility
 
 /*
 
-TODO these tests are deprecated and are to be migrated ;)
+function: fetchBlockFromLibrary
+purpose: fetch a block from storage given its game and hash
+
+? Test cases
+success
+	| #1 => Block found and returned
+
+failure
+	| unexpected arguments
+			| #1 => game not owned by user
+			| #2 => shard not in game
+			| #3 => user is downloading game and doesn't have block
 
 */
 
-func TestOnMessage(t *testing.T) {
-	t.Skip()
-	testutil.ShortTest(t)
+func TestFetchBlockFromLibrary(t *testing.T) {
+	game := testenv.CreateTestGame(t, "../../")
+	err := Peer().library.AddOwnedGame(game)
+	if err != nil {
+		t.Fatal(err)
+	}
 
-	// SETUP TEST GAME
-	lib := Peer().Library()
-	_ = lib
-	g := Peer().Library().GetOwnedGame([32]byte{15, 158, 115, 2, 196, 26, 32, 86, 37, 148, 142, 89, 228, 208, 228, 199, 218, 164, 63, 61, 130, 248, 52, 193, 143, 10, 154, 1, 176, 67, 9, 239})
+	t.Cleanup(func() {
+		Peer().library.ClearOwnedGames()
+	})
 
-	t.Run("SEND_BLOCK", func(t *testing.T) {
-
-		t.Run("success", func(t *testing.T) {
-
-			err := Peer().Library().CreateDownload(g)
-			if err != nil {
-				t.Fatal(err)
-			}
-
-			// * SETUP
-			gameData, err := g.GetData()
-			if err != nil {
-				t.Fatal(err)
-			}
-
-			smoke := t.Run("single shard", func(t *testing.T) {
-				shard := gameData.RootDir.Files["architecture-diagram.png"].Hashes[1]
-				buffer := make([]byte, gameData.ShardSize)
-
-				err := sendBlock("../../test/data/tmp/toolkit/architecture-diagram.png", g, gameData, shard, 1, buffer)
-				if err != nil {
-					t.Fatal(err)
-				}
-
-			})
-
-			if !smoke {
-				t.FailNow()
-			}
-
-			t.Run("entire file", func(t *testing.T) {
-				file := gameData.RootDir.Subdirs["subdir"].Files["chip8.c"]
-				buffer := make([]byte, gameData.ShardSize)
-
-				for i, shard := range file.Hashes {
-					err := sendBlock("../../test/data/tmp/toolkit/subdir/chip8.c", g, gameData, shard, i, buffer)
+	t.Run("failure", func(t *testing.T) {
+		t.Run("unexpected arguments", func(t *testing.T) {
+			t.Run("game not owned by user", func(t *testing.T) {
+				Peer().library.ClearOwnedGames()
+				t.Cleanup(func() {
+					err := Peer().library.AddOwnedGame(game)
 					if err != nil {
 						t.Fatal(err)
 					}
-					time.Sleep(25 * time.Millisecond)
-				}
-				// fmt.Println()
-			})
-		})
+				})
 
-		t.Run("failure", func(t *testing.T) {
-
-			t.Run("sending incorrect data", func(t *testing.T) {
-
+				_, err := fetchBlockFromLibrary(game.RootHash, sha256.Sum256([]byte("asdas")))
+				assert.NotNil(t, err, err)
+				assert.Equal(t, "game not in library", err.Error(), "incorrect err message")
 			})
 
+			t.Run("shard not found in game", func(t *testing.T) {
+				_, err := fetchBlockFromLibrary(game.RootHash, sha256.Sum256([]byte("asdas")))
+				assert.NotNil(t, err, err)
+				assert.Equal(t, "block not found", err.Error(), "incorrect err message")
+			})
 		})
-
-		testutil.ClearTmp("../../")
-
-	})
-
-}
-
-// util functions
-
-func TestFetchBlock(t *testing.T) {
-	testutil.ShortTest(t)
-
-	t.Run("game doesn't exist", func(t *testing.T) {
-		_, err := fetchBlockFromLibrary([32]byte{}, [32]byte{})
-		if err == nil {
-			t.Error("Missing game not identified as not existing")
-		}
-	})
-
-	p := Peer()
-	g := p.Library().GetOwnedGame([32]byte{15, 158, 115, 2, 196, 26, 32, 86, 37, 148, 142, 89, 228, 208, 228, 199, 218, 164, 63, 61, 130, 248, 52, 193, 143, 10, 154, 1, 176, 67, 9, 239})
-
-	t.Run("game exists but block does not", func(t *testing.T) {
-		_, err := fetchBlockFromLibrary(g.RootHash, [32]byte{})
-		if err == nil {
-			t.Error("Block should not have been identified")
-		}
 	})
 
 	t.Run("success", func(t *testing.T) {
-		ht, err := g.GetData()
-		if err != nil {
-			t.Fatal(err)
-		}
+		t.Run("block found", func(t *testing.T) {
+			ht, err := game.GetData()
+			if err != nil {
+				t.Fatal(err)
+			}
 
-		hash := ht.RootDir.Files["architecture-diagram.png"].Hashes[1]
-		data, err := fetchBlockFromLibrary(g.RootHash, hash)
-		if err != nil {
-			t.Fatal(err)
-		}
+			hash := ht.RootDir.Files["architecture-diagram.png"].Hashes[1]
+			data, err := fetchBlockFromLibrary(game.RootHash, hash)
+			assert.Nil(t, err, err)
 
-		dataHash := sha256.Sum256(data)
-		if !bytes.Equal(dataHash[:], hash[:]) {
-			t.Fatal("incorrect block fetched")
-		}
+			dataHash := sha256.Sum256(data)
+			assert.Equal(t, dataHash[:], hash[:], "incorrect block fetched")
+		})
 	})
-
-}
-
-// helper
-
-func sendBlock(filename string, g *games.Game, gameData *hash.HashTree, hash [32]byte, offset int, buffer []byte) error {
-	found, data, err := g.FetchShard(hash)
-	if err != nil {
-		return err
-	}
-
-	if !found {
-		return errors.New("Test shard not found")
-	}
-
-	mockPeer.SetResponse(
-		fmt.Sprintf("BLOCK;%x;%x\n", g.RootHash, hash),
-		fmt.Sprintf("SEND_BLOCK;%x;%x;%x\n", g.RootHash, hash, data),
-	)
-
-	mockPeerClient.SendStringf("BLOCK;%x;%x\n", g.RootHash, hash)
-	time.Sleep(25 * time.Millisecond)
-
-	// ? was the shard inserted
-	f, err := os.Open(filename)
-	if err != nil {
-		return fmt.Errorf("Unable to verify whether shard was inserted %s", err)
-	}
-	defer f.Close()
-
-	_, err = f.Seek(int64(gameData.ShardSize)*int64(offset), 0)
-	if err != nil {
-		return fmt.Errorf("Unable to verify whether shard was inserted %s", err)
-	}
-
-	// ? clear buffer
-	for i := range buffer {
-		buffer[i] = 0x00
-	}
-
-	reader := bufio.NewReader(f)
-	_, err = reader.Read(buffer)
-	if err != nil {
-		return fmt.Errorf("error reading shard %s", err)
-	}
-
-	if !bytes.Equal(buffer, data) {
-		return fmt.Errorf("incorrect shard inserted\ngot %x\nexpected %x", buffer, data)
-	}
-
-	return nil
 }

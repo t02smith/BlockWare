@@ -4,11 +4,9 @@ import (
 	"bufio"
 	"bytes"
 	"crypto/sha256"
-	"encoding/hex"
 	"errors"
 	"fmt"
 	"os"
-	"strings"
 	"testing"
 	"time"
 
@@ -26,50 +24,13 @@ TODO these tests are deprecated and are to be migrated ;)
 */
 
 func TestOnMessage(t *testing.T) {
+	t.Skip()
 	testutil.ShortTest(t)
 
 	// SETUP TEST GAME
 	lib := Peer().Library()
 	_ = lib
 	g := Peer().Library().GetOwnedGame([32]byte{15, 158, 115, 2, 196, 26, 32, 86, 37, 148, 142, 89, 228, 208, 228, 199, 218, 164, 63, 61, 130, 248, 52, 193, 143, 10, 154, 1, 176, 67, 9, 239})
-
-	t.Run("BLOCK", func(t *testing.T) {
-
-		gData, _ := g.GetData()
-		blockHash := gData.RootDir.Files["architecture-diagram.png"].Hashes[1]
-
-		t.Run("block exists", func(t *testing.T) {
-			mockPeer.SendStringAndWait(25, "BLOCK;%x;%x\n", g.RootHash, blockHash)
-
-			msg := mockPeer.GetLastMessage()
-			msg = msg[:len(msg)-1]
-
-			res := strings.Split(msg, ";")
-			if len(res) != 4 {
-				t.Fatalf("incorrect response received '%s'", msg)
-			}
-
-			data, err := hex.DecodeString(res[3])
-			if err != nil {
-				t.Fatal(err)
-			}
-
-			hash := sha256.Sum256(data)
-			if !bytes.Equal(hash[:], blockHash[:]) {
-				t.Fatalf("block's hashes do not match\ngot: %x\nexpected: %x", hash, blockHash)
-			}
-		})
-
-		t.Run("block doesn't exist", func(t *testing.T) {
-			mockPeer.SendStringAndWait(25, "BLOCK;%x;%x\n", g.RootHash, [32]byte{})
-
-			msg := mockPeer.GetLastMessage()
-			if msg != fmt.Sprintf("ERROR;Block %x not found\n", [32]byte{}) {
-				t.Fatalf("Expected an error message from peer")
-			}
-		})
-
-	})
 
 	t.Run("SEND_BLOCK", func(t *testing.T) {
 

@@ -27,6 +27,7 @@ func onMessage(cmd []string, client PeerIT) {
 		err := handleLIBRARY(cmd, client)
 		if err != nil {
 			util.Logger.Warnf("Error handling LIBRARY message: %s", err)
+			client.SendString(generateERROR(err.Error()))
 		}
 		return
 
@@ -35,6 +36,7 @@ func onMessage(cmd []string, client PeerIT) {
 		err := handleGAMES(cmd, client)
 		if err != nil {
 			util.Logger.Warnf("Error handling GAMES message: %s", err)
+			client.SendString(generateERROR(err.Error()))
 		}
 
 		return
@@ -44,6 +46,7 @@ func onMessage(cmd []string, client PeerIT) {
 		err := handleBLOCK(cmd, client)
 		if err != nil {
 			util.Logger.Warnf("Error handling BLOCK message %s", err)
+			client.SendString(generateERROR(err.Error()))
 		}
 		return
 
@@ -52,6 +55,7 @@ func onMessage(cmd []string, client PeerIT) {
 		err := handleSEND_BLOCK(cmd, client)
 		if err != nil {
 			util.Logger.Warnf("Error handling SEND_BLOCK message %s", err)
+			client.SendString(generateERROR(err.Error()))
 		}
 		return
 

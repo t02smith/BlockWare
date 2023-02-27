@@ -69,6 +69,10 @@ func handleGAMES(cmd []string, client PeerIT) error {
 	}
 
 	for i := 1; i < len(cmd); i++ {
+		if len(cmd[i]) != 64 {
+			continue
+		}
+
 		var hash [32]byte
 
 		receivedHash, err := hex.DecodeString(cmd[i])
@@ -137,6 +141,10 @@ func handleSEND_BLOCK(cmd []string, client PeerIT) error {
 
 	// * fetch game and find location
 	game := Peer().library.GetOwnedGame(gh)
+	if game == nil {
+		return fmt.Errorf("user does not own game with hash %x", gh)
+	}
+
 	gameTree, err := game.GetData()
 	if err != nil {
 		return fmt.Errorf("error loading game data %s", err)

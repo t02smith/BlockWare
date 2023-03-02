@@ -99,6 +99,10 @@ func FillLibraryBlockchainGames(lib *games.Library) error {
 	util.Logger.Infof("Populating library with %d games", len(gs))
 	for _, g := range gs {
 		lib.SetBlockchainGame(g.RootHash, g)
+		err := g.DownloadAssets()
+		if err != nil {
+			util.Logger.Warnf("Error fetching assets for game %x", g.RootHash)
+		}
 	}
 	util.Logger.Infof("Library populated with %d games", len(gs))
 
@@ -136,10 +140,13 @@ func fetchGamesFromEthereum() ([]*games.Game, error) {
 			ReleaseDate:         game.ReleaseDate,
 			Developer:           game.Developer,
 			RootHash:            game.RootHash,
-			HashTreeIPFSAddress: game.IpfsAddress,
+			HashTreeIPFSAddress: game.HashTreeIPFSAddress,
 			Uploader:            game.Uploader,
 			Price:               game.Price,
 			PreviousVersion:     game.PreviousVersion,
+			Assets: &games.GameAssets{
+				Cid: game.AssetsIPFSAddress,
+			},
 		})
 	}
 
@@ -158,18 +165,27 @@ func uploadToEthereum(g *games.Game) error {
 	}
 	util.Logger.Infof("Successfully uploaded game data for %s to IPFS", g.Title)
 
+	// upload assets
+	util.Logger.Infof("Uploading assets to IPFS")
+	err = g.UploadAssets()
+	if err != nil {
+		return err
+	}
+	util.Logger.Info("Uploaded assets to IPFS")
+
 	// upload metadata to blockchain
 	util.Logger.Infof("Uploading game metadata for %s to Ethereum", g.Title)
 	_, err = lib_instance.UploadGame(auth_instance, library.LibraryGameEntry{
-		Title:           g.Title,
-		Version:         g.Version,
-		ReleaseDate:     g.ReleaseDate,
-		Developer:       g.Developer,
-		RootHash:        g.RootHash,
-		IpfsAddress:     g.HashTreeIPFSAddress,
-		PreviousVersion: g.PreviousVersion,
-		Price:           g.Price,
-		Uploader:        g.Uploader,
+		Title:               g.Title,
+		Version:             g.Version,
+		ReleaseDate:         g.ReleaseDate,
+		Developer:           g.Developer,
+		RootHash:            g.RootHash,
+		HashTreeIPFSAddress: g.HashTreeIPFSAddress,
+		PreviousVersion:     g.PreviousVersion,
+		Price:               g.Price,
+		Uploader:            g.Uploader,
+		AssetsIPFSAddress:   g.Assets.Cid,
 	})
 
 	if err != nil {
@@ -259,10 +275,13 @@ func gameEntryToGame(game *library.LibraryGameEntry) *games.Game {
 		ReleaseDate:         game.ReleaseDate,
 		Developer:           game.Developer,
 		RootHash:            game.RootHash,
-		HashTreeIPFSAddress: game.IpfsAddress,
-		Uploader:            game.Uploader,
-		Price:               game.Price,
-		PreviousVersion:     game.PreviousVersion,
+		HashTreeIPFSAddress: game.HashTreeIPFSAddress,
+		Assets: &games.GameAssets{
+			Cid: game.AssetsIPFSAddress,
+		},
+		Uploader:        game.Uploader,
+		Price:           game.Price,
+		PreviousVersion: game.PreviousVersion,
 	}
 }
 
@@ -288,15 +307,16 @@ func Purchase(l *games.Library, rootHash [32]byte) error {
 		}
 
 		g = gameEntryToGame(&library.LibraryGameEntry{
-			Title:           gx.Title,
-			Version:         gx.Version,
-			ReleaseDate:     gx.ReleaseDate,
-			Developer:       gx.Developer,
-			RootHash:        gx.RootHash,
-			PreviousVersion: gx.PreviousVersion,
-			Price:           gx.Price,
-			Uploader:        gx.Uploader,
-			IpfsAddress:     gx.IpfsAddress,
+			Title:               gx.Title,
+			Version:             gx.Version,
+			ReleaseDate:         gx.ReleaseDate,
+			Developer:           gx.Developer,
+			RootHash:            gx.RootHash,
+			PreviousVersion:     gx.PreviousVersion,
+			Price:               gx.Price,
+			Uploader:            gx.Uploader,
+			HashTreeIPFSAddress: gx.HashTreeIPFSAddress,
+			AssetsIPFSAddress:   gx.AssetsIPFSAddress,
 		})
 
 		l.SetBlockchainGame(g.RootHash, g)

@@ -30,6 +30,7 @@ func (a *Controller) GetOwnedGames() []*ControllerGame {
 			Price:           g.Price,
 			Uploader:        g.Uploader,
 			Download:        downloadToAppDownload(g.Download),
+			AssetsFolder:    g.Assets.AbsolutePath,
 		})
 	}
 
@@ -60,6 +61,7 @@ func (c *Controller) GetStoreGames() []*ControllerGame {
 			Price:           g.Price,
 			Uploader:        g.Uploader,
 			Download:        downloadToAppDownload(g.Download),
+			AssetsFolder:    g.Assets.AbsolutePath,
 		})
 	}
 
@@ -67,7 +69,7 @@ func (c *Controller) GetStoreGames() []*ControllerGame {
 }
 
 // upload a new game
-func (c *Controller) UploadGame(title, version, dev, rootDir string, shardSize, price, workerCount uint) {
+func (c *Controller) UploadGame(title, version, dev, rootDir string, shardSize, price, workerCount uint, assetsDir string) {
 	release := time.Now().String()
 	progress := make(chan int)
 
@@ -83,7 +85,15 @@ func (c *Controller) UploadGame(title, version, dev, rootDir string, shardSize, 
 	}()
 
 	viper.Set("meta.hashes.workerCount", workerCount)
-	g, err := games.CreateGame(title, version, release, dev, rootDir, big.NewInt(int64(price)), shardSize, progress)
+	g, err := games.CreateGame(games.NewGame{
+		Title:       title,
+		Version:     version,
+		ReleaseDate: release,
+		Developer:   dev,
+		RootDir:     rootDir,
+		Price:       big.NewInt(int64(price)),
+		ShardSize:   shardSize,
+		AssetsDir:   assetsDir}, progress)
 	if err != nil {
 		c.controllerErrorf("Error creating game %s", err)
 		return
@@ -129,6 +139,7 @@ func (c *Controller) GetGameFromStoreByRootHash(rh string) *ControllerGame {
 		Price:           g.Price,
 		Uploader:        g.Uploader,
 		Download:        downloadToAppDownload(g.Download),
+		AssetsFolder:    g.Assets.AbsolutePath,
 	}
 }
 

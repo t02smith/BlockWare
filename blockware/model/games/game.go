@@ -44,8 +44,8 @@ type Game struct {
 	PreviousVersion [32]byte `json:"previousVersion"`
 
 	// IPFS
-	HashTreeIPFSAddress string     `json:"IPFSId"`
-	AssetsIPFSAddress   GameAssets `json:"assets"`
+	HashTreeIPFSAddress string      `json:"IPFSId"`
+	Assets              *GameAssets `json:"assets"`
 
 	// blockchain related
 	Price    *big.Int       `json:"price"`
@@ -58,35 +58,29 @@ type Game struct {
 	Download *Download
 }
 
-/*
-Game assets will be stored on IPFS and should be fetched as
-necessary and will include things like artwork, description,
-etc.
-
-The assets should be stored in a .zip archive and use the
-following naming scheme:
-
-- "cover.png" = main piece of artwork for the game
-- "description.md" = a description of the game to be displayed on its library page
-*/
-type GameAssets struct {
-	IPFSId string
-
-	absolutePath string
-}
-
 // Creator
 
-// create a new instance of a game and generate a hash tree for it
-func CreateGame(title, version, releaseDate, developer, rootDir string, price *big.Int, shardSize uint, progress chan int) (*Game, error) {
+type NewGame struct {
+	Title       string
+	Version     string
+	ReleaseDate string
+	Developer   string
+	RootDir     string
+	Price       *big.Int
+	ShardSize   uint
+	AssetsDir   string
+}
 
-	if shardSize == 0 {
+// create a new instance of a game and generate a hash tree for it
+func CreateGame(newGame NewGame, progress chan int) (*Game, error) {
+
+	if newGame.ShardSize == 0 {
 		util.Logger.Errorf("shard size should be > 0")
 		return nil, errors.New("invalid shard size")
 	}
 
 	// check version format
-	versionMatches, err := regexp.MatchString("^(\\d+\\.)*\\d+$", version)
+	versionMatches, err := regexp.MatchString("^(\\d+\\.)*\\d+$", newGame.Version)
 	if err != nil {
 		util.Logger.Errorf("error matching version number to regex")
 		return nil, err
@@ -98,14 +92,14 @@ func CreateGame(title, version, releaseDate, developer, rootDir string, price *b
 	}
 
 	// check release date
-	_, err = time.Parse("2006-01-02 15:04:05.999999999 -0700 MST", strings.Split(releaseDate, " m=")[0])
+	_, err = time.Parse("2006-01-02 15:04:05.999999999 -0700 MST", strings.Split(newGame.ReleaseDate, " m=")[0])
 	if err != nil {
-		util.Logger.Errorf("invalid release date given got %s", releaseDate)
+		util.Logger.Errorf("invalid release date given got %s", newGame.ReleaseDate)
 		return nil, errors.New("invalid release date given")
 	}
 
 	// hash data
-	tree, err := hash.NewHashTree(rootDir, shardSize, progress)
+	tree, err := hash.NewHashTree(newGame.RootDir, newGame.ShardSize, progress)
 	if err != nil {
 		return nil, err
 	}
@@ -117,10 +111,10 @@ func CreateGame(title, version, releaseDate, developer, rootDir string, price *b
 
 	// game root hash
 	hasher := sha256.New()
-	hasher.Write([]byte(title))
-	hasher.Write([]byte(version))
-	hasher.Write([]byte(releaseDate))
-	hasher.Write([]byte(developer))
+	hasher.Write([]byte(newGame.Title))
+	hasher.Write([]byte(newGame.Version))
+	hasher.Write([]byte(newGame.ReleaseDate))
+	hasher.Write([]byte(newGame.Developer))
 	hasher.Write(tree.RootDir.RootHash[:])
 
 	hash := hasher.Sum([]byte{})
@@ -130,16 +124,19 @@ func CreateGame(title, version, releaseDate, developer, rootDir string, price *b
 
 	// return value
 	game := &Game{
-		Title:               title,
-		Version:             version,
-		ReleaseDate:         releaseDate,
-		Developer:           developer,
+		Title:               newGame.Title,
+		Version:             newGame.Version,
+		ReleaseDate:         newGame.ReleaseDate,
+		Developer:           newGame.Developer,
 		data:                tree,
 		RootHash:            h,
 		HashTreeIPFSAddress: "",
-		Price:               price,
+		Price:               newGame.Price,
 		PreviousVersion:     [32]byte{},
 		Uploader:            common.Address{},
+		Assets: &GameAssets{
+			AbsolutePath: newGame.AssetsDir,
+		},
 	}
 
 	return game, nil

@@ -14,6 +14,10 @@ should contact other peers with messages
 
 */
 
+const (
+	MAX_ATETMPTS_DOWNLOAD_REQUEST int = 32
+)
+
 // process a message received from a peer
 func onMessage(cmd []string, client PeerIT) {
 	if cmd[0][len(cmd[0])-1] == '\r' {
@@ -73,12 +77,13 @@ func (p *peer) listenToDownloadRequests() {
 	util.Logger.Info("Listening for incoming download requests")
 	go func() {
 		for request := range p.library.RequestDownload {
-			if request.Attempts > 32 {
+			if request.Attempts > uint8(MAX_ATETMPTS_DOWNLOAD_REQUEST) {
 				// ! limit number of attempts we can make for a given download
+				util.Logger.Warnf("Request for block %x cancelled after %d attempts", request.BlockHash, MAX_ATETMPTS_DOWNLOAD_REQUEST)
 				continue
 			}
 
-			util.Logger.Infof("Processing request %s", request)
+			util.Logger.Infof("Processing request for block %x", request.BlockHash)
 			request.Attempts++
 
 			ps := p.findPeersWhoHaveGame(request.GameHash)
@@ -95,7 +100,7 @@ func (p *peer) listenToDownloadRequests() {
 
 			// * at least one peer has it
 			// TODO order peers by something
-			chosen := ps[0]
+			chosen := ps[int(request.Attempts)%len(ps)]
 			chosen.SendString(generateBLOCK(request.GameHash, request.BlockHash))
 		}
 		util.Logger.Info("stopped listening to incoming download requests")

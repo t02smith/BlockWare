@@ -4,12 +4,8 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
-	"fmt"
-	"os"
-	"path/filepath"
 
 	shell "github.com/ipfs/go-ipfs-api"
-	"github.com/t02smith/part-iii-project/toolkit/model"
 	hash "github.com/t02smith/part-iii-project/toolkit/model/hashtree"
 	"github.com/t02smith/part-iii-project/toolkit/util"
 )
@@ -69,57 +65,5 @@ func (g *Game) GetHashTreeFromIPFS() error {
 	}
 
 	util.Logger.Info("Read game %s data from IPFS", g.Title)
-	return nil
-}
-
-func (ga *GameAssets) FetchGameAssets(outputLocation string) error {
-	if ga.IPFSId == "" {
-		return fmt.Errorf("asset location not specified")
-	}
-
-	if outputLocation == "" {
-		outputLocation = "."
-	}
-
-	// * fetch from ipfs
-	sh := shell.NewShell("localhost:5001")
-	util.Logger.Infof("Fetching assets from IPFS address %s", ga.IPFSId)
-
-	data, err := sh.Cat(ga.IPFSId)
-	if err != nil {
-		return err
-	}
-
-	buf := new(bytes.Buffer)
-	buf.ReadFrom(data)
-
-	util.Logger.Infof("Writing archive to file")
-	archive, err := os.Create(filepath.Join(outputLocation, fmt.Sprintf("%s.zip", ga.IPFSId)))
-	if err != nil {
-		return err
-	}
-
-	_, err = archive.Write(buf.Bytes())
-	if err != nil {
-		archive.Close()
-		return err
-	}
-
-	archive.Close()
-	util.Logger.Info("Archive written to file")
-
-	// * unzip archive
-	ga.absolutePath = filepath.Join(outputLocation, ga.IPFSId)
-	err = model.UnzipArchive(filepath.Join(outputLocation, fmt.Sprintf("%s.zip", ga.IPFSId)), ga.absolutePath)
-	if err != nil {
-		return err
-	}
-
-	// * tear down
-	err = os.Remove(filepath.Join(outputLocation, fmt.Sprintf("%s.zip", ga.IPFSId)))
-	if err != nil {
-		util.Logger.Warnf("Error removing archive: %s", err)
-	}
-
 	return nil
 }

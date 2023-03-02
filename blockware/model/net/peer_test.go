@@ -22,20 +22,16 @@ func TestMain(m *testing.M) {
 // start peer
 
 func TestConnectToPeer(t *testing.T) {
-	testutil.ShortTest(t)
-	beforeEach()
-
 	assert.Equal(t, 1, len(testPeer.peers), "Peer not tracked/connected")
 
-	mpClient := testPeer.server.clients[0]
-	mpClient.SendString("test message\n")
+	mp, it := createMockPeer(t)
+	it.SendString("test message\n")
 	time.Sleep(25 * time.Millisecond)
 
-	assert.NotEqual(t, "test message", mockPeer.GetLastMessage(), "Test message not received got "+mockPeer.GetLastMessage())
+	assert.NotEqual(t, "test message", mp.GetLastMessage(), "Test message not received got "+mp.GetLastMessage())
 }
 
 func TestLoadPeersFromFile(t *testing.T) {
-	beforeEach()
 	viper.Set("meta.directory", "../../test/data/tmp")
 
 	t.Run("file not found", func(t *testing.T) {
@@ -69,7 +65,6 @@ func TestLoadPeersFromFile(t *testing.T) {
 }
 
 func TestSavePeersToFile(t *testing.T) {
-	beforeEach()
 	viper.Set("meta.directory", "../../test/data/tmp")
 
 	t.Run("success", func(t *testing.T) {
@@ -87,7 +82,6 @@ func TestSavePeersToFile(t *testing.T) {
 }
 
 func TestConnectToKnownPeers(t *testing.T) {
-	beforeEach()
 
 	t.Run("success", func(t *testing.T) {
 		ports := []uint{6750, 6751, 6752}

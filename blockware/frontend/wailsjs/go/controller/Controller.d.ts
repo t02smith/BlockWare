@@ -27,4 +27,4 @@ export function PurchaseGame(arg1:string):Promise<void>;
 
 export function StartDownloadListener():Promise<void>;
 
-export function UploadGame(arg1:string,arg2:string,arg3:string,arg4:string,arg5:number,arg6:number,arg7:number):Promise<void>;
+export function UploadGame(arg1:string,arg2:string,arg3:string,arg4:string,arg5:number,arg6:number,arg7:number,arg8:string):Promise<void>;

@@ -65,8 +65,6 @@
             <p>What is your name?</p>
           </div>
 
-          <!-- TODO release => auto generate? -->
-
           <!-- Price -->
           <div class="form-group">
             <h3>Price (in Wei)</h3>
@@ -79,6 +77,20 @@
               :disabled="submitted"
             />
             <p>What is the current price? (in Wei)</p>
+          </div>
+
+          <!-- Price -->
+          <div class="form-group">
+            <h3>Assets Directory</h3>
+            <input
+              type="number"
+              name=""
+              id=""
+              placeholder="in Wei"
+              v-model="assets"
+              :disabled="submitted"
+            />
+            <p>Absolute directory of this game's assets folder</p>
           </div>
         </div>
       </div>
@@ -183,6 +195,7 @@ const price = ref(0);
 const shardSize = ref(16384);
 const file = ref("");
 const workers = ref(5);
+const assets = ref("");
 
 // upload progress
 const fileCount = ref(0);
@@ -214,7 +227,8 @@ async function submit() {
     file.value,
     shardSize.value,
     price.value,
-    workers.value
+    workers.value,
+    assets.value
   );
 
   if (err.value.length > 0) {
@@ -225,6 +239,7 @@ async function submit() {
     shardSize.value = 16384;
     price.value = 0;
     workers.value = 5;
+    assets.value = "";
   } else {
     success.value = true;
   }

@@ -155,6 +155,7 @@ func startPeer() error {
 		net.PeerConfig{
 			ContinueDownloads: true,
 			LoadPeersFromFile: true,
+			ServeAssets:       true,
 		},
 		"localhost",
 		viper.GetUint("net.port"),

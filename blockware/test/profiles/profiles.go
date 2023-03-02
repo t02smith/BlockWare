@@ -10,7 +10,10 @@ import (
 	"github.com/t02smith/part-iii-project/toolkit/model"
 	"github.com/t02smith/part-iii-project/toolkit/model/ethereum"
 	"github.com/t02smith/part-iii-project/toolkit/model/net"
+	deployEth "github.com/t02smith/part-iii-project/toolkit/test/profiles/deploy"
 	listenOnly "github.com/t02smith/part-iii-project/toolkit/test/profiles/listenOnly"
+	listenOnlyUpload "github.com/t02smith/part-iii-project/toolkit/test/profiles/listenOnlyWithUpload"
+	"github.com/t02smith/part-iii-project/toolkit/test/testutil"
 	"github.com/t02smith/part-iii-project/toolkit/util"
 )
 
@@ -29,8 +32,10 @@ to be parsed initially.
 type Profile uint8
 
 const (
-	None Profile = iota
-	ListenOnly
+	None                  Profile = 0
+	_listenOnlyWithUpload Profile = 1
+	_listenOnly           Profile = 2
+	_deploy               Profile = 3
 )
 
 // run a given profile by its ID number
@@ -40,15 +45,29 @@ func RunProfile(profileNumber Profile, contractAddr string) error {
 	addr := common.HexToAddress(contractAddr)
 
 	switch profileNumber {
-	case ListenOnly:
+	case _listenOnly:
 		err := SetupProfile("./test/profiles/listenOnly", listenOnly.PrivateKey, addr, net.PeerConfig{
 			ContinueDownloads: false,
 			LoadPeersFromFile: false,
+			ServeAssets:       false,
 		})
 		if err != nil {
 			return err
 		}
 		listenOnly.Run()
+
+	case _listenOnlyWithUpload:
+		err := SetupProfile("./test/profiles/listenOnlyWithUpload", listenOnlyUpload.PrivateKey, addr, net.PeerConfig{
+			ContinueDownloads: false,
+			LoadPeersFromFile: false,
+			ServeAssets:       false,
+		})
+		if err != nil {
+			return err
+		}
+		listenOnlyUpload.Run()
+	case _deploy:
+		return deployEth.Run(testutil.Accounts[3][1])
 	case None:
 	default:
 		return errors.New("unknown profile")
@@ -99,10 +118,7 @@ func SetupProfile(path, privateKey string, contractAddr common.Address, config n
 		return fmt.Errorf("error starting eth client %s", err)
 	}
 
-	_, _, err = ethereum.DeployLibraryContract(privateKey)
-	if err != nil {
-		return fmt.Errorf("error connecting to lib instance %s", err)
-	}
+	ethereum.ConnectToLibraryInstance(contractAddr, privateKey)
 
 	return nil
 }

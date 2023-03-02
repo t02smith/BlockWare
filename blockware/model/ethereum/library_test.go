@@ -46,7 +46,8 @@ func TestEthereum(t *testing.T) {
 			assert.Equal(t, testGame.Version, uploadedGame.Version, "game versions not equal")
 			assert.Equal(t, testGame.ReleaseDate, uploadedGame.ReleaseDate, "game release date not equal")
 			assert.Equal(t, testGame.Developer, uploadedGame.Developer, "game dev not equal")
-			assert.Equal(t, testGame.HashTreeIPFSAddress, uploadedGame.IpfsAddress, "game IPFS data id not equal")
+			assert.Equal(t, testGame.HashTreeIPFSAddress, uploadedGame.HashTreeIPFSAddress, "game IPFS data id not equal")
+			assert.Equal(t, testGame.Assets.Cid, uploadedGame.AssetsIPFSAddress, "game IPFS data id not equal")
 
 		})
 

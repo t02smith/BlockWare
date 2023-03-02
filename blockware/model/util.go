@@ -42,6 +42,13 @@ func SetupToolkitEnvironment() error {
 		return err
 	}
 
+	// look for assets directory
+	assetsDir := filepath.Join(toolkitDir, "assets")
+	err = CreateDirectoryIfNotExist(assetsDir)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -72,6 +79,7 @@ func CreateDirectoryIfNotExist(dir string) error {
 
 // create a zip archive of a directory
 func ZipDirectory(archivePath, outputLocation string) error {
+	util.Logger.Infof("Attempting to create archive %s from directory %s", outputLocation, archivePath)
 	file, err := os.Create(outputLocation)
 	if err != nil {
 		return err
@@ -81,6 +89,7 @@ func ZipDirectory(archivePath, outputLocation string) error {
 	defer compressor.Close()
 
 	_archivePath := fmt.Sprintf("%s%s", filepath.Join(archivePath), string(os.PathSeparator))
+	fileCount, dirCount := 0, 0
 	err = filepath.WalkDir(_archivePath, func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
 			return err
@@ -93,6 +102,7 @@ func ZipDirectory(archivePath, outputLocation string) error {
 
 		if d.IsDir() {
 			_, err = compressor.Create(relPath + "/")
+			dirCount++
 			return err
 		}
 
@@ -117,6 +127,7 @@ func ZipDirectory(archivePath, outputLocation string) error {
 			return err
 		}
 
+		fileCount++
 		return nil
 	})
 
@@ -131,6 +142,7 @@ func ZipDirectory(archivePath, outputLocation string) error {
 		return err
 	}
 
+	util.Logger.Infof("Archive created at %s from %d folders and %d files", dirCount, fileCount)
 	defer file.Close()
 	return compressor.Flush()
 }

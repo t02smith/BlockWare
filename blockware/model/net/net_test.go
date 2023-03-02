@@ -12,9 +12,7 @@ import (
 )
 
 var (
-	testPeer       *peer
-	mockPeer       *testutil.MockPeer
-	mockPeerClient PeerIT
+	testPeer *peer
 )
 
 const (
@@ -36,33 +34,15 @@ func beforeAll() {
 	viper.Set("meta.directory", "../../test/data/.toolkit")
 	viper.Set("games.installFolder", "../../test/data/tmp")
 
-	tp, err := StartPeer(PeerConfig{false, false}, "localhost", 7887, "../../test/data/tmp", "../../test/data/.toolkit")
+	tp, err := StartPeer(PeerConfig{false, false, false}, "localhost", 7887, "../../test/data/tmp", "../../test/data/.toolkit")
 	if err != nil {
 		log.Printf("Error starting test peer")
 		os.Exit(1)
 	}
 	testPeer = tp
-
-	time.Sleep(25 * time.Millisecond)
-	mockPeer, err = testutil.StartMockPeer(PEER_PORT, true)
-	if err != nil {
-		log.Printf("Error starting mock peer")
-		os.Exit(1)
-	}
-	time.Sleep(25 * time.Millisecond)
-
-	mockPeerClient = testPeer.server.clients[0]
-}
-
-func beforeEach() {
-	mockPeer.Clear()
 }
 
 func afterAll() {
-	if mockPeer != nil {
-		mockPeer.Close()
-	}
-
 	testPeer.Close()
 	testutil.ClearTmp("../../")
 }

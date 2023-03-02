@@ -61,14 +61,20 @@ func TestMain(m *testing.M) {
 //
 
 func setupTestGame() error {
-
 	_, err := os.Stat("../../test/data/.toolkit/toolkit-1.0.4-google.com.json")
 	if err == nil {
 		return nil
 	}
 
 	datetime := time.Date(2002, 1, 10, 0, 0, 0, 0, time.UTC).String()
-	game, err := games.CreateGame("toolkit", "1.0.4", datetime, "google.com", "../../test/data/testdir", big.NewInt(0), 256, nil)
+	game, err := games.CreateGame(games.NewGame{
+		Title:       "toolkit",
+		Version:     "1.0.4",
+		ReleaseDate: datetime,
+		Developer:   "google.com",
+		RootDir:     "../../test/data/testdir",
+		Price:       big.NewInt(0),
+		ShardSize:   256}, nil)
 
 	if err != nil {
 		log.Printf("Error creating game: %s\n", err)

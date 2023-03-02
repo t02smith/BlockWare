@@ -50,6 +50,6 @@ export function StartDownloadListener() {
   return window['go']['controller']['Controller']['StartDownloadListener']();
 }
 
-export function UploadGame(arg1, arg2, arg3, arg4, arg5, arg6, arg7) {
-  return window['go']['controller']['Controller']['UploadGame'](arg1, arg2, arg3, arg4, arg5, arg6, arg7);
+export function UploadGame(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8) {
+  return window['go']['controller']['Controller']['UploadGame'](arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
 }

@@ -10,7 +10,7 @@ meta:
   log: stdout
   threadpoolsize: 5
 net:
-  port: 6751
+  port: 6750
   useknownpeers: false
 user:
   info:

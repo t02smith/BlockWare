@@ -31,7 +31,8 @@ contract Library {
         address uploader;
 
         // address to download hash data from IPFS
-        string ipfsAddress;
+        string hashTreeIPFSAddress;
+        string assetsIPFSAddress;
     }
 
     constructor() {}
@@ -43,7 +44,7 @@ contract Library {
     function uploadGame(GameEntry memory _game) external {
         // check input data
         require(_game.rootHash.length > 0, "no root hash given");
-        require(bytes(_game.ipfsAddress).length > 0, "no IPFS address given for hash treee");
+        require(bytes(_game.hashTreeIPFSAddress).length > 0, "no IPFS address given for hash treee");
 
         // look for previous version
         if (_game.previousVersion != 0) {

@@ -35,7 +35,7 @@ func TestMain(m *testing.M) {
 // create a test game and store it in long term storage
 func setupTestGame() error {
 	datetime := time.Date(2002, 1, 10, 0, 0, 0, 0, time.UTC).String()
-	game, err := CreateGame("toolkit", "1.0.4", datetime, "google.com", "../../test/data/testdir", big.NewInt(0), 256, nil)
+	game, err := CreateGame(NewGame{"toolkit", "1.0.4", datetime, "google.com", "../../test/data/testdir", big.NewInt(0), 256, "../../test/data/assets"}, nil)
 
 	if err != nil {
 		log.Printf("Error creating game: %s\n", err)

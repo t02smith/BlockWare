@@ -73,6 +73,9 @@ type PeerConfig struct {
 
 	// read and attempt to connect to peers from a file
 	LoadPeersFromFile bool
+
+	//
+	ServeAssets bool
 }
 
 // Stores useful information about other peers
@@ -113,6 +116,11 @@ func StartPeer(config PeerConfig, serverHostname string, serverPort uint, instal
 
 		if config.ContinueDownloads {
 			singleton.listenToDownloadRequests()
+		}
+
+		if config.ServeAssets {
+			go peer.serveAssetsFolder()
+
 		}
 	})
 

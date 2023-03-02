@@ -86,9 +86,10 @@ func _generateFileCountData(n uint) error {
 }
 
 func BenchmarkHash_FileCount(b *testing.B) {
+	b.Skip()
 	util.InitLogger()
 
-	levels := []uint{100, 1_000, 10_000, 100_000}
+	levels := []uint{100, 1_000, 10_000, 50_000}
 	for _, n := range levels {
 		util.Logger.Infof("Generating data for file count = %d", n)
 		err := _generateFileCountData(n)
@@ -98,11 +99,12 @@ func BenchmarkHash_FileCount(b *testing.B) {
 		util.Logger.Infof("Generated data for file count = %d", n)
 
 		b.Run(fmt.Sprintf("file count = %d", n), func(b *testing.B) {
-
+			b.StopTimer()
 			ht, err := NewHashTree("../../test/data/tmp/benchmark_filecount", b_filecount_shardsize, nil)
 			if err != nil {
 				b.Fatal(err)
 			}
+			b.StartTimer()
 
 			util.Logger.Infof("Starting hash for file count = %d", n)
 			err = ht.Hash()

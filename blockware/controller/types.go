@@ -16,6 +16,8 @@ type ControllerGame struct {
 	RootHash        string `json:"rootHash"`
 	PreviousVersion string `json:"previousVersion"`
 
+	AssetsFolder string
+
 	// blockchain related
 	IPFSId   string         `json:"IPFSId"`
 	Price    *big.Int       `json:"price"`

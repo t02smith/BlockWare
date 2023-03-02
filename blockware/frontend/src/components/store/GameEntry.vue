@@ -3,9 +3,14 @@
     <div class="header-wrapper">
       <div class="gradient"></div>
       <div class="header">
-        <img src="../../assets/images/logo-universal.png" alt="" />
-
-        <div class="header-text-wrapper">
+        <img
+          :src="`http://localhost:3003/test/data/.toolkit/assets/${game.rootHash}/cover.png`"
+          alt=""
+        />
+        <div
+          class="header-text-wrapper"
+          :style="`background: url(http://localhost:3003/test/data/.toolkit/assets/${game.rootHash}/cover.png) no-repeat;`"
+        >
           <div class="header-text">
             <h2>{{ props.game.title }}</h2>
             <h3>{{ props.game.dev }}</h3>
@@ -58,7 +63,6 @@ const props = defineProps({
   > .header-wrapper {
     width: 100%;
     position: relative;
-    background: url("../../assets/images/logo-universal.png") no-repeat;
     padding-bottom: 1rem;
 
     > .gradient {

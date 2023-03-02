@@ -1,5 +1,9 @@
 <template>
-  <router-link :to="`/${props.linkTo}?game=${props.hash}`" class="game">
+  <router-link
+    :to="`/${props.linkTo}?game=${props.hash}`"
+    class="game"
+    :style="`background: url('http://localhost:3003/test/data/.toolkit/assets/${props.hash}/cover.png') no-repeat center;`"
+  >
     <div class="gradient"></div>
     <h5 class="version">v{{ props.version }}</h5>
 
@@ -40,8 +44,6 @@ const props = defineProps({
   margin: 0.5rem;
   width: 200px;
   height: 200px;
-  background: url("../../assets/images/logo-universal.png") no-repeat center
-    center;
   background-size: cover;
   background-color: #101010;
   cursor: pointer;

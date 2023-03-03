@@ -11,7 +11,7 @@ import (
 	"time"
 
 	"github.com/spf13/viper"
-	hash "github.com/t02smith/part-iii-project/toolkit/model/hashtree"
+	hash "github.com/t02smith/part-iii-project/toolkit/model/manager/hashtree"
 	"github.com/t02smith/part-iii-project/toolkit/util"
 )
 

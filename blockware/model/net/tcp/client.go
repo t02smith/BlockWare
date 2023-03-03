@@ -1,4 +1,4 @@
-package net
+package tcp
 
 import (
 	"bufio"
@@ -30,7 +30,12 @@ type TCPClient struct {
 }
 
 // generate a new TCP client to conenct to a server
-func InitTCPClient(serverHostname string, serverPort uint) (*TCPClient, error) {
+func InitTCPClient(
+	serverHostname string,
+	serverPort uint,
+	onMessage func([]string, TCPConnection),
+	onConnection func(string, uint, TCPConnection),
+	onClose func(TCPConnection)) (*TCPClient, error) {
 	util.Logger.Infof("Attempting to open connection to %s:%d", serverHostname, serverPort)
 	con, err := net.Dial("tcp", fmt.Sprintf("%s:%d", serverHostname, serverPort))
 	if err != nil {
@@ -46,21 +51,20 @@ func InitTCPClient(serverHostname string, serverPort uint) (*TCPClient, error) {
 		writer:   bufio.NewWriter(con),
 	}
 
-	p := Peer()
-	p.onConnection(serverHostname, serverPort, client)
+	onConnection(serverHostname, serverPort, client)
 
-	go client.listen(onMessage)
+	go client.listen(onMessage, onClose)
 	return client, nil
 }
 
 // listen for messages from the server
 // onMessage is a handler that is called when a message is received
-func (c *TCPClient) listen(onMessage func([]string, PeerIT)) {
+func (c *TCPClient) listen(onMessage func([]string, TCPConnection), onClose func(TCPConnection)) {
 	for {
 		msg, err := c.reader.ReadString('\n')
 		if err != nil {
 			if err == io.EOF {
-				Peer().onClose(c)
+				onClose(c)
 				return
 			}
 

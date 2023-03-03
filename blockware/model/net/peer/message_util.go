@@ -1,4 +1,4 @@
-package net
+package peer
 
 import (
 	"encoding/hex"

@@ -3,7 +3,7 @@ package profileDeploy
 import (
 	"fmt"
 
-	"github.com/t02smith/part-iii-project/toolkit/model/ethereum"
+	"github.com/t02smith/part-iii-project/toolkit/model/persistence/ethereum"
 )
 
 func Run(privateKey string) error {

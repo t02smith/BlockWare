@@ -9,9 +9,9 @@ import (
 	"os"
 	"time"
 
-	"github.com/t02smith/part-iii-project/toolkit/model/ethereum"
-	"github.com/t02smith/part-iii-project/toolkit/model/games"
+	"github.com/t02smith/part-iii-project/toolkit/model/manager/games"
 	"github.com/t02smith/part-iii-project/toolkit/model/net"
+	"github.com/t02smith/part-iii-project/toolkit/model/persistence/ethereum"
 	"github.com/t02smith/part-iii-project/toolkit/test/testutil"
 	"github.com/t02smith/part-iii-project/toolkit/util"
 )

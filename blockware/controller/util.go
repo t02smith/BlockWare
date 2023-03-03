@@ -4,7 +4,7 @@ import (
 	"encoding/hex"
 	"fmt"
 
-	"github.com/t02smith/part-iii-project/toolkit/model/games"
+	"github.com/t02smith/part-iii-project/toolkit/model/manager/games"
 	"github.com/t02smith/part-iii-project/toolkit/util"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )

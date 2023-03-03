@@ -1,4 +1,4 @@
-package net
+package peer
 
 import (
 	"log"
@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/spf13/viper"
+	"github.com/t02smith/part-iii-project/toolkit/model/net/tcp"
 	"github.com/t02smith/part-iii-project/toolkit/test/testutil"
 	"github.com/t02smith/part-iii-project/toolkit/util"
 )
@@ -31,10 +32,10 @@ func beforeAll() {
 	util.InitLogger()
 
 	// config
-	viper.Set("meta.directory", "../../test/data/.toolkit")
-	viper.Set("games.installFolder", "../../test/data/tmp")
+	viper.Set("meta.directory", "../../../test/data/tmp/.toolkit")
+	viper.Set("games.installFolder", "../../../test/data/tmp")
 
-	tp, err := StartPeer(PeerConfig{false, false, false}, "localhost", 7887, "../../test/data/tmp", "../../test/data/.toolkit")
+	tp, err := StartPeer(PeerConfig{false, false, false}, "localhost", 7887, "../../../test/data/tmp", "../../../test/data/.toolkit")
 	if err != nil {
 		log.Printf("Error starting test peer")
 		os.Exit(1)
@@ -44,13 +45,13 @@ func beforeAll() {
 
 func afterAll() {
 	testPeer.Close()
-	testutil.ClearTmp("../../")
+	testutil.ClearTmp("../../../")
 }
 
 // utility
 
 // create a new mock peer to test the peer
-func createMockPeer(t *testing.T) (*testutil.MockPeer, PeerIT) {
+func createMockPeer(t *testing.T) (*testutil.MockPeer, tcp.TCPConnection) {
 	t.Helper()
 	mp, err := testutil.StartMockPeer(PEER_PORT, true)
 	if err != nil {
@@ -62,5 +63,6 @@ func createMockPeer(t *testing.T) (*testutil.MockPeer, PeerIT) {
 		mp.Close()
 	})
 
-	return mp, testPeer.server.clients[len(testPeer.server.clients)-1]
+	clients := testPeer.server.Clients()
+	return mp, clients[len(clients)-1]
 }

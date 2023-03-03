@@ -4,14 +4,14 @@ import (
 	"encoding/hex"
 	"fmt"
 
-	"github.com/t02smith/part-iii-project/toolkit/model/net"
+	"github.com/t02smith/part-iii-project/toolkit/model/net/peer"
 	"github.com/t02smith/part-iii-project/toolkit/util"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
 // get a list of downloads
 func (a *Controller) GetDownloads() map[string]*ControllerDownload {
-	ds := net.Peer().Library().GetDownloads()
+	ds := peer.Peer().Library().GetDownloads()
 	return downloadToGameDownloads(ds)
 }
 
@@ -26,7 +26,7 @@ func (a *Controller) IsDownloading(gh string) int {
 	gameHash := [32]byte{}
 	copy(gameHash[:], gh_tmp[:])
 
-	lib := net.Peer().Library()
+	lib := peer.Peer().Library()
 	g := lib.GetOwnedGame(gameHash)
 
 	// ? game exists
@@ -55,7 +55,7 @@ func (a *Controller) IsDownloading(gh string) int {
 // listen for incoming download progress alerts
 func (a *Controller) StartDownloadListener() {
 	go func() {
-		downloadChannel := net.Peer().Library().DownloadProgress
+		downloadChannel := peer.Peer().Library().DownloadProgress
 		for progress := range downloadChannel {
 			util.Logger.Infof("Download event received %x-%x", progress.GameHash, progress.BlockHash)
 			runtime.EventsEmit(a.ctx, fmt.Sprintf("%x", progress.GameHash), fmt.Sprintf("%x", progress.BlockHash))
@@ -75,7 +75,7 @@ func (c *Controller) CreateDownload(gh string) {
 	gameHash := [32]byte{}
 	copy(gameHash[:], gh_tmp[:])
 
-	lib := net.Peer().Library()
+	lib := peer.Peer().Library()
 	g := lib.GetOwnedGame(gameHash)
 
 	// ? game exists

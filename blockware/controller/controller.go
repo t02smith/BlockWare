@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/t02smith/part-iii-project/toolkit/model/ethereum"
+	"github.com/t02smith/part-iii-project/toolkit/model/persistence/ethereum"
 	"github.com/t02smith/part-iii-project/toolkit/util"
 )
 

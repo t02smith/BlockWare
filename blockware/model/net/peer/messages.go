@@ -1,8 +1,9 @@
-package net
+package peer
 
 import (
 	"errors"
 
+	"github.com/t02smith/part-iii-project/toolkit/model/net/tcp"
 	"github.com/t02smith/part-iii-project/toolkit/util"
 )
 
@@ -19,7 +20,7 @@ const (
 )
 
 // process a message received from a peer
-func onMessage(cmd []string, client PeerIT) {
+func onMessage(cmd []string, client tcp.TCPConnection) {
 	if cmd[0][len(cmd[0])-1] == '\r' {
 		cmd[0] = cmd[0][:len(cmd[0])-1]
 	}

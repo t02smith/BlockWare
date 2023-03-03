@@ -6,7 +6,7 @@ import (
 	"errors"
 
 	shell "github.com/ipfs/go-ipfs-api"
-	hash "github.com/t02smith/part-iii-project/toolkit/model/hashtree"
+	hash "github.com/t02smith/part-iii-project/toolkit/model/manager/hashtree"
 	"github.com/t02smith/part-iii-project/toolkit/util"
 )
 

@@ -1,4 +1,4 @@
-package net
+package tcp
 
 import (
 	"bufio"
@@ -53,7 +53,11 @@ func InitServer(hostname string, port uint) *TCPServer {
 }
 
 // start a new TCP server and listen for incoming connections
-func (s *TCPServer) Start(onMessage func([]string, PeerIT)) error {
+func (s *TCPServer) Start(
+	onMessage func([]string, TCPConnection),
+	onConnection func(string, uint, TCPConnection),
+	onClose func(TCPConnection)) error {
+
 	util.Logger.Infof("Starting server on %s:%d", s.hostname, s.port)
 
 	ln, err := net.Listen("tcp", fmt.Sprintf("%s:%d", s.hostname, s.port))
@@ -64,14 +68,18 @@ func (s *TCPServer) Start(onMessage func([]string, PeerIT)) error {
 
 	s.listener = ln
 	util.Logger.Infof("Server listening on %s:%d", s.hostname, s.port)
-	s.listen(onMessage)
+	s.listen(onMessage, onConnection, onClose)
 	util.Logger.Infof("server started")
 	return nil
 }
 
 // listen for incoming connections and setup processes to listen
 // for incoming messages from them
-func (s *TCPServer) listen(onMessage func([]string, PeerIT)) {
+func (s *TCPServer) listen(
+	onMessage func([]string, TCPConnection),
+	onConnection func(string, uint, TCPConnection),
+	onClose func(TCPConnection)) {
+
 	for {
 		con, err := s.listener.Accept()
 		if err != nil {
@@ -91,10 +99,8 @@ func (s *TCPServer) listen(onMessage func([]string, PeerIT)) {
 		}
 		s.clients = append(s.clients, client)
 
-		p := Peer()
-		p.onConnection(con.RemoteAddr().String(), 0000, client)
-
-		go client.listen(onMessage)
+		onConnection(con.RemoteAddr().String(), 0000, client)
+		go client.listen(onMessage, onClose)
 	}
 }
 
@@ -106,13 +112,17 @@ func (s *TCPServer) Close() {
 	}
 }
 
+func (s *TCPServer) Clients() []*TCPServerClient {
+	return s.clients
+}
+
 // listen for messages from a specific TCP connection
-func (c *TCPServerClient) listen(onMessage func([]string, PeerIT)) {
+func (c *TCPServerClient) listen(onMessage func([]string, TCPConnection), onClose func(TCPConnection)) {
 	for {
 		msg, err := c.reader.ReadString('\n')
 		if err != nil {
 			if err == io.EOF {
-				Peer().onClose(c)
+				onClose(c)
 				return
 			}
 

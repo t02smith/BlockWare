@@ -1,4 +1,4 @@
-package net
+package peer
 
 import (
 	"crypto/sha256"
@@ -26,7 +26,7 @@ failure
 */
 
 func TestFetchBlockFromLibrary(t *testing.T) {
-	game := testenv.CreateTestGame(t, "../../")
+	game := testenv.CreateTestGame(t, "../../../")
 	err := Peer().library.AddOwnedGame(game)
 	if err != nil {
 		t.Fatal(err)

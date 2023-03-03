@@ -78,7 +78,7 @@ func TestShardFile(t *testing.T) {
 				"normal file",
 				&HashTreeFile{
 					Filename:         "test.txt",
-					AbsoluteFilename: "../../test/data/testdir/test.txt",
+					AbsoluteFilename: "../../../test/data/testdir/test.txt",
 				},
 				[32]byte{2, 96, 221, 220, 74, 251, 255, 33, 146, 79, 118, 176, 189, 239, 210, 55, 87, 12, 16, 175, 90, 116, 199, 69, 81, 247, 149, 65, 223, 135, 190, 163},
 			},
@@ -86,7 +86,7 @@ func TestShardFile(t *testing.T) {
 				"empty file",
 				&HashTreeFile{
 					Filename:         "EMPTY",
-					AbsoluteFilename: "../../test/data/testfiles/EMPTY",
+					AbsoluteFilename: "../../../test/data/testfiles/EMPTY",
 				},
 				sha256.Sum256(empty[:]),
 			},
@@ -113,7 +113,7 @@ func TestShardFile(t *testing.T) {
 func TestHash(t *testing.T) {
 
 	t.Run("valid input", func(t *testing.T) {
-		ht, err := NewHashTree("../../test/data/testdir", 1024, nil)
+		ht, err := NewHashTree("../../../test/data/testdir", 1024, nil)
 		if err != nil {
 			t.Fatalf("NewHashTree failed on valid input")
 		}
@@ -142,7 +142,7 @@ func TestHash(t *testing.T) {
 	})
 
 	t.Run("vary worker count", func(t *testing.T) {
-		ht, err := NewHashTree("../../test/data/testdir", 1024, nil)
+		ht, err := NewHashTree("../../../test/data/testdir", 1024, nil)
 		if err != nil {
 			t.Fatalf("NewHashTree failed on valid input")
 		}
@@ -164,7 +164,7 @@ func TestHash(t *testing.T) {
 
 func TestVerifyDir(t *testing.T) {
 
-	ht1, err := NewHashTree("../../test/data/testdir", 256, nil)
+	ht1, err := NewHashTree("../../../test/data/testdir", 256, nil)
 	if err != nil {
 		t.Fatalf("error creating new hash tree %s", err)
 	}
@@ -175,7 +175,7 @@ func TestVerifyDir(t *testing.T) {
 	}
 
 	t.Run("compare to same directory", func(t *testing.T) {
-		res, err := ht1.VerifyTree(&VerifyHashTreeConfig{false, false, 0}, "../../test/data/testdir")
+		res, err := ht1.VerifyTree(&VerifyHashTreeConfig{false, false, 0}, "../../../test/data/testdir")
 		if err != nil {
 			t.Fatalf("error verifying tree %s", err)
 		}
@@ -186,7 +186,7 @@ func TestVerifyDir(t *testing.T) {
 	})
 
 	t.Run("compare to different directory", func(t *testing.T) {
-		res, err := ht1.VerifyTree(&VerifyHashTreeConfig{false, false, 0}, "../../test")
+		res, err := ht1.VerifyTree(&VerifyHashTreeConfig{false, false, 0}, "../../../test")
 		if err != nil {
 			t.Errorf("error verifying tree %s", err)
 		}

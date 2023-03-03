@@ -5,8 +5,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/t02smith/part-iii-project/toolkit/model/games"
-	"github.com/t02smith/part-iii-project/toolkit/model/net"
+	"github.com/t02smith/part-iii-project/toolkit/model/manager/games"
+	"github.com/t02smith/part-iii-project/toolkit/model/net/peer"
 	"github.com/t02smith/part-iii-project/toolkit/test/testutil"
 )
 
@@ -99,7 +99,7 @@ func TestEthereum(t *testing.T) {
 		}
 
 		t.Run("game already owned", func(t *testing.T) {
-			err := Purchase(net.Peer().Library(), testGame.RootHash)
+			err := Purchase(peer.Peer().Library(), testGame.RootHash)
 			if err.Error() != fmt.Sprintf("game %x already purchased", testGame.RootHash) {
 				t.Error("Already owned game not detected")
 			}

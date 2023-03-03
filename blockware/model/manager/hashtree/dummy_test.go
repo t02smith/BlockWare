@@ -83,7 +83,7 @@ func _TestCreateDummyFiles(t *testing.T) {
 // Inserting shards
 
 func TestInsertData(t *testing.T) {
-	tmpFile := "../../test/data/tmp/skeleton.txt"
+	tmpFile := "../../../test/data/tmp/skeleton.txt"
 	err := setupFile(tmpFile, 64, 100)
 	if err != nil {
 		t.Fatalf("error setting up dummy file %s", err)
@@ -95,7 +95,7 @@ func TestInsertData(t *testing.T) {
 			newShard[i] = 255
 		}
 
-		err = InsertData("../../test/data/tmp/skeleton.txt", 64, 12, newShard)
+		err = InsertData("../../../test/data/tmp/skeleton.txt", 64, 12, newShard)
 		if err != nil {
 			t.Errorf("%s", err)
 		}

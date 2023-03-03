@@ -6,16 +6,16 @@ import (
 	"time"
 
 	"github.com/spf13/viper"
-	"github.com/t02smith/part-iii-project/toolkit/model/ethereum"
-	"github.com/t02smith/part-iii-project/toolkit/model/games"
-	"github.com/t02smith/part-iii-project/toolkit/model/net"
+	"github.com/t02smith/part-iii-project/toolkit/model/manager/games"
+	"github.com/t02smith/part-iii-project/toolkit/model/net/peer"
+	"github.com/t02smith/part-iii-project/toolkit/model/persistence/ethereum"
 	"github.com/t02smith/part-iii-project/toolkit/util"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
 // get a list of owned games
 func (a *Controller) GetOwnedGames() []*ControllerGame {
-	gs := net.Peer().Library().GetOwnedGames()
+	gs := peer.Peer().Library().GetOwnedGames()
 	out := []*ControllerGame{}
 
 	for _, g := range gs {
@@ -39,7 +39,7 @@ func (a *Controller) GetOwnedGames() []*ControllerGame {
 
 // get a list of games from the eth store
 func (c *Controller) GetStoreGames() []*ControllerGame {
-	lib := net.Peer().Library()
+	lib := peer.Peer().Library()
 	err := ethereum.FillLibraryBlockchainGames(lib)
 	if err != nil {
 		c.controllerErrorf("Error getting games from ETH: %s", err)
@@ -106,7 +106,7 @@ func (c *Controller) UploadGame(title, version, dev, rootDir string, shardSize, 
 		return
 	}
 
-	net.Peer().Library().AddOwnedGame(g)
+	peer.Peer().Library().AddOwnedGame(g)
 	err = games.OutputAllGameDataToFile(g)
 	if err != nil {
 		c.controllerErrorf("Error saving game to file %s", err)
@@ -121,7 +121,7 @@ func (c *Controller) GetGameFromStoreByRootHash(rh string) *ControllerGame {
 		util.Logger.Errorf("Error parsing hash %s", err)
 	}
 
-	lib := net.Peer().Library()
+	lib := peer.Peer().Library()
 	g := lib.GetBlockchainGame(gh)
 	if g == nil {
 		c.controllerErrorf("Game %s not found", rh)
@@ -150,7 +150,7 @@ func (c *Controller) PurchaseGame(rh string) {
 		return
 	}
 
-	lib := net.Peer().Library()
+	lib := peer.Peer().Library()
 	err = ethereum.Purchase(lib, gh)
 	if err != nil {
 		c.controllerErrorf("Error purchasing game %s", err)

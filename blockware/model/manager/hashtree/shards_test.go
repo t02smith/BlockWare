@@ -9,7 +9,7 @@ import (
 )
 
 func produceTestHashTree() (*HashTree, error) {
-	ht, err := NewHashTree("../../test/data/testdir", 1024, nil)
+	ht, err := NewHashTree("../../../test/data/testdir", 1024, nil)
 	if err != nil {
 		return nil, err
 	}

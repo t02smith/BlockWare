@@ -1,4 +1,4 @@
-package net
+package peer
 
 import (
 	"bufio"
@@ -10,7 +10,9 @@ import (
 	"sync"
 
 	"github.com/spf13/viper"
-	"github.com/t02smith/part-iii-project/toolkit/model/games"
+	"github.com/t02smith/part-iii-project/toolkit/model"
+	"github.com/t02smith/part-iii-project/toolkit/model/manager/games"
+	"github.com/t02smith/part-iii-project/toolkit/model/net/tcp"
 	"github.com/t02smith/part-iii-project/toolkit/util"
 )
 
@@ -33,17 +35,6 @@ var (
 
 // * types
 
-/*
-An abstraction over any maintained connection with another peer.
-Can be managed under the TCPServer or as one of the TCPClients.
-*/
-type PeerIT interface {
-	Send(command []byte) error
-	SendString(command string) error
-	SendStringf(command string, args ...any) error
-	Info() string
-}
-
 // A peer represents a node in a distributed network
 type peer struct {
 
@@ -51,11 +42,11 @@ type peer struct {
 	config PeerConfig
 
 	// connections
-	server  *TCPServer
-	clients []*TCPClient
+	server  *tcp.TCPServer
+	clients []*tcp.TCPClient
 
 	// state
-	peers map[PeerIT]*peerData
+	peers map[tcp.TCPConnection]*peerData
 
 	// data
 	installFolder string
@@ -86,7 +77,7 @@ type peerData struct {
 	Port     uint
 
 	// socket interface to communicate with peer
-	Peer PeerIT
+	Peer tcp.TCPConnection
 
 	// what games they have installed
 	Library map[[32]byte]bool
@@ -103,6 +94,12 @@ func Peer() *peer {
 func StartPeer(config PeerConfig, serverHostname string, serverPort uint, installFolder, toolkitFolder string) (*peer, error) {
 	util.Logger.Info("Starting peer")
 	once.Do(func() {
+		err := model.SetupToolkitEnvironment()
+		if err != nil {
+			util.Logger.Errorf("Error setting up toolkit dir: %s", err)
+			return
+		}
+
 		peer, err := newPeer(config, serverHostname, serverPort, installFolder, toolkitFolder)
 		if err != nil {
 			util.Logger.Errorf("Error creating peer %s", err)
@@ -154,22 +151,22 @@ func newPeer(config PeerConfig, serverHostname string, serverPort uint, installF
 	}
 
 	peer := &peer{
-		server:             InitServer(serverHostname, serverPort),
-		clients:            []*TCPClient{},
-		peers:              make(map[PeerIT]*peerData),
+		server:             tcp.InitServer(serverHostname, serverPort),
+		clients:            []*tcp.TCPClient{},
+		peers:              make(map[tcp.TCPConnection]*peerData),
 		installFolder:      installFolder,
 		library:            lib,
 		knownPeerAddresses: knownPeers,
 		config:             config,
 	}
 
-	go peer.server.Start(onMessage)
+	go peer.server.Start(onMessage, peer.onConnection, peer.onClose)
 	return peer, nil
 }
 
 // form a connection to another peer
 func (p *peer) ConnectToPeer(hostname string, portNo uint) error {
-	client, err := InitTCPClient(hostname, portNo)
+	client, err := tcp.InitTCPClient(hostname, portNo, onMessage, p.onConnection, p.onClose)
 	if err != nil {
 		return err
 	}
@@ -179,7 +176,7 @@ func (p *peer) ConnectToPeer(hostname string, portNo uint) error {
 }
 
 // run this function every time we connect to a new peer
-func (p *peer) onConnection(hostname string, port uint, peer PeerIT) {
+func (p *peer) onConnection(hostname string, port uint, peer tcp.TCPConnection) {
 	p.peers[peer] = &peerData{
 		Hostname: hostname,
 		Port:     port,
@@ -194,14 +191,14 @@ func (p *peer) onConnection(hostname string, port uint, peer PeerIT) {
 }
 
 // run this function after closing a connection to an existing peer
-func (p *peer) onClose(peer PeerIT) {
+func (p *peer) onClose(peer tcp.TCPConnection) {
 	util.Logger.Infof("Closing connection to %s", peer.Info())
 	delete(p.peers, peer)
 }
 
 // get information about the current peer
 func (p *peer) GetServerInfo() (string, uint) {
-	return p.server.hostname, p.server.port
+	return "", 0
 }
 
 // * known peers
@@ -291,12 +288,12 @@ func (p *peer) savePeersToFile() error {
 // * GETTERS
 
 // get a list of peers
-func (p *peer) GetPeers() map[PeerIT]*peerData {
+func (p *peer) GetPeers() map[tcp.TCPConnection]*peerData {
 	return p.peers
 }
 
 // get an existing peer
-func (p *peer) GetPeer(peer PeerIT) *peerData {
+func (p *peer) GetPeer(peer tcp.TCPConnection) *peerData {
 	return p.peers[peer]
 }
 

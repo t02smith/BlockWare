@@ -1,4 +1,4 @@
-package net
+package peer
 
 import (
 	"bytes"
@@ -6,7 +6,8 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/t02smith/part-iii-project/toolkit/model/games"
+	"github.com/t02smith/part-iii-project/toolkit/model/manager/games"
+	"github.com/t02smith/part-iii-project/toolkit/model/net/tcp"
 	"github.com/t02smith/part-iii-project/toolkit/util"
 )
 
@@ -33,7 +34,7 @@ func generateLIBRARY() string {
 	return "LIBRARY\n"
 }
 
-func handleLIBRARY(cmd []string, client PeerIT) error {
+func handleLIBRARY(cmd []string, client tcp.TCPConnection) error {
 	util.Logger.Info("Library command called")
 	return client.SendString(generateGAMES(Peer().library.GetOwnedGames()...))
 }
@@ -60,7 +61,7 @@ func generateGAMES(games ...*games.Game) string {
 	return buf.String()
 }
 
-func handleGAMES(cmd []string, client PeerIT) error {
+func handleGAMES(cmd []string, client tcp.TCPConnection) error {
 	util.Logger.Infof("Games command called")
 
 	pData, ok := Peer().peers[client]
@@ -93,7 +94,7 @@ func generateBLOCK(gameHash, blockHash [32]byte) string {
 	return fmt.Sprintf("BLOCK;%x;%x\n", gameHash, blockHash)
 }
 
-func handleBLOCK(cmd []string, client PeerIT) error {
+func handleBLOCK(cmd []string, client tcp.TCPConnection) error {
 	util.Logger.Infof("Block command called for block %s", cmd[2])
 
 	gh, err := stringTo32ByteArr(cmd[1])
@@ -126,7 +127,7 @@ func generateSEND_BLOCK(gameHash, shardHash [32]byte, data []byte) string {
 	return fmt.Sprintf("SEND_BLOCK;%x;%x;%x\n", gameHash, shardHash, data)
 }
 
-func handleSEND_BLOCK(cmd []string, client PeerIT) error {
+func handleSEND_BLOCK(cmd []string, client tcp.TCPConnection) error {
 	util.Logger.Infof("SEND_BLOCK => Block received")
 	// * parse input
 	gh, err := stringTo32ByteArr(cmd[1])

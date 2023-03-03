@@ -8,8 +8,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/t02smith/part-iii-project/toolkit/model/games"
-	"github.com/t02smith/part-iii-project/toolkit/model/net"
+	"github.com/t02smith/part-iii-project/toolkit/model/manager/games"
+	"github.com/t02smith/part-iii-project/toolkit/model/net/peer"
 	"github.com/t02smith/part-iii-project/toolkit/test/testutil"
 	"github.com/t02smith/part-iii-project/toolkit/util"
 )
@@ -24,8 +24,8 @@ func beforeAll() {
 		os.Exit(1)
 	}
 
-	_, err = net.StartPeer(
-		net.PeerConfig{
+	_, err = peer.StartPeer(
+		peer.PeerConfig{
 			ContinueDownloads: false,
 			LoadPeersFromFile: false,
 		},

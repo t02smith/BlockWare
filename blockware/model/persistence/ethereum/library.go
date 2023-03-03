@@ -9,8 +9,8 @@ import (
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/t02smith/part-iii-project/toolkit/build/contracts/library"
-	"github.com/t02smith/part-iii-project/toolkit/model/games"
-	"github.com/t02smith/part-iii-project/toolkit/model/net"
+	"github.com/t02smith/part-iii-project/toolkit/model/manager/games"
+	"github.com/t02smith/part-iii-project/toolkit/model/net/peer"
 	"github.com/t02smith/part-iii-project/toolkit/util"
 )
 
@@ -221,7 +221,7 @@ func watchNewGameEvent() error {
 
 	util.Logger.Info("Watching for new games")
 	go func() {
-		p := net.Peer()
+		p := peer.Peer()
 		defer util.Logger.Info("Stopped watching for new games")
 		defer sub.Unsubscribe()
 
@@ -254,7 +254,7 @@ func ReadPreviousGameEvents() error {
 		return err
 	}
 
-	lib := net.Peer().Library()
+	lib := peer.Peer().Library()
 	count := 0
 	for newGameIterator.Next() {
 		g := newGameIterator.Event.Game

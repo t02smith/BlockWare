@@ -3,7 +3,7 @@ package controller
 import (
 	"fmt"
 
-	"github.com/t02smith/part-iii-project/toolkit/model/net"
+	"github.com/t02smith/part-iii-project/toolkit/model/net/peer"
 	"github.com/t02smith/part-iii-project/toolkit/util"
 )
 
@@ -11,7 +11,7 @@ import (
 func (a *Controller) GetPeerInformation() []string {
 	ps := []string{}
 
-	p := net.Peer()
+	p := peer.Peer()
 	for _, data := range p.GetPeers() {
 		ps = append(ps, fmt.Sprintf("%s:%d", data.Hostname, data.Port))
 	}
@@ -21,7 +21,7 @@ func (a *Controller) GetPeerInformation() []string {
 
 // form a connection with a new peer
 func (c *Controller) ConnectToPeer(hostname string, port uint) {
-	err := net.Peer().ConnectToPeer(hostname, port)
+	err := peer.Peer().ConnectToPeer(hostname, port)
 	if err != nil {
 		c.controllerErrorf("Error connecting to peer %s", err)
 		return

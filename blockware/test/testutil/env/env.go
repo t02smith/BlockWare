@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/spf13/viper"
-	"github.com/t02smith/part-iii-project/toolkit/model/games"
+	"github.com/t02smith/part-iii-project/toolkit/model/manager/games"
 )
 
 // creates a test game and stores the data in the tmp folder
@@ -23,6 +23,11 @@ func CreateTestGame(t *testing.T, toRoot string) *games.Game {
 		RootDir:     filepath.Join(toRoot, "./test/data/testdir"),
 		Price:       big.NewInt(0),
 		ShardSize:   256}, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = games.OutputAllGameDataToFile(game)
 	if err != nil {
 		t.Fatal(err)
 	}

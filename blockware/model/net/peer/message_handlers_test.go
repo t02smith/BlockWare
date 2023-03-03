@@ -1,4 +1,4 @@
-package net
+package peer
 
 import (
 	"bufio"
@@ -12,8 +12,8 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/t02smith/part-iii-project/toolkit/model/games"
-	hash "github.com/t02smith/part-iii-project/toolkit/model/hashtree"
+	"github.com/t02smith/part-iii-project/toolkit/model/manager/games"
+	hash "github.com/t02smith/part-iii-project/toolkit/model/manager/hashtree"
 	"github.com/t02smith/part-iii-project/toolkit/test/testutil"
 	testenv "github.com/t02smith/part-iii-project/toolkit/test/testutil/env"
 )
@@ -266,7 +266,7 @@ failure
 func TestHandleBLOCK(t *testing.T) {
 	mp, _ := createMockPeer(t)
 
-	game := testenv.CreateTestGame(t, "../../")
+	game := testenv.CreateTestGame(t, "../../../")
 	err := Peer().library.AddOwnedGame(game)
 	if err != nil {
 		t.Fatalf("Error adding game to library: %s", err)
@@ -274,6 +274,7 @@ func TestHandleBLOCK(t *testing.T) {
 
 	t.Cleanup(func() {
 		Peer().library.ClearOwnedGames()
+
 	})
 
 	t.Run("failure", func(t *testing.T) {
@@ -395,7 +396,7 @@ failure
 func TestHandleSEND_BLOCK(t *testing.T) {
 	mp, _ := createMockPeer(t)
 
-	game := testenv.CreateTestGame(t, "../../")
+	game := testenv.CreateTestGame(t, "../../../")
 	err := Peer().library.AddOwnedGame(game)
 	if err != nil {
 		t.Fatalf("Error adding game to library: %s", err)
@@ -431,7 +432,7 @@ func TestHandleSEND_BLOCK(t *testing.T) {
 			})
 
 			t.Run("invalid data", func(t *testing.T) {
-				testenv.SetupTestDownload(t, game, "../../")
+				testenv.SetupTestDownload(t, game, "../../../")
 
 				gData, err := game.GetData()
 				if err != nil {
@@ -486,7 +487,7 @@ func TestHandleSEND_BLOCK(t *testing.T) {
 				)
 			})
 
-			testenv.SetupTestDownload(t, game, "../../")
+			testenv.SetupTestDownload(t, game, "../../../")
 
 			t.Run("block not needed", func(t *testing.T) {
 				fileHash := gData.RootDir.Files["architecture-diagram.png"].RootHash
@@ -506,8 +507,8 @@ func TestHandleSEND_BLOCK(t *testing.T) {
 	})
 
 	t.Run("success", func(t *testing.T) {
-		game := testenv.CreateTestGame(t, "../../")
-		testenv.SetupTestDownload(t, game, "../../")
+		game := testenv.CreateTestGame(t, "../../../")
+		testenv.SetupTestDownload(t, game, "../../../")
 
 		Peer().library.AddOwnedGame(game)
 		t.Cleanup(func() {
@@ -523,7 +524,7 @@ func TestHandleSEND_BLOCK(t *testing.T) {
 			shardHash := gData.RootDir.Files["architecture-diagram.png"].Hashes[1]
 			buffer := make([]byte, gData.ShardSize)
 
-			_sendBlock(t, "../../test/data/tmp/toolkit/architecture-diagram.png", mp, game, gData, shardHash, 1, buffer)
+			_sendBlock(t, "../../../test/data/tmp/toolkit/architecture-diagram.png", mp, game, gData, shardHash, 1, buffer)
 
 		})
 
@@ -536,7 +537,7 @@ func TestHandleSEND_BLOCK(t *testing.T) {
 			buffer := make([]byte, gData.ShardSize)
 
 			for i, shard := range file.Hashes {
-				_sendBlock(t, "../../test/data/tmp/toolkit/subdir/chip8.c", mp, game, gData, shard, uint(i), buffer)
+				_sendBlock(t, "../../../test/data/tmp/toolkit/subdir/chip8.c", mp, game, gData, shard, uint(i), buffer)
 				time.Sleep(25 * time.Millisecond)
 			}
 		})

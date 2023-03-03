@@ -1,0 +1,27 @@
+
+\subsection{Persistence}
+
+The persistence layer is about storing public data that can be accessed by any user of the application at any point in time.
+
+\subsubsection*{Ethereum}
+
+The smart contract will be written in Solidity \url{https://docs.soliditylang.org/en/v0.8.19/}, and will have to be able to store the data mentioned in Section~\ref{subsubsec:eth-data} as well as perform the following functions:
+
+\begin{itemize}
+  \item \textbf{uploadGame} Upload a new game to the blockchain provided it doesn't already exist. Once uploaded, emit an event to let all peers aware of the new game.
+  \item \textbf{purchaseGame} A peer purchases a game they don't already own and transfer ETH to the original uploader and are added to the list of authorised users.
+\end{itemize}
+
+\vspace{2mm}\noindent
+The go-ethereum package \url{https://geth.ethereum.org/} will allow us to interact with the ethereum blockchain and Abigen \url{https://docs.avax.network/specs/abigen} will allow us to compile any smart contracts to Go code. This will allow us to interact with our smart contract on ethereum using a set of Go functions.
+
+\subsubsection*{IPFS}
+
+Storing data on the Ethereum platform is costly to the uploader and adds a greater storage burden on other nodes in the Ethereum network. As such, we only want to store the minimal amount of data required for the identification of a given game on Ethereum and can leverage IPFS for the storage and distribution of larger pieces of public data.
+\x
+This includes:
+
+\begin{itemize}
+  \item \textbf{Hash Tree} The tree representation of the game's data contents. Only users who purchase the game will need this.
+  \item \textbf{Assets} Digital assets such as artwork, description, promotional work, etc.  
+\end{itemize}

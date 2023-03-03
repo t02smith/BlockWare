@@ -1,0 +1,30 @@
+\subsubsection*{Networking}
+
+Users running this application will be a part of a distributed network of peers by creating and maintaining a set of TCP connections with other users in the network and will communicate by sending structured messages to each other. Section~\ref{subsubsec:commands} describes these commands in detail.
+
+\paragraph*{Message Handling}
+
+The main responsibility of this section is to respond to requests sent by the Data Manager by sending and tracking messages to other peers to gain the necessary information. Each message should be tracked by the peer for a given time period and resent if an appropriate response has not been received. Any duplicate requests sent by the data manager will be ignored if a pending request is active. 
+
+\paragraph*{Commands}\label{subsubsec:commands}
+
+Structured messages will typically come as part of a request/response pair involving the sharing of information between peers.
+
+\begin{longtable}{p{.4\textwidth} p{.57\textwidth}}
+  \toprule
+  \textbf{Message Format} & \textbf{Description}\\
+  \midrule\midrule
+  LIBRARY
+  & Request that a peer sends their library of games in the form of a BLOCK message.\\
+  GAMES;$[hash_1]$;$[hash_2]$;\ldots;
+  & The user sends a list of their games as a series of unique root hashes. These root hashes will map to games on the blockchain.\\
+  \midrule
+  BLOCK;$[gameHash]$;$[blockHash]$;
+  & The user will request a block of data off of a user by sending the root hash of the game and the hash of the block being requested. The response will be a SEND\_BLOCK message.\\
+  SEND\_BLOCK;$[gameHash]$;\newline $[blockHash]$;$[data]$;
+  & The user sends a block of data in response to a BLOCK message.\\
+  \midrule
+  ERROR;$[message]$
+  & An error message that can be used to prompt a peer to resend a message.\\
+  \bottomrule\bottomrule
+\end{longtable}

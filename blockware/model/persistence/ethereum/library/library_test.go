@@ -12,7 +12,7 @@ import (
 
 func TestEthereum(t *testing.T) {
 	t.Skip()
-	lib := lib_instance
+	lib := libInstance
 	testGame, err := fetchTestGame()
 	if err != nil {
 		t.Fatal(err)
@@ -66,7 +66,7 @@ func TestEthereum(t *testing.T) {
 	})
 
 	t.Run("join existing network", func(t *testing.T) {
-		addr := contract_address
+		addr := contractAddress
 		err := ConnectToLibraryInstance(addr, testutil.Accounts[0][1])
 		if err != nil {
 			t.Fatal(err)
@@ -110,7 +110,7 @@ func TestEthereum(t *testing.T) {
 			lib := games.NewLibrary()
 			lib.SetBlockchainGame(testGame.RootHash, testGame)
 
-			err = ConnectToLibraryInstance(contract_address, testutil.Accounts[2][1])
+			err = ConnectToLibraryInstance(contractAddress, testutil.Accounts[2][1])
 			if err != nil {
 				t.Fatal(err)
 			}

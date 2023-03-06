@@ -24,17 +24,17 @@ should be stored locally when officially deployed.
 */
 
 var (
-	lib_instance     *library.Library
-	auth_instance    *bind.TransactOpts
-	contract_address common.Address
+	libInstance     *library.Library
+	authInstance    *bind.TransactOpts
+	contractAddress common.Address
 )
 
-// get the address of the currently in-use Library contract
+// GetContractAddress get the address of the currently in-use Library contract
 func GetContractAddress() common.Address {
-	return contract_address
+	return contractAddress
 }
 
-// setup instance of smart contract to interact with blockchain
+// DeployLibraryContract setup instance of smart contract to interact with blockchain
 func DeployLibraryContract(privateKey string) (*bind.TransactOpts, *library.Library, error) {
 	if ethereum.Client() == nil {
 		return nil, nil, errors.New("you need to instantiate the Eth Client => run StartClient")
@@ -46,15 +46,15 @@ func DeployLibraryContract(privateKey string) (*bind.TransactOpts, *library.Libr
 	if err != nil {
 		return nil, nil, err
 	}
-	auth_instance = auth
+	authInstance = auth
 
 	addr, _, instance, err := library.DeployLibrary(auth, ethereum.Client())
 	if err != nil {
 		return nil, nil, err
 	}
-	contract_address = addr
+	contractAddress = addr
 
-	lib_instance = instance
+	libInstance = instance
 	util.Logger.Info("Deployed library")
 
 	err = ReadPreviousGameEvents()
@@ -68,10 +68,10 @@ func DeployLibraryContract(privateKey string) (*bind.TransactOpts, *library.Libr
 		return nil, nil, err
 	}
 
-	return auth_instance, lib_instance, nil
+	return authInstance, libInstance, nil
 }
 
-// Connect to an existing contract
+// ConnectToLibraryInstance Connect to an existing contract
 func ConnectToLibraryInstance(address common.Address, privateKey string) error {
 	util.Logger.Infof("Connecting to addr %s", address)
 	lib, err := library.NewLibrary(address, ethereum.Client())
@@ -79,19 +79,19 @@ func ConnectToLibraryInstance(address common.Address, privateKey string) error {
 		util.Logger.Errorf("Error connecting to library instance: %s", err)
 	}
 
-	contract_address = address
-	lib_instance = lib
+	contractAddress = address
+	libInstance = lib
 	util.Logger.Infof("Connected to %s", address)
 	auth, err := ethereum.GenerateAuthInstance(privateKey)
 	if err != nil {
 		return err
 	}
-	auth_instance = auth
+	authInstance = auth
 
 	return nil
 }
 
-// populate a library with games from the blockchain
+// FillLibraryBlockchainGames populate a library with games from the blockchain
 func FillLibraryBlockchainGames(lib *games.Library) error {
 	util.Logger.Info("Filling library with game metadata from ethereum")
 	gs, err := fetchGamesFromEthereum()
@@ -115,9 +115,9 @@ func FillLibraryBlockchainGames(lib *games.Library) error {
 // fetch a list of games from ethereum
 func fetchGamesFromEthereum() ([]*games.Game, error) {
 	util.Logger.Info("Fetching games from ethereum")
-	gs := []*games.Game{}
+	var gs []*games.Game
 
-	gameSize, err := lib_instance.LibSize(nil)
+	gameSize, err := libInstance.LibSize(nil)
 	if err != nil {
 		return nil, err
 	}
@@ -125,13 +125,13 @@ func fetchGamesFromEthereum() ([]*games.Game, error) {
 
 	one := big.NewInt(1)
 	for i := big.NewInt(0); i.Cmp(gameSize) < 0; i.Add(i, one) {
-		gameHash, err := lib_instance.GameHashes(nil, i)
+		gameHash, err := libInstance.GameHashes(nil, i)
 		if err != nil {
 			util.Logger.Warnf("Error getting game hash %s", err)
 			continue
 		}
 
-		game, err := lib_instance.Games(nil, gameHash)
+		game, err := libInstance.Games(nil, gameHash)
 		if err != nil {
 			util.Logger.Warnf("Error getting game %s", err)
 			continue
@@ -178,7 +178,7 @@ func uploadToEthereum(g *games.Game) error {
 
 	// upload metadata to blockchain
 	util.Logger.Infof("Uploading game metadata for %s to Ethereum", g.Title)
-	_, err = lib_instance.UploadGame(auth_instance, library.LibraryGameEntry{
+	_, err = libInstance.UploadGame(authInstance, library.LibraryGameEntry{
 		Title:               g.Title,
 		Version:             g.Version,
 		ReleaseDate:         g.ReleaseDate,
@@ -199,9 +199,9 @@ func uploadToEthereum(g *games.Game) error {
 	return nil
 }
 
-// upload a new game to ethereum as well as its data from IPFS with some checks
+// Upload upload a new game to ethereum as well as its data from IPFS with some checks
 func Upload(g *games.Game) error {
-	if lib_instance == nil || auth_instance == nil {
+	if libInstance == nil || authInstance == nil {
 		return errors.New("lib or auth instance are nil => run DeployLibraryContract first to initialise them")
 	}
 
@@ -213,7 +213,7 @@ func Upload(g *games.Game) error {
 func watchNewGameEvent() error {
 	newGameChannel := make(chan *library.LibraryNewGame)
 
-	sub, err := lib_instance.WatchNewGame(&bind.WatchOpts{
+	sub, err := libInstance.WatchNewGame(&bind.WatchOpts{
 		Start:   nil,
 		Context: nil,
 	}, newGameChannel)
@@ -245,10 +245,10 @@ func watchNewGameEvent() error {
 	return nil
 }
 
-// Will look at previous GameEntry events to fill store games
+// ReadPreviousGameEvents Will look at previous GameEntry events to fill store games
 func ReadPreviousGameEvents() error {
 	util.Logger.Info("Reading previous games from eth")
-	newGameIterator, err := lib_instance.FilterNewGame(&bind.FilterOpts{
+	newGameIterator, err := libInstance.FilterNewGame(&bind.FilterOpts{
 		End:     nil,
 		Start:   1,
 		Context: nil,
@@ -288,7 +288,7 @@ func gameEntryToGame(game *library.LibraryGameEntry) *games.Game {
 	}
 }
 
-// purchase a new game off the blockchain
+// Purchase purchase a new game off the blockchain
 func Purchase(l *games.Library, rootHash [32]byte) error {
 	var g *games.Game
 	util.Logger.Infof("Attempting to purchase game %x", rootHash)
@@ -304,7 +304,7 @@ func Purchase(l *games.Library, rootHash [32]byte) error {
 
 		// ! doesn't exist locally => check blockchain again
 		util.Logger.Infof("Game not found locally, looking for game %x on eth", rootHash)
-		gx, err := lib_instance.Games(&bind.CallOpts{}, rootHash)
+		gx, err := libInstance.Games(&bind.CallOpts{}, rootHash)
 		if err != nil {
 			return err
 		}
@@ -327,7 +327,7 @@ func Purchase(l *games.Library, rootHash [32]byte) error {
 
 	// * purchase the game
 	util.Logger.Infof("Game %x found => proceeding to purchase", rootHash)
-	txn, err := lib_instance.PurchaseGame(auth_instance, rootHash)
+	txn, err := libInstance.PurchaseGame(authInstance, rootHash)
 	if err != nil {
 		return err
 	}
@@ -357,4 +357,8 @@ func Purchase(l *games.Library, rootHash [32]byte) error {
 
 	util.Logger.Info("Game purchased successfully")
 	return nil
+}
+
+func HasPurchased(gameHash [32]byte, addr common.Address) (bool, error) {
+	return libInstance.HasPurchased(nil, gameHash, addr)
 }

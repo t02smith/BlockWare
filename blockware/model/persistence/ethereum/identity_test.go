@@ -32,7 +32,7 @@ func TestProduceTestValidation(t *testing.T) {
 	if err != nil {
 		t.Fatalf("error parsing test private key %s", err)
 	}
-	private_key = privateKeyECDSA
+	_privateKey = privateKeyECDSA
 
 	publicKeyBytes := crypto.FromECDSAPub(&privateKeyECDSA.PublicKey)
 
@@ -81,15 +81,15 @@ failure
 
 */
 
-func TestCheckAddressValidaton(t *testing.T) {
+func TestCheckAddressValidation(t *testing.T) {
 	privateKey := testutil.Accounts[0][1]
 	privateKeyECDSA, err := crypto.HexToECDSA(privateKey)
 	if err != nil {
 		t.Fatalf("error parsing test private key %s", err)
 	}
-	private_key = privateKeyECDSA
+	_privateKey = privateKeyECDSA
 
-	validator := GenerateAddressValidation(&privateKeyECDSA.PublicKey)
+	validator := GenerateAddressValidation()
 
 	t.Run("success", func(t *testing.T) {
 		t.Run("valid signature", func(t *testing.T) {
@@ -108,10 +108,10 @@ func TestCheckAddressValidaton(t *testing.T) {
 					t.Fatalf("error parsing test private key %s", err)
 				}
 
-				oldPrivKey := private_key
-				private_key = privKeyII
+				oldPrivKey := _privateKey
+				_privateKey = privKeyII
 				t.Cleanup(func() {
-					private_key = oldPrivKey
+					_privateKey = oldPrivKey
 				})
 
 				sig, err := ProduceAddressValidation(validator.message)

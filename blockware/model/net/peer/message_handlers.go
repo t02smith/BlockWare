@@ -85,7 +85,7 @@ func handleGAMES(cmd []string, client tcp.TCPConnection) error {
 		}
 
 		copy(hash[:], receivedHash)
-		pData.Library[hash] = true
+		pData.Library[hash] = unknown
 	}
 
 	return nil
@@ -108,6 +108,16 @@ func handleBLOCK(cmd []string, client tcp.TCPConnection) error {
 	sh, err := stringTo32ByteArr(cmd[2])
 	if err != nil {
 		return fmt.Errorf("error reading shard hash on BLOCK cmd: %s", err)
+	}
+
+	pd := Peer().peers[client]
+	ownsGame, err := pd.checkOwnership(gh)
+	if err != nil {
+		return err
+	}
+
+	if !ownsGame {
+		return fmt.Errorf("user does not own game %x", gh)
 	}
 
 	found, data, err := Peer().library.FindBlock(gh, sh)

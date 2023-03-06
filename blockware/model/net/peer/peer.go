@@ -39,7 +39,7 @@ var (
 type peer struct {
 
 	// config
-	config PeerConfig
+	config Config
 
 	// connections
 	server  *tcp.TCPServer
@@ -56,8 +56,8 @@ type peer struct {
 	knownPeerAddresses []string
 }
 
-// Runtime configuration settings for the peer
-type PeerConfig struct {
+// Config Runtime configuration settings for the peer
+type Config struct {
 
 	// attempt to start downloads when starting the peer
 	ContinueDownloads bool
@@ -71,13 +71,13 @@ type PeerConfig struct {
 
 // * functions
 
-// Get the singleton instance of the current peer if it exists
+// Peer Get the singleton instance of the current peer if it exists
 func Peer() *peer {
 	return singleton
 }
 
-// start a new instance of a peer and assign it to the singleton
-func StartPeer(config PeerConfig, serverHostname string, serverPort uint, installFolder, toolkitFolder string) (*peer, error) {
+// StartPeer start a new instance of a peer and assign it to the singleton
+func StartPeer(config Config, serverHostname string, serverPort uint, installFolder, toolkitFolder string) (*peer, error) {
 	util.Logger.Info("Starting peer")
 	once.Do(func() {
 		err := model.SetupToolkitEnvironment()
@@ -111,7 +111,7 @@ func StartPeer(config PeerConfig, serverHostname string, serverPort uint, instal
 }
 
 // create a new peer instance
-func newPeer(config PeerConfig, serverHostname string, serverPort uint, installFolder, toolkitFolder string) (*peer, error) {
+func newPeer(config Config, serverHostname string, serverPort uint, installFolder, toolkitFolder string) (*peer, error) {
 	gameLs, err := games.LoadGames(filepath.Join(toolkitFolder, "games"))
 	if err != nil {
 		return nil, err
@@ -128,7 +128,7 @@ func newPeer(config PeerConfig, serverHostname string, serverPort uint, installF
 
 	lib.OutputGamesTable()
 
-	var knownPeers []string = []string{}
+	var knownPeers []string
 	if config.LoadPeersFromFile {
 		knownPeers, err = loadPeersFromFile()
 		if err != nil {
@@ -150,7 +150,7 @@ func newPeer(config PeerConfig, serverHostname string, serverPort uint, installF
 	return peer, nil
 }
 
-// form a connection to another peer
+// ConnectToPeer form a connection to another peer
 func (p *peer) ConnectToPeer(hostname string, portNo uint) error {
 	client, err := tcp.InitTCPClient(hostname, portNo, onMessage, p.onConnection, p.onClose)
 	if err != nil {
@@ -167,7 +167,7 @@ func (p *peer) onConnection(hostname string, port uint, peer tcp.TCPConnection) 
 		Hostname: hostname,
 		Port:     port,
 		Peer:     peer,
-		Library:  make(map[[32]byte]bool),
+		Library:  make(map[[32]byte]ownership),
 	}
 
 	err := peer.SendString(generateLIBRARY())
@@ -182,7 +182,7 @@ func (p *peer) onClose(peer tcp.TCPConnection) {
 	delete(p.peers, peer)
 }
 
-// get information about the current peer
+// GetServerInfo get information about the current peer
 func (p *peer) GetServerInfo() (string, uint) {
 	return "", 0
 }
@@ -273,24 +273,24 @@ func (p *peer) savePeersToFile() error {
 
 // * GETTERS
 
-// get a list of peers
+// GetPeers get a list of peers
 func (p *peer) GetPeers() map[tcp.TCPConnection]*peerData {
 	return p.peers
 }
 
-// get an existing peer
+// GetPeer get an existing peer
 func (p *peer) GetPeer(peer tcp.TCPConnection) *peerData {
 	return p.peers[peer]
 }
 
-// Get the library of the current peer
+// Library Get the library of the current peer
 func (p *peer) Library() *games.Library {
 	return p.library
 }
 
 // * UTIL
 
-// shutdown the peer
+// Close shutdown the peer
 func (p *peer) Close() {
 	util.Logger.Info("Closing down peer")
 	p.savePeersToFile()
@@ -301,7 +301,7 @@ func (p *peer) Close() {
 	}
 }
 
-// send a message to all peers
+// Broadcast send a message to all peers
 func (p *peer) Broadcast(message string) {
 	for peer := range p.peers {
 		peer.SendString(message)

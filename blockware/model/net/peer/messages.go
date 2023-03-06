@@ -18,7 +18,7 @@ should contact other peers with messages
 */
 
 const (
-	MAX_ATETMPTS_DOWNLOAD_REQUEST int = 32
+	MaxAttemptsDownloadRequest int = 32
 )
 
 // process a message received from a peer
@@ -98,9 +98,9 @@ func (p *peer) listenToDownloadRequests() {
 	util.Logger.Info("Listening for incoming download requests")
 	go func() {
 		for request := range p.library.RequestDownload {
-			if request.Attempts > uint8(MAX_ATETMPTS_DOWNLOAD_REQUEST) {
+			if request.Attempts > uint8(MaxAttemptsDownloadRequest) {
 				// ! limit number of attempts we can make for a given download
-				util.Logger.Warnf("Request for block %x cancelled after %d attempts", request.BlockHash, MAX_ATETMPTS_DOWNLOAD_REQUEST)
+				util.Logger.Warnf("Request for block %x cancelled after %d attempts", request.BlockHash, MaxAttemptsDownloadRequest)
 				continue
 			}
 

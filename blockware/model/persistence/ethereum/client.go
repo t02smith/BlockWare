@@ -26,19 +26,19 @@ for the entire runtime of the application
 */
 
 var (
-	eth_client  *ethclient.Client
-	private_key *ecdsa.PrivateKey
+	_ethClient  *ethclient.Client
+	_privateKey *ecdsa.PrivateKey
 	once        sync.Once
 )
 
-// get the current ETH client
+// Client get the current ETH client
 func Client() *ethclient.Client {
-	return eth_client
+	return _ethClient
 }
 
 // functions
 
-// start the ethereum client
+// StartClient start the ethereum client
 func StartClient(addr string) (*ethclient.Client, *accounts.Account, error) {
 	var acc *accounts.Account
 	once.Do(func() {
@@ -48,26 +48,26 @@ func StartClient(addr string) (*ethclient.Client, *accounts.Account, error) {
 		}
 
 		util.Logger.Infof("Connection to ETH network at %s made", addr)
-		eth_client = client
+		_ethClient = client
 	})
 
-	return eth_client, acc, nil
+	return _ethClient, acc, nil
 }
 
 func CloseEthClient() {
-	eth_client.Close()
+	_ethClient.Close()
 }
 
 //
 
-// creates a new auth instance given a private key for performing non gettet actions
+// GenerateAuthInstance creates a new auth instance given a private key for performing non gettet actions
 func GenerateAuthInstance(privateKey string) (*bind.TransactOpts, error) {
 	util.Logger.Info("Generating auth instance")
 	privKeyECDSA, err := crypto.HexToECDSA(privateKey)
 	if err != nil {
 		util.Logger.Panic(err)
 	}
-	private_key = privKeyECDSA
+	_privateKey = privKeyECDSA
 
 	pubKeyECDSA, ok := privKeyECDSA.Public().(*ecdsa.PublicKey)
 	if !ok {
@@ -75,19 +75,19 @@ func GenerateAuthInstance(privateKey string) (*bind.TransactOpts, error) {
 	}
 
 	fromAddress := crypto.PubkeyToAddress(*pubKeyECDSA)
-	nonce, err := eth_client.PendingNonceAt(context.Background(), fromAddress)
+	nonce, err := _ethClient.PendingNonceAt(context.Background(), fromAddress)
 	if err != nil {
 		util.Logger.Panic(err)
 	}
 
 	util.Logger.Info("Getting chain ID")
-	chainID, err := eth_client.ChainID(context.TODO())
+	chainID, err := _ethClient.ChainID(context.TODO())
 	if err != nil {
 		util.Logger.Panic(err)
 	}
 
 	util.Logger.Info("Getting gas price")
-	gasPrice, err := eth_client.SuggestGasPrice(context.Background())
+	gasPrice, err := _ethClient.SuggestGasPrice(context.Background())
 	if err != nil {
 		util.Logger.Panic(err)
 	}
@@ -108,7 +108,7 @@ func GenerateAuthInstance(privateKey string) (*bind.TransactOpts, error) {
 
 // key store
 
-// create a new keystore
+// CreateKeyStore create a new keystore
 func CreateKeyStore(keyStorePath string, password string) (*accounts.Account, error) {
 	ks := keystore.NewKeyStore(keyStorePath, keystore.StandardScryptN, keystore.StandardScryptP)
 	account, err := ks.NewAccount(password)

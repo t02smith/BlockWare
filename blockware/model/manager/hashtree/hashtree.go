@@ -34,7 +34,7 @@ An example structure of a Hash Tree is:
 
 */
 
-// Describes a directory in terms of its files hashes
+// HashTree Describes a directory in terms of its files hashes
 type HashTree struct {
 
 	// the directory object for the root folder
@@ -50,7 +50,7 @@ type HashTree struct {
 	progress chan int
 }
 
-// Describes a directory with tracked files
+// HashTreeDir Describes a directory with tracked files
 type HashTreeDir struct {
 
 	// the path relative to the root directory location
@@ -66,7 +66,7 @@ type HashTreeDir struct {
 	Files map[string]*HashTreeFile `json:"files"`
 }
 
-// Describes a singular tracked files
+// HashTreeFile Describes a singular tracked files
 type HashTreeFile struct {
 	Filename string `json:"filename"`
 
@@ -79,18 +79,14 @@ type HashTreeFile struct {
 	RootHash [32]byte `json:"roothash"`
 }
 
-/*
-Config that defines how strict the verification of
-a hash tree is
-! to be removed
-*/
+// VerifyHashTreeConfig /*
 type VerifyHashTreeConfig struct {
 	IgnoreNewFilesAndDirs     bool
 	ContinueAfterError        bool
 	continueAfterErrorCounter uint
 }
 
-// create a new hash tree of a directory
+// NewHashTree create a new hash tree of a directory
 func NewHashTree(rootDir string, shardSize uint, progress chan int) (*HashTree, error) {
 	if shardSize == 0 {
 		return nil, errors.New("shard size must be greater than 0")
@@ -108,14 +104,14 @@ func NewHashTree(rootDir string, shardSize uint, progress chan int) (*HashTree, 
 	}, nil
 }
 
-func (ht1 *HashTree) Equals(ht2 *HashTree) bool {
-	return ht1.ShardSize == ht2.ShardSize &&
-		ht1.RootDir.Equals(ht2.RootDir)
+func (ht *HashTree) Equals(ht2 *HashTree) bool {
+	return ht.ShardSize == ht2.ShardSize &&
+		ht.RootDir.Equals(ht2.RootDir)
 }
 
 // IO
 
-// output a hash tree to a json file
+// OutputToFile output a hash tree to a json file
 func (ht *HashTree) OutputToFile(filename string) error {
 	util.Logger.Infof("Outputting hash tree to file %s\n", filename)
 
@@ -123,7 +119,12 @@ func (ht *HashTree) OutputToFile(filename string) error {
 	if err != nil {
 		return err
 	}
-	defer file.Close()
+	defer func() {
+		err := file.Close()
+		if err != nil {
+			util.Logger.Errorf("Error closing file %s: %s", filename, err)
+		}
+	}()
 
 	writer := gzip.NewWriter(file)
 	encoder := gob.NewEncoder(writer)
@@ -132,20 +133,28 @@ func (ht *HashTree) OutputToFile(filename string) error {
 		return err
 	}
 
-	writer.Flush()
-	util.Logger.Infof("Successfully outputted hash tree to file %s\n", filename)
+	err = writer.Flush()
+	if err != nil {
+		return err
+	}
 
+	util.Logger.Infof("Successfully outputted hash tree to file %s\n", filename)
 	return nil
 }
 
-// read a hash tree from a json file
+// ReadHashTreeFromFile read a hash tree from a json file
 func ReadHashTreeFromFile(filename string) (*HashTree, error) {
 	util.Logger.Infof("Attempting to read hash data from %s", filename)
 	file, err := os.Open(filename)
 	if err != nil {
 		return nil, err
 	}
-	defer file.Close()
+	defer func() {
+		err := file.Close()
+		if err != nil {
+			util.Logger.Errorf("Error closing file %s: %s", filename, err)
+		}
+	}()
 
 	ht := &HashTree{
 		RootDirLocation: filename,
@@ -168,7 +177,7 @@ func ReadHashTreeFromFile(filename string) (*HashTree, error) {
 
 // Hashing functions
 
-// generate the hash tree for a given directory
+// Hash generate the hash tree for a given directory
 // if the data is already generated, it will be overwritten
 func (ht *HashTree) Hash() error {
 	startTime := time.Now()
@@ -186,7 +195,7 @@ func (ht *HashTree) Hash() error {
 		wc = 1
 	}
 
-	wg, fileIn, errors := hasherPool(wc, fileCount, ht.ShardSize, ht.progress)
+	wg, fileIn, errorChan := hasherPool(wc, fileCount, ht.ShardSize, ht.progress)
 	err = ht.RootDir.shardData(fileIn, ht.ShardSize)
 	if err != nil {
 		util.Logger.Error(err)
@@ -194,7 +203,7 @@ func (ht *HashTree) Hash() error {
 
 	wg.Wait()
 	close(fileIn)
-	close(errors)
+	close(errorChan)
 
 	endTime := time.Now()
 	util.Logger.Infof("Directory %s hashed in %dms", ht.RootDirLocation, endTime.Sub(startTime).Milliseconds())
@@ -225,7 +234,12 @@ func (htd *HashTreeDir) traverseDirectory(absolutePath string) (int, error) {
 	if err != nil {
 		return counter, err
 	}
-	defer dir.Close()
+	defer func() {
+		err := dir.Close()
+		if err != nil {
+			util.Logger.Errorf("Error closing directory %s: %s", absolutePath, err)
+		}
+	}()
 
 	dirContents, err := dir.Readdirnames(0)
 	if err != nil {
@@ -273,7 +287,7 @@ func (htd *HashTreeDir) traverseDirectory(absolutePath string) (int, error) {
 
 // hashing
 
-// traverse a directory and shard all its files and subdirs
+// traverse a directory and shard all its files and sub-dirs
 func (htd *HashTreeDir) shardData(fileIn chan *HashTreeFile, shardSize uint) error {
 	for _, f := range htd.Files {
 		fileIn <- f
@@ -310,7 +324,12 @@ func (htf *HashTreeFile) shardFile(shardSize uint) error {
 		return err
 	}
 
-	defer file.Close()
+	defer func() {
+		err := file.Close()
+		if err != nil {
+			util.Logger.Errorf("Error closing file %s: %s", htf.AbsoluteFilename, err)
+		}
+	}()
 
 	buffer := make([]byte, shardSize)
 	reader := bufio.NewReader(file)
@@ -336,7 +355,7 @@ func (htf *HashTreeFile) shardFile(shardSize uint) error {
 	return nil
 }
 
-// verify that a given directory matches this hash tree
+// VerifyTree verify that a given directory matches this hash tree
 func (ht *HashTree) VerifyTree(config *VerifyHashTreeConfig, chosenDirectory string) (bool, error) {
 	if ht.RootDir == nil {
 		return false, errors.New("hash tree not found to compare given directory to")
@@ -354,7 +373,13 @@ func (ht *HashTree) verifyDir(config *VerifyHashTreeConfig, currentDir string, d
 		return false, err
 	}
 
-	defer file.Close()
+	defer func() {
+		err := file.Close()
+		if err != nil {
+			util.Logger.Errorf("Error cosing directory %s: %s", directoryBeingVerified, err)
+		}
+	}()
+
 	list, err := file.Readdirnames(0)
 	if err != nil {
 		return false, err
@@ -480,13 +505,13 @@ func (ht *HashTree) verifyFile(htf *HashTreeFile, currentDirectory string, filen
 
 // Utility
 
-// calculate the root hash of a file by creating a MerkleTree of its shard hashes
+// CalculateRootHash calculate the root hash of a file by creating a MerkleTree of its shard hashes
 func CalculateRootHash(hashes [][32]byte) [32]byte {
 	oldLayer, newLayer := hashes, [][32]byte{}
 
 	for len(oldLayer) != 1 {
 
-		// duplicate the last element if there an odd number
+		// duplicate the last element if they're an odd number
 		if len(oldLayer)%2 == 1 {
 			oldLayer = append(oldLayer, oldLayer[len(oldLayer)-1])
 		}
@@ -504,21 +529,21 @@ func CalculateRootHash(hashes [][32]byte) [32]byte {
 
 }
 
-// get the progress channel that shows how much of the directory has been hashed/processed
+// GetProgress get the progress channel that shows how much of the directory has been hashed/processed
 func (ht *HashTree) GetProgress() chan int {
 	return ht.progress
 }
 
-// compare two hash trees
-func (htd1 *HashTreeDir) Equals(htd2 *HashTreeDir) bool {
-	if len(htd1.Files) != len(htd2.Files) ||
-		len(htd1.Subdirs) != len(htd2.Subdirs) ||
-		!bytes.Equal(htd1.RootHash[:], htd2.RootHash[:]) ||
-		htd1.Dirname != htd2.Dirname {
+// Equals compare two hash trees
+func (htd *HashTreeDir) Equals(htd2 *HashTreeDir) bool {
+	if len(htd.Files) != len(htd2.Files) ||
+		len(htd.Subdirs) != len(htd2.Subdirs) ||
+		!bytes.Equal(htd.RootHash[:], htd2.RootHash[:]) ||
+		htd.Dirname != htd2.Dirname {
 		return false
 	}
 
-	for filename, htf1 := range htd1.Files {
+	for filename, htf1 := range htd.Files {
 		if htf2, ok := htd2.Files[filename]; ok {
 			if !htf1.Equals(htf2) {
 				return false
@@ -529,7 +554,7 @@ func (htd1 *HashTreeDir) Equals(htd2 *HashTreeDir) bool {
 		}
 	}
 
-	for subdir, sd1 := range htd1.Subdirs {
+	for subdir, sd1 := range htd.Subdirs {
 		if sd2, ok := htd2.Subdirs[subdir]; ok {
 			if !sd1.Equals(sd2) {
 				return false
@@ -542,15 +567,15 @@ func (htd1 *HashTreeDir) Equals(htd2 *HashTreeDir) bool {
 	return true
 }
 
-// are two files equal
-func (htf1 *HashTreeFile) Equals(htf2 *HashTreeFile) bool {
-	if !bytes.Equal(htf1.RootHash[:], htf2.RootHash[:]) ||
-		htf1.Filename != htf2.Filename ||
-		len(htf1.Hashes) != len(htf2.Hashes) {
+// Equals are two files equal
+func (htf *HashTreeFile) Equals(htf2 *HashTreeFile) bool {
+	if !bytes.Equal(htf.RootHash[:], htf2.RootHash[:]) ||
+		htf.Filename != htf2.Filename ||
+		len(htf.Hashes) != len(htf2.Hashes) {
 		return false
 	}
 
-	for i, h1 := range htf1.Hashes {
+	for i, h1 := range htf.Hashes {
 		if !bytes.Equal(h1[:], htf2.Hashes[i][:]) {
 			return false
 		}

@@ -22,7 +22,7 @@ func TestMain(m *testing.M) {
 // start peer
 
 func TestConnectToPeer(t *testing.T) {
-	assert.Equal(t, 0, len(testPeer.peers), "Peer not tracked/connected")
+	assert.Equal(t, 1, len(testPeer.peers), "Peer not tracked/connected")
 
 	mp, it := createMockPeer(t)
 	it.SendString("test message\n")

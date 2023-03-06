@@ -42,7 +42,7 @@ Starting a download will:
 
 */
 
-// A download manager for a game
+// Download A download manager for a game
 type Download struct {
 
 	// progress of each file being downloaded
@@ -55,7 +55,7 @@ type Download struct {
 	AbsolutePath string
 }
 
-// the progress of a specific file's download
+// FileProgress the progress of a specific file's download
 type FileProgress struct {
 
 	// where the file is located in storage
@@ -65,10 +65,7 @@ type FileProgress struct {
 	BlocksRemaining map[[32]byte]uint
 }
 
-/*
-Stores the details about a given block to attempt
-to download it.
-*/
+// DownloadRequest /*
 type DownloadRequest struct {
 
 	// details to uniquely identify the block
@@ -84,11 +81,11 @@ type DownloadRequest struct {
 
 // ? setup
 
-// create a new download for an existing game
-func (game *Game) SetupDownload() error {
+// SetupDownload create a new download for an existing game
+func (g *Game) SetupDownload() error {
 
 	// read hash data if isn't already loaded
-	data, err := game.GetData()
+	data, err := g.GetData()
 	if err != nil {
 		return err
 	}
@@ -105,10 +102,10 @@ func (game *Game) SetupDownload() error {
 		return errors.New("game install folder not found")
 	}
 
-	d.AbsolutePath = filepath.Join(dir, game.Title)
+	d.AbsolutePath = filepath.Join(dir, g.Title)
 
-	util.Logger.Infof("Generating dummy files for %s-%s", game.Title, game.Version)
-	err = data.CreateDummyFiles(dir, game.Title, func(path string, htf *hash.HashTreeFile) {
+	util.Logger.Infof("Generating dummy files for %s-%s", g.Title, g.Version)
+	err = data.CreateDummyFiles(dir, g.Title, func(path string, htf *hash.HashTreeFile) {
 		p := FileProgress{
 			AbsolutePath:    path,
 			BlocksRemaining: make(map[[32]byte]uint),
@@ -126,11 +123,11 @@ func (game *Game) SetupDownload() error {
 		return err
 	}
 
-	game.Download = d
+	g.Download = d
 	return nil
 }
 
-// cancel an existing download
+// CancelDownload cancel an existing download
 func (g *Game) CancelDownload() error {
 	if g.Download == nil {
 		util.Logger.Warnf("Download not found for game %x", g.RootHash)
@@ -154,7 +151,7 @@ func (g *Game) CancelDownload() error {
 
 // ? downloading data
 
-// insert data into a file for a given game download
+// InsertData insert data into a file for a given game download
 func (d *Download) InsertData(fileHash, blockHash [32]byte, data []byte) error {
 	util.Logger.Infof("Attempting to insert shard %x into %x with data %x", blockHash, fileHash, data)
 	file, ok := d.Progress[fileHash]
@@ -190,7 +187,7 @@ func (d *Download) InsertData(fileHash, blockHash [32]byte, data []byte) error {
 	return nil
 }
 
-// continue/start a download where the desired blocks are already known
+// ContinueDownload continue/start a download where the desired blocks are already known
 // this function will make requests down the libraries download request
 // channel
 func (d *Download) ContinueDownload(gameHash [32]byte, newRequest chan DownloadRequest) {
@@ -242,14 +239,7 @@ func (d *Download) ContinueDownload(gameHash [32]byte, newRequest chan DownloadR
 
 // ? misc functions
 
-/*
-It is extremely likely that files won't be multiples of
-the shard size so this will result in a trail of bytes
-that are unexepcted.
-
-This function will remove any trailing bytes from the
-end of a file
-*/
+// CleanFile /*
 func CleanFile(path string) error {
 	util.Logger.Infof("Cleaning file %s", path)
 	file, err := os.OpenFile(path, os.O_RDWR, 0644)
@@ -281,12 +271,12 @@ func CleanFile(path string) error {
 	return nil
 }
 
-// get the total download progress as a percent
+// GetProgress get the total download progress as a percent
 func (d *Download) GetProgress() float32 {
 	return 1 - float32(len(d.Progress))/float32(d.TotalBlocks)
 }
 
-// whether any more blocks are still needed
+// Finished whether any more blocks are still needed
 func (d *Download) Finished() bool {
 	return len(d.Progress) == 0
 }

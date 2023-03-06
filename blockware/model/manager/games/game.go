@@ -22,17 +22,7 @@ import (
 	"github.com/t02smith/part-iii-project/toolkit/util"
 )
 
-/*
-
-A game represents a single version of a game uploaded to the
-network and will include all data relevant to the unique identification
-of it.
-
-Each game should be uniquely identifiable by its root hash that takes
-into account its metadata and file contents.
-
-*/
-
+// Game /*
 type Game struct {
 
 	// game metadata
@@ -71,7 +61,7 @@ type NewGame struct {
 	AssetsDir   string
 }
 
-// create a new instance of a game and generate a hash tree for it
+// CreateGame create a new instance of a game and generate a hash tree for it
 func CreateGame(newGame NewGame, progress chan int) (*Game, error) {
 
 	if newGame.ShardSize == 0 {
@@ -117,10 +107,10 @@ func CreateGame(newGame NewGame, progress chan int) (*Game, error) {
 	hasher.Write([]byte(newGame.Developer))
 	hasher.Write(tree.RootDir.RootHash[:])
 
-	hash := hasher.Sum([]byte{})
+	gameRootHash := hasher.Sum([]byte{})
 
 	var h [32]byte
-	copy(h[:], hash)
+	copy(h[:], gameRootHash)
 
 	// return value
 	game := &Game{
@@ -144,7 +134,7 @@ func CreateGame(newGame NewGame, progress chan int) (*Game, error) {
 
 // IO
 
-// get a game's hash tree data and fetch it from a file if necessary
+// GetData get a game's hash tree data and fetch it from a file if necessary
 func (g *Game) GetData() (*hash.HashTree, error) {
 	if g.data == nil {
 		err := g.readHashData()
@@ -175,7 +165,7 @@ func (g *Game) readHashData() error {
 
 // * IO
 
-// output data to file
+// OutputAllGameDataToFile output data to file
 func OutputAllGameDataToFile(g *Game) error {
 	gameFilename := filepath.Join(viper.GetString("meta.directory"), "games", fmt.Sprintf("%x", g.RootHash))
 	err := g.OutputToFile(gameFilename)
@@ -193,7 +183,7 @@ func OutputAllGameDataToFile(g *Game) error {
 	return nil
 }
 
-// output a game to file
+// OutputToFile output a game to file
 func (g *Game) OutputToFile(filename string) error {
 	util.Logger.Infof("Outputting game data to %s", filename)
 
@@ -216,7 +206,7 @@ func (g *Game) OutputToFile(filename string) error {
 	return nil
 }
 
-// load all the game data stored in storage
+// LoadGames load all the game data stored in storage
 func LoadGames(gameDataLocation string) ([]*Game, error) {
 
 	// does the directory to load from exist?
@@ -226,7 +216,7 @@ func LoadGames(gameDataLocation string) ([]*Game, error) {
 	}
 
 	// Parse the games
-	games := []*Game{}
+	var games []*Game
 
 	dir, err := os.Open(gameDataLocation)
 	if err != nil {
@@ -275,7 +265,7 @@ func LoadGames(gameDataLocation string) ([]*Game, error) {
 
 // Serialisation
 
-// Turns a game into a base64 encoded, gzip compressed byte stream
+// Serialise Turns a game into a base64 encoded, gzip compressed byte stream
 func (g *Game) Serialise() (string, error) {
 
 	// encode
@@ -297,8 +287,8 @@ func (g *Game) Serialise() (string, error) {
 	return base64.StdEncoding.EncodeToString(compressed.Bytes()), nil
 }
 
-// Takes a serialised game and turns it into a struct
-func DeserialiseGame(data string) (*Game, error) {
+// DeserializeGame Takes a serialised game and turns it into a struct
+func DeserializeGame(data string) (*Game, error) {
 	g := &Game{}
 
 	// from base64
@@ -333,17 +323,17 @@ func DeserialiseGame(data string) (*Game, error) {
 	return g, nil
 }
 
-// compare two games
-func (g1 *Game) Equals(g2 *Game) bool {
-	return g1.Title == g2.Title &&
-		g1.Version == g2.Version &&
-		g1.Developer == g2.Developer &&
-		g1.ReleaseDate == g2.ReleaseDate &&
-		bytes.Equal(g1.RootHash[:], g2.RootHash[:])
+// Equals compare two games
+func (g *Game) Equals(g2 *Game) bool {
+	return g.Title == g2.Title &&
+		g.Version == g2.Version &&
+		g.Developer == g2.Developer &&
+		g.ReleaseDate == g2.ReleaseDate &&
+		bytes.Equal(g.RootHash[:], g2.RootHash[:])
 
 }
 
-// Fetch the shard for a given hash
+// FetchShard Fetch the shard for a given hash
 func (g *Game) FetchShard(hash [32]byte) (bool, []byte, error) {
 	err := g.readHashData()
 	if err != nil {
@@ -362,7 +352,7 @@ func (g *Game) FetchShard(hash [32]byte) (bool, []byte, error) {
 	return true, data, nil
 }
 
-// Get a games download
+// GetDownload Get a games download
 func (g *Game) GetDownload() *Download {
 	return g.Download
 }

@@ -20,17 +20,14 @@ the user cannot have enough storage.
 
 */
 
-/*
-Use the data stored in the hash tree to generate a set of null byte filled files in the
-expected directory structure.
-*/
-func (t *HashTree) CreateDummyFiles(rootDir, title string, onCreate func(string, *HashTreeFile)) error {
+// CreateDummyFiles /*
+func (ht *HashTree) CreateDummyFiles(rootDir, title string, onCreate func(string, *HashTreeFile)) error {
 	err := os.Mkdir(filepath.Join(rootDir, title), 0777)
 	if err != nil && !os.IsExist(err) {
 		return err
 	}
 
-	err = t.createDummyFilesFromDirectory(t.RootDir, filepath.Join(rootDir, title), onCreate)
+	err = ht.createDummyFilesFromDirectory(ht.RootDir, filepath.Join(rootDir, title), onCreate)
 	if err != nil {
 		return err
 	}
@@ -39,8 +36,8 @@ func (t *HashTree) CreateDummyFiles(rootDir, title string, onCreate func(string,
 
 }
 
-// traverse a directory and create any dummy files and recursively traverse subdirs
-func (t *HashTree) createDummyFilesFromDirectory(dir *HashTreeDir, path string, onCreate func(string, *HashTreeFile)) error {
+// traverse a directory and create any dummy files and recursively traverse sub-dirs
+func (ht *HashTree) createDummyFilesFromDirectory(dir *HashTreeDir, path string, onCreate func(string, *HashTreeFile)) error {
 	util.Logger.Infof("Generating files for folder %s", filepath.Join(path, dir.Dirname))
 
 	if len(dir.Dirname) > 0 {
@@ -54,17 +51,17 @@ func (t *HashTree) createDummyFilesFromDirectory(dir *HashTreeDir, path string, 
 	for _, f := range dir.Files {
 		fileLocation := filepath.Join(path, dir.Dirname, f.Filename)
 		util.Logger.Infof("Creating dummy for %s", fileLocation)
-		err := setupFile(fileLocation, t.ShardSize, uint(len(f.Hashes)))
+		err := setupFile(fileLocation, ht.ShardSize, uint(len(f.Hashes)))
 		if err != nil {
 			return err
 		}
 		onCreate(fileLocation, f)
 	}
 
-	// generate subdirs
+	// generate sub-dirs
 	newPath := filepath.Join(path, dir.Dirname)
 	for _, d := range dir.Subdirs {
-		err := t.createDummyFilesFromDirectory(d, newPath, onCreate)
+		err := ht.createDummyFilesFromDirectory(d, newPath, onCreate)
 		if err != nil {
 			return err
 		}
@@ -101,7 +98,7 @@ func setupFile(filename string, shardSize, shardCount uint) error {
 	return nil
 }
 
-// Insert a shard of data into a given dummy file
+// InsertData Insert a shard of data into a given dummy file
 func InsertData(filename string, shardSize, offset uint, data []byte) error {
 	if len(data) != int(shardSize) {
 		return errors.New("data should be the same length as the byte size")

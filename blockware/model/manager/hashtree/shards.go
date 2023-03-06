@@ -17,16 +17,16 @@ shard in a given file.
 
 */
 
-// locate a given shard within a hash tree by looking through all files
-func (t *HashTree) GetShard(hash [32]byte) (bool, []byte, error) {
-	util.Logger.Infof("Looking for shard %x in %s", hash, t.RootDirLocation)
-	found, _, location, offset := t.FindShard(hash)
+// GetShard locate a given shard within a hash tree by looking through all files
+func (ht *HashTree) GetShard(hash [32]byte) (bool, []byte, error) {
+	util.Logger.Infof("Looking for shard %x in %s", hash, ht.RootDirLocation)
+	found, _, location, offset := ht.FindShard(hash)
 	if !found {
 		return false, nil, nil
 	}
 
 	util.Logger.Infof("Shard found at %s - piece %d", location, offset)
-	data, err := t.readShard(filepath.Join(t.RootDirLocation, location), offset)
+	data, err := ht.readShard(filepath.Join(ht.RootDirLocation, location), offset)
 	if err != nil {
 		return false, nil, err
 	}
@@ -38,24 +38,24 @@ func (t *HashTree) GetShard(hash [32]byte) (bool, []byte, error) {
 
 // looks for a given shard in the entire hash tree
 // return <hashFound> <file struct> <relative filename> <shard position in file>
-func (t *HashTree) FindShard(hash [32]byte) (bool, *HashTreeFile, string, int) {
-	return t.RootDir.findShard(hash)
+func (ht *HashTree) FindShard(hash [32]byte) (bool, *HashTreeFile, string, int) {
+	return ht.RootDir.findShard(hash)
 }
 
 // auxillary function for FindShard => looks in particular directory
-func (td *HashTreeDir) findShard(hash [32]byte) (bool, *HashTreeFile, string, int) {
-	for _, f := range td.Files {
+func (htd *HashTreeDir) findShard(hash [32]byte) (bool, *HashTreeFile, string, int) {
+	for _, f := range htd.Files {
 		for i, h := range f.Hashes {
 			if bytes.Equal(hash[:], h[:]) {
-				return true, f, filepath.Join(td.Dirname, f.Filename), i
+				return true, f, filepath.Join(htd.Dirname, f.Filename), i
 			}
 		}
 	}
 
-	for _, sd := range td.Subdirs {
+	for _, sd := range htd.Subdirs {
 		found, htf, filename, offset := sd.findShard(hash)
 		if found {
-			return true, htf, filepath.Join(td.Dirname, filename), offset
+			return true, htf, filepath.Join(htd.Dirname, filename), offset
 		}
 
 	}
@@ -67,7 +67,7 @@ func (td *HashTreeDir) findShard(hash [32]byte) (bool, *HashTreeFile, string, in
 // READING SHARD
 
 // Reads a shard from a given file
-func (t *HashTree) readShard(filename string, offset int) ([]byte, error) {
+func (ht *HashTree) readShard(filename string, offset int) ([]byte, error) {
 
 	file, err := os.Open(filename)
 	if err != nil {
@@ -75,10 +75,10 @@ func (t *HashTree) readShard(filename string, offset int) ([]byte, error) {
 	}
 	defer file.Close()
 
-	buffer := make([]byte, t.ShardSize)
+	buffer := make([]byte, ht.ShardSize)
 	reader := bufio.NewReader(file)
 
-	_, err = file.Seek(int64(offset*int(t.ShardSize)), 0)
+	_, err = file.Seek(int64(offset*int(ht.ShardSize)), 0)
 	if err != nil {
 		return nil, err
 	}

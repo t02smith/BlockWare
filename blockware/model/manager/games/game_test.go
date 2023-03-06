@@ -96,7 +96,7 @@ func TestSerialise(t *testing.T) {
 			return
 		}
 
-		d, err := DeserialiseGame(serialised)
+		d, err := DeserializeGame(serialised)
 		if err != nil {
 			t.Error(err)
 			return

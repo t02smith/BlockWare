@@ -47,7 +47,7 @@ func RunProfile(profileNumber Profile, contractAddr string) error {
 
 	switch profileNumber {
 	case _listenOnly:
-		err := SetupProfile("./test/profiles/listenOnly", listenOnly.PrivateKey, addr, peer.PeerConfig{
+		err := SetupProfile("./test/profiles/listenOnly", listenOnly.PrivateKey, addr, peer.Config{
 			ContinueDownloads: false,
 			LoadPeersFromFile: false,
 			ServeAssets:       false,
@@ -58,7 +58,7 @@ func RunProfile(profileNumber Profile, contractAddr string) error {
 		listenOnly.Run()
 
 	case _listenOnlyWithUpload:
-		err := SetupProfile("./test/profiles/listenOnlyWithUpload", listenOnlyUpload.PrivateKey, addr, peer.PeerConfig{
+		err := SetupProfile("./test/profiles/listenOnlyWithUpload", listenOnlyUpload.PrivateKey, addr, peer.Config{
 			ContinueDownloads: false,
 			LoadPeersFromFile: false,
 			ServeAssets:       false,
@@ -79,7 +79,7 @@ func RunProfile(profileNumber Profile, contractAddr string) error {
 }
 
 // general setup needed for all peers
-func SetupProfile(path, privateKey string, contractAddr common.Address, config peer.PeerConfig) error {
+func SetupProfile(path, privateKey string, contractAddr common.Address, config peer.Config) error {
 	err := os.Chdir(path)
 	if err != nil {
 		return err

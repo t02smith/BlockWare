@@ -152,7 +152,7 @@ func defaultConfig() {
 func startPeer() error {
 	util.Logger.Info("Attempting to start peer")
 	_, err := peer.StartPeer(
-		peer.PeerConfig{
+		peer.Config{
 			ContinueDownloads: true,
 			LoadPeersFromFile: true,
 			ServeAssets:       true,

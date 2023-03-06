@@ -20,7 +20,7 @@ both of them.
 
 */
 
-// stores user's game information on owned and downloading games
+// Library stores user's game information on owned and downloading games
 type Library struct {
 
 	// a user's owned games (includes downloads)
@@ -44,7 +44,7 @@ type Library struct {
 	DownloadProgress chan DownloadRequest
 }
 
-// create a new library
+// NewLibrary create a new library
 func NewLibrary() *Library {
 	util.Logger.Info("Creating new library")
 	return &Library{
@@ -55,7 +55,7 @@ func NewLibrary() *Library {
 	}
 }
 
-// create a download for a given game
+// CreateDownload create a download for a given game
 func (l *Library) CreateDownload(g *Game) error {
 	util.Logger.Infof("Creating download for %s:%x", g.Title, g.RootHash)
 	if _, ok := l.ownedGames[g.RootHash]; !ok {
@@ -72,7 +72,7 @@ func (l *Library) CreateDownload(g *Game) error {
 	return nil
 }
 
-// get a game and its download if they exist
+// GetOwnedGame get a game and its download if they exist
 func (l *Library) GetOwnedGame(rootHash [32]byte) *Game {
 	if _, ok := l.ownedGames[rootHash]; !ok {
 		return nil
@@ -81,7 +81,7 @@ func (l *Library) GetOwnedGame(rootHash [32]byte) *Game {
 	return l.ownedGames[rootHash]
 }
 
-// get all games stored in the library
+// GetOwnedGames get all games stored in the library
 func (l *Library) GetOwnedGames() []*Game {
 	gs := []*Game{}
 	for _, g := range l.ownedGames {
@@ -92,13 +92,13 @@ func (l *Library) GetOwnedGames() []*Game {
 
 //
 
-// add a game to the library
+// AddOwnedGame add a game to the library
 func (l *Library) AddOwnedGame(g *Game) error {
 	l.ownedGames[g.RootHash] = g
 	return nil
 }
 
-// output a table representation of the games list to the console
+// OutputGamesTable output a table representation of the games list to the console
 func (l *Library) OutputGamesTable() {
 	t := table.NewWriter()
 	t.SetOutputMirror(os.Stdout)
@@ -113,7 +113,7 @@ func (l *Library) OutputGamesTable() {
 	t.Render()
 }
 
-// find a given block within a game in a player's library
+// FindBlock find a given block within a game in a player's library
 func (l *Library) FindBlock(gameHash [32]byte, hash [32]byte) (bool, []byte, error) {
 	g, ok := l.ownedGames[gameHash]
 	if !ok {
@@ -123,12 +123,12 @@ func (l *Library) FindBlock(gameHash [32]byte, hash [32]byte) (bool, []byte, err
 	return g.FetchShard(hash)
 }
 
-// store a details from a game on the blockchain store
+// SetBlockchainGame store a details from a game on the blockchain store
 func (l *Library) SetBlockchainGame(rootHash [32]byte, game *Game) {
 	l.blockchainGames[rootHash] = game
 }
 
-// get a game and its download if they exist
+// GetBlockchainGame get a game and its download if they exist
 func (l *Library) GetBlockchainGame(rootHash [32]byte) *Game {
 	if _, ok := l.blockchainGames[rootHash]; !ok {
 		return nil
@@ -137,7 +137,7 @@ func (l *Library) GetBlockchainGame(rootHash [32]byte) *Game {
 	return l.blockchainGames[rootHash]
 }
 
-// get all games stored in the library
+// GetBlockchainGames get all games stored in the library
 func (l *Library) GetBlockchainGames() []*Game {
 	gs := []*Game{}
 	for _, g := range l.blockchainGames {
@@ -146,7 +146,7 @@ func (l *Library) GetBlockchainGames() []*Game {
 	return gs
 }
 
-// get the games being downloaded
+// GetDownloads get the games being downloaded
 func (l *Library) GetDownloads() map[[32]byte]*Download {
 	ds := make(map[[32]byte]*Download)
 
@@ -159,7 +159,7 @@ func (l *Library) GetDownloads() map[[32]byte]*Download {
 	return ds
 }
 
-// close down a current library instance
+// Close close down a current library instance
 func (l *Library) Close() {
 	close(l.DownloadProgress)
 	l.StopDownloads()
@@ -173,14 +173,14 @@ func (l *Library) Close() {
 	}
 }
 
-// stop downloads from making requests
+// StopDownloads stop downloads from making requests
 func (l *Library) StopDownloads() {
 	util.Logger.Info("Stopping download requests")
 	close(l.RequestDownload)
 	l.RequestDownload = nil
 }
 
-// continue a libraries downloads
+// ContinueDownloads continue a libraries downloads
 func (l *Library) ContinueDownloads() {
 	util.Logger.Info("Continuing downloads")
 	l.RequestDownload = make(chan DownloadRequest)
@@ -197,7 +197,7 @@ func (l *Library) ContinueDownloads() {
 	util.Logger.Infof("Started %d downloads", count)
 }
 
-// clear stored owned games from memory
+// ClearOwnedGames clear stored owned games from memory
 func (l *Library) ClearOwnedGames() {
 	util.Logger.Info("Flushing owned games from memory")
 	l.ownedGames = make(map[[32]byte]*Game)

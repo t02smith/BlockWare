@@ -10,6 +10,7 @@ import (
 	"github.com/t02smith/part-iii-project/toolkit/model"
 	"github.com/t02smith/part-iii-project/toolkit/model/net/peer"
 	"github.com/t02smith/part-iii-project/toolkit/model/persistence/ethereum"
+	"github.com/t02smith/part-iii-project/toolkit/model/persistence/ethereum/library"
 	deployEth "github.com/t02smith/part-iii-project/toolkit/test/profiles/deploy"
 	listenOnly "github.com/t02smith/part-iii-project/toolkit/test/profiles/listenOnly"
 	listenOnlyUpload "github.com/t02smith/part-iii-project/toolkit/test/profiles/listenOnlyWithUpload"
@@ -118,7 +119,7 @@ func SetupProfile(path, privateKey string, contractAddr common.Address, config p
 		return fmt.Errorf("error starting eth client %s", err)
 	}
 
-	ethereum.ConnectToLibraryInstance(contractAddr, privateKey)
+	library.ConnectToLibraryInstance(contractAddr, privateKey)
 
 	return nil
 }

@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/t02smith/part-iii-project/toolkit/model/persistence/ethereum"
+	"github.com/t02smith/part-iii-project/toolkit/model/persistence/ethereum/library"
 )
 
 func Run(privateKey string) error {
@@ -12,7 +13,7 @@ func Run(privateKey string) error {
 		return fmt.Errorf("error starting eth client %s", err)
 	}
 
-	_, _, err = ethereum.DeployLibraryContract(privateKey)
+	_, _, err = library.DeployLibraryContract(privateKey)
 	if err != nil {
 		return fmt.Errorf("error connecting to lib instance %s", err)
 	}

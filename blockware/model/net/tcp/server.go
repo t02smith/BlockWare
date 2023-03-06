@@ -54,7 +54,7 @@ func InitServer(hostname string, port uint) *TCPServer {
 
 // start a new TCP server and listen for incoming connections
 func (s *TCPServer) Start(
-	onMessage func([]string, TCPConnection),
+	onMessage func([]string, TCPConnection) error,
 	onConnection func(string, uint, TCPConnection),
 	onClose func(TCPConnection)) error {
 
@@ -76,7 +76,7 @@ func (s *TCPServer) Start(
 // listen for incoming connections and setup processes to listen
 // for incoming messages from them
 func (s *TCPServer) listen(
-	onMessage func([]string, TCPConnection),
+	onMessage func([]string, TCPConnection) error,
 	onConnection func(string, uint, TCPConnection),
 	onClose func(TCPConnection)) {
 
@@ -117,7 +117,7 @@ func (s *TCPServer) Clients() []*TCPServerClient {
 }
 
 // listen for messages from a specific TCP connection
-func (c *TCPServerClient) listen(onMessage func([]string, TCPConnection), onClose func(TCPConnection)) {
+func (c *TCPServerClient) listen(onMessage func([]string, TCPConnection) error, onClose func(TCPConnection)) {
 	for {
 		msg, err := c.reader.ReadString('\n')
 		if err != nil {
@@ -131,7 +131,10 @@ func (c *TCPServerClient) listen(onMessage func([]string, TCPConnection), onClos
 		}
 
 		util.Logger.Infof("message received %s", msg)
-		onMessage(strings.Split(msg[:len(msg)-1], ";"), c)
+		err = onMessage(strings.Split(msg[:len(msg)-1], ";"), c)
+		if err != nil {
+			util.Logger.Warn(err)
+		}
 	}
 
 	c.Close()

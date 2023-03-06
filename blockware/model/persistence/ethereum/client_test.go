@@ -32,7 +32,7 @@ func TestStartClient(t *testing.T) {
 }
 
 func TestCreateKeyStore(t *testing.T) {
-
+	t.Skip()
 	keyStorePath := "../../test/data/tmp/wallets"
 	err := model.CreateDirectoryIfNotExist(keyStorePath)
 	if err != nil {

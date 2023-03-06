@@ -33,38 +33,41 @@ const (
 This type is used to track the progress of another party verifying
 their address using a signed piece of data
 */
-type addressValidator struct {
+type AddressValidator struct {
 	// the public key the other party claims to have
 	PublicKey *ecdsa.PublicKey
 
 	// the message that is sent to confirm
-	Message []byte
+	message []byte
 
 	// the signature received
-	Signature []byte
+	signature []byte
 
 	// When the validation has to be responded to by
 	// otherwise the validation will have to be restarted
-	Expiry time.Time
+	expiry time.Time
+
+	// signature valid
+	valid bool
 }
 
 // start a new validation
-func GenerateAddressValidation(pubKey *ecdsa.PublicKey) *addressValidator {
-	return &addressValidator{
+func GenerateAddressValidation(pubKey *ecdsa.PublicKey) *AddressValidator {
+	return &AddressValidator{
 		PublicKey: pubKey,
-		Message:   []byte(time.Now().String()),
-		Expiry:    time.Now().Add(ADDR_VALIDATION_TIMEOUT_AFTER),
+		message:   []byte(time.Now().String()),
+		expiry:    time.Now().Add(ADDR_VALIDATION_TIMEOUT_AFTER),
 	}
 }
 
 // produce a validation for a given message
-func ProduceAddressValidation(privateKey *ecdsa.PrivateKey, message []byte) ([]byte, error) {
+func ProduceAddressValidation(message []byte) ([]byte, error) {
 	if len(message) == 0 {
 		return nil, fmt.Errorf("validation message should not be empty")
 	}
 
 	hash := crypto.Keccak256Hash(message)
-	signature, err := crypto.Sign(hash.Bytes(), privateKey)
+	signature, err := crypto.Sign(hash.Bytes(), private_key)
 	if err != nil {
 		return nil, err
 	}
@@ -73,14 +76,26 @@ func ProduceAddressValidation(privateKey *ecdsa.PrivateKey, message []byte) ([]b
 }
 
 // check whether a received signature matches an expected one
-func CheckAddressValidation(validator *addressValidator, receivedSig []byte) (bool, error) {
-	if validator.Expiry.Before(time.Now()) {
-		return false, fmt.Errorf("validation expired on %s", validator.Expiry.String())
+func CheckAddressValidation(validator *AddressValidator, receivedSig []byte) (bool, error) {
+	if validator.expiry.Before(time.Now()) {
+		return false, fmt.Errorf("validation expired on %s", validator.expiry.String())
 	}
 
-	validator.Signature = receivedSig
-	return crypto.VerifySignature(
+	pubKey, err := crypto.SigToPub(crypto.Keccak256Hash(validator.Message()).Bytes(), receivedSig)
+	if err != nil {
+		return false, err
+	}
+
+	validator.PublicKey = pubKey
+	validator.signature = receivedSig
+	validator.valid = crypto.VerifySignature(
 		crypto.FromECDSAPub(validator.PublicKey),
-		crypto.Keccak256Hash(validator.Message).Bytes(),
-		receivedSig[:len(receivedSig)-1]), nil
+		crypto.Keccak256Hash(validator.message).Bytes(),
+		receivedSig[:len(receivedSig)-1])
+
+	return validator.valid, nil
+}
+
+func (a *AddressValidator) Message() []byte {
+	return a.message
 }

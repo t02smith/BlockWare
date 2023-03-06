@@ -26,12 +26,13 @@ for the entire runtime of the application
 */
 
 var (
-	eth_client *ethclient.Client
-	once       sync.Once
+	eth_client  *ethclient.Client
+	private_key *ecdsa.PrivateKey
+	once        sync.Once
 )
 
 // get the current ETH client
-func GetClient() *ethclient.Client {
+func Client() *ethclient.Client {
 	return eth_client
 }
 
@@ -60,12 +61,13 @@ func CloseEthClient() {
 //
 
 // creates a new auth instance given a private key for performing non gettet actions
-func generateAuthInstance(privateKey string) (*bind.TransactOpts, error) {
+func GenerateAuthInstance(privateKey string) (*bind.TransactOpts, error) {
 	util.Logger.Info("Generating auth instance")
 	privKeyECDSA, err := crypto.HexToECDSA(privateKey)
 	if err != nil {
 		util.Logger.Panic(err)
 	}
+	private_key = privKeyECDSA
 
 	pubKeyECDSA, ok := privKeyECDSA.Public().(*ecdsa.PublicKey)
 	if !ok {
@@ -99,8 +101,6 @@ func generateAuthInstance(privateKey string) (*bind.TransactOpts, error) {
 	auth.Value = big.NewInt(0)
 	auth.GasLimit = uint64(3000000)
 	auth.GasPrice = gasPrice
-
-	auth_instance = auth
 
 	util.Logger.Info("Auth instance generated")
 	return auth, nil

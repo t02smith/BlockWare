@@ -33,7 +33,7 @@ type TCPClient struct {
 func InitTCPClient(
 	serverHostname string,
 	serverPort uint,
-	onMessage func([]string, TCPConnection),
+	onMessage func([]string, TCPConnection) error,
 	onConnection func(string, uint, TCPConnection),
 	onClose func(TCPConnection)) (*TCPClient, error) {
 	util.Logger.Infof("Attempting to open connection to %s:%d", serverHostname, serverPort)
@@ -59,7 +59,7 @@ func InitTCPClient(
 
 // listen for messages from the server
 // onMessage is a handler that is called when a message is received
-func (c *TCPClient) listen(onMessage func([]string, TCPConnection), onClose func(TCPConnection)) {
+func (c *TCPClient) listen(onMessage func([]string, TCPConnection) error, onClose func(TCPConnection)) {
 	for {
 		msg, err := c.reader.ReadString('\n')
 		if err != nil {
@@ -73,7 +73,10 @@ func (c *TCPClient) listen(onMessage func([]string, TCPConnection), onClose func
 		}
 
 		util.Logger.Infof("message received %s\n", msg)
-		onMessage(strings.Split(msg[:len(msg)-1], ";"), c)
+		err = onMessage(strings.Split(msg[:len(msg)-1], ";"), c)
+		if err != nil {
+			util.Logger.Warn(err)
+		}
 	}
 }
 

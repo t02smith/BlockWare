@@ -1,4 +1,4 @@
-package ethereum
+package library
 
 import (
 	"errors"
@@ -8,9 +8,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/spf13/viper"
 	"github.com/t02smith/part-iii-project/toolkit/model/manager/games"
 	"github.com/t02smith/part-iii-project/toolkit/model/net/peer"
+	"github.com/t02smith/part-iii-project/toolkit/model/persistence/ethereum"
 	"github.com/t02smith/part-iii-project/toolkit/test/testutil"
 	"github.com/t02smith/part-iii-project/toolkit/util"
 )
@@ -19,16 +19,13 @@ func beforeAll() {
 	util.InitLogger()
 	testutil.SetupTestConfig()
 
-	viper.Set("meta.directory", "../../../test/data/tmp/.toolkit")
-	viper.Set("games.installFolder", "../../../test/data/tmp")
-
 	_, err := peer.StartPeer(peer.PeerConfig{ContinueDownloads: false, LoadPeersFromFile: false, ServeAssets: false}, "localhost", 7887, "../../../test/data/tmp", "../../../test/data/.toolkit")
 	if err != nil {
 		log.Printf("Error starting test peer")
 		os.Exit(1)
 	}
 
-	_, _, err = StartClient("ws://localhost:8545")
+	_, _, err = ethereum.StartClient("ws://localhost:8545")
 	if err != nil {
 		util.Logger.Error(err)
 	}

@@ -1,4 +1,4 @@
-package ethereum
+package library
 
 import (
 	"context"
@@ -11,6 +11,7 @@ import (
 	"github.com/t02smith/part-iii-project/toolkit/build/contracts/library"
 	"github.com/t02smith/part-iii-project/toolkit/model/manager/games"
 	"github.com/t02smith/part-iii-project/toolkit/model/net/peer"
+	"github.com/t02smith/part-iii-project/toolkit/model/persistence/ethereum"
 	"github.com/t02smith/part-iii-project/toolkit/util"
 )
 
@@ -35,18 +36,19 @@ func GetContractAddress() common.Address {
 
 // setup instance of smart contract to interact with blockchain
 func DeployLibraryContract(privateKey string) (*bind.TransactOpts, *library.Library, error) {
-	if eth_client == nil {
+	if ethereum.Client() == nil {
 		return nil, nil, errors.New("you need to instantiate the Eth Client => run StartClient")
 	}
 
 	// run setup functions at most once
 	util.Logger.Info("Starting library deployment")
-	auth, err := generateAuthInstance(privateKey)
+	auth, err := ethereum.GenerateAuthInstance(privateKey)
 	if err != nil {
 		return nil, nil, err
 	}
+	auth_instance = auth
 
-	addr, _, instance, err := library.DeployLibrary(auth, eth_client)
+	addr, _, instance, err := library.DeployLibrary(auth, ethereum.Client())
 	if err != nil {
 		return nil, nil, err
 	}
@@ -72,7 +74,7 @@ func DeployLibraryContract(privateKey string) (*bind.TransactOpts, *library.Libr
 // Connect to an existing contract
 func ConnectToLibraryInstance(address common.Address, privateKey string) error {
 	util.Logger.Infof("Connecting to addr %s", address)
-	lib, err := library.NewLibrary(address, eth_client)
+	lib, err := library.NewLibrary(address, ethereum.Client())
 	if err != nil {
 		util.Logger.Errorf("Error connecting to library instance: %s", err)
 	}
@@ -80,10 +82,11 @@ func ConnectToLibraryInstance(address common.Address, privateKey string) error {
 	contract_address = address
 	lib_instance = lib
 	util.Logger.Infof("Connected to %s", address)
-	_, err = generateAuthInstance(privateKey)
+	auth, err := ethereum.GenerateAuthInstance(privateKey)
 	if err != nil {
 		return err
 	}
+	auth_instance = auth
 
 	return nil
 }
@@ -329,7 +332,7 @@ func Purchase(l *games.Library, rootHash [32]byte) error {
 		return err
 	}
 
-	receipt, err := bind.WaitMined(context.Background(), eth_client, txn)
+	receipt, err := bind.WaitMined(context.Background(), ethereum.Client(), txn)
 	if err != nil {
 		return err
 	}

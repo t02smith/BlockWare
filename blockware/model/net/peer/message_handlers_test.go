@@ -586,3 +586,25 @@ func _sendBlock(t *testing.T, filename string, mp *testutil.MockPeer, g *games.G
 		t.Fatalf("incorrect shard inserted\ngot %x\nexpected %x", buffer, data)
 	}
 }
+
+/*
+
+function: generateVALIDATE_REQ
+purpose: build a structured message from id verification
+
+? Test cases
+success
+	| #1 base case
+
+*/
+
+func TestGnerateVALIDATE_REQ(t *testing.T) {
+	t.Run("success", func(t *testing.T) {
+		t.Run("base case", func(t *testing.T) {
+			msg := []byte("hello world - blockware")
+			res := generateVALIDATE_REQ(msg)
+
+			assert.Equal(t, fmt.Sprintf("VALIDATE_REQ;%x\n", msg), res, "invalid message")
+		})
+	})
+}

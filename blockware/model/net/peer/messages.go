@@ -2,6 +2,8 @@ package peer
 
 import (
 	"errors"
+	"fmt"
+	"strings"
 
 	"github.com/t02smith/part-iii-project/toolkit/model/net/tcp"
 	"github.com/t02smith/part-iii-project/toolkit/util"
@@ -20,7 +22,7 @@ const (
 )
 
 // process a message received from a peer
-func onMessage(cmd []string, client tcp.TCPConnection) {
+func onMessage(cmd []string, client tcp.TCPConnection) error {
 	if cmd[0][len(cmd[0])-1] == '\r' {
 		cmd[0] = cmd[0][:len(cmd[0])-1]
 	}
@@ -34,7 +36,7 @@ func onMessage(cmd []string, client tcp.TCPConnection) {
 			util.Logger.Warnf("Error handling LIBRARY message: %s", err)
 			client.SendString(generateERROR(err.Error()))
 		}
-		return
+		return nil
 
 	// GAMES => a list of users games
 	case "GAMES":
@@ -44,7 +46,7 @@ func onMessage(cmd []string, client tcp.TCPConnection) {
 			client.SendString(generateERROR(err.Error()))
 		}
 
-		return
+		return nil
 
 	// BLOCK <game hash> <hash> => Request a block of data from a user
 	case "BLOCK":
@@ -53,7 +55,7 @@ func onMessage(cmd []string, client tcp.TCPConnection) {
 			util.Logger.Warnf("Error handling BLOCK message %s", err)
 			client.SendString(generateERROR(err.Error()))
 		}
-		return
+		return nil
 
 	// SEND_BLOCK <game hash> <hash> <shard> => Download a shard off of a user
 	case "SEND_BLOCK":
@@ -62,13 +64,31 @@ func onMessage(cmd []string, client tcp.TCPConnection) {
 			util.Logger.Warnf("Error handling SEND_BLOCK message %s", err)
 			client.SendString(generateERROR(err.Error()))
 		}
-		return
+		return nil
 
 	// ERROR <msg> => used to send an error message following a command
 	case "ERROR":
 		util.Logger.Errorf("Error received %s", cmd[1])
-		return
+		return nil
+
+	// VALIDATE_REQ <message> => request a signed message to prove identity
+	case "VALIDATE_REQ":
+		err := handleVALIDATE_REQ(cmd, client)
+		if err != nil {
+			util.Logger.Warnf("Error reading validation request: %s", err)
+		}
+		return nil
+
+	// VALIDATE_RES <signed message> => validate someone's public key
+	case "VALIDATE_RES":
+		err := handleVALIDATE_RES(cmd, client)
+		if err != nil {
+			util.Logger.Warnf("Error reading validation response: %s", err)
+		}
+		return nil
 	}
+
+	return fmt.Errorf("unrecognised message: %s", strings.Join(cmd, ";"))
 }
 
 // * DOWNLOADS

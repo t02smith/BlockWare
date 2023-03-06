@@ -69,20 +69,6 @@ type PeerConfig struct {
 	ServeAssets bool
 }
 
-// Stores useful information about other peers
-type peerData struct {
-
-	// peer details for logging
-	Hostname string
-	Port     uint
-
-	// socket interface to communicate with peer
-	Peer tcp.TCPConnection
-
-	// what games they have installed
-	Library map[[32]byte]bool
-}
-
 // * functions
 
 // Get the singleton instance of the current peer if it exists

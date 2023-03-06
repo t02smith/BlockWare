@@ -8,7 +8,7 @@ import (
 	"github.com/spf13/viper"
 	"github.com/t02smith/part-iii-project/toolkit/model/manager/games"
 	"github.com/t02smith/part-iii-project/toolkit/model/net/peer"
-	"github.com/t02smith/part-iii-project/toolkit/model/persistence/ethereum"
+	"github.com/t02smith/part-iii-project/toolkit/model/persistence/ethereum/library"
 	"github.com/t02smith/part-iii-project/toolkit/util"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
@@ -40,7 +40,7 @@ func (a *Controller) GetOwnedGames() []*ControllerGame {
 // get a list of games from the eth store
 func (c *Controller) GetStoreGames() []*ControllerGame {
 	lib := peer.Peer().Library()
-	err := ethereum.FillLibraryBlockchainGames(lib)
+	err := library.FillLibraryBlockchainGames(lib)
 	if err != nil {
 		c.controllerErrorf("Error getting games from ETH: %s", err)
 		return []*ControllerGame{}
@@ -100,7 +100,7 @@ func (c *Controller) UploadGame(title, version, dev, rootDir string, shardSize, 
 	}
 	close(progress)
 
-	err = ethereum.Upload(g)
+	err = library.Upload(g)
 	if err != nil {
 		c.controllerErrorf("Error uploading game %s", err)
 		return
@@ -151,7 +151,7 @@ func (c *Controller) PurchaseGame(rh string) {
 	}
 
 	lib := peer.Peer().Library()
-	err = ethereum.Purchase(lib, gh)
+	err = library.Purchase(lib, gh)
 	if err != nil {
 		c.controllerErrorf("Error purchasing game %s", err)
 		return

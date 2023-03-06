@@ -32,13 +32,14 @@ func TestProduceTestValidation(t *testing.T) {
 	if err != nil {
 		t.Fatalf("error parsing test private key %s", err)
 	}
+	private_key = privateKeyECDSA
 
 	publicKeyBytes := crypto.FromECDSAPub(&privateKeyECDSA.PublicKey)
 
 	t.Run("success", func(t *testing.T) {
 		t.Run("msg produced and correct", func(t *testing.T) {
 			message, hash := []byte("hello world"), crypto.Keccak256Hash([]byte("hello world"))
-			sig, err := ProduceAddressValidation(privateKeyECDSA, message)
+			sig, err := ProduceAddressValidation(message)
 			assert.Nil(t, err, "no error expected")
 
 			assert.True(t, crypto.VerifySignature(publicKeyBytes, hash.Bytes(), sig[:len(sig)-1]), "public keys do not match")
@@ -49,7 +50,7 @@ func TestProduceTestValidation(t *testing.T) {
 	t.Run("failure", func(t *testing.T) {
 		t.Run("illegal arguments", func(t *testing.T) {
 			t.Run("empty message", func(t *testing.T) {
-				_, err := ProduceAddressValidation(privateKeyECDSA, []byte{})
+				_, err := ProduceAddressValidation([]byte{})
 				assert.NotNil(t, err, "error message expected")
 				assert.Equal(t, "validation message should not be empty", err.Error(), "invalid error message")
 			})
@@ -86,12 +87,13 @@ func TestCheckAddressValidaton(t *testing.T) {
 	if err != nil {
 		t.Fatalf("error parsing test private key %s", err)
 	}
+	private_key = privateKeyECDSA
 
 	validator := GenerateAddressValidation(&privateKeyECDSA.PublicKey)
 
 	t.Run("success", func(t *testing.T) {
 		t.Run("valid signature", func(t *testing.T) {
-			sig, err := ProduceAddressValidation(privateKeyECDSA, validator.Message)
+			sig, err := ProduceAddressValidation(validator.message)
 			assert.Nil(t, err, "no err expected")
 
 			res, err := CheckAddressValidation(validator, sig)
@@ -106,7 +108,13 @@ func TestCheckAddressValidaton(t *testing.T) {
 					t.Fatalf("error parsing test private key %s", err)
 				}
 
-				sig, err := ProduceAddressValidation(privKeyII, validator.Message)
+				oldPrivKey := private_key
+				private_key = privKeyII
+				t.Cleanup(func() {
+					private_key = oldPrivKey
+				})
+
+				sig, err := ProduceAddressValidation(validator.message)
 				assert.Nil(t, err, "no err expected")
 
 				res, err := CheckAddressValidation(validator, sig)
@@ -115,7 +123,7 @@ func TestCheckAddressValidaton(t *testing.T) {
 			})
 
 			t.Run("invalid message", func(t *testing.T) {
-				sig, err := ProduceAddressValidation(privateKeyECDSA, []byte("asuidghasgdasddash"))
+				sig, err := ProduceAddressValidation([]byte("asuidghasgdasddash"))
 				assert.Nil(t, err, "no err expected")
 
 				res, err := CheckAddressValidation(validator, sig)
@@ -128,16 +136,16 @@ func TestCheckAddressValidaton(t *testing.T) {
 	t.Run("failure", func(t *testing.T) {
 		t.Run("illegal arguments", func(t *testing.T) {
 			t.Run("expired validation", func(t *testing.T) {
-				originalTime := validator.Expiry
-				validator.Expiry = time.Date(2002, time.January, 10, 0, 0, 0, 0, time.UTC)
+				originalTime := validator.expiry
+				validator.expiry = time.Date(2002, time.January, 10, 0, 0, 0, 0, time.UTC)
 				t.Cleanup(func() {
-					validator.Expiry = originalTime
+					validator.expiry = originalTime
 				})
 
-				res, err := CheckAddressValidation(validator, validator.Message)
+				res, err := CheckAddressValidation(validator, validator.message)
 				assert.False(t, res, "output should be false")
 				assert.NotNil(t, err, "Expected error message about expiry")
-				assert.Equal(t, fmt.Sprintf("validation expired on %s", validator.Expiry.String()), err.Error(), "incorrect err message")
+				assert.Equal(t, fmt.Sprintf("validation expired on %s", validator.expiry.String()), err.Error(), "incorrect err message")
 			})
 		})
 	})

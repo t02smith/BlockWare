@@ -11,7 +11,7 @@ import (
 
 	"github.com/t02smith/part-iii-project/toolkit/model/manager/games"
 	"github.com/t02smith/part-iii-project/toolkit/model/net/peer"
-	"github.com/t02smith/part-iii-project/toolkit/model/persistence/ethereum"
+	"github.com/t02smith/part-iii-project/toolkit/model/persistence/ethereum/library"
 	"github.com/t02smith/part-iii-project/toolkit/test/testutil"
 	"github.com/t02smith/part-iii-project/toolkit/util"
 )
@@ -75,7 +75,7 @@ func Run() {
 	}
 
 	p.Library().AddOwnedGame(g)
-	err = ethereum.Upload(g)
+	err = library.Upload(g)
 	if err != nil {
 		util.Logger.Fatalf("Error uploading game to ETH %s", err)
 	}

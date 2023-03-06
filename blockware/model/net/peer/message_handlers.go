@@ -8,6 +8,7 @@ import (
 
 	"github.com/t02smith/part-iii-project/toolkit/model/manager/games"
 	"github.com/t02smith/part-iii-project/toolkit/model/net/tcp"
+	"github.com/t02smith/part-iii-project/toolkit/model/persistence/ethereum"
 	"github.com/t02smith/part-iii-project/toolkit/util"
 )
 
@@ -25,6 +26,8 @@ BLOCK => request a block of data from a user
 SEND_BLOCK => receive a block of data from a user
 ERROR => an error message to send to a peer
 				 TODO properly deal with incoming errors
+VALIDATE_REQ => request a signed message from a peer
+VALIDATE_RES => respond to a validation request
 
 */
 
@@ -191,4 +194,50 @@ func handleSEND_BLOCK(cmd []string, client tcp.TCPConnection) error {
 
 func generateERROR(msg string, args ...any) string {
 	return fmt.Sprintf("ERROR;%s\n", fmt.Sprintf(msg, args...))
+}
+
+// VALIDATE_REQ <message>
+
+func generateVALIDATE_REQ(message []byte) string {
+	return fmt.Sprintf("VALIDATE_REQ;%x\n", message)
+}
+
+func handleVALIDATE_REQ(cmd []string, client tcp.TCPConnection) error {
+	message, err := hex.DecodeString(cmd[1])
+	if err != nil {
+		return err
+	}
+
+	sig, err := ethereum.ProduceAddressValidation(message)
+	if err != nil {
+		return err
+	}
+
+	client.SendString(generateVALIDATE_RES(sig))
+	return nil
+}
+
+// VALIDATE_RES <signed message>
+
+func generateVALIDATE_RES(sig []byte) string {
+	return fmt.Sprintf("VALIDATE_RES;%x\n", sig)
+}
+
+func handleVALIDATE_RES(cmd []string, client tcp.TCPConnection) error {
+	sig, err := hex.DecodeString(cmd[1])
+	if err != nil {
+		return err
+	}
+
+	validator := Peer().GetPeer(client).Validator
+	valid, err := ethereum.CheckAddressValidation(validator, sig)
+	if err != nil {
+		return err
+	}
+
+	if !valid {
+		client.SendStringf(generateERROR("invalid signature sent"))
+	}
+
+	return nil
 }

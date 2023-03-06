@@ -23,3 +23,6 @@ setup-profiles:
 build-profiles:
 	cd frontend && npm install && npm build
 	go build
+
+cloc:
+	cloc.exe --exclude-dir=node_modules,.git --include-ext=go,vue,sol,js .

@@ -8,6 +8,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/spf13/viper"
 	"github.com/t02smith/part-iii-project/toolkit/model/manager/games"
 	"github.com/t02smith/part-iii-project/toolkit/model/net/peer"
 	"github.com/t02smith/part-iii-project/toolkit/test/testutil"
@@ -18,24 +19,12 @@ func beforeAll() {
 	util.InitLogger()
 	testutil.SetupTestConfig()
 
-	err := setupTestGame()
-	if err != nil {
-		util.Logger.Error(err)
-		os.Exit(1)
-	}
+	viper.Set("meta.directory", "../../../test/data/tmp/.toolkit")
+	viper.Set("games.installFolder", "../../../test/data/tmp")
 
-	_, err = peer.StartPeer(
-		peer.PeerConfig{
-			ContinueDownloads: false,
-			LoadPeersFromFile: false,
-		},
-		"localhost",
-		6749,
-		"../../test/data/tmp",
-		"../../test/data/.toolkit",
-	)
+	_, err := peer.StartPeer(peer.PeerConfig{ContinueDownloads: false, LoadPeersFromFile: false, ServeAssets: false}, "localhost", 7887, "../../../test/data/tmp", "../../../test/data/.toolkit")
 	if err != nil {
-		util.Logger.Error(err)
+		log.Printf("Error starting test peer")
 		os.Exit(1)
 	}
 
@@ -53,7 +42,7 @@ func beforeAll() {
 func TestMain(m *testing.M) {
 	beforeAll()
 	code := m.Run()
-	testutil.ClearTmp("../../")
+	testutil.ClearTmp("../../../")
 
 	os.Exit(code)
 }
@@ -61,7 +50,7 @@ func TestMain(m *testing.M) {
 //
 
 func setupTestGame() error {
-	_, err := os.Stat("../../test/data/.toolkit/toolkit-1.0.4-google.com.json")
+	_, err := os.Stat("../../../test/data/.toolkit/toolkit-1.0.4-google.com.json")
 	if err == nil {
 		return nil
 	}
@@ -72,7 +61,7 @@ func setupTestGame() error {
 		Version:     "1.0.4",
 		ReleaseDate: datetime,
 		Developer:   "google.com",
-		RootDir:     "../../test/data/testdir",
+		RootDir:     "../../../test/data/testdir",
 		Price:       big.NewInt(0),
 		ShardSize:   256}, nil)
 
@@ -92,7 +81,7 @@ func setupTestGame() error {
 }
 
 func fetchTestGame() (*games.Game, error) {
-	games, err := games.LoadGames("../../test/data/.toolkit/games")
+	games, err := games.LoadGames("../../../test/data/.toolkit/games")
 	if err != nil {
 		return nil, err
 	}

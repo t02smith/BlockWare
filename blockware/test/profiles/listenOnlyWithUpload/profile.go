@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/t02smith/part-iii-project/toolkit/model/manager/games"
-	"github.com/t02smith/part-iii-project/toolkit/model/net"
+	"github.com/t02smith/part-iii-project/toolkit/model/net/peer"
 	"github.com/t02smith/part-iii-project/toolkit/model/persistence/ethereum"
 	"github.com/t02smith/part-iii-project/toolkit/test/testutil"
 	"github.com/t02smith/part-iii-project/toolkit/util"
@@ -55,7 +55,7 @@ func Run() {
 		util.Logger.Fatalf("Latex template directory not found. Run 'make' to fetch it")
 	}
 
-	p := net.Peer()
+	p := peer.Peer()
 
 	// * create & upload game
 	g, err := games.CreateGame(games.NewGame{

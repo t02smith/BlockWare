@@ -8,7 +8,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/spf13/viper"
 	"github.com/t02smith/part-iii-project/toolkit/model"
-	"github.com/t02smith/part-iii-project/toolkit/model/net"
+	"github.com/t02smith/part-iii-project/toolkit/model/net/peer"
 	"github.com/t02smith/part-iii-project/toolkit/model/persistence/ethereum"
 	deployEth "github.com/t02smith/part-iii-project/toolkit/test/profiles/deploy"
 	listenOnly "github.com/t02smith/part-iii-project/toolkit/test/profiles/listenOnly"
@@ -46,7 +46,7 @@ func RunProfile(profileNumber Profile, contractAddr string) error {
 
 	switch profileNumber {
 	case _listenOnly:
-		err := SetupProfile("./test/profiles/listenOnly", listenOnly.PrivateKey, addr, net.PeerConfig{
+		err := SetupProfile("./test/profiles/listenOnly", listenOnly.PrivateKey, addr, peer.PeerConfig{
 			ContinueDownloads: false,
 			LoadPeersFromFile: false,
 			ServeAssets:       false,
@@ -57,7 +57,7 @@ func RunProfile(profileNumber Profile, contractAddr string) error {
 		listenOnly.Run()
 
 	case _listenOnlyWithUpload:
-		err := SetupProfile("./test/profiles/listenOnlyWithUpload", listenOnlyUpload.PrivateKey, addr, net.PeerConfig{
+		err := SetupProfile("./test/profiles/listenOnlyWithUpload", listenOnlyUpload.PrivateKey, addr, peer.PeerConfig{
 			ContinueDownloads: false,
 			LoadPeersFromFile: false,
 			ServeAssets:       false,
@@ -78,7 +78,7 @@ func RunProfile(profileNumber Profile, contractAddr string) error {
 }
 
 // general setup needed for all peers
-func SetupProfile(path, privateKey string, contractAddr common.Address, config net.PeerConfig) error {
+func SetupProfile(path, privateKey string, contractAddr common.Address, config peer.PeerConfig) error {
 	err := os.Chdir(path)
 	if err != nil {
 		return err
@@ -100,7 +100,7 @@ func SetupProfile(path, privateKey string, contractAddr common.Address, config n
 	}
 
 	// * start peer
-	_, err = net.StartPeer(
+	_, err = peer.StartPeer(
 		config,
 		"localhost",
 		viper.GetUint("net.port"),
@@ -125,6 +125,6 @@ func SetupProfile(path, privateKey string, contractAddr common.Address, config n
 
 // tear down after profile runtime finished
 func CloseProfile() {
-	net.Peer().Close()
+	peer.Peer().Close()
 	ethereum.CloseEthClient()
 }

@@ -11,7 +11,7 @@ import (
 	"github.com/spf13/viper"
 	"github.com/t02smith/part-iii-project/toolkit/controller"
 	"github.com/t02smith/part-iii-project/toolkit/model"
-	"github.com/t02smith/part-iii-project/toolkit/model/net"
+	"github.com/t02smith/part-iii-project/toolkit/model/net/peer"
 	"github.com/t02smith/part-iii-project/toolkit/model/persistence/ethereum"
 	"github.com/t02smith/part-iii-project/toolkit/test/profiles"
 	"github.com/t02smith/part-iii-project/toolkit/util"
@@ -59,7 +59,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("Error starting peer %s", err)
 	}
-	defer net.Peer().Close()
+	defer peer.Peer().Close()
 
 	// ? start ETH client
 	_, _, err = ethereum.StartClient(viper.GetString("eth.address"))
@@ -151,8 +151,8 @@ func defaultConfig() {
 
 func startPeer() error {
 	util.Logger.Info("Attempting to start peer")
-	_, err := net.StartPeer(
-		net.PeerConfig{
+	_, err := peer.StartPeer(
+		peer.PeerConfig{
 			ContinueDownloads: true,
 			LoadPeersFromFile: true,
 			ServeAssets:       true,

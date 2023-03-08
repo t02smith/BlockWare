@@ -1,16 +1,16 @@
 <template>
   <div class="details">
     <div class="header-wrapper">
-      <div class="gradient"></div>
       <div class="header">
         <img
-          :src="`http://localhost:3003/test/data/.toolkit/assets/${game.rootHash}/cover.png`"
+          :src="`http://localhost:3003/test/data/.toolkit/assets/${props.game.rootHash}/cover.png`"
           alt=""
         />
-        <div
-          class="header-text-wrapper"
-          :style="`background: url(http://localhost:3003/test/data/.toolkit/assets/${game.rootHash}/cover.png) no-repeat;`"
-        >
+        <div class="header-text-wrapper">
+          <!-- <img
+            :src="`http://localhost:3003/test/data/.toolkit/assets/${props.game.rootHash}/background.png`"
+          /> -->
+
           <div class="header-text">
             <h2>{{ props.game.title }}</h2>
             <h3>{{ props.game.dev }}</h3>
@@ -23,60 +23,45 @@
       </div>
     </div>
 
-    <p>
-      Lorem ipsum dolor, sit amet consectetur adipisicing elit. Deleniti
-      dignissimos aliquid quod, quae perspiciatis incidunt, aperiam a illum
-      facilis voluptate provident consequuntur iste fugit voluptatem? Ducimus et
-      similique eius, excepturi quo maiores! Incidunt saepe magnam laudantium
-      earum sed dolores dolor natus beatae, tempore labore sunt exercitationem
-      quidem nam quis non.
-    </p>
-
-    <p>
-      Lorem ipsum dolor sit amet consectetur, adipisicing elit. Vitae nemo,
-      dolorem quas excepturi totam itaque ducimus tempore fugit quo sed, amet
-      adipisci consequuntur eos accusantium, iste impedit omnis cumque delectus!
-      Iusto modi, ipsam omnis error soluta vel distinctio consequuntur? Eaque
-      nihil nobis itaque libero? Praesentium, rem unde. At beatae rem laborum
-      iste enim incidunt natus amet fugit id quos, eligendi adipisci illo ipsum
-      nostrum fugiat necessitatibus architecto provident recusandae optio nemo
-      molestiae ex veniam aperiam.
-    </p>
+    <div v-html="content"></div>
   </div>
 </template>
 <script setup>
+import { onMounted, ref } from "vue";
+import md from "markdown-it";
+
 const props = defineProps({
   game: {
     type: Object,
     required: true,
   },
 });
+
+const content = ref(null);
+
+onMounted(async () => {
+  const res = await fetch(
+    `http://localhost:3003/test/data/.toolkit/assets/${props.game.rootHash}/description.md`
+  );
+
+  content.value = md().render(await res.text());
+});
 </script>
 <style scoped lang="scss">
 .details {
-  margin: 1rem;
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  width: 95%;
 
   > .header-wrapper {
-    width: 100%;
     position: relative;
     padding-bottom: 1rem;
-
-    > .gradient {
-      position: absolute;
-      width: 150%;
-      height: 100%;
-      background: linear-gradient(0deg, #171717b8 30%, #ffffff00 100%);
-    }
+    background-size: cover;
 
     > .header {
       display: flex;
       align-items: flex-end;
       gap: 1rem;
-      width: 100%;
       position: sticky;
 
       > img {
@@ -90,9 +75,17 @@ const props = defineProps({
       }
 
       > .header-text-wrapper {
-        display: flex;
-        align-items: flex-end;
+        display: grid;
+        grid-template-columns: 3fr 1fr;
         width: 100%;
+
+        > * {
+          margin: 0.5rem 1rem;
+        }
+
+        > img {
+          grid-column: span 2;
+        }
 
         > .header-text {
           display: flex;
@@ -109,6 +102,7 @@ const props = defineProps({
         }
 
         > .slot {
+          place-self: flex-end;
           margin-left: auto;
           display: flex;
           flex-direction: column;

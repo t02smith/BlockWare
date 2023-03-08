@@ -14,8 +14,9 @@
 
     <!-- game details -->
     <GameEntry :game="selected" v-if="selected">
+      {{ selectedIsDownloading }}
       <button
-        @click="() => games.createDownload(selected.rootHash)"
+        @click="createDownload"
         v-if="selectedIsDownloading === 0"
         class="download new"
       >
@@ -41,7 +42,6 @@ import { ref, watch, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import GameEntry from "../components/store/GameEntry.vue";
 import { IsDownloading } from "../../wailsjs/go/controller/Controller";
-import { EventsOn } from "../../wailsjs/runtime/runtime";
 import { useGamesStore } from "../stores/games";
 
 const props = defineProps({
@@ -74,8 +74,6 @@ watch(selected, async () => {
 });
 
 onMounted(async () => {
-  EventsOn("update-owned-games", async () => await games.refreshOwnedGames());
-
   const gameHash = route.query.game;
   if (!gameHash) {
     if (games.ownedGames.length === 0) return;
@@ -86,6 +84,11 @@ onMounted(async () => {
 
   selected.value = games.ownedGames.find((g) => gameHash === g.rootHash);
 });
+
+function createDownload() {
+  games.createDownload(selected.value.rootHash);
+  selectedIsDownloading.value = 2;
+}
 </script>
 <style scoped lang="scss">
 .library {

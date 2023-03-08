@@ -5,6 +5,10 @@ import {controller} from '../models';
 
 export function ConnectToPeer(arg1:string,arg2:number):Promise<void>;
 
+export function ContinueAllDownloads():Promise<void>;
+
+export function ContinueDownload(arg1:string):Promise<void>;
+
 export function CreateDownload(arg1:string):Promise<void>;
 
 export function DeployLibraryInstance(arg1:string):Promise<string>;
@@ -15,7 +19,7 @@ export function GetGameFromStoreByRootHash(arg1:string):Promise<controller.Contr
 
 export function GetOwnedGames():Promise<Array<controller.ControllerGame>>;
 
-export function GetPeerInformation():Promise<Array<string>>;
+export function GetPeerInformation():Promise<Array<controller.ControllerPeerData>>;
 
 export function GetStoreGames():Promise<Array<controller.ControllerGame>>;
 

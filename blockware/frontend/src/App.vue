@@ -10,16 +10,29 @@
   </div>
 </template>
 <script setup>
-import { computed } from "vue";
+import { computed, onMounted } from "vue";
 import { useRoute } from "vue-router";
 import Error from "./components/Error.vue";
 import Navbar from "./components/Navbar.vue";
 import { useGamesStore } from "./stores/games";
+import { usePeerStore } from "./stores/peers";
+import { EventsOn } from "../wailsjs/runtime/runtime";
+import { StartDownloadListener } from "../wailsjs/go/controller/Controller";
 
 const router = useRoute();
 const route = computed(() => router.path);
 
-useGamesStore();
+const games = useGamesStore();
+const peers = usePeerStore();
+
+onMounted(() => {
+  EventsOn("update-owned-games", async () => await games.refreshOwnedGames());
+  EventsOn("new-peer", async () => await peers.refreshPeers());
+  EventsOn("update-downloads", async () => await games.refreshDownloads());
+  EventsOn("download-progress", async () => await games.refreshDownloads());
+
+  StartDownloadListener();
+});
 </script>
 <style scoped lang="scss">
 .main {
@@ -29,6 +42,7 @@ useGamesStore();
 
   > .router-view {
     width: 100vw;
+    max-width: 2000px;
     height: 100%;
   }
 }

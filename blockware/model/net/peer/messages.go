@@ -93,41 +93,6 @@ func onMessage(cmd []string, client tcp.TCPConnection) error {
 
 // * DOWNLOADS
 
-// listen for incoming download requests
-func (p *peer) listenToDownloadRequests() {
-	util.Logger.Info("Listening for incoming download requests")
-	go func() {
-		for request := range p.library.RequestDownload {
-			if request.Attempts > uint8(MaxAttemptsDownloadRequest) {
-				// ! limit number of attempts we can make for a given download
-				util.Logger.Warnf("Request for block %x cancelled after %d attempts", request.BlockHash, MaxAttemptsDownloadRequest)
-				continue
-			}
-
-			util.Logger.Infof("Processing request for block %x", request.BlockHash)
-			request.Attempts++
-
-			ps := p.findPeersWhoHaveGame(request.GameHash)
-			if len(ps) == 0 {
-				// ! no peers have games
-				p.refreshLibraries()
-
-				// TODO discovery
-
-				// * requeue and attempt later
-				p.library.RequestDownload <- request
-				continue
-			}
-
-			// * at least one peer has it
-			// TODO order peers by something
-			chosen := ps[int(request.Attempts)%len(ps)]
-			chosen.SendString(generateBLOCK(request.GameHash, request.BlockHash))
-		}
-		util.Logger.Info("stopped listening to incoming download requests")
-	}()
-}
-
 // fetch a block given a game identifier and a shard
 func fetchBlockFromLibrary(gameHash, shardHash [32]byte) ([]byte, error) {
 	p := Peer()

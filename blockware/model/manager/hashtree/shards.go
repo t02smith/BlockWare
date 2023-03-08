@@ -68,6 +68,14 @@ func (htd *HashTreeDir) findShard(hash [32]byte) (bool, *HashTreeFile, string, i
 
 // Reads a shard from a given file
 func (ht *HashTree) readShard(filename string, offset int) ([]byte, error) {
+	fileState, err := os.Stat(filename)
+	if err != nil {
+		return nil, err
+	}
+
+	if fileState.Size() == 0 {
+		return make([]byte, ht.ShardSize), nil
+	}
 
 	file, err := os.Open(filename)
 	if err != nil {

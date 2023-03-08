@@ -27,6 +27,7 @@ type ControllerGame struct {
 }
 
 type ControllerDownload struct {
+	Name        string
 	Progress    map[string]ControllerFileProgress
 	TotalBlocks int
 }
@@ -34,4 +35,10 @@ type ControllerDownload struct {
 type ControllerFileProgress struct {
 	AbsolutePath    string
 	BlocksRemaining []string
+}
+
+type ControllerPeerData struct {
+	Hostname string
+	Port     uint
+	Library  []string
 }

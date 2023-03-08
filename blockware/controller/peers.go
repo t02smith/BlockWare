@@ -1,20 +1,39 @@
 package controller
 
 import (
-	"fmt"
+	"sort"
 
 	"github.com/t02smith/part-iii-project/toolkit/model/net/peer"
 	"github.com/t02smith/part-iii-project/toolkit/util"
+	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
 // get information about peers
-func (a *Controller) GetPeerInformation() []string {
-	ps := []string{}
+func (a *Controller) GetPeerInformation() []ControllerPeerData {
+	var ps []ControllerPeerData
 
 	p := peer.Peer()
 	for _, data := range p.GetPeers() {
-		ps = append(ps, fmt.Sprintf("%s:%d", data.Hostname, data.Port))
+		var games []string
+		for g := range data.Library {
+			game := p.Library().GetOwnedGame(g)
+			if game == nil {
+				continue
+			}
+
+			games = append(games, game.Title)
+		}
+
+		ps = append(ps, ControllerPeerData{
+			Hostname: data.Hostname,
+			Port:     data.Port,
+			Library:  games,
+		})
 	}
+
+	sort.Slice(ps, func(i, j int) bool {
+		return len(ps[i].Library) > len(ps[j].Library)
+	})
 
 	return ps
 }
@@ -28,4 +47,5 @@ func (c *Controller) ConnectToPeer(hostname string, port uint) {
 	}
 
 	util.Logger.Infof("Connected to peer %s:%d", hostname, port)
+	runtime.EventsEmit(c.ctx, "new-peer")
 }

@@ -202,7 +202,7 @@ func TestHandleGAMES(t *testing.T) {
 		t.Run("known games", func(t *testing.T) {
 			t.Cleanup(func() {
 				Peer().library.ClearOwnedGames()
-				data.Library = make(map[[32]byte]bool)
+				data.Library = make(map[[32]byte]ownership)
 			})
 
 			Peer().library.AddOwnedGame(game)
@@ -212,7 +212,7 @@ func TestHandleGAMES(t *testing.T) {
 
 			hasGame, ok := data.Library[game.RootHash]
 			assert.True(t, ok, "game not found in peers collection")
-			assert.True(t, hasGame, "game ownership not stored correctly")
+			assert.Equal(t, owned, hasGame, "game ownership not stored correctly")
 
 		})
 

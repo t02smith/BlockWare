@@ -29,7 +29,7 @@ func (a *Controller) GetOwnedGames() []*ControllerGame {
 			IPFSId:          g.HashTreeIPFSAddress,
 			Price:           g.Price,
 			Uploader:        g.Uploader,
-			Download:        downloadToAppDownload(g.Download),
+			Download:        downloadToAppDownload(g.Download, g.Title),
 			AssetsFolder:    g.Assets.AbsolutePath,
 		})
 	}
@@ -60,7 +60,7 @@ func (c *Controller) GetStoreGames() []*ControllerGame {
 			IPFSId:          g.HashTreeIPFSAddress,
 			Price:           g.Price,
 			Uploader:        g.Uploader,
-			Download:        downloadToAppDownload(g.Download),
+			Download:        downloadToAppDownload(g.Download, g.Title),
 			AssetsFolder:    g.Assets.AbsolutePath,
 		})
 	}
@@ -138,7 +138,7 @@ func (c *Controller) GetGameFromStoreByRootHash(rh string) *ControllerGame {
 		IPFSId:          g.HashTreeIPFSAddress,
 		Price:           g.Price,
 		Uploader:        g.Uploader,
-		Download:        downloadToAppDownload(g.Download),
+		Download:        downloadToAppDownload(g.Download, g.Title),
 		AssetsFolder:    g.Assets.AbsolutePath,
 	}
 }

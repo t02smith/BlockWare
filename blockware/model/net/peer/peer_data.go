@@ -1,10 +1,11 @@
 package peer
 
 import (
-	"github.com/ethereum/go-ethereum/crypto"
-	"github.com/t02smith/part-iii-project/toolkit/model/persistence/ethereum/library"
 	"net/http"
+	"sort"
 
+	"github.com/t02smith/part-iii-project/toolkit/model"
+	"github.com/t02smith/part-iii-project/toolkit/model/manager/games"
 	"github.com/t02smith/part-iii-project/toolkit/model/net/tcp"
 	"github.com/t02smith/part-iii-project/toolkit/model/persistence/ethereum"
 	"github.com/t02smith/part-iii-project/toolkit/util"
@@ -33,6 +34,9 @@ type peerData struct {
 
 	// used to validate the peer's identity
 	Validator *ethereum.AddressValidator
+
+	//
+	SentRequests map[games.DownloadRequest]model.Void
 }
 
 // validate the identity of a given peer
@@ -63,19 +67,20 @@ func (pd *peerData) checkOwnership(gameHash [32]byte) (bool, error) {
 	case notOwned:
 		return false, nil
 	case unknown:
-		addr := crypto.PubkeyToAddress(*pd.Validator.PublicKey)
-		verified, err := library.HasPurchased(gameHash, addr)
-		if err != nil {
-			return false, err
-		}
+		return true, nil
+		// addr := crypto.PubkeyToAddress(*pd.Validator.PublicKey)
+		// verified, err := library.HasPurchased(gameHash, addr)
+		// if err != nil {
+		// 	return false, err
+		// }
 
-		if verified {
-			pd.Library[gameHash] = owned
-		} else {
-			pd.Library[gameHash] = notOwned
-		}
+		// if verified {
+		// 	pd.Library[gameHash] = owned
+		// } else {
+		// 	pd.Library[gameHash] = notOwned
+		// }
 
-		return verified, nil
+		// return verified, nil
 	}
 
 	return false, nil
@@ -90,13 +95,22 @@ func (p *peer) findPeersWhoHaveGame(gameHash [32]byte) []tcp.TCPConnection {
 		}
 	}
 
+	// prioritise connections who have been sent the least blocks
+	sort.Slice(peers, func(i, j int) bool {
+		return len(p.peers[peers[i]].SentRequests) < len(p.peers[peers[j]].SentRequests)
+	})
+
 	return peers
 }
 
 // serve game assets to be fetched from the frontend locally
 func (p *peer) serveAssetsFolder() {
 	fs := http.FileServer(http.Dir("."))
-	http.Handle("/", fs)
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+		fs.ServeHTTP(w, r)
+	})
 
 	util.Logger.Info("Serving assets on port 3003")
 	err := http.ListenAndServe(":3003", nil)

@@ -3,34 +3,59 @@
     <div class="header">
       <h1>Downloads</h1>
 
-      <div class="options">
+      <div class="options" v-if="games.downloads.length > 0">
         <button @click="() => (pauseAll = !pauseAll)">
           {{ pauseAll ? "▶️" : "⏸️" }}
         </button>
       </div>
     </div>
 
-    <table>
-      <thead>
-        <th>Game</th>
-        <th>Files Remaining</th>
-        <th>Blocks Remaining</th>
-      </thead>
-      <tbody>
-        <tr v-for="[hash, download] in downloadGamePairs">
-          <td>{{ hash }}</td>
-          <td>{{ Object.keys(download.Progress).length }}</td>
-          <td>
+    <div class="download-table" v-if="Object.keys(games.downloads).length > 0">
+      <div class="table-header">
+        <h2><strong>Game</strong></h2>
+        <h2>File's Left</h2>
+        <h2>Block's Left</h2>
+        <h2>Progress</h2>
+      </div>
+
+      <router-link
+        :to="`/library?game=${hash}`"
+        class="table-row"
+        v-for="[hash, download] in downloadGamePairs"
+      >
+        <p>{{ download.Name }}</p>
+        <p>{{ Object.keys(download.Progress).length }}</p>
+        <p>
+          {{
+            Object.values(download.Progress).reduce(
+              (acc, f) => acc + f.BlocksRemaining.length,
+              0
+            )
+          }}
+        </p>
+        <p>
+          <strong>
             {{
-              Object.values(download.Progress).reduce(
-                (acc, f) => acc + f.BlocksRemaining.length,
-                0
-              )
+              Math.round(
+                (1 -
+                  Object.values(download.Progress).reduce(
+                    (acc, f) => acc + f.BlocksRemaining.length,
+                    0
+                  ) /
+                    download.TotalBlocks) *
+                  1000
+              ) / 10
             }}
-          </td>
-        </tr>
-      </tbody>
-    </table>
+            %</strong
+          >
+        </p>
+      </router-link>
+    </div>
+
+    <div v-else>
+      <h2>🥲 You have no downloads currently in progress</h2>
+      <p>Head to your library to start a new download</p>
+    </div>
   </div>
 </template>
 <script setup>
@@ -85,6 +110,42 @@ const pauseAll = ref(false);
   }
 }
 
+.download-table {
+  margin: 1rem 4rem;
+
+  > * {
+    display: grid;
+    grid-template-columns: 3fr 1fr 1fr 1fr;
+  }
+
+  > .table-header {
+    color: darken(white, 25%);
+    background-color: lighten(#131313, 10%);
+    padding: 0.4rem 0.85rem;
+    border-radius: 10px;
+    margin-bottom: 1rem;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  }
+
+  > .table-row {
+    padding: 0.25rem 1rem;
+    text-decoration: none;
+    border-radius: 10px;
+    color: white;
+    transition: 150ms;
+
+    &:hover {
+      background-color: lighten(#131313, 5%);
+      box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2),
+        0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    }
+  }
+
+  p {
+    font-size: 1.15rem;
+  }
+}
+
 table {
   align-self: center;
   width: 90%;
@@ -97,7 +158,10 @@ table {
   td,
   th {
     border: solid 1px gray;
-    text-align: center;
+  }
+
+  td {
+    padding: 1rem 0.5rem;
   }
 
   tr {

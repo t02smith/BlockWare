@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"time"
 
 	"github.com/spf13/viper"
 	hash "github.com/t02smith/part-iii-project/toolkit/model/manager/hashtree"
@@ -178,9 +177,15 @@ func (d *Download) InsertData(fileHash, blockHash [32]byte, data []byte) error {
 	util.Logger.Infof("successfully inserted shard %x into %x with data %x", blockHash, fileHash, data)
 
 	if len(file.BlocksRemaining) == 0 {
+		util.Logger.Infof("Download complete for file %s", file.AbsolutePath)
 		err = CleanFile(file.AbsolutePath)
 		if err != nil {
 			util.Logger.Errorf("Error cleaning file %s: %s", file.AbsolutePath, err)
+		}
+
+		delete(d.Progress, fileHash)
+		if len(d.Progress) == 0 {
+			util.Logger.Infof("Download complete")
 		}
 	}
 
@@ -222,11 +227,7 @@ func (d *Download) ContinueDownload(gameHash [32]byte, newRequest chan DownloadR
 					BlockHash: shard,
 					Attempts:  0,
 				}
-
 			}
-
-			time.Sleep(500 * time.Millisecond)
-
 		}
 	}()
 

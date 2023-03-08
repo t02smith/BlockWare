@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/t02smith/part-iii-project/toolkit/model/manager/games"
+	"github.com/t02smith/part-iii-project/toolkit/model/net/peer"
 	"github.com/t02smith/part-iii-project/toolkit/util"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
@@ -35,13 +36,15 @@ func downloadToGameDownloads(ds map[[32]byte]*games.Download) map[string]*Contro
 	out := make(map[string]*ControllerDownload)
 
 	for hash, d := range ds {
-		out[fmt.Sprintf("%x", hash)] = downloadToAppDownload(d)
+		g := peer.Peer().Library().GetOwnedGame(hash)
+
+		out[fmt.Sprintf("%x", hash)] = downloadToAppDownload(d, g.Title)
 	}
 
 	return out
 }
 
-func downloadToAppDownload(d *games.Download) *ControllerDownload {
+func downloadToAppDownload(d *games.Download, name string) *ControllerDownload {
 	if d == nil {
 		return nil
 	}
@@ -49,6 +52,7 @@ func downloadToAppDownload(d *games.Download) *ControllerDownload {
 	x := &ControllerDownload{
 		TotalBlocks: d.TotalBlocks,
 		Progress:    make(map[string]ControllerFileProgress),
+		Name:        name,
 	}
 
 	for fHash, f := range d.Progress {

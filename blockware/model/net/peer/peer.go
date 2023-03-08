@@ -164,10 +164,11 @@ func (p *peer) ConnectToPeer(hostname string, portNo uint) error {
 // run this function every time we connect to a new peer
 func (p *peer) onConnection(hostname string, port uint, peer tcp.TCPConnection) {
 	p.peers[peer] = &peerData{
-		Hostname: hostname,
-		Port:     port,
-		Peer:     peer,
-		Library:  make(map[[32]byte]ownership),
+		Hostname:     hostname,
+		Port:         port,
+		Peer:         peer,
+		Library:      make(map[[32]byte]ownership),
+		SentRequests: make(map[games.DownloadRequest]model.Void, maxRequestsPerPeer),
 	}
 
 	err := peer.SendString(generateLIBRARY())

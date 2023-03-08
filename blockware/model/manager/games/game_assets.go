@@ -18,6 +18,7 @@ The assets should be stored in a .zip archive and use the
 following naming scheme:
 
 - "cover.png" = main piece of artwork for the game
+- "background.png" = wide element on store page
 - "description.md" = a description of the game to be displayed on its library page
 */
 
@@ -32,6 +33,7 @@ type GameAssets struct {
 const (
 	ASSET_COVER       string = "cover.png"
 	ASSET_DESCRIPTION string = "description.md"
+	ASSET_BACKGROUND  string = "background.png"
 )
 
 //

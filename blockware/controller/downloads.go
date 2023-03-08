@@ -2,7 +2,6 @@ package controller
 
 import (
 	"encoding/hex"
-	"fmt"
 
 	"github.com/t02smith/part-iii-project/toolkit/model/net/peer"
 	"github.com/t02smith/part-iii-project/toolkit/util"
@@ -37,13 +36,13 @@ func (a *Controller) IsDownloading(gh string) int {
 
 	// ? download not started
 	if g.GetDownload() == nil {
-		util.Logger.Info("download for game %s not started", gh)
+		util.Logger.Infof("download for game %s not started", gh)
 		return 0
 	}
 
 	// ? download finished
 	if g.GetDownload().Finished() {
-		util.Logger.Info("download for game %s finished", gh)
+		util.Logger.Infof("download for game %s finished", gh)
 		return 1
 	}
 
@@ -53,12 +52,12 @@ func (a *Controller) IsDownloading(gh string) int {
 }
 
 // listen for incoming download progress alerts
-func (a *Controller) StartDownloadListener() {
+func (c *Controller) StartDownloadListener() {
 	go func() {
 		downloadChannel := peer.Peer().Library().DownloadProgress
 		for progress := range downloadChannel {
 			util.Logger.Infof("Download event received %x-%x", progress.GameHash, progress.BlockHash)
-			runtime.EventsEmit(a.ctx, fmt.Sprintf("%x", progress.GameHash), fmt.Sprintf("%x", progress.BlockHash))
+			runtime.EventsEmit(c.ctx, "download-progress")
 		}
 	}()
 }
@@ -96,4 +95,49 @@ func (c *Controller) CreateDownload(gh string) {
 		return
 	}
 
+	runtime.EventsEmit(c.ctx, "update-downloads")
+}
+
+func (c *Controller) ContinueAllDownloads() {
+	util.Logger.Infof("continuing all downloads")
+
+	lib := peer.Peer().Library()
+	for _, g := range lib.GetOwnedGames() {
+		if g.Download == nil || g.Download.Finished() {
+			continue
+		}
+
+		g.Download.ContinueDownload(g.RootHash, lib.RequestDownload)
+	}
+
+	runtime.EventsEmit(c.ctx, "update-downloads")
+}
+
+func (c *Controller) ContinueDownload(gh string) {
+	util.Logger.Infof("continuing download for %s", gh)
+
+	gh_tmp, err := hex.DecodeString(gh)
+	if err != nil {
+		c.controllerErrorf("Error creating download %s", err)
+		return
+	}
+	gameHash := [32]byte{}
+	copy(gameHash[:], gh_tmp[:])
+
+	lib := peer.Peer().Library()
+	g := lib.GetOwnedGame(gameHash)
+
+	// ? game exists
+	if g == nil {
+		c.controllerErrorf("game %s doesn't exist", gh)
+		return
+	}
+
+	if g.Download == nil {
+		c.controllerErrorf("download not started for game %s", gh)
+		return
+	}
+
+	g.Download.ContinueDownload(gameHash, lib.RequestDownload)
+	runtime.EventsEmit(c.ctx, "update-downloads")
 }

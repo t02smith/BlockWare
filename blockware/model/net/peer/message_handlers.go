@@ -5,7 +5,9 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
+	"path/filepath"
 
+	"github.com/spf13/viper"
 	"github.com/t02smith/part-iii-project/toolkit/model/manager/games"
 	"github.com/t02smith/part-iii-project/toolkit/model/net/tcp"
 	"github.com/t02smith/part-iii-project/toolkit/model/persistence/ethereum"
@@ -110,15 +112,15 @@ func handleBLOCK(cmd []string, client tcp.TCPConnection) error {
 		return fmt.Errorf("error reading shard hash on BLOCK cmd: %s", err)
 	}
 
-	pd := Peer().peers[client]
-	ownsGame, err := pd.checkOwnership(gh)
-	if err != nil {
-		return err
-	}
+	// pd := Peer().peers[client]
+	// ownsGame, err := pd.checkOwnership(gh)
+	// if err != nil {
+	// 	return err
+	// }
 
-	if !ownsGame {
-		return fmt.Errorf("user does not own game %x", gh)
-	}
+	// if !ownsGame {
+	// 	return fmt.Errorf("user does not own game %x", gh)
+	// }
 
 	found, data, err := Peer().library.FindBlock(gh, sh)
 	if err != nil {
@@ -190,11 +192,22 @@ func handleSEND_BLOCK(cmd []string, client tcp.TCPConnection) error {
 		return err
 	}
 
+	delete(Peer().GetPeer(client).SentRequests, games.DownloadRequest{
+		GameHash:  gh,
+		BlockHash: sh,
+	})
+
+	game.OutputToFile(
+		filepath.Join(
+			viper.GetString("meta.directory"),
+			"games",
+			fmt.Sprintf("%x", game.RootHash)))
+
 	// send message as confirmation
-	// Peer().library.DownloadProgress <- games.DownloadRequest{
-	// 	GameHash:  gh,
-	// 	BlockHash: sh,
-	// }
+	Peer().library.DownloadProgress <- games.DownloadRequest{
+		GameHash:  gh,
+		BlockHash: sh,
+	}
 
 	util.Logger.Infof("Successfully inserted shard %x", sh)
 	return nil

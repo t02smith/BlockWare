@@ -94,6 +94,7 @@ func (l *Library) GetOwnedGames() []*Game {
 
 // AddOwnedGame add a game to the library
 func (l *Library) AddOwnedGame(g *Game) error {
+	util.Logger.Debug(g)
 	l.ownedGames[g.RootHash] = g
 	return nil
 }

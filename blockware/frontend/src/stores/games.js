@@ -6,6 +6,7 @@ import {
   GetDownloads,
   CreateDownload,
   PurchaseGame,
+  ContinueAllDownloads,
 } from "../../wailsjs/go/controller/Controller";
 import { EventsOn } from "../../wailsjs/runtime/runtime";
 
@@ -16,15 +17,14 @@ export const useGamesStore = defineStore("games", () => {
   // what games are being downloaded
   const downloads = ref([]);
 
-  //
+  // games in the blockware store
   const storeGames = ref([]);
 
   // setup
   onMounted(() => {
-    EventsOn("update-owned-games", async () => await games.refreshOwnedGames());
-
     refreshOwnedGames();
     refreshDownloads();
+    ContinueAllDownloads();
   });
 
   // get an updated list of owned games

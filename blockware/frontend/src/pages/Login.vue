@@ -61,7 +61,9 @@ import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { useEthStore } from "../stores/eth";
 
-const key = ref("");
+const key = ref(
+  "af9668cd6ebc3ba4c0e5036c284e128ed66e18ba9e4ed87b2c0c6d9642f2b879"
+);
 const addr = ref("0x750cf6392175f94ff5014803a0bb6b79de543337");
 const isJoining = ref(true);
 

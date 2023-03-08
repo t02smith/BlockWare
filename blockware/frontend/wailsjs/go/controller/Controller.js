@@ -6,6 +6,14 @@ export function ConnectToPeer(arg1, arg2) {
   return window['go']['controller']['Controller']['ConnectToPeer'](arg1, arg2);
 }
 
+export function ContinueAllDownloads() {
+  return window['go']['controller']['Controller']['ContinueAllDownloads']();
+}
+
+export function ContinueDownload(arg1) {
+  return window['go']['controller']['Controller']['ContinueDownload'](arg1);
+}
+
 export function CreateDownload(arg1) {
   return window['go']['controller']['Controller']['CreateDownload'](arg1);
 }

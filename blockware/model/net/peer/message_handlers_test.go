@@ -516,7 +516,7 @@ func TestHandleSEND_BLOCK(t *testing.T) {
 		})
 
 		go func() {
-			for range Peer().library.DownloadProgress {
+			for range Peer().library.DownloadManager.DownloadProgress {
 				continue
 			}
 		}()

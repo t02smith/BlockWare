@@ -204,7 +204,7 @@ func handleSEND_BLOCK(cmd []string, client tcp.TCPConnection) error {
 			fmt.Sprintf("%x", game.RootHash)))
 
 	// send message as confirmation
-	Peer().library.DownloadProgress <- games.DownloadRequest{
+	Peer().library.DownloadManager.DownloadProgress <- games.DownloadRequest{
 		GameHash:  gh,
 		BlockHash: sh,
 	}
@@ -262,6 +262,7 @@ func handleVALIDATE_RES(cmd []string, client tcp.TCPConnection) error {
 		client.SendStringf(generateERROR("invalid signature sent"))
 	} else {
 		client.SendString(generateLIBRARY())
+		loadDeferredRequests()
 	}
 
 	return nil

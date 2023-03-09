@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/t02smith/part-iii-project/toolkit/model"
+	"github.com/t02smith/part-iii-project/toolkit/model/manager/games"
 	"github.com/t02smith/part-iii-project/toolkit/util"
 )
 
@@ -19,7 +20,10 @@ const (
 func (p *peer) listenToDownloadRequests() {
 	util.Logger.Info("Listening for incoming download requests")
 	go func() {
-		for request := range p.library.RequestDownload {
+		for len(p.peers) == 0 {
+		}
+
+		for request := range p.library.DownloadManager.RequestDownload {
 			if request.Attempts > uint8(MaxAttemptsDownloadRequest) {
 				// ! limit number of attempts we can make for a given download
 				util.Logger.Warnf("Request for block %x cancelled after %d attempts", request.BlockHash, MaxAttemptsDownloadRequest)
@@ -34,7 +38,7 @@ func (p *peer) listenToDownloadRequests() {
 				// ! no peers have games
 				p.refreshLibraries()
 
-				// TODO discovery
+				p.library.DownloadManager.DeferredRequests <- request
 				continue
 			}
 
@@ -48,4 +52,23 @@ func (p *peer) listenToDownloadRequests() {
 		}
 		util.Logger.Info("stopped listening to incoming download requests")
 	}()
+}
+
+/*
+queues all deferred requests
+*/
+func loadDeferredRequests() {
+	manager := Peer().Library().DownloadManager
+	cached := manager.DeferredRequests
+
+	go func() {
+		util.Logger.Infof("loading %d deferred requests", len(cached))
+		defer close(cached)
+		manager.DeferredRequests = make(chan games.DownloadRequest)
+		for request := range cached {
+			manager.RequestDownload <- request
+		}
+		util.Logger.Infof("deferred requests loaded")
+	}()
+
 }

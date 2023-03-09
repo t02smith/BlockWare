@@ -3,6 +3,7 @@ import { ref, onMounted } from "vue";
 import {
   GetPeerInformation,
   ConnectToPeer,
+  ConnectToManyPeers,
 } from "../../wailsjs/go/controller/Controller";
 import { EventsOn } from "../../wailsjs/runtime/runtime";
 
@@ -21,5 +22,9 @@ export const usePeerStore = defineStore("peers", () => {
     ConnectToPeer(hostname, port);
   }
 
-  return { peers, connect, refreshPeers };
+  function connectToAll(peerLs) {
+    ConnectToManyPeers(peerLs);
+  }
+
+  return { peers, connect, refreshPeers, connectToAll };
 });

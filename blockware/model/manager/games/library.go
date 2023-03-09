@@ -29,29 +29,16 @@ type Library struct {
 	// games present on the blockchain
 	blockchainGames map[[32]byte]*Game
 
-	/**
-	Download manager threads will send requests down this channel
-	to prompt a peer listener to attempt to download the block
-	*/
-	RequestDownload chan DownloadRequest
-
-	/**
-	Once a block has been downloaded a message will be sent down
-	this channel.
-	This can be used to signal to the UI that a download has been
-	completed
-	*/
-	DownloadProgress chan DownloadRequest
+	DownloadManager *DownloadManager
 }
 
 // NewLibrary create a new library
 func NewLibrary() *Library {
 	util.Logger.Info("Creating new library")
 	return &Library{
-		ownedGames:       make(map[[32]byte]*Game),
-		blockchainGames:  make(map[[32]byte]*Game),
-		RequestDownload:  make(chan DownloadRequest),
-		DownloadProgress: make(chan DownloadRequest),
+		ownedGames:      make(map[[32]byte]*Game),
+		blockchainGames: make(map[[32]byte]*Game),
+		DownloadManager: NewDownloadManager(),
 	}
 }
 
@@ -68,7 +55,7 @@ func (l *Library) CreateDownload(g *Game) error {
 	}
 
 	util.Logger.Infof("Download created for %s:%x", g.Title, g.RootHash)
-	g.Download.ContinueDownload(g.RootHash, l.RequestDownload)
+	g.Download.ContinueDownload(g.RootHash, l.DownloadManager.RequestDownload)
 	return nil
 }
 
@@ -162,7 +149,6 @@ func (l *Library) GetDownloads() map[[32]byte]*Download {
 
 // Close close down a current library instance
 func (l *Library) Close() {
-	close(l.DownloadProgress)
 	l.StopDownloads()
 
 	metaDir := viper.GetString("meta.directory")
@@ -177,14 +163,13 @@ func (l *Library) Close() {
 // StopDownloads stop downloads from making requests
 func (l *Library) StopDownloads() {
 	util.Logger.Info("Stopping download requests")
-	close(l.RequestDownload)
-	l.RequestDownload = nil
+	l.DownloadManager.Close()
 }
 
 // ContinueDownloads continue a libraries downloads
 func (l *Library) ContinueDownloads() {
 	util.Logger.Info("Continuing downloads")
-	l.RequestDownload = make(chan DownloadRequest)
+	l.DownloadManager.RequestDownload = make(chan DownloadRequest)
 
 	count := 0
 	for _, g := range l.ownedGames {
@@ -192,7 +177,7 @@ func (l *Library) ContinueDownloads() {
 			continue
 		}
 
-		g.Download.ContinueDownload(g.RootHash, l.RequestDownload)
+		g.Download.ContinueDownload(g.RootHash, l.DownloadManager.RequestDownload)
 		count++
 	}
 	util.Logger.Infof("Started %d downloads", count)

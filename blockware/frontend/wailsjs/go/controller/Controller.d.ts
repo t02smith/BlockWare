@@ -3,6 +3,8 @@
 import {map[string]controller} from '../models';
 import {controller} from '../models';
 
+export function ConnectToManyPeers(arg1:string):Promise<void>;
+
 export function ConnectToPeer(arg1:string,arg2:number):Promise<void>;
 
 export function ContinueAllDownloads():Promise<void>;

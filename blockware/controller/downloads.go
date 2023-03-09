@@ -54,7 +54,7 @@ func (a *Controller) IsDownloading(gh string) int {
 // listen for incoming download progress alerts
 func (c *Controller) StartDownloadListener() {
 	go func() {
-		downloadChannel := peer.Peer().Library().DownloadProgress
+		downloadChannel := peer.Peer().Library().DownloadManager.DownloadProgress
 		for progress := range downloadChannel {
 			util.Logger.Infof("Download event received %x-%x", progress.GameHash, progress.BlockHash)
 			runtime.EventsEmit(c.ctx, "download-progress")
@@ -107,7 +107,7 @@ func (c *Controller) ContinueAllDownloads() {
 			continue
 		}
 
-		g.Download.ContinueDownload(g.RootHash, lib.RequestDownload)
+		g.Download.ContinueDownload(g.RootHash, lib.DownloadManager.RequestDownload)
 	}
 
 	runtime.EventsEmit(c.ctx, "update-downloads")
@@ -138,6 +138,6 @@ func (c *Controller) ContinueDownload(gh string) {
 		return
 	}
 
-	g.Download.ContinueDownload(gameHash, lib.RequestDownload)
+	g.Download.ContinueDownload(gameHash, lib.DownloadManager.RequestDownload)
 	runtime.EventsEmit(c.ctx, "update-downloads")
 }

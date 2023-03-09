@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/t02smith/part-iii-project/toolkit/model/net/tcp"
 	"github.com/t02smith/part-iii-project/toolkit/util"
@@ -18,7 +19,12 @@ should contact other peers with messages
 */
 
 const (
-	MaxAttemptsDownloadRequest int = 32
+	MaxAttemptsDownloadRequest int           = 32
+	minRefreshPeriod           time.Duration = time.Minute * 5
+)
+
+var (
+	lastRefresh *time.Time
 )
 
 // process a message received from a peer
@@ -134,6 +140,13 @@ func fetchBlockFromLibrary(gameHash, shardHash [32]byte) ([]byte, error) {
 
 // refresh all known peer's game libraries
 func (p *peer) refreshLibraries() {
+	timestamp := time.Now()
+	if lastRefresh != nil && lastRefresh.Add(minRefreshPeriod).After(timestamp) {
+		util.Logger.Debugf("skipping refresh => min gap between library refreshes = %s", minRefreshPeriod)
+		return
+	}
+
+	lastRefresh = &timestamp
 	util.Logger.Info("Refreshing peer library data")
 	p.Broadcast(generateLIBRARY())
 }

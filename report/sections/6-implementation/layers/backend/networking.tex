@@ -2,6 +2,12 @@
 
 Users running this application will be a part of a distributed network of peers by creating and maintaining a set of TCP connections with other users in the network and will communicate by sending structured messages to each other. Section~\ref{subsubsec:commands} describes these commands in detail.
 
+\paragraph*{Address Verification}
+
+To verify the Ethereum address of each peer, and thus which games they own and are allowed to be sent the data of, we will request a signed message using the peer's Ethereum private key (See the VALIDATE\_REQ and VALIDATE\_RES commands).
+\x
+When two peer's initiate a connection they will need to perform a handshake that will allow them identify each other according to their Ethereum addresses. 
+
 \paragraph*{Message Handling}
 
 The main responsibility of this section is to respond to requests sent by the Data Manager by sending and tracking messages to other peers to gain the necessary information. Each message should be tracked by the peer for a given time period and resent if an appropriate response has not been received. Any duplicate requests sent by the data manager will be ignored if a pending request is active. 
@@ -23,6 +29,11 @@ Structured messages will typically come as part of a request/response pair invol
   & The user will request a block of data off of a user by sending the root hash of the game and the hash of the block being requested. The response will be a SEND\_BLOCK message.\\
   SEND\_BLOCK;$[gameHash]$;\newline $[blockHash]$;$[data]$;
   & The user sends a block of data in response to a BLOCK message.\\
+  \midrule
+  VALIDATE\_REQ;$[message]$
+  & The user is requesting for this message to be signed using the receiver's Ethereum private key. This is used to verify the receiver's identity and owned collection of games.\\
+  VALIDATE\_RES;$[signed message]$
+  & The user responds to a VALIDATE\_REQ message with a signed version of the given message. From this signature, the receiver can determine the address and public key of the user.\\
   \midrule
   ERROR;$[message]$
   & An error message that can be used to prompt a peer to resend a message.\\

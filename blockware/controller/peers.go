@@ -2,6 +2,8 @@ package controller
 
 import (
 	"sort"
+	"strconv"
+	"strings"
 
 	"github.com/t02smith/part-iii-project/toolkit/model/net/peer"
 	"github.com/t02smith/part-iii-project/toolkit/util"
@@ -48,4 +50,32 @@ func (c *Controller) ConnectToPeer(hostname string, port uint) {
 
 	util.Logger.Infof("Connected to peer %s:%d", hostname, port)
 	runtime.EventsEmit(c.ctx, "new-peer")
+}
+
+// connect to many peers at once
+func (c *Controller) ConnectToManyPeers(lines string) {
+	p := peer.Peer()
+	for _, peer := range strings.Split(lines, "\n") {
+		peerInfo := strings.Split(peer, ":")
+
+		// ! remove carriage return if it exists
+		if peerInfo[1][len(peerInfo[1])-1] == '\r' {
+			peerInfo[1] = peerInfo[1][:len(peerInfo[1])-1]
+		}
+
+		port, err := strconv.ParseUint(peerInfo[1], 10, 16)
+		if err != nil {
+			util.Logger.Warnf("Error parsing peer details for peer %s: %s", peer, err)
+			continue
+		}
+
+		go func() {
+			err = p.ConnectToPeer(peerInfo[0], uint(port))
+			if err != nil {
+				util.Logger.Warnf("Error conneting to peer %s: %s", err)
+				return
+			}
+			runtime.EventsEmit(c.ctx, "new-peer")
+		}()
+	}
 }

@@ -38,11 +38,12 @@ onMounted(() => {
 .main {
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  height: 100%;
+  max-width: 100vw;
 
   > .router-view {
-    width: 100vw;
-    max-width: 2000px;
+    display: flex;
+    flex-direction: column;
     height: 100%;
   }
 }

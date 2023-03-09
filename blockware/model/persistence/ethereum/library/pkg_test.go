@@ -19,7 +19,7 @@ func beforeAll() {
 	util.InitLogger()
 	testutil.SetupTestConfig()
 
-	_, err := peer.StartPeer(peer.Config{ContinueDownloads: false, LoadPeersFromFile: false, ServeAssets: false}, "localhost", 7887, "../../../test/data/tmp", "../../../test/data/.toolkit")
+	_, err := peer.StartPeer(peer.Config{ContinueDownloads: false, LoadPeersFromFile: false, ServeAssets: false, SkipValidation: true}, "localhost", 7887, "../../../test/data/tmp", "../../../test/data/.toolkit")
 	if err != nil {
 		log.Printf("Error starting test peer")
 		os.Exit(1)

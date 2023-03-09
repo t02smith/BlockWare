@@ -65,7 +65,7 @@ func Run() {
 		Developer:   "tcs1g20",
 		RootDir:     "./latex-template-main",
 		Price:       big.NewInt(150),
-		ShardSize:   32,
+		ShardSize:   512,
 		AssetsDir:   "../../data/assets"},
 		nil,
 	)

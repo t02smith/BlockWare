@@ -203,3 +203,23 @@ func (l *Library) ClearOwnedGames() {
 	util.Logger.Info("Flushing owned games from memory")
 	l.ownedGames = make(map[[32]byte]*Game)
 }
+
+func (l *Library) Uninstall(gameHash [32]byte) error {
+	game := l.GetOwnedGame(gameHash)
+	if game == nil {
+		return fmt.Errorf("game %x not owned", gameHash)
+	}
+	util.Logger.Infof("Uninstalling game %s", game.Title)
+
+	if game.Download == nil {
+		return fmt.Errorf("game %x not installed", gameHash)
+	}
+
+	err := game.CancelDownload()
+	if err != nil {
+		return err
+	}
+
+	util.Logger.Infof("Game %s uninstalled", game.Title)
+	return nil
+}

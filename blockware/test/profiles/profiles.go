@@ -51,6 +51,7 @@ func RunProfile(profileNumber Profile, contractAddr string) error {
 			ContinueDownloads: false,
 			LoadPeersFromFile: false,
 			ServeAssets:       false,
+			SkipValidation:    false,
 		})
 		if err != nil {
 			return err
@@ -62,13 +63,14 @@ func RunProfile(profileNumber Profile, contractAddr string) error {
 			ContinueDownloads: false,
 			LoadPeersFromFile: false,
 			ServeAssets:       false,
+			SkipValidation:    false,
 		})
 		if err != nil {
 			return err
 		}
 		listenOnlyUpload.Run()
 	case _deploy:
-		return deployEth.Run(testutil.Accounts[3][1])
+		deployEth.Run(testutil.Accounts[3][1])
 	case None:
 	default:
 		return errors.New("unknown profile")

@@ -45,7 +45,7 @@ func downloadToGameDownloads(ds map[[32]byte]*games.Download) map[string]*Contro
 }
 
 func downloadToAppDownload(d *games.Download, name string) *ControllerDownload {
-	if d == nil {
+	if d == nil || d.Finished() {
 		return nil
 	}
 
@@ -61,8 +61,10 @@ func downloadToAppDownload(d *games.Download, name string) *ControllerDownload {
 			BlocksRemaining: []string{},
 		}
 
-		for b := range f.BlocksRemaining {
-			fProgress.BlocksRemaining = append(fProgress.BlocksRemaining, fmt.Sprintf("%x", b))
+		if len(f.BlocksRemaining) > 0 {
+			for b := range f.BlocksRemaining {
+				fProgress.BlocksRemaining = append(fProgress.BlocksRemaining, fmt.Sprintf("%x", b))
+			}
 		}
 
 		x.Progress[fmt.Sprintf("%x", fHash)] = *fProgress

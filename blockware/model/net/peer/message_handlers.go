@@ -260,6 +260,8 @@ func handleVALIDATE_RES(cmd []string, client tcp.TCPConnection) error {
 
 	if !valid {
 		client.SendStringf(generateERROR("invalid signature sent"))
+	} else {
+		client.SendString(generateLIBRARY())
 	}
 
 	return nil

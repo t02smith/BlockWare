@@ -159,3 +159,20 @@ func (c *Controller) PurchaseGame(rh string) {
 
 	runtime.EventsEmit(c.ctx, "update-owned-games")
 }
+
+func (c *Controller) UninstallGame(rh string) {
+	gh, err := hashStringToByte32(rh)
+	if err != nil {
+		c.controllerErrorf("Error parsing hash %s", err)
+		return
+	}
+
+	lib := peer.Peer().Library()
+	err = lib.Uninstall(gh)
+	if err != nil {
+		c.controllerErrorf("Error uninstalling game %s", err)
+		return
+	}
+
+	runtime.EventsEmit(c.ctx, "update-downloads")
+}

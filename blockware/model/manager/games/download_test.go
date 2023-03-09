@@ -47,9 +47,9 @@ func TestContinueDownload(t *testing.T) {
 
 	fileProgress := FileProgress{
 		AbsolutePath:    "test-file.x",
-		BlocksRemaining: make(map[[32]byte]uint),
+		BlocksRemaining: make(map[[32]byte][]uint),
 	}
-	fileProgress.BlocksRemaining[shardHash] = 0
+	fileProgress.BlocksRemaining[shardHash] = []uint{0}
 
 	download.Progress[fileHash] = fileProgress
 

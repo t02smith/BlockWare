@@ -13,35 +13,43 @@
     </ul>
 
     <!-- game details -->
-    <GameEntry :game="selected" v-if="selected">
-      {{ selectedIsDownloading }}
-      <button
-        @click="createDownload"
-        v-if="selectedIsDownloading === 0"
-        class="download new"
-      >
-        <h3>💡 Download now</h3>
-      </button>
+    <div class="details-wrapper">
+      <GameEntry :game="selected" v-if="selected">
+        <button
+          @click="createDownload"
+          v-if="selectedIsDownloading === 0"
+          class="download new"
+        >
+          <h3>💡 Download now</h3>
+        </button>
 
-      <div v-else-if="selectedIsDownloading === 1" class="download finished">
-        <h3>✅ Downloaded</h3>
-      </div>
+        <div
+          v-else-if="selectedIsDownloading === 1"
+          class="download finished"
+          @click="uninstall"
+        >
+          <h3>🗑️ Uninstall</h3>
+        </div>
 
-      <router-link
-        :to="`/downloads`"
-        v-else-if="selectedIsDownloading === 2"
-        class="download downloading"
-      >
-        <h3>⌛ Downloading...</h3>
-      </router-link>
-    </GameEntry>
+        <router-link
+          :to="`/downloads`"
+          v-else-if="selectedIsDownloading === 2"
+          class="download downloading"
+        >
+          <h3>⏸️ Pause</h3>
+        </router-link>
+      </GameEntry>
+    </div>
   </div>
 </template>
 <script setup>
 import { ref, watch, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import GameEntry from "../components/store/GameEntry.vue";
-import { IsDownloading } from "../../wailsjs/go/controller/Controller";
+import {
+  IsDownloading,
+  UninstallGame,
+} from "../../wailsjs/go/controller/Controller";
 import { useGamesStore } from "../stores/games";
 
 const props = defineProps({
@@ -89,6 +97,10 @@ function createDownload() {
   games.createDownload(selected.value.rootHash);
   selectedIsDownloading.value = 2;
 }
+
+function uninstall() {
+  UninstallGame(selected.value.rootHash);
+}
 </script>
 <style scoped lang="scss">
 .library {
@@ -97,7 +109,13 @@ function createDownload() {
   grid-template-columns: 1fr 5fr;
   gap: 1rem;
   height: 100%;
-  overflow-x: hidden;
+  flex-grow: 1;
+
+  .details-wrapper {
+    padding: 1.5rem;
+    max-width: 1500px;
+    justify-self: center;
+  }
 
   ul {
     list-style: none;
@@ -107,6 +125,8 @@ function createDownload() {
     border: solid 2px rgba(0, 132, 255, 0.24);
     border-bottom: none;
     border-left: none;
+    max-width: 250px;
+    overflow-y: hidden;
 
     > p {
       margin: 0.4rem 0.5rem;
@@ -147,6 +167,7 @@ function createDownload() {
   cursor: pointer;
   transform-origin: 150ms;
   text-decoration: none;
+  font-size: 0.9rem;
 
   &:hover {
     scale: 1.02;

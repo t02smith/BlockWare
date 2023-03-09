@@ -31,9 +31,16 @@ const icons = [
   {
     name: "Downloads",
     icon: "🎁",
-    colorA: "#8810d2",
-    colorB: "#00ff2e",
+    colorA: "#002cff",
+    colorB: "#f800ff",
     link: "/downloads",
+  },
+  {
+    name: "Upload",
+    icon: "☁️",
+    colorA: "#00c2ff",
+    colorB: "#ff0081",
+    link: "/upload",
   },
   {
     name: "Store",
@@ -48,6 +55,13 @@ const icons = [
     colorA: "#6472ff",
     colorB: "#ffa264",
     link: "/upload",
+  },
+  {
+    name: "Peers",
+    icon: "🫂",
+    colorA: "#f7fb3f",
+    colorB: "#35de00",
+    link: "/peers",
   },
 ];
 </script>
@@ -82,11 +96,15 @@ const icons = [
   }
 
   > .quick-links {
-    margin: 1rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 2.5rem;
+    background-color: lighten(#131313, 10%);
+    padding: 1rem 3rem;
+    border-left: solid 2px rgba(0, 132, 255, 0.24);
+    border-right: solid 2px rgba(0, 132, 255, 0.24);
+    border-radius: 10px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    place-items: center;
+    gap: 1.5rem;
   }
 }
 </style>

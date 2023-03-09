@@ -1,6 +1,8 @@
 package peer
 
 import (
+	"time"
+
 	"github.com/t02smith/part-iii-project/toolkit/model"
 	"github.com/t02smith/part-iii-project/toolkit/util"
 )
@@ -42,6 +44,7 @@ func (p *peer) listenToDownloadRequests() {
 
 			chosenPD := p.peers[chosen]
 			chosenPD.SentRequests[request] = model.Void{}
+			time.Sleep(100 * time.Millisecond)
 		}
 		util.Logger.Info("stopped listening to incoming download requests")
 	}()

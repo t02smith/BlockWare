@@ -1,15 +1,15 @@
 <template>
   <nav>
-    <div class="title">
+    <router-link to="/home" class="title">
       <img src="../assets/images/icon.png" alt="" />
       <h4>BlockWare</h4>
-    </div>
+    </router-link>
 
     <div class="links">
       <h3 class="address">🌍 Connected to {{ eth.contractAddress }}</h3>
 
-      <router-link to="/home">🏡 Home</router-link>
       <router-link to="/library">🕹️ Library</router-link>
+      <router-link to="/downloads">🎁 Downloads</router-link>
       <router-link to="/upload">🆕 Upload</router-link>
       <router-link to="/store">💵 Store</router-link>
       <router-link to="/peers">🫂 Peers</router-link>
@@ -23,7 +23,7 @@ const eth = useEthStore();
 </script>
 <style scoped lang="scss">
 nav {
-  width: 100vw;
+  max-width: 100vw;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -41,6 +41,7 @@ nav {
     display: flex;
     gap: 0.4rem;
     align-items: center;
+    color: white;
 
     > img {
       width: 30px;

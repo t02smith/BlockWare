@@ -61,7 +61,7 @@ type FileProgress struct {
 	AbsolutePath string
 
 	// block hash => position in file
-	BlocksRemaining map[[32]byte]uint
+	BlocksRemaining map[[32]byte][]uint
 }
 
 // DownloadRequest /*
@@ -107,11 +107,15 @@ func (g *Game) SetupDownload() error {
 	err = data.CreateDummyFiles(dir, g.Title, func(path string, htf *hash.HashTreeFile) {
 		p := FileProgress{
 			AbsolutePath:    path,
-			BlocksRemaining: make(map[[32]byte]uint),
+			BlocksRemaining: make(map[[32]byte][]uint),
 		}
 
 		for i, b := range htf.Hashes {
-			p.BlocksRemaining[b] = uint(i)
+			if offsets, ok := p.BlocksRemaining[b]; ok {
+				offsets = append(offsets, uint(i))
+			} else {
+				p.BlocksRemaining[b] = []uint{uint(i)}
+			}
 		}
 
 		d.TotalBlocks += len(p.BlocksRemaining)
@@ -158,7 +162,7 @@ func (d *Download) InsertData(fileHash, blockHash [32]byte, data []byte) error {
 		return fmt.Errorf("file %x not in download queue", fileHash)
 	}
 
-	offset, ok := file.BlocksRemaining[blockHash]
+	offsets, ok := file.BlocksRemaining[blockHash]
 	if !ok {
 		return fmt.Errorf("block %x not in download queue", blockHash)
 	}
@@ -168,9 +172,11 @@ func (d *Download) InsertData(fileHash, blockHash [32]byte, data []byte) error {
 		return fmt.Errorf("block %x data does not match expected content", blockHash)
 	}
 
-	err := hash.InsertData(file.AbsolutePath, uint(len(data)), uint(offset), data)
-	if err != nil {
-		return err
+	for _, offset := range offsets {
+		err := hash.InsertData(file.AbsolutePath, uint(len(data)), uint(offset), data)
+		if err != nil {
+			return err
+		}
 	}
 
 	delete(file.BlocksRemaining, blockHash)
@@ -178,14 +184,9 @@ func (d *Download) InsertData(fileHash, blockHash [32]byte, data []byte) error {
 
 	if len(file.BlocksRemaining) == 0 {
 		util.Logger.Infof("Download complete for file %s", file.AbsolutePath)
-		err = CleanFile(file.AbsolutePath)
+		err := CleanFile(file.AbsolutePath)
 		if err != nil {
 			util.Logger.Errorf("Error cleaning file %s: %s", file.AbsolutePath, err)
-		}
-
-		delete(d.Progress, fileHash)
-		if len(d.Progress) == 0 {
-			util.Logger.Infof("Download complete")
 		}
 	}
 
@@ -215,12 +216,7 @@ func (d *Download) ContinueDownload(gameHash [32]byte, newRequest chan DownloadR
 		for _, file := range d.Progress {
 			util.Logger.Infof("Requesting file %s for game %x", file.AbsolutePath, gameHash)
 
-			shards := [][32]byte{}
-			for sh := range file.BlocksRemaining {
-				shards = append(shards, sh)
-			}
-
-			for _, shard := range shards {
+			for shard := range file.BlocksRemaining {
 				util.Logger.Infof("Requesting shard %x for file %s in game %x", shard, file.AbsolutePath, gameHash)
 				newRequest <- DownloadRequest{
 					GameHash:  gameHash,
@@ -279,5 +275,11 @@ func (d *Download) GetProgress() float32 {
 
 // Finished whether any more blocks are still needed
 func (d *Download) Finished() bool {
-	return len(d.Progress) == 0
+	for _, d := range d.Progress {
+		if len(d.BlocksRemaining) > 0 {
+			return false
+		}
+	}
+
+	return true
 }

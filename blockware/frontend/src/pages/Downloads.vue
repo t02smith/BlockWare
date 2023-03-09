@@ -21,29 +21,19 @@
       <router-link
         :to="`/library?game=${hash}`"
         class="table-row"
+        :class="blocksLeft(download) === 0 && 'complete'"
         v-for="[hash, download] in downloadGamePairs"
       >
         <p>{{ download.Name }}</p>
-        <p>{{ Object.keys(download.Progress).length }}</p>
+        <p>{{ filesLeft(download) }}</p>
         <p>
-          {{
-            Object.values(download.Progress).reduce(
-              (acc, f) => acc + f.BlocksRemaining.length,
-              0
-            )
-          }}
+          {{ blocksLeft(download) }}
         </p>
         <p>
           <strong>
             {{
               Math.round(
-                (1 -
-                  Object.values(download.Progress).reduce(
-                    (acc, f) => acc + f.BlocksRemaining.length,
-                    0
-                  ) /
-                    download.TotalBlocks) *
-                  1000
+                (1 - blocksLeft(download) / download.TotalBlocks) * 1000
               ) / 10
             }}
             %</strong
@@ -68,6 +58,19 @@ const downloadGamePairs = computed(() =>
   Object.keys(games.downloads).map((hash) => [hash, games.downloads[hash]])
 );
 
+function blocksLeft(download) {
+  return Object.values(download.Progress).reduce(
+    (acc, f) => acc + f.BlocksRemaining.length,
+    0
+  );
+}
+
+function filesLeft(download) {
+  return Object.values(download.Progress).filter(
+    (f) => f.BlocksRemaining.length !== 0
+  ).length;
+}
+
 const pauseAll = ref(false);
 </script>
 <style scoped lang="scss">
@@ -75,6 +78,8 @@ const pauseAll = ref(false);
   width: 100%;
   display: flex;
   flex-direction: column;
+  max-width: 2000px;
+  align-self: center;
 
   > * {
     margin: 0rem 1rem;
@@ -133,6 +138,14 @@ const pauseAll = ref(false);
     border-radius: 10px;
     color: white;
     transition: 150ms;
+
+    &.complete {
+      background-color: rgba(0, 252, 0, 0.185);
+
+      &:hover {
+        background-color: lighten(rgba(0, 252, 0, 0.185), 10%);
+      }
+    }
 
     &:hover {
       background-color: lighten(#131313, 5%);

@@ -1,13 +1,17 @@
 <template>
   <div class="login">
     <div class="title">
-      <img src="../assets/images/icon.png" alt="" />
-      <h1>BlockWare</h1>
+      <h1><strong>Block</strong>Ware</h1>
+      <h2>by Tom Smith</h2>
     </div>
+
+    <h3>
+      🌍 Connecting to Store <strong>{{ addr }}</strong>
+    </h3>
 
     <div class="form">
       <form @submit.prevent="join" v-if="isJoining">
-        <div class="form-group">
+        <!-- <div class="form-group">
           <p>The address of your chosen BlockWare instance</p>
           <input
             type="text"
@@ -16,43 +20,36 @@
             placeholder="Contract Address"
             v-model="addr"
           />
-        </div>
+        </div> -->
 
-        <div class="form-group">
-          <p>Your ETH private key for uploading and buying</p>
-          <input
-            type="password"
-            name=""
-            id=""
-            placeholder="Private Key"
-            v-model="key"
-          />
-        </div>
+        <input
+          type="password"
+          name=""
+          id=""
+          placeholder="🔑Your ETH Private Key"
+          v-model="key"
+        />
 
-        <button type="submit">Join</button>
+        <button type="submit">Go</button>
       </form>
 
       <form @submit.prevent="create" v-else>
-        <div class="form-group">
-          <p>Your ETH private key for deploying</p>
-          <input
-            type="password"
-            name=""
-            id=""
-            placeholder="Private Key"
-            v-model="key"
-          />
-        </div>
-
+        <input
+          type="password"
+          name=""
+          id=""
+          placeholder="🔑Your ETH Private Key"
+          v-model="key"
+        />
         <button type="submit">Deploy</button>
       </form>
 
-      <p @click="() => (isJoining = !isJoining)">
+      <!-- <p @click="() => (isJoining = !isJoining)">
         Click here to
         {{
           isJoining ? "deploy your own instance" : "join an existing instance"
         }}
-      </p>
+      </p> -->
     </div>
   </div>
 </template>
@@ -91,19 +88,35 @@ async function join() {
   gap: 2rem;
   height: 100vh;
 
+  > h3 {
+    margin-top: 5rem;
+    background-color: #303030;
+    padding: 3px 15px;
+    border-radius: 10px;
+    font-size: 1.15rem;
+  }
+
   > .title {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: 1rem;
+    justify-content: center;
 
     > h1 {
-      font-size: 5rem;
+      font-size: 12rem;
+
+      > strong {
+        background: url("../assets/images/icon.png");
+        background-attachment: fixed;
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
     }
 
-    > img {
-      width: 100px;
-      height: 100px;
-      object-fit: cover;
+    > h2 {
+      margin-top: -1.75rem;
+      color: darken(white, 20%);
     }
   }
 
@@ -114,35 +127,38 @@ async function join() {
 
     > form {
       display: flex;
-      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background-color: lighten(#131313, 10%);
+      padding: 0.5rem;
+      border-radius: 5px;
 
-      > .form-group {
-        margin-bottom: 1rem;
-
-        > p {
-          color: darken(white, 20%);
-          font-style: italic;
-        }
-
-        > input {
-          width: 100%;
-          padding: 5px 6px;
-          border-radius: 4px;
-          outline: none;
-          min-width: 400px;
-        }
+      > input {
+        padding: 10px;
+        min-width: 350px;
+        height: 20px;
+        border-radius: 5px 0 0 5px;
+        outline: none;
+        border: none;
       }
 
       > button {
-        background-color: rgb(18, 141, 18);
+        background-color: rgb(21, 64, 255);
         font-weight: bold;
         width: fit-content;
-        place-self: center;
-        padding: 4px 30px;
-        border-radius: 4px;
+        padding: 10px;
+        outline: none;
+        border: none;
+        border-radius: 0 5px 5px 0;
         color: white;
-        margin-top: 1rem;
+        height: 40px;
+        font-size: 1.2rem;
         cursor: pointer;
+        transition: 150ms;
+
+        &:hover {
+          background-color: lighten(rgb(21, 64, 255), 4%);
+        }
       }
     }
 

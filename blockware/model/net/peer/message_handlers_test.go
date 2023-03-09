@@ -212,7 +212,7 @@ func TestHandleGAMES(t *testing.T) {
 
 			hasGame, ok := data.Library[game.RootHash]
 			assert.True(t, ok, "game not found in peers collection")
-			assert.Equal(t, owned, hasGame, "game ownership not stored correctly")
+			assert.Equal(t, unknown, hasGame, "game ownership not stored correctly => should be unknown initially")
 
 		})
 
@@ -514,6 +514,12 @@ func TestHandleSEND_BLOCK(t *testing.T) {
 		t.Cleanup(func() {
 			Peer().library.ClearOwnedGames()
 		})
+
+		go func() {
+			for range Peer().library.DownloadProgress {
+				continue
+			}
+		}()
 
 		gData, err := game.GetData()
 		if err != nil {

@@ -45,7 +45,7 @@ const props = defineProps({
   color: white;
 
   &:hover {
-    scale: 1.04;
+    scale: 1.02;
   }
 
   > .icon {

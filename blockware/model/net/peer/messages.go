@@ -27,6 +27,11 @@ func onMessage(cmd []string, client tcp.TCPConnection) error {
 		cmd[0] = cmd[0][:len(cmd[0])-1]
 	}
 
+	pd := Peer().peers[client]
+	if !Peer().config.SkipValidation && !pd.Validator.Valid() && cmd[0] != "VALIDATE_REQ" && cmd[0] != "VALIDATE_RES" {
+		util.Logger.Warnf("Peer not validated => discarding message")
+	}
+
 	switch cmd[0] {
 
 	// LIBRARY => request a list of a peers games

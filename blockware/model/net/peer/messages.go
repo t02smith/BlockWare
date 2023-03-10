@@ -33,7 +33,7 @@ func onMessage(cmd []string, client tcp.TCPConnection) error {
 		cmd[0] = cmd[0][:len(cmd[0])-1]
 	}
 
-	pd := Peer().peers[client]
+	pd := Peer().GetPeer(client)
 	if !Peer().config.SkipValidation && !pd.Validator.Valid() && cmd[0] != "VALIDATE_REQ" && cmd[0] != "VALIDATE_RES" {
 		util.Logger.Warnf("Peer not validated => discarding message")
 	}
@@ -63,8 +63,7 @@ func onMessage(cmd []string, client tcp.TCPConnection) error {
 	case "BLOCK":
 		err := handleBLOCK(cmd, client)
 		if err != nil {
-			util.Logger.Warnf("Error handling BLOCK message %s", err)
-			client.SendString(generateERROR(err.Error()))
+			util.Logger.Errorf("Error handling BLOCK message %s", err)
 		}
 		return nil
 
@@ -72,8 +71,7 @@ func onMessage(cmd []string, client tcp.TCPConnection) error {
 	case "SEND_BLOCK":
 		err := handleSEND_BLOCK(cmd, client)
 		if err != nil {
-			util.Logger.Warnf("Error handling SEND_BLOCK message %s", err)
-			client.SendString(generateERROR(err.Error()))
+			util.Logger.Errorf("Error handling SEND_BLOCK message %s", err)
 		}
 		return nil
 

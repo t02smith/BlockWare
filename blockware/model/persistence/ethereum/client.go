@@ -44,7 +44,7 @@ func StartClient(addr string) (*ethclient.Client, *accounts.Account, error) {
 	once.Do(func() {
 		client, err := ethclient.Dial(addr)
 		if err != nil {
-			util.Logger.Panic(err)
+			util.Logger.Info(err)
 		}
 
 		util.Logger.Infof("Connection to ETH network at %s made", addr)
@@ -65,36 +65,36 @@ func GenerateAuthInstance(privateKey string) (*bind.TransactOpts, error) {
 	util.Logger.Info("Generating auth instance")
 	privKeyECDSA, err := crypto.HexToECDSA(privateKey)
 	if err != nil {
-		util.Logger.Panic(err)
+		util.Logger.Info(err)
 	}
 	_privateKey = privKeyECDSA
 
 	pubKeyECDSA, ok := privKeyECDSA.Public().(*ecdsa.PublicKey)
 	if !ok {
-		util.Logger.Panic("public key of incorrect type")
+		util.Logger.Info("public key of incorrect type")
 	}
 
 	fromAddress := crypto.PubkeyToAddress(*pubKeyECDSA)
 	nonce, err := _ethClient.PendingNonceAt(context.Background(), fromAddress)
 	if err != nil {
-		util.Logger.Panic(err)
+		util.Logger.Info(err)
 	}
 
 	util.Logger.Info("Getting chain ID")
 	chainID, err := _ethClient.ChainID(context.TODO())
 	if err != nil {
-		util.Logger.Panic(err)
+		util.Logger.Info(err)
 	}
 
 	util.Logger.Info("Getting gas price")
 	gasPrice, err := _ethClient.SuggestGasPrice(context.Background())
 	if err != nil {
-		util.Logger.Panic(err)
+		util.Logger.Info(err)
 	}
 
 	auth, err := bind.NewKeyedTransactorWithChainID(privKeyECDSA, chainID)
 	if err != nil {
-		util.Logger.Panic(err)
+		util.Logger.Info(err)
 	}
 
 	auth.Nonce = big.NewInt(int64(nonce))

@@ -27,6 +27,9 @@ type TCPClient struct {
 	con    net.Conn
 	reader *bufio.Reader
 	writer *bufio.Writer
+
+	//
+	closed bool
 }
 
 // generate a new TCP client to conenct to a server
@@ -49,6 +52,7 @@ func InitTCPClient(
 		con:      con,
 		reader:   bufio.NewReader(con),
 		writer:   bufio.NewWriter(con),
+		closed:   false,
 	}
 
 	onConnection(serverHostname, serverPort, client)
@@ -65,6 +69,7 @@ func (c *TCPClient) listen(onMessage func([]string, TCPConnection) error, onClos
 		if err != nil {
 			if err == io.EOF {
 				onClose(c)
+				c.Close()
 				return
 			}
 
@@ -82,6 +87,10 @@ func (c *TCPClient) listen(onMessage func([]string, TCPConnection) error, onClos
 
 // Send a message in bytes to the server
 func (c *TCPClient) Send(command []byte) error {
+	if c.closed {
+		return nil
+	}
+
 	_, err := c.writer.Write(command)
 	if err != nil {
 		util.Logger.Errorf("Error sending message %s", err)
@@ -99,6 +108,10 @@ func (c *TCPClient) Send(command []byte) error {
 
 // Send a string message to the server
 func (c *TCPClient) SendString(command string) error {
+	if c.closed {
+		return nil
+	}
+
 	_, err := c.writer.WriteString(command)
 	if err != nil {
 		util.Logger.Errorf("Error sending message %s", err)
@@ -128,4 +141,5 @@ func (c *TCPClient) Info() string {
 // close the tcp client
 func (c *TCPClient) Close() {
 	c.con.Close()
+	c.closed = true
 }

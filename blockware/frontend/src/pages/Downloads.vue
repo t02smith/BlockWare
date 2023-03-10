@@ -24,6 +24,11 @@
         :class="blocksLeft(download) === 0 && 'complete'"
         v-for="[hash, download] in downloadGamePairs"
       >
+        {{
+          Object.values(download.Progress).filter(
+            (f) => f.BlocksRemaining.length !== 0
+          )
+        }}
         <p>{{ download.Name }}</p>
         <p>{{ filesLeft(download) }}</p>
         <p>

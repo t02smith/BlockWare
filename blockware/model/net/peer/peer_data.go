@@ -89,6 +89,9 @@ func (pd *peerData) checkOwnership(gameHash [32]byte) (bool, error) {
 // find peers who have a given game in their library
 func (p *peer) findPeersWhoHaveGame(gameHash [32]byte) []tcp.TCPConnection {
 	var peers []tcp.TCPConnection
+
+	p.peersMU.Lock()
+	defer p.peersMU.Unlock()
 	for peerIT, peer := range p.peers {
 		if _, ok := peer.Library[gameHash]; ok {
 			peers = append(peers, peerIT)

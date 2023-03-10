@@ -41,7 +41,8 @@ async function purchase() {
 .wrapper {
   display: flex;
   justify-content: center;
-  overflow-x: hidden;
+  height: 100%;
+  padding-bottom: 2rem;
 
   > * {
     max-width: 80vw;

@@ -17,16 +17,25 @@ shard in a given file.
 
 */
 
+type ShardLocation struct {
+	File         *HashTreeFile
+	AbsolutePath string
+	Offset       int
+}
+
 // GetShard locate a given shard within a hash tree by looking through all files
 func (ht *HashTree) GetShard(hash [32]byte) (bool, []byte, error) {
 	util.Logger.Infof("Looking for shard %x in %s", hash, ht.RootDirLocation)
-	found, _, location, offset := ht.FindShard(hash)
-	if !found {
+	locations := ht.FindShard(hash)
+	if len(locations) == 0 {
 		return false, nil, nil
 	}
 
-	util.Logger.Infof("Shard found at %s - piece %d", location, offset)
-	data, err := ht.readShard(filepath.Join(ht.RootDirLocation, location), offset)
+	// ? choose first found
+	shard := locations[0]
+
+	util.Logger.Infof("Shard found at %s - piece %d", shard.AbsolutePath, shard.Offset)
+	data, err := ht.readShard(filepath.Join(ht.RootDirLocation, shard.AbsolutePath), shard.Offset)
 	if err != nil {
 		return false, nil, err
 	}
@@ -38,29 +47,36 @@ func (ht *HashTree) GetShard(hash [32]byte) (bool, []byte, error) {
 
 // looks for a given shard in the entire hash tree
 // return <hashFound> <file struct> <relative filename> <shard position in file>
-func (ht *HashTree) FindShard(hash [32]byte) (bool, *HashTreeFile, string, int) {
+func (ht *HashTree) FindShard(hash [32]byte) []*ShardLocation {
 	return ht.RootDir.findShard(hash)
 }
 
 // auxillary function for FindShard => looks in particular directory
-func (htd *HashTreeDir) findShard(hash [32]byte) (bool, *HashTreeFile, string, int) {
+func (htd *HashTreeDir) findShard(hash [32]byte) []*ShardLocation {
+	var shardLocations []*ShardLocation
 	for _, f := range htd.Files {
 		for i, h := range f.Hashes {
 			if bytes.Equal(hash[:], h[:]) {
-				return true, f, filepath.Join(htd.Dirname, f.Filename), i
+				shardLocations = append(shardLocations, &ShardLocation{
+					File:         f,
+					AbsolutePath: filepath.Join(htd.Dirname, f.Filename),
+					Offset:       i,
+				})
 			}
 		}
 	}
 
 	for _, sd := range htd.Subdirs {
-		found, htf, filename, offset := sd.findShard(hash)
-		if found {
-			return true, htf, filepath.Join(htd.Dirname, filename), offset
+		locations := sd.findShard(hash)
+		for i := range locations {
+			locations[i].AbsolutePath = filepath.Join(htd.Dirname, locations[i].AbsolutePath)
 		}
+
+		shardLocations = append(shardLocations, locations...)
 
 	}
 
-	return false, nil, "", -1
+	return shardLocations
 
 }
 

@@ -50,22 +50,22 @@ func Run() {
 	// }
 
 	// ? PRE-LAUNCH CHECKS
-	_, err := os.Stat("latex-template-main")
+	_, err := os.Stat("t02smith.github.io")
 	if err != nil {
-		util.Logger.Fatalf("Latex template directory not found. Run 'make' to fetch it")
+		util.Logger.Fatalf("t02smith.github.io not found. Run 'make' to fetch it")
 	}
 
 	p := peer.Peer()
 
 	// * create & upload game
 	g, err := games.CreateGame(games.NewGame{
-		Title:       "latex-template",
+		Title:       "t02smith.github.io",
 		Version:     "4.7.1",
 		ReleaseDate: time.Date(2002, time.January, 10, 0, 0, 0, 0, time.UTC).String(),
 		Developer:   "tcs1g20",
-		RootDir:     "./latex-template-main",
+		RootDir:     "./t02smith.github.io",
 		Price:       big.NewInt(150),
-		ShardSize:   512,
+		ShardSize:   16384,
 		AssetsDir:   "../../data/assets"},
 		nil,
 	)

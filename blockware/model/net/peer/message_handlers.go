@@ -68,9 +68,10 @@ func generateGAMES(games ...*games.Game) string {
 
 func handleGAMES(cmd []string, client tcp.TCPConnection) error {
 	util.Logger.Infof("Games command called")
+	changes := false
 
-	pData, ok := Peer().peers[client]
-	if !ok {
+	pData := Peer().GetPeer(client)
+	if pData == nil {
 		return errors.New("unknown peer")
 	}
 
@@ -80,14 +81,22 @@ func handleGAMES(cmd []string, client tcp.TCPConnection) error {
 		}
 
 		var hash [32]byte
-
 		receivedHash, err := hex.DecodeString(cmd[i])
 		if err != nil {
 			return err
 		}
-
 		copy(hash[:], receivedHash)
-		pData.Library[hash] = unknown
+
+		if _, ok := pData.Library[hash]; !ok {
+			changes = true
+			pData.Library[hash] = unknown
+		}
+	}
+
+	// if new games are detected we can start trying to process
+	// deferred requests
+	if changes {
+		loadDeferredRequests()
 	}
 
 	return nil
@@ -182,14 +191,16 @@ func handleSEND_BLOCK(cmd []string, client tcp.TCPConnection) error {
 	}
 
 	// ? find file
-	found, file, _, _ := gameTree.FindShard(sh)
-	if !found {
+	locations := gameTree.FindShard(sh)
+	if len(locations) == 0 {
 		return fmt.Errorf("shard %x not found", sh)
 	}
 
-	err = download.InsertData(file.RootHash, sh, data)
-	if err != nil {
-		return err
+	for _, l := range locations {
+		err = download.InsertData(l.File.RootHash, sh, data)
+		if err != nil {
+			return err
+		}
 	}
 
 	delete(Peer().GetPeer(client).SentRequests, games.DownloadRequest{
@@ -262,7 +273,6 @@ func handleVALIDATE_RES(cmd []string, client tcp.TCPConnection) error {
 		client.SendStringf(generateERROR("invalid signature sent"))
 	} else {
 		client.SendString(generateLIBRARY())
-		loadDeferredRequests()
 	}
 
 	return nil

@@ -70,17 +70,11 @@ type DownloadRequest struct {
 	// details to uniquely identify the block
 	GameHash  [32]byte
 	BlockHash [32]byte
-
-	/* how many attempts have already been made to find
-	this block. After a certain number, this block will
-	either be timed out or cancelled for this session
-	*/
-	Attempts uint8
 }
 
 // ? setup
 
-// SetupDownload create a new download for an existing game
+// create a new download for an existing game
 func (g *Game) SetupDownload() error {
 
 	// read hash data if isn't already loaded
@@ -112,7 +106,7 @@ func (g *Game) SetupDownload() error {
 
 		for i, b := range htf.Hashes {
 			if offsets, ok := p.BlocksRemaining[b]; ok {
-				offsets = append(offsets, uint(i))
+				p.BlocksRemaining[b] = append(offsets, uint(i))
 			} else {
 				p.BlocksRemaining[b] = []uint{uint(i)}
 			}
@@ -198,12 +192,12 @@ func (d *Download) InsertData(fileHash, blockHash [32]byte, data []byte) error {
 // channel
 func (d *Download) ContinueDownload(gameHash [32]byte, newRequest chan DownloadRequest) {
 
-	// TODO
-	/**
-	Currently, this function will go through files sequentially and request
-	individual blocks at a time and will block until that block is received
+	/*
+		TODO
+		Currently, this function will go through files sequentially and request
+		individual blocks at a time and will block until that block is received
 
-	Just for simplicity :)
+		Just for simplicity :)
 	*/
 
 	util.Logger.Infof("Continuing download for game %x", gameHash)
@@ -221,7 +215,6 @@ func (d *Download) ContinueDownload(gameHash [32]byte, newRequest chan DownloadR
 				newRequest <- DownloadRequest{
 					GameHash:  gameHash,
 					BlockHash: shard,
-					Attempts:  0,
 				}
 			}
 		}

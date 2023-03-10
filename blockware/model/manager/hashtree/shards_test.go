@@ -5,6 +5,7 @@ import (
 	"crypto/sha256"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/t02smith/part-iii-project/toolkit/test/testutil"
 )
 
@@ -32,26 +33,16 @@ func TestFindShard(t *testing.T) {
 
 	t.Run("valid shard", func(t *testing.T) {
 		file := ht.RootDir.Files["test.txt"]
-		found, _, filename, offset := ht.FindShard(file.Hashes[0])
+		locations := ht.FindShard(file.Hashes[0])
 
-		if !found {
-			t.Error("Existing shard not found")
-		}
-
-		if filename != file.Filename {
-			t.Errorf("Incorrect filepath returned %s", filename)
-		}
-
-		if offset != 0 {
-			t.Error("Incorrect offset")
-		}
+		assert.NotEmpty(t, locations)
+		assert.Equal(t, file.Filename, locations[0].AbsolutePath, "was %s", locations[0].AbsolutePath)
+		assert.Zero(t, locations[0].Offset)
 	})
 
 	t.Run("invalid shard", func(t *testing.T) {
-		found, _, _, _ := ht.FindShard([32]byte{})
-		if found {
-			t.Errorf("Shard does not exist but states it is found")
-		}
+		locations := ht.FindShard([32]byte{})
+		assert.Empty(t, locations)
 	})
 
 }

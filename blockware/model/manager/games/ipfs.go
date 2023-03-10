@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
-	"fmt"
 
 	shell "github.com/ipfs/go-ipfs-api"
 	hash "github.com/t02smith/part-iii-project/toolkit/model/manager/hashtree"
@@ -66,7 +65,5 @@ func (g *Game) GetHashTreeFromIPFS() error {
 	}
 
 	util.Logger.Info("Read game %s data from IPFS", g.Title)
-
-	fmt.Println(g.data.RootDir.Subdirs["sections"].Subdirs["preface"].Files["acknowledgements.tex"])
 	return nil
 }

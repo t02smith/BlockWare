@@ -46,7 +46,8 @@ type peer struct {
 	clients []*tcp.TCPClient
 
 	// state
-	peers map[tcp.TCPConnection]*peerData
+	peers   map[tcp.TCPConnection]*peerData
+	peersMU sync.Mutex
 
 	// data
 	installFolder string
@@ -173,7 +174,7 @@ func (p *peer) onConnection(hostname string, port uint, peer tcp.TCPConnection) 
 		Library:      make(map[[32]byte]ownership),
 		SentRequests: make(map[games.DownloadRequest]model.Void, maxRequestsPerPeer),
 	}
-	p.peers[peer] = pd
+	p.setPeerData(peer, pd)
 
 	// ? start address verification handshake
 	if !p.config.SkipValidation {
@@ -184,7 +185,7 @@ func (p *peer) onConnection(hostname string, port uint, peer tcp.TCPConnection) 
 // run this function after closing a connection to an existing peer
 func (p *peer) onClose(peer tcp.TCPConnection) {
 	util.Logger.Infof("Closing connection to %s", peer.Info())
-	delete(p.peers, peer)
+	p.DeletePeer(peer)
 }
 
 // GetServerInfo get information about the current peer
@@ -285,7 +286,17 @@ func (p *peer) GetPeers() map[tcp.TCPConnection]*peerData {
 
 // GetPeer get an existing peer
 func (p *peer) GetPeer(peer tcp.TCPConnection) *peerData {
+	p.peersMU.Lock()
+	defer p.peersMU.Unlock()
+
 	return p.peers[peer]
+}
+
+func (p *peer) DeletePeer(peer tcp.TCPConnection) {
+	p.peersMU.Lock()
+	defer p.peersMU.Unlock()
+
+	delete(p.peers, peer)
 }
 
 // Library Get the library of the current peer
@@ -308,6 +319,9 @@ func (p *peer) Close() {
 
 // Broadcast send a message to all peers
 func (p *peer) Broadcast(message string) {
+	p.peersMU.Lock()
+	defer p.peersMU.Unlock()
+
 	for peer := range p.peers {
 		peer.SendString(message)
 	}
@@ -330,4 +344,11 @@ func (p *peer) SetContinueDownloads(state bool) {
 		// pause downloads
 		p.library.StopDownloads()
 	}
+}
+
+func (p *peer) setPeerData(con tcp.TCPConnection, pd *peerData) {
+	p.peersMU.Lock()
+	defer p.peersMU.Unlock()
+
+	p.peers[con] = pd
 }

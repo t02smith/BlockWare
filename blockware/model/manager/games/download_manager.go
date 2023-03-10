@@ -38,9 +38,9 @@ type DownloadManager struct {
 
 func NewDownloadManager() *DownloadManager {
 	return &DownloadManager{
-		RequestDownload:  make(chan DownloadRequest),
-		DeferredRequests: make(chan DownloadRequest),
-		DownloadProgress: make(chan DownloadRequest),
+		RequestDownload:  make(chan DownloadRequest, 25),
+		DeferredRequests: make(chan DownloadRequest, 25),
+		DownloadProgress: make(chan DownloadRequest, 25),
 	}
 }
 

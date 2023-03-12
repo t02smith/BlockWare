@@ -13,7 +13,7 @@ func InitLogger() *zap.SugaredLogger {
 	config := zap.NewDevelopmentConfig()
 	config.EncoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
 	config.EncoderConfig.ConsoleSeparator = "\t"
-	config.Level = zap.NewAtomicLevelAt(zapcore.InfoLevel)
+	config.Level = zap.NewAtomicLevelAt(zapcore.DebugLevel)
 
 	// config.OutputPaths = []string{
 	// 	"./zap.log",

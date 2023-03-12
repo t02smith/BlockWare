@@ -113,7 +113,7 @@ func (ht *HashTree) Equals(ht2 *HashTree) bool {
 
 // OutputToFile output a hash tree to a json file
 func (ht *HashTree) OutputToFile(filename string) error {
-	util.Logger.Infof("Outputting hash tree to file %s\n", filename)
+	util.Logger.Infof("Outputting hash tree to file %s", filename)
 
 	file, err := os.Create(filename)
 	if err != nil {
@@ -138,7 +138,7 @@ func (ht *HashTree) OutputToFile(filename string) error {
 		return err
 	}
 
-	util.Logger.Infof("Successfully outputted hash tree to file %s\n", filename)
+	util.Logger.Infof("Successfully outputted hash tree to file %s", filename)
 	return nil
 }
 

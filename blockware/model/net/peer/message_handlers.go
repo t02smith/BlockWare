@@ -2,6 +2,7 @@ package peer
 
 import (
 	"bytes"
+	"compress/flate"
 	"encoding/hex"
 	"errors"
 	"fmt"
@@ -148,7 +149,13 @@ func handleBLOCK(cmd []string, client tcp.TCPConnection) error {
 // SEND_BLOCK <game hash> <shard hash> <shard data>
 
 func generateSEND_BLOCK(gameHash, shardHash [32]byte, data []byte) string {
-	return fmt.Sprintf("SEND_BLOCK;%x;%x;%x\n", gameHash, shardHash, data)
+	// compress data
+	var b bytes.Buffer
+	w, _ := flate.NewWriter(&b, 6)
+	w.Write(data)
+	w.Close()
+
+	return fmt.Sprintf("SEND_BLOCK;%x;%x;%x\n", gameHash, shardHash, b.Bytes())
 }
 
 func handleSEND_BLOCK(cmd []string, client tcp.TCPConnection) error {
@@ -180,10 +187,18 @@ func handleSEND_BLOCK(cmd []string, client tcp.TCPConnection) error {
 		return fmt.Errorf("error loading game data %s", err)
 	}
 
-	data, err := hex.DecodeString(cmd[3])
+	compressedData, err := hex.DecodeString(cmd[3])
 	if err != nil {
 		return err
 	}
+
+	// decompress
+	var b bytes.Buffer
+	w := flate.NewReader(bytes.NewReader(compressedData))
+	b.ReadFrom(w)
+	w.Close()
+
+	data := b.Bytes()
 
 	// ? data correct length
 	if uint(len(data)) != gameTree.ShardSize {

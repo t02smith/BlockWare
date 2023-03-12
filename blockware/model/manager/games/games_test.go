@@ -14,7 +14,7 @@ import (
 )
 
 func TestMain(m *testing.M) {
-	util.InitLogger()
+	util.InitLogger(true)
 	testutil.SetupTestConfig()
 	model.SetupToolkitEnvironment()
 

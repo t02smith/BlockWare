@@ -45,21 +45,21 @@ const props = defineProps({
   color: white;
 
   &:hover {
-    scale: 1.02;
+    scale: 1.01;
   }
 
   > .icon {
-    width: 100px;
-    height: 100px;
+    width: 90px;
+    height: 90px;
     display: grid;
     place-items: center;
-    font-size: 4rem;
+    font-size: 3.5rem;
     border-radius: 10px;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
   }
 
   > h4 {
-    font-size: 2rem;
+    font-size: 1.75rem;
     font-weight: bold;
   }
 }

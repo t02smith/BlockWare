@@ -10,7 +10,7 @@ import (
 
 func TestMain(m *testing.M) {
 	viper.Set("meta.hashes.workerCount", 5)
-	util.InitLogger()
+	util.InitLogger(true)
 
 	code := m.Run()
 	os.Exit(code)

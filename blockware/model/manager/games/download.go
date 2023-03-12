@@ -181,7 +181,7 @@ func (d *Download) InsertData(fileHash, blockHash [32]byte, data []byte) error {
 	d.progressLock.Unlock()
 
 	if len(file.BlocksRemaining) == 0 {
-		util.Logger.Infof("Download complete for file %s", file.AbsolutePath)
+		util.Logger.Debugf("Download complete for file %s", file.AbsolutePath)
 		err := CleanFile(file.AbsolutePath)
 		if err != nil {
 			util.Logger.Errorf("Error cleaning file %s: %s", file.AbsolutePath, err)

@@ -33,21 +33,21 @@
       </div>
 
       <form @submit.prevent="connectAll" class="many-peers">
-        <p>Connect to many peers at once:</p>
-
-        <div class="content">
-          <textarea
-            name=""
-            id=""
-            cols="30"
-            rows="10"
-            v-model="manyPeers"
-            placeholder="localhost:6750
-localhost:6751
-..."
-          ></textarea>
+        <div class="header">
+          <p>Connect to <strong>many peers</strong> at once:</p>
           <button type="submit">Connect</button>
         </div>
+
+        <textarea
+          name=""
+          id=""
+          cols="30"
+          rows="10"
+          v-model="manyPeers"
+          placeholder="localhost:6750
+localhost:6751
+..."
+        ></textarea>
       </form>
     </div>
 
@@ -116,33 +116,41 @@ async function connectAll() {
     > .many-peers {
       display: flex;
       flex-direction: column;
+      margin-right: 2rem;
 
-      > .content {
+      > .header {
         display: flex;
-        textarea {
-          outline: none;
-          border: none;
-          padding: 0.5rem;
-          width: 100%;
-          resize: none;
-          border-radius: 5px 0 0 5px;
+        align-items: center;
+        height: 30px;
+        margin: 0.6rem 0rem;
+
+        > p {
+          font-size: 1.1rem;
         }
 
         > button {
-          background-color: rgb(56, 121, 219);
-          border-radius: 0 5px 5px 0;
-          padding: 1.5rem 0.75rem;
-          font-weight: bold;
+          margin-left: auto;
           color: white;
+          background-color: rgb(56, 121, 219);
+          font-weight: bold;
+          border-radius: 5px;
+          padding: 0.3rem 0.75rem;
           border: none;
-          outline: none;
           cursor: pointer;
-          transition: 150ms;
 
           &:hover {
             background-color: darken(rgb(56, 121, 219), 4%);
           }
         }
+      }
+
+      textarea {
+        outline: none;
+        border: none;
+        padding: 0.5rem;
+        width: 100%;
+        resize: none;
+        border-radius: 2px;
       }
     }
 

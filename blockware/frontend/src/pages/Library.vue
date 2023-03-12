@@ -111,11 +111,13 @@ async function uninstall() {
   gap: 1rem;
   height: 100%;
   flex-grow: 1;
+  overflow: hidden;
 
   .details-wrapper {
     padding: 1.5rem;
     max-width: 1500px;
     justify-self: center;
+    overflow-y: auto;
   }
 
   ul {
@@ -127,7 +129,7 @@ async function uninstall() {
     border-bottom: none;
     border-left: none;
     max-width: 250px;
-    overflow-y: hidden;
+    overflow-y: auto;
 
     > p {
       margin: 0.4rem 0.5rem;

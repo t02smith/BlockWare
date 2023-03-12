@@ -40,11 +40,13 @@ onMounted(() => {
   flex-direction: column;
   height: 100%;
   max-width: 100vw;
+  overflow: hidden;
 
   > .router-view {
     display: flex;
     flex-direction: column;
     height: 100%;
+    overflow: hidden;
   }
 }
 </style>

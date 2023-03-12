@@ -58,7 +58,8 @@ async function purchase() {
   display: flex;
   justify-content: center;
   height: 100%;
-  padding-bottom: 2rem;
+  overflow: hidden;
+  background-color: lighten(#131313, 2%);
 
   > * {
     max-width: 80vw;

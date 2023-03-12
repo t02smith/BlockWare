@@ -29,7 +29,7 @@ const (
 */
 
 func beforeAll() {
-	util.InitLogger()
+	util.InitLogger(true)
 
 	// config
 	viper.Set("meta.directory", "../../../test/data/tmp/.toolkit")

@@ -52,6 +52,9 @@ onMounted(async () => {
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  padding: 1rem;
+  overflow-y: auto;
+  background-color: #131313;
 
   > .header-wrapper {
     position: relative;

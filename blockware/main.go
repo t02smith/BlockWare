@@ -24,13 +24,14 @@ import (
 var assets embed.FS
 
 func main() {
-	util.InitLogger()
 
 	// * FLAGS
 	profile := flag.Uint("profile", 0, "Run the application as a profile. (default off | see profiles.go for details)")
 	contractAddr := flag.String("contract", "", "The address of the deployed contract")
+	showDebugLogs := flag.Bool("debug", false, "whether debug logs should be displayed")
 
 	flag.Parse()
+	util.InitLogger(*showDebugLogs)
 
 	// ? run a profile
 	if *profile != 0 {

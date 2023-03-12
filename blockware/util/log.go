@@ -9,11 +9,16 @@ var (
 	Logger *zap.SugaredLogger
 )
 
-func InitLogger() *zap.SugaredLogger {
+func InitLogger(showDebug bool) *zap.SugaredLogger {
 	config := zap.NewDevelopmentConfig()
 	config.EncoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
 	config.EncoderConfig.ConsoleSeparator = "\t"
-	config.Level = zap.NewAtomicLevelAt(zapcore.DebugLevel)
+
+	if showDebug {
+		config.Level = zap.NewAtomicLevelAt(zapcore.DebugLevel)
+	} else {
+		config.Level = zap.NewAtomicLevelAt(zapcore.InfoLevel)
+	}
 
 	// config.OutputPaths = []string{
 	// 	"./zap.log",

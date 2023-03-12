@@ -87,7 +87,7 @@ func _generateFileCountData(n uint) error {
 
 func BenchmarkHash_FileCount(b *testing.B) {
 	b.Skip()
-	util.InitLogger()
+	util.InitLogger(true)
 
 	levels := []uint{100, 1_000, 10_000, 50_000}
 	for _, n := range levels {

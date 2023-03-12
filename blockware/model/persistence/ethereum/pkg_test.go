@@ -17,7 +17,7 @@ func TestMain(m *testing.M) {
 }
 
 func beforeAll() {
-	util.InitLogger()
+	util.InitLogger(true)
 	testutil.SetupTestConfig()
 
 	_, _, err := StartClient("ws://localhost:8545")

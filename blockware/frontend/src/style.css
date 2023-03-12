@@ -23,3 +23,25 @@ body {
 strong {
   color: rgb(0, 131, 253);
 }
+
+/* SCROLLBAR */
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #080808;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #202020;
+  border-radius: 10px;
+  
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #252525;
+  
+}

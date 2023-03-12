@@ -14,7 +14,7 @@ import (
 // * test utilities
 
 func TestMain(m *testing.M) {
-	util.InitLogger()
+	util.InitLogger(true)
 
 	os.Exit(m.Run())
 }

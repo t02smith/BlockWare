@@ -185,7 +185,7 @@ func OutputAllGameDataToFile(g *Game) error {
 
 // OutputToFile output a game to file
 func (g *Game) OutputToFile(filename string) error {
-	util.Logger.Infof("Outputting game data to %s", filename)
+	util.Logger.Debugf("Outputting game data to %s", filename)
 
 	f, err := os.Create(filename)
 	if err != nil {
@@ -201,7 +201,7 @@ func (g *Game) OutputToFile(filename string) error {
 	}
 
 	writer.Flush()
-	util.Logger.Infof("Successfully outputted game data to %s", filename)
+	util.Logger.Debugf("Successfully outputted game data to %s", filename)
 
 	return nil
 }

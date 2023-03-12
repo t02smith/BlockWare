@@ -98,8 +98,9 @@ function createDownload() {
   selectedIsDownloading.value = 2;
 }
 
-function uninstall() {
-  UninstallGame(selected.value.rootHash);
+async function uninstall() {
+  await UninstallGame(selected.value.rootHash);
+  selectedIsDownloading.value = await IsDownloading(selected.value.rootHash);
 }
 </script>
 <style scoped lang="scss">

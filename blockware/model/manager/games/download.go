@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"sync"
 
 	"github.com/spf13/viper"
 	hash "github.com/t02smith/part-iii-project/toolkit/model/manager/hashtree"
@@ -45,7 +46,8 @@ Starting a download will:
 type Download struct {
 
 	// progress of each file being downloaded
-	Progress map[[32]byte]FileProgress
+	Progress     map[[32]byte]FileProgress
+	progressLock sync.Mutex
 
 	// total number of blocks to install
 	TotalBlocks int
@@ -150,7 +152,7 @@ func (g *Game) CancelDownload() error {
 
 // InsertData insert data into a file for a given game download
 func (d *Download) InsertData(fileHash, blockHash [32]byte, data []byte) error {
-	util.Logger.Infof("Attempting to insert shard %x into %x with data %x", blockHash, fileHash, data)
+	util.Logger.Debugf("Attempting to insert shard %x into %x", blockHash, fileHash)
 	file, ok := d.Progress[fileHash]
 	if !ok {
 		return fmt.Errorf("file %x not in download queue", fileHash)
@@ -173,8 +175,10 @@ func (d *Download) InsertData(fileHash, blockHash [32]byte, data []byte) error {
 		}
 	}
 
+	d.progressLock.Lock()
 	delete(file.BlocksRemaining, blockHash)
-	util.Logger.Infof("successfully inserted shard %x into %x with data %x", blockHash, fileHash, data)
+	util.Logger.Debugf("successfully inserted shard %x into %x", blockHash, fileHash)
+	d.progressLock.Unlock()
 
 	if len(file.BlocksRemaining) == 0 {
 		util.Logger.Infof("Download complete for file %s", file.AbsolutePath)
@@ -208,10 +212,10 @@ func (d *Download) ContinueDownload(gameHash [32]byte, newRequest chan DownloadR
 		}
 
 		for _, file := range d.Progress {
-			util.Logger.Infof("Requesting file %s for game %x", file.AbsolutePath, gameHash)
+			util.Logger.Debugf("Requesting file %s for game %x", file.AbsolutePath, gameHash)
 
 			for shard := range file.BlocksRemaining {
-				util.Logger.Infof("Requesting shard %x for file %s in game %x", shard, file.AbsolutePath, gameHash)
+				util.Logger.Debugf("Requesting shard %x for file %s in game %x", shard, file.AbsolutePath, gameHash)
 				newRequest <- DownloadRequest{
 					GameHash:  gameHash,
 					BlockHash: shard,
@@ -231,7 +235,7 @@ func (d *Download) ContinueDownload(gameHash [32]byte, newRequest chan DownloadR
 
 // CleanFile /*
 func CleanFile(path string) error {
-	util.Logger.Infof("Cleaning file %s", path)
+	util.Logger.Debugf("Cleaning file %s", path)
 	file, err := os.OpenFile(path, os.O_RDWR, 0644)
 	if err != nil {
 		return err
@@ -257,7 +261,7 @@ func CleanFile(path string) error {
 	if err = file.Truncate(int64(bytesToRemove)); err != nil {
 		return err
 	}
-	util.Logger.Infof("Cleaned file %s", path)
+	util.Logger.Debugf("Cleaned file %s", path)
 	return nil
 }
 
@@ -275,4 +279,8 @@ func (d *Download) Finished() bool {
 	}
 
 	return true
+}
+
+func (d *Download) GetProgressLock() *sync.Mutex {
+	return &d.progressLock
 }

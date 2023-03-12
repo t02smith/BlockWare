@@ -55,6 +55,8 @@ func downloadToAppDownload(d *games.Download, name string) *ControllerDownload {
 		Name:        name,
 	}
 
+	lock := d.GetProgressLock()
+	lock.Lock()
 	for fHash, f := range d.Progress {
 		fProgress := &ControllerFileProgress{
 			AbsolutePath:    f.AbsolutePath,
@@ -69,6 +71,7 @@ func downloadToAppDownload(d *games.Download, name string) *ControllerDownload {
 
 		x.Progress[fmt.Sprintf("%x", fHash)] = *fProgress
 	}
+	lock.Unlock()
 
 	return x
 }

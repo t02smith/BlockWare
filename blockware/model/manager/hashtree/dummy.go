@@ -115,7 +115,7 @@ func InsertData(filename string, shardSize, offset uint, data []byte) error {
 		return err
 	}
 
-	util.Logger.Infof("Writing shard to %s:%d", filename, offset)
+	util.Logger.Debugf("Writing shard to %s:%d", filename, offset)
 	writer := bufio.NewWriter(file)
 
 	_, err = writer.Write(data)
@@ -130,6 +130,6 @@ func InsertData(filename string, shardSize, offset uint, data []byte) error {
 		return err
 	}
 
-	util.Logger.Infof("shard %s:%d written successfully", filename, offset)
+	util.Logger.Debugf("shard %s:%d written successfully", filename, offset)
 	return nil
 }

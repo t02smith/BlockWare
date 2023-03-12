@@ -206,7 +206,7 @@ func (ht *HashTree) Hash() error {
 	close(errorChan)
 
 	endTime := time.Now()
-	util.Logger.Infof("Directory %s hashed in %dms", ht.RootDirLocation, endTime.Sub(startTime).Milliseconds())
+	util.Logger.Debugf("Directory %s hashed in %dms", ht.RootDirLocation, endTime.Sub(startTime).Milliseconds())
 	return nil
 }
 
@@ -227,7 +227,7 @@ func (ht *HashTree) buildTree() (int, error) {
 
 // perform a search to build a directory tree
 func (htd *HashTreeDir) traverseDirectory(absolutePath string) (int, error) {
-	util.Logger.Infof("Hashing directory %s\n", htd.Dirname)
+	util.Logger.Debugf("Hashing directory %s\n", htd.Dirname)
 
 	counter := 0
 	dir, err := os.Open(filepath.Join(absolutePath, htd.Dirname))
@@ -367,7 +367,7 @@ func (ht *HashTree) VerifyTree(config *VerifyHashTreeConfig, chosenDirectory str
 
 // traverse a directory and verify each file and subdir
 func (ht *HashTree) verifyDir(config *VerifyHashTreeConfig, currentDir string, directoryBeingVerified string, htDir *HashTreeDir) (bool, error) {
-	util.Logger.Infof("verifying directory %s/%s\n", currentDir, directoryBeingVerified)
+	util.Logger.Debugf("verifying directory %s/%s\n", currentDir, directoryBeingVerified)
 	file, err := os.Open(filepath.Join(currentDir, directoryBeingVerified))
 	if err != nil {
 		return false, err
@@ -477,7 +477,7 @@ func (ht *HashTree) verifyFile(htf *HashTreeFile, currentDirectory string, filen
 	reader := bufio.NewReader(file)
 	counter := 0
 
-	util.Logger.Infof("\tSharding file '%s'\n", filename)
+	util.Logger.Debugf("Sharding file '%s'", filename)
 	for {
 		_, err := reader.Read(buffer)
 		if err == io.EOF {

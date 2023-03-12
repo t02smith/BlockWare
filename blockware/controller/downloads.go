@@ -36,18 +36,15 @@ func (a *Controller) IsDownloading(gh string) int {
 
 	// ? download not started
 	if g.GetDownload() == nil {
-		util.Logger.Infof("download for game %s not started", gh)
 		return 0
 	}
 
 	// ? download finished
 	if g.GetDownload().Finished() {
-		util.Logger.Infof("download for game %s finished", gh)
 		return 1
 	}
 
 	// ? download in progress
-	util.Logger.Infof("download for game %s in progress", gh)
 	return 2
 }
 
@@ -55,8 +52,7 @@ func (a *Controller) IsDownloading(gh string) int {
 func (c *Controller) StartDownloadListener() {
 	go func() {
 		downloadChannel := peer.Peer().Library().DownloadManager.DownloadProgress
-		for progress := range downloadChannel {
-			util.Logger.Infof("Download event received %x-%x", progress.GameHash, progress.BlockHash)
+		for range downloadChannel {
 			runtime.EventsEmit(c.ctx, "download-progress")
 		}
 	}()

@@ -10,7 +10,7 @@
       </div>
     </div>
 
-    <div class="download-table" v-if="Object.keys(games.downloads).length > 0">
+    <div class="download-table" v-if="downloadGamePairs.length > 0">
       <div class="table-header">
         <h2><strong>Game</strong></h2>
         <h2>File's Left</h2>
@@ -24,11 +24,6 @@
         :class="blocksLeft(download) === 0 && 'complete'"
         v-for="[hash, download] in downloadGamePairs"
       >
-        {{
-          Object.values(download.Progress).filter(
-            (f) => f.BlocksRemaining.length !== 0
-          )
-        }}
         <p>{{ download.Name }}</p>
         <p>{{ filesLeft(download) }}</p>
         <p>
@@ -59,11 +54,15 @@ import { useGamesStore } from "../stores/games";
 
 const games = useGamesStore();
 
-const downloadGamePairs = computed(() =>
-  Object.keys(games.downloads).map((hash) => [hash, games.downloads[hash]])
-);
+const downloadGamePairs = computed(() => {
+  if (games.downloads.length === 0) return [];
+  return Object.keys(games.downloads)
+    .filter((hash) => games.downloads[hash] !== null)
+    .map((hash) => [hash, games.downloads[hash]]);
+});
 
 function blocksLeft(download) {
+  if (!download) return 0;
   return Object.values(download.Progress).reduce(
     (acc, f) => acc + f.BlocksRemaining.length,
     0
@@ -71,6 +70,7 @@ function blocksLeft(download) {
 }
 
 function filesLeft(download) {
+  if (!download) return 0;
   return Object.values(download.Progress).filter(
     (f) => f.BlocksRemaining.length !== 0
   ).length;

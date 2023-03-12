@@ -81,7 +81,7 @@ func CreateDirectoryIfNotExist(dir string) error {
 
 // create a zip archive of a directory
 func ZipDirectory(archivePath, outputLocation string) error {
-	util.Logger.Infof("Attempting to create archive %s from directory %s", outputLocation, archivePath)
+	util.Logger.Debugf("Attempting to create archive %s from directory %s", outputLocation, archivePath)
 	file, err := os.Create(outputLocation)
 	if err != nil {
 		return err

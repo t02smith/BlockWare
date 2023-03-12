@@ -40,7 +40,7 @@ func generateLIBRARY() string {
 }
 
 func handleLIBRARY(cmd []string, client tcp.TCPConnection) error {
-	util.Logger.Info("Library command called")
+	util.Logger.Debugf("Library command called")
 	return client.SendString(generateGAMES(Peer().library.GetOwnedGames()...))
 }
 
@@ -67,7 +67,7 @@ func generateGAMES(games ...*games.Game) string {
 }
 
 func handleGAMES(cmd []string, client tcp.TCPConnection) error {
-	util.Logger.Infof("Games command called")
+	util.Logger.Debugf("Games command called")
 	changes := false
 
 	pData := Peer().GetPeer(client)
@@ -109,7 +109,7 @@ func generateBLOCK(gameHash, blockHash [32]byte) string {
 }
 
 func handleBLOCK(cmd []string, client tcp.TCPConnection) error {
-	util.Logger.Infof("Block command called for block %s", cmd[2])
+	util.Logger.Debugf("Block command called for block %s", cmd[2])
 
 	gh, err := stringTo32ByteArr(cmd[1])
 	if err != nil {
@@ -152,7 +152,7 @@ func generateSEND_BLOCK(gameHash, shardHash [32]byte, data []byte) string {
 }
 
 func handleSEND_BLOCK(cmd []string, client tcp.TCPConnection) error {
-	util.Logger.Infof("SEND_BLOCK => Block received")
+	util.Logger.Debugf("SEND_BLOCK => Block received")
 	// * parse input
 	gh, err := stringTo32ByteArr(cmd[1])
 	if err != nil {
@@ -203,7 +203,7 @@ func handleSEND_BLOCK(cmd []string, client tcp.TCPConnection) error {
 		}
 	}
 
-	delete(Peer().GetPeer(client).SentRequests, games.DownloadRequest{
+	delete(Peer().GetPeer(client).sentRequests, games.DownloadRequest{
 		GameHash:  gh,
 		BlockHash: sh,
 	})
@@ -220,7 +220,7 @@ func handleSEND_BLOCK(cmd []string, client tcp.TCPConnection) error {
 		BlockHash: sh,
 	}
 
-	util.Logger.Infof("Successfully inserted shard %x", sh)
+	util.Logger.Debugf("Successfully inserted shard %x", sh)
 	return nil
 }
 

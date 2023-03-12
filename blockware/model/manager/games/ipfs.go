@@ -30,7 +30,7 @@ func (g *Game) UploadHashTreeToIPFS() error {
 		return err
 	}
 
-	util.Logger.Info("Uploading game %s data to IPFS", g.Title)
+	util.Logger.Debugf("Uploading game %s data to IPFS", g.Title)
 	reader := bytes.NewReader(json)
 	cid, err := sh.Add(reader)
 	if err != nil {

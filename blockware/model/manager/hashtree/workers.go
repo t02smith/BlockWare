@@ -37,19 +37,19 @@ func hasherPool(capacity int, fileCount int, shardSize uint, progress chan int) 
 // start a new worker thread to greedily take files sent down a channel
 func worker(id int, wg *sync.WaitGroup, shardSize uint, files <-chan *HashTreeFile, errors chan<- error, progress chan int) {
 	for f := range files {
-		util.Logger.Infof("WORKER %d: Sharding file %s", id, f.AbsoluteFilename)
+		util.Logger.Debugf("WORKER %d: Sharding file %s", id, f.AbsoluteFilename)
 		err := f.shardFile(shardSize)
 		if err != nil {
 			util.Logger.Errorf("WORKER %d: Error sharding file %s: %s", id, f.AbsoluteFilename, err)
 			// errors <- err
 		}
 		wg.Done()
-		util.Logger.Infof("WORKER %d: Completed sharding %s", id, f.AbsoluteFilename)
+		util.Logger.Debugf("WORKER %d: Completed sharding %s", id, f.AbsoluteFilename)
 
 		if progress != nil {
 			progress <- 1
 		}
 	}
 
-	util.Logger.Infof("WORKER %d: FINISHED", id)
+	util.Logger.Debugf("WORKER %d: FINISHED", id)
 }

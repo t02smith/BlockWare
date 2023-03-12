@@ -49,6 +49,7 @@ const props = defineProps({
   cursor: pointer;
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
   transition: 150ms;
+  overflow-x: hidden;
 
   &:hover {
     scale: 1.01;
@@ -81,12 +82,8 @@ const props = defineProps({
     position: absolute;
     bottom: 1rem;
     left: 1rem;
-    line-height: 1.2rem;
-    color: white;
 
-    h3 {
-      font-size: 1.5rem;
-    }
+    color: white;
 
     > h4 {
       font-style: italic;

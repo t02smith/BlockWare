@@ -36,7 +36,7 @@ type peerData struct {
 	Validator *ethereum.AddressValidator
 
 	//
-	SentRequests map[games.DownloadRequest]model.Void
+	sentRequests map[games.DownloadRequest]model.Void
 }
 
 // validate the identity of a given peer
@@ -100,7 +100,7 @@ func (p *peer) findPeersWhoHaveGame(gameHash [32]byte) []tcp.TCPConnection {
 
 	// prioritise connections who have been sent the least blocks
 	sort.Slice(peers, func(i, j int) bool {
-		return len(p.peers[peers[i]].SentRequests) < len(p.peers[peers[j]].SentRequests)
+		return len(p.peers[peers[i]].sentRequests) < len(p.peers[peers[j]].sentRequests)
 	})
 
 	return peers

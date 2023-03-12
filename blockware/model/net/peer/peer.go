@@ -172,7 +172,7 @@ func (p *peer) onConnection(hostname string, port uint, peer tcp.TCPConnection) 
 		Port:         port,
 		Peer:         peer,
 		Library:      make(map[[32]byte]ownership),
-		SentRequests: make(map[games.DownloadRequest]model.Void, maxRequestsPerPeer),
+		sentRequests: make(map[games.DownloadRequest]model.Void, maxRequestsPerPeer),
 	}
 	p.setPeerData(peer, pd)
 

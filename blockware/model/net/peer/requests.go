@@ -1,8 +1,6 @@
 package peer
 
 import (
-	"time"
-
 	"github.com/t02smith/part-iii-project/toolkit/model"
 	"github.com/t02smith/part-iii-project/toolkit/model/manager/games"
 	"github.com/t02smith/part-iii-project/toolkit/util"
@@ -21,11 +19,11 @@ func (p *peer) listenToDownloadRequests() {
 	util.Logger.Info("Listening for incoming download requests")
 	go func() {
 		for request := range p.library.DownloadManager.RequestDownload {
-			util.Logger.Infof("Processing request for block %x", request.BlockHash)
+			util.Logger.Debugf("Processing request for block %x", request.BlockHash)
 
 			ps := p.findPeersWhoHaveGame(request.GameHash)
 			if len(ps) == 0 {
-				util.Logger.Infof("Deferring block %x", request.BlockHash)
+				util.Logger.Debugf("Deferring block %x", request.BlockHash)
 				p.library.DownloadManager.DeferredRequests <- request
 				continue
 			}
@@ -35,8 +33,7 @@ func (p *peer) listenToDownloadRequests() {
 			chosen.SendString(generateBLOCK(request.GameHash, request.BlockHash))
 
 			chosenPD := p.GetPeer(chosen)
-			chosenPD.SentRequests[request] = model.Void{}
-			time.Sleep(20 * time.Millisecond)
+			chosenPD.sentRequests[request] = model.Void{}
 		}
 		util.Logger.Info("stopped listening to incoming download requests")
 	}()

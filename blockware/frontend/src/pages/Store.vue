@@ -10,15 +10,18 @@
     </div>
 
     <form class="search" @submit.prevent="searchForGame">
-      <h3>Search for a game:</h3>
-      <input
-        v-model="search"
-        type="text"
-        name=""
-        id=""
-        placeholder="The game's root hash"
-      />
-      <button type="submit">Search</button>
+      <h3>Find a Game</h3>
+
+      <div class="input">
+        <input
+          v-model="search"
+          type="text"
+          name=""
+          id=""
+          placeholder="The game's root hash"
+        />
+        <button type="submit">Search</button>
+      </div>
     </form>
 
     <div class="searched-game" v-if="searchedGame"></div>
@@ -36,25 +39,27 @@
 import { onMounted, ref } from "vue";
 import CustomLibrary from "../components/library/CustomLibrary.vue";
 import { useGamesStore } from "../stores/games";
-import { GetGameFromStoreByRootHash } from "../../wailsjs/go/controller/Controller";
+import { useRouter } from "vue-router";
 
 const games = useGamesStore();
+const router = useRouter();
 
-onMounted(async () => {
+onMounted(() => {
   games.getStoreGames();
 });
 
 // search
 const search = ref("");
-const searchedGame = ref(null);
 
 async function searchForGame() {
   if (search.value.length === 0) return;
 
-  const g = GetGameFromStoreByRootHash(search.value);
-  if (g === null) return;
-
-  searchedGame.value = g;
+  router.push({
+    path: "/store/entry",
+    query: {
+      game: search.value,
+    },
+  });
   search.value = null;
 }
 </script>
@@ -99,6 +104,33 @@ async function searchForGame() {
     > h3 {
       color: orangered;
       font-size: 1.4rem;
+    }
+  }
+
+  > .search {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+
+    > .input {
+      input {
+        padding: 0.5rem 0.75rem;
+        width: 300px;
+        border-radius: 5px 0 0 5px;
+        border: none;
+        outline: none;
+      }
+
+      button {
+        border-radius: 0 5px 5px 0;
+        border: none;
+        padding: 0.5rem 0.75rem;
+        background-color: rgb(0, 132, 255);
+        font-weight: bold;
+        color: white;
+        cursor: pointer;
+      }
     }
   }
 }

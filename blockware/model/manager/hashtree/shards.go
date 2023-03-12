@@ -25,7 +25,7 @@ type ShardLocation struct {
 
 // GetShard locate a given shard within a hash tree by looking through all files
 func (ht *HashTree) GetShard(hash [32]byte) (bool, []byte, error) {
-	util.Logger.Infof("Looking for shard %x in %s", hash, ht.RootDirLocation)
+	util.Logger.Debugf("Looking for shard %x in %s", hash, ht.RootDirLocation)
 	locations := ht.FindShard(hash)
 	if len(locations) == 0 {
 		return false, nil, nil

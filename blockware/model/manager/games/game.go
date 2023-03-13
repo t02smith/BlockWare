@@ -335,12 +335,12 @@ func (g *Game) Equals(g2 *Game) bool {
 
 // FetchShard Fetch the shard for a given hash
 func (g *Game) FetchShard(hash [32]byte) (bool, []byte, error) {
-	err := g.readHashData()
+	hashtree, err := g.GetData()
 	if err != nil {
 		return false, nil, err
 	}
 
-	found, data, err := g.data.GetShard(hash)
+	found, data, err := hashtree.GetShard(hash)
 	if err != nil {
 		return false, nil, err
 	}

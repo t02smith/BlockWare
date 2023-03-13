@@ -155,12 +155,14 @@ func (d *Download) InsertData(fileHash, blockHash [32]byte, data []byte) error {
 	util.Logger.Debugf("Attempting to insert shard %x into %x", blockHash, fileHash)
 	file, ok := d.Progress[fileHash]
 	if !ok {
-		return fmt.Errorf("file %x not in download queue", fileHash)
+		util.Logger.Debugf("file %x not in download queue", fileHash)
+		return nil
 	}
 
 	offsets, ok := file.BlocksRemaining[blockHash]
 	if !ok {
-		return fmt.Errorf("block %x not in download queue", blockHash)
+		util.Logger.Debugf("block %x not in download queue", blockHash)
+		return nil
 	}
 
 	dataHash := sha256.Sum256(data)

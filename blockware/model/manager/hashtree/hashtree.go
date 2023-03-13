@@ -7,12 +7,14 @@ import (
 	"crypto/sha256"
 	"encoding/gob"
 	"errors"
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
 	"time"
 
 	"github.com/spf13/viper"
+	"github.com/t02smith/part-iii-project/toolkit/model/manager/ignore"
 	"github.com/t02smith/part-iii-project/toolkit/util"
 )
 
@@ -144,7 +146,7 @@ func (ht *HashTree) OutputToFile(filename string) error {
 
 // ReadHashTreeFromFile read a hash tree from a json file
 func ReadHashTreeFromFile(filename string) (*HashTree, error) {
-	util.Logger.Infof("Attempting to read hash data from %s", filename)
+	util.Logger.Debugf("Attempting to read hash data from %s", filename)
 	file, err := os.Open(filename)
 	if err != nil {
 		return nil, err
@@ -171,7 +173,7 @@ func ReadHashTreeFromFile(filename string) (*HashTree, error) {
 		return nil, err
 	}
 
-	util.Logger.Infof("Hash data read from %s successfully", filename)
+	util.Logger.Debugf("Hash data read from %s successfully", filename)
 	return ht, nil
 }
 
@@ -214,7 +216,25 @@ func (ht *HashTree) Hash() error {
 
 // build a directory tree and count the number of files
 func (ht *HashTree) buildTree() (int, error) {
-	util.Logger.Infof("Building tree of directory %s\n", ht.RootDirLocation)
+	util.Logger.Infof("Building tree of directory %s", ht.RootDirLocation)
+
+	// .ignore
+	var i ignore.Ignore
+	_, err := os.Stat(filepath.Join(ht.RootDirLocation, ".blockwareignore"))
+	if err != nil {
+		if !errors.Is(err, os.ErrNotExist) {
+			return 0, err
+		}
+		i = []string{}
+	} else {
+		_i, err := ignore.ReadIgnoreFromFile(filepath.Join(ht.RootDirLocation, ".blockwareignore"))
+		if err != nil {
+			return 0, err
+		}
+		i = _i
+	}
+
+	util.Logger.Infof("Ignoring %s", i)
 
 	ht.RootDir = &HashTreeDir{
 		Dirname: "",
@@ -222,22 +242,27 @@ func (ht *HashTree) buildTree() (int, error) {
 		Files:   make(map[string]*HashTreeFile),
 	}
 
-	return ht.RootDir.traverseDirectory(ht.RootDirLocation)
+	return ht.RootDir.traverseDirectory(ht.RootDirLocation, "", i)
 }
 
 // perform a search to build a directory tree
-func (htd *HashTreeDir) traverseDirectory(absolutePath string) (int, error) {
-	util.Logger.Debugf("Hashing directory %s\n", htd.Dirname)
+func (htd *HashTreeDir) traverseDirectory(rootPath string, relativePath string, i ignore.Ignore) (int, error) {
+	util.Logger.Debugf("Hashing directory %s", htd.Dirname)
+
+	if !i.Allowed(rootPath, filepath.Join(relativePath, htd.Dirname)) {
+		util.Logger.Debugf("Ignoring %s", filepath.Join(relativePath, htd.Dirname))
+		return 0, nil
+	}
 
 	counter := 0
-	dir, err := os.Open(filepath.Join(absolutePath, htd.Dirname))
+	dir, err := os.Open(filepath.Join(rootPath, relativePath, htd.Dirname))
 	if err != nil {
-		return counter, err
+		return counter, fmt.Errorf("err opening file %s", err)
 	}
 	defer func() {
 		err := dir.Close()
 		if err != nil {
-			util.Logger.Errorf("Error closing directory %s: %s", absolutePath, err)
+			util.Logger.Errorf("Error closing directory %s: %s", relativePath, err)
 		}
 	}()
 
@@ -248,9 +273,14 @@ func (htd *HashTreeDir) traverseDirectory(absolutePath string) (int, error) {
 
 	// look in the current directory
 	for _, name := range dirContents {
-		f, err := os.Stat(filepath.Join(absolutePath, htd.Dirname, name))
+		f, err := os.Stat(filepath.Join(rootPath, relativePath, htd.Dirname, name))
 		if err != nil {
 			return counter, err
+		}
+
+		if !i.Allowed(rootPath, filepath.Join(relativePath, htd.Dirname, name)) {
+			util.Logger.Debugf("Ignoring %s", filepath.Join(relativePath, htd.Dirname, name))
+			continue
 		}
 
 		// the data object is a directory
@@ -267,14 +297,14 @@ func (htd *HashTreeDir) traverseDirectory(absolutePath string) (int, error) {
 		// the data object is a file
 		htd.Files[name] = &HashTreeFile{
 			Filename:         name,
-			AbsoluteFilename: filepath.Join(absolutePath, htd.Dirname, name),
+			AbsoluteFilename: filepath.Join(rootPath, relativePath, htd.Dirname, name),
 		}
 		counter++
 	}
 
 	// look in subdirectories
 	for _, subdir := range htd.Subdirs {
-		fileCount, err := subdir.traverseDirectory(filepath.Join(filepath.Join(absolutePath, htd.Dirname)))
+		fileCount, err := subdir.traverseDirectory(rootPath, filepath.Join(filepath.Join(relativePath, htd.Dirname)), i)
 		if err != nil {
 			return counter, err
 		}

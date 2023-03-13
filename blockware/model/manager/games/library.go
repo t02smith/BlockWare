@@ -29,6 +29,7 @@ type Library struct {
 	// games present on the blockchain
 	blockchainGames map[[32]byte]*Game
 
+	//
 	DownloadManager *DownloadManager
 }
 
@@ -81,7 +82,6 @@ func (l *Library) GetOwnedGames() []*Game {
 
 // AddOwnedGame add a game to the library
 func (l *Library) AddOwnedGame(g *Game) error {
-	util.Logger.Debug(g)
 	l.ownedGames[g.RootHash] = g
 	return nil
 }

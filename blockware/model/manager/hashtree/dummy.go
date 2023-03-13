@@ -38,7 +38,7 @@ func (ht *HashTree) CreateDummyFiles(rootDir, title string, onCreate func(string
 
 // traverse a directory and create any dummy files and recursively traverse sub-dirs
 func (ht *HashTree) createDummyFilesFromDirectory(dir *HashTreeDir, path string, onCreate func(string, *HashTreeFile)) error {
-	util.Logger.Infof("Generating files for folder %s", filepath.Join(path, dir.Dirname))
+	util.Logger.Debugf("Generating files for folder %s", filepath.Join(path, dir.Dirname))
 
 	if len(dir.Dirname) > 0 {
 		err := os.Mkdir(filepath.Join(path, dir.Dirname), 0777)
@@ -50,7 +50,6 @@ func (ht *HashTree) createDummyFilesFromDirectory(dir *HashTreeDir, path string,
 	// generate files
 	for _, f := range dir.Files {
 		fileLocation := filepath.Join(path, dir.Dirname, f.Filename)
-		util.Logger.Infof("Creating dummy for %s", fileLocation)
 		err := setupFile(fileLocation, ht.ShardSize, uint(len(f.Hashes)))
 		if err != nil {
 			return err
@@ -76,7 +75,7 @@ A dummy file with N shards of size B will be filled with N*B NULL bytes
 to be filled in later
 */
 func setupFile(filename string, shardSize, shardCount uint) error {
-	util.Logger.Infof("Creating empty file %s", filename)
+	util.Logger.Debugf("Creating dummy file %s", filename)
 	file, err := os.Create(filename)
 	if err != nil {
 		return err
@@ -94,7 +93,7 @@ func setupFile(filename string, shardSize, shardCount uint) error {
 		}
 	}
 
-	util.Logger.Infof("%s created", filename)
+	util.Logger.Debugf("dummy file %s created", filename)
 	return nil
 }
 

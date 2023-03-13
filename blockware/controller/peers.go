@@ -58,6 +58,10 @@ func (c *Controller) ConnectToManyPeers(lines string) {
 	for _, peer := range strings.Split(lines, "\n") {
 		peerInfo := strings.Split(peer, ":")
 
+		if len(peerInfo) != 2 {
+			continue
+		}
+
 		// ! remove carriage return if it exists
 		if peerInfo[1][len(peerInfo[1])-1] == '\r' {
 			peerInfo[1] = peerInfo[1][:len(peerInfo[1])-1]

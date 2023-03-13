@@ -34,7 +34,7 @@ func (ht *HashTree) GetShard(hash [32]byte) (bool, []byte, error) {
 	// ? choose first found
 	shard := locations[0]
 
-	util.Logger.Infof("Shard found at %s - piece %d", shard.AbsolutePath, shard.Offset)
+	util.Logger.Debugf("Shard found at %s - piece %d", shard.AbsolutePath, shard.Offset)
 	data, err := ht.readShard(filepath.Join(ht.RootDirLocation, shard.AbsolutePath), shard.Offset)
 	if err != nil {
 		return false, nil, err

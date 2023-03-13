@@ -1,5 +1,7 @@
 package games
 
+import "github.com/t02smith/part-iii-project/toolkit/util"
+
 /*
 
 
@@ -36,6 +38,12 @@ type DownloadManager struct {
 	DownloadProgress chan DownloadRequest
 }
 
+type InsertShardRequest struct {
+	FileHash  [32]byte
+	BlockHash [32]byte
+	Data      []byte
+}
+
 func NewDownloadManager() *DownloadManager {
 	return &DownloadManager{
 		RequestDownload:  make(chan DownloadRequest, 25),
@@ -48,4 +56,31 @@ func (d *DownloadManager) Close() {
 	close(d.DeferredRequests)
 	close(d.DownloadProgress)
 	close(d.RequestDownload)
+}
+
+// workers
+
+func shardInserterPool(capacity int, download *Download) chan InsertShardRequest {
+	util.Logger.Infof("Creating shard inserted pool")
+	input := make(chan InsertShardRequest, 25)
+
+	for w := 1; w <= capacity; w++ {
+		go shardInserterWorker(w, download, input)
+	}
+
+	return input
+}
+
+func shardInserterWorker(id int, download *Download, input chan InsertShardRequest) {
+	util.Logger.Debugf("INSERT WORKER %d: STARTED", id)
+	for shard := range input {
+		util.Logger.Debugf("INSERT WORKER %d: attempting to insert %x", id, shard.BlockHash)
+		err := download.insertData(shard.FileHash, shard.BlockHash, shard.Data)
+		if err != nil {
+			util.Logger.Errorf("INSERT WORKER %d: error inserted shard %x => %s", id, shard.BlockHash, err)
+		}
+		util.Logger.Debugf("INSERT WORKER %d: Inserted %x", id, shard.BlockHash)
+	}
+	util.Logger.Debugf("INSERT WORKER %d: FINISHED", id)
+
 }

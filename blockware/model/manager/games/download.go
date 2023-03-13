@@ -54,6 +54,9 @@ type Download struct {
 
 	// absolute path of root directory
 	AbsolutePath string
+
+	//
+	InserterPool chan InsertShardRequest
 }
 
 // FileProgress the progress of a specific file's download
@@ -64,6 +67,8 @@ type FileProgress struct {
 
 	// block hash => position in file
 	BlocksRemaining map[[32]byte][]uint
+
+	lock *sync.Mutex
 }
 
 // DownloadRequest /*
@@ -87,9 +92,12 @@ func (g *Game) SetupDownload() error {
 
 	// create download obj
 	d := &Download{
-		Progress:    make(map[[32]byte]FileProgress),
-		TotalBlocks: 0,
+		Progress:     make(map[[32]byte]FileProgress),
+		TotalBlocks:  0,
+		InserterPool: make(chan InsertShardRequest),
 	}
+
+	d.InserterPool = shardInserterPool(5, d)
 
 	// generate dummy files
 	dir := viper.GetString("games.installFolder")
@@ -104,6 +112,7 @@ func (g *Game) SetupDownload() error {
 		p := FileProgress{
 			AbsolutePath:    path,
 			BlocksRemaining: make(map[[32]byte][]uint),
+			lock:            &sync.Mutex{},
 		}
 
 		for i, b := range htf.Hashes {
@@ -151,13 +160,15 @@ func (g *Game) CancelDownload() error {
 // ? downloading data
 
 // InsertData insert data into a file for a given game download
-func (d *Download) InsertData(fileHash, blockHash [32]byte, data []byte) error {
+func (d *Download) insertData(fileHash, blockHash [32]byte, data []byte) error {
 	util.Logger.Debugf("Attempting to insert shard %x into %x", blockHash, fileHash)
 	file, ok := d.Progress[fileHash]
 	if !ok {
 		util.Logger.Debugf("file %x not in download queue", fileHash)
 		return nil
 	}
+	file.lock.Lock()
+	defer file.lock.Unlock()
 
 	offsets, ok := file.BlocksRemaining[blockHash]
 	if !ok {
@@ -217,20 +228,16 @@ func (d *Download) ContinueDownload(gameHash [32]byte, newRequest chan DownloadR
 			util.Logger.Debugf("Requesting file %s for game %x", file.AbsolutePath, gameHash)
 
 			for shard := range file.BlocksRemaining {
+				file.lock.Lock()
 				util.Logger.Debugf("Requesting shard %x for file %s in game %x", shard, file.AbsolutePath, gameHash)
 				newRequest <- DownloadRequest{
 					GameHash:  gameHash,
 					BlockHash: shard,
 				}
+				file.lock.Unlock()
 			}
 		}
 	}()
-
-	if d.Finished() {
-		util.Logger.Infof("Download complete for game %x", gameHash)
-	} else {
-		util.Logger.Infof("Download paused for game %x", gameHash)
-	}
 }
 
 // ? misc functions

@@ -33,7 +33,10 @@ func (p *peer) listenToDownloadRequests() {
 			chosen.SendString(generateBLOCK(request.GameHash, request.BlockHash))
 
 			chosenPD := p.GetPeer(chosen)
+
+			chosenPD.Lock()
 			chosenPD.sentRequests[request] = model.Void{}
+			chosenPD.Unlock()
 		}
 		util.Logger.Info("stopped listening to incoming download requests")
 	}()

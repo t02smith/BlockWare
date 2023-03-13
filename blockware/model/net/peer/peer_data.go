@@ -3,6 +3,7 @@ package peer
 import (
 	"net/http"
 	"sort"
+	"sync"
 
 	"github.com/t02smith/part-iii-project/toolkit/model"
 	"github.com/t02smith/part-iii-project/toolkit/model/manager/games"
@@ -37,6 +38,8 @@ type peerData struct {
 
 	//
 	sentRequests map[games.DownloadRequest]model.Void
+
+	lock sync.Mutex
 }
 
 // validate the identity of a given peer
@@ -120,4 +123,12 @@ func (p *peer) serveAssetsFolder() {
 	if err != nil {
 		util.Logger.Error(err)
 	}
+}
+
+func (pd *peerData) Lock() {
+	pd.lock.Lock()
+}
+
+func (pd *peerData) Unlock() {
+	pd.lock.Unlock()
 }

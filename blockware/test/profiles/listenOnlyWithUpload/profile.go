@@ -58,14 +58,26 @@ func Run() {
 	p := peer.Peer()
 
 	// * create & upload game
+	// g, err := games.CreateGame(games.NewGame{
+	// 	Title:       "t02smith.github.io",
+	// 	Version:     "4.7.1",
+	// 	ReleaseDate: time.Date(2002, time.January, 10, 0, 0, 0, 0, time.UTC).String(),
+	// 	Developer:   "tcs1g20",
+	// 	RootDir:     "./t02smith.github.io",
+	// 	Price:       big.NewInt(150),
+	// 	ShardSize:   16384,
+	// 	AssetsDir:   "../../data/assets"},
+	// 	nil,
+	// )
+
 	g, err := games.CreateGame(games.NewGame{
-		Title:       "t02smith.github.io",
+		Title:       "Transformers",
 		Version:     "4.7.1",
 		ReleaseDate: time.Date(2002, time.January, 10, 0, 0, 0, 0, time.UTC).String(),
 		Developer:   "tcs1g20",
-		RootDir:     "./t02smith.github.io",
+		RootDir:     "C:\\Games\\Transformers - Fall of Cybertron",
 		Price:       big.NewInt(150),
-		ShardSize:   16384,
+		ShardSize:   4194304,
 		AssetsDir:   "../../data/assets"},
 		nil,
 	)

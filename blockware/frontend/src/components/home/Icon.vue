@@ -1,9 +1,6 @@
 <template>
-  <router-link :to="props.link" class="wrapper">
-    <div
-      class="icon"
-      :style="`background: linear-gradient(144deg, ${props.colorA} 0%, ${props.colorB} 150%);`"
-    >
+  <router-link :to="props.link" class="wrapper" :class="`${props.class}`">
+    <div class="icon">
       {{ props.icon }}
     </div>
     <h4>{{ props.name }}</h4>
@@ -31,8 +28,25 @@ const props = defineProps({
     type: String,
     default: "/home",
   },
+  class: {
+    type: String,
+    default: "",
+  },
 });
+
+const background = `linear-gradient(144deg, ${props.colorA} 0%, ${props.colorB} 150%)`;
+const backgroundHover = `linear-gradient(144deg, ${props.colorB} 0%, ${props.colorA} 150%)`;
 </script>
+<style>
+.wrapper > .icon {
+  background: v-bind("background");
+}
+
+.wrapper:hover > .icon {
+  background: v-bind("backgroundHover");
+  transition: background 1000ms linear;
+}
+</style>
 <style scoped lang="scss">
 .wrapper {
   display: flex;
@@ -43,19 +57,26 @@ const props = defineProps({
   cursor: pointer;
   text-decoration: none;
   color: white;
+  transition: 150ms;
 
   &:hover {
-    scale: 1.01;
+    scale: 1.05;
+    z-index: 100;
   }
 
   > .icon {
-    width: 90px;
-    height: 90px;
+    width: 200px;
+    height: 200px;
     display: grid;
     place-items: center;
-    font-size: 3.5rem;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    font-size: 8rem;
+    border: 2px solid gray;
+
+    &:hover {
+      box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2),
+        0 6px 20px 0 rgba(0, 0, 0, 0.19);
+      opacity: 1;
+    }
   }
 
   > h4 {

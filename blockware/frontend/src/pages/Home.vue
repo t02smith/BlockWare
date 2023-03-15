@@ -6,24 +6,12 @@
     </div>
 
     <div class="quick-links-wrapper">
-      <div class="left-joycon joycon">
-        <div class="bumper">
-          <div class="cover"></div>
-        </div>
-        <div class="minus"></div>
-
-        <div class="joystick"></div>
-
-        <div class="buttons">
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
-        </div>
-
-        <div class="screenshot"></div>
+      <div class="text">
+        <p>{{ text }}</p>
+        <p><strong> 1.0.0 </strong></p>
       </div>
-      <div class="quick-links">
+
+      <div class="quick-links" @mouseleave="() => (text = '')">
         <Icon
           v-for="i in icons"
           :colorA="i.colorA"
@@ -31,33 +19,18 @@
           :name="i.name"
           :icon="i.icon"
           :link="i.link"
+          class="icon"
+          @mouseover="() => (text = i.description)"
         />
-      </div>
-      <div class="right-joycon joycon">
-        <div class="bumper">
-          <div class="cover"></div>
-        </div>
-        <div class="plus">
-          <div></div>
-          <div></div>
-        </div>
-
-        <div class="buttons">
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
-        </div>
-
-        <div class="joystick"></div>
-
-        <div class="home"></div>
       </div>
     </div>
   </div>
 </template>
 <script setup>
+import { ref } from "vue";
 import Icon from "../components/home/Icon.vue";
+
+const text = ref("");
 
 const icons = [
   {
@@ -66,6 +39,7 @@ const icons = [
     colorA: "#790953",
     colorB: "#ff6464",
     link: "/library",
+    description: "View your current library of games",
   },
   {
     name: "Downloads",
@@ -73,51 +47,93 @@ const icons = [
     colorA: "#002cff",
     colorB: "#f800ff",
     link: "/downloads",
-  },
-  {
-    name: "Upload",
-    icon: "☁️",
-    colorA: "#00c2ff",
-    colorB: "#ff0081",
-    link: "/upload",
+    description: "View the progress of your ongoing downloads",
   },
   {
     name: "Store",
     icon: "🏪",
-    colorA: "#ffbf64",
-    colorB: "#ff6474",
+    colorA: "#e200ff",
+    colorB: "#ff5100",
     link: "/store",
+    description: "Search for new games on BlockWare",
   },
   {
     name: "Upload",
     icon: "🌍",
-    colorA: "#6472ff",
-    colorB: "#ffa264",
+    colorA: "#ff6a00",
+    colorB: "#0012ff",
     link: "/upload",
+    description: "Upload a new game to the BlockWare store",
   },
   {
     name: "Peers",
     icon: "🫂",
-    colorA: "#f7fb3f",
-    colorB: "#35de00",
+    colorA: "#00d70a",
+    colorB: "#ff0052",
     link: "/peers",
+    description: "Manage connections with your peers",
   },
 ];
 </script>
 <style scoped lang="scss">
 .home {
   height: 100%;
-  display: grid;
-  place-items: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem;
+
+  > .quick-links-wrapper {
+    margin-top: auto;
+    display: flex;
+    flex-direction: column;
+
+    > .text {
+      display: flex;
+      align-items: center;
+      padding: 2px 0.5rem;
+
+      > p {
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: darken(white, 20%);
+      }
+
+      > *:last-child {
+        margin-left: auto;
+      }
+    }
+
+    > .quick-links {
+      align-self: center;
+      display: flex;
+      position: relative;
+      background-color: black;
+      padding: 1rem;
+      border: solid 5px rgb(75, 75, 75);
+      box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2),
+        0 6px 20px 0 rgba(0, 0, 0, 0.19);
+
+      &:hover .icon:hover {
+        opacity: 1;
+      }
+
+      &:hover .icon {
+        opacity: 0.7;
+      }
+    }
+  }
 
   > .title {
+    justify-self: flex-start;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    margin-top: auto;
 
     > h1 {
-      font-size: 10rem;
+      font-size: 12.5rem;
 
       > strong {
         background: url("../assets/images/icon.png");
@@ -131,195 +147,6 @@ const icons = [
     > h2 {
       margin-top: -1.75rem;
       color: darken(white, 20%);
-    }
-  }
-
-  > .quick-links-wrapper {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: lighten(#131313, 10%);
-    border-radius: 40px;
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-
-    > .joycon {
-      width: 80px;
-      height: 300px;
-      padding: 1rem;
-      position: relative;
-
-      > * {
-        position: absolute;
-      }
-
-      > .joystick {
-        border-radius: 50%;
-        background-color: black;
-        height: 70px;
-        width: 70px;
-      }
-
-      > .buttons {
-        position: relative;
-
-        > * {
-          position: absolute;
-          border-radius: 50%;
-          background-color: black;
-          height: 28px;
-          width: 28px;
-        }
-      }
-
-      > .bumper {
-        top: -5px;
-        width: 100px;
-        height: 100px;
-        z-index: -1;
-        background-color: black;
-
-        > .cover {
-          position: absolute;
-          background-color: #131313;
-          top: 40px;
-          width: 100px;
-          height: 100px;
-        }
-      }
-    }
-
-    > .left-joycon {
-      background-color: green;
-      border-radius: 40px 0 0 40px;
-
-      > .bumper {
-        border-top-left-radius: 40px;
-        left: -5px;
-      }
-
-      > .minus {
-        background-color: black;
-        height: 7px;
-        width: 20px;
-        right: 10px;
-      }
-
-      > .joystick {
-        left: 23px;
-        top: 60px;
-      }
-
-      > .screenshot {
-        background-color: black;
-        width: 20px;
-        height: 20px;
-        right: 15px;
-        top: 240px;
-      }
-
-      > .buttons {
-        top: 140px;
-
-        > div:first-child {
-          left: 30px;
-        }
-
-        > div:nth-child(2) {
-          top: 24px;
-          left: 5px;
-        }
-
-        > div:nth-child(3) {
-          top: 24px;
-          right: 0px;
-        }
-
-        > div:nth-child(4) {
-          top: 48px;
-          left: 30px;
-        }
-      }
-    }
-
-    > .right-joycon {
-      background-color: rgb(255, 22, 80);
-      border-radius: 0 40px 40px 0;
-
-      > .bumper {
-        border-top-right-radius: 40px;
-        right: -5px;
-      }
-
-      > .plus {
-        position: relative;
-        right: 8px;
-        top: -4px;
-
-        > * {
-          background-color: black;
-          position: absolute;
-        }
-
-        > div:first-child {
-          left: 6px;
-          height: 20px;
-          width: 7px;
-        }
-
-        > div:nth-child(2) {
-          top: 7px;
-          height: 7px;
-          width: 20px;
-        }
-      }
-
-      > .buttons {
-        top: 40px;
-        right: 7px;
-
-        > div:first-child {
-          left: 30px;
-        }
-
-        > div:nth-child(2) {
-          top: 24px;
-          left: 5px;
-        }
-
-        > div:nth-child(3) {
-          top: 24px;
-          right: 0px;
-        }
-
-        > div:nth-child(4) {
-          top: 48px;
-          left: 30px;
-        }
-      }
-
-      > .joystick {
-        right: 23px;
-        top: 160px;
-      }
-
-      > .home {
-        border-radius: 50%;
-        background-color: black;
-        width: 28px;
-        height: 28px;
-        top: 240px;
-      }
-    }
-
-    > .quick-links {
-      background-color: black;
-      margin: 0.5rem;
-      padding: 0.5rem 3rem;
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      place-items: center;
-      gap: 1rem;
-      height: 300px;
     }
   }
 }

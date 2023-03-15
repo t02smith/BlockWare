@@ -3,11 +3,11 @@
     <router-link to="/home" class="title">
       <img src="../assets/images/icon.png" alt="" />
       <h4>BlockWare</h4>
+
+      <h3 class="address">🌍 Using library {{ eth.contractAddress }}</h3>
     </router-link>
 
     <div class="links">
-      <h3 class="address">🌍 Connected to {{ eth.contractAddress }}</h3>
-
       <router-link to="/library">🕹️ Library</router-link>
       <router-link to="/downloads">🎁 Downloads</router-link>
       <router-link to="/upload">🆕 Upload</router-link>
@@ -47,19 +47,28 @@ nav {
       width: 30px;
       height: 30px;
     }
+
+    > .address {
+      display: flex;
+      gap: 0.35rem;
+      align-items: center;
+      background-color: #303030;
+      padding: 3px 8px;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      overflow: hidden;
+      height: 25px;
+      cursor: pointer;
+      width: auto;
+      margin-top: 4px;
+      color: darken(white, 15%);
+    }
   }
 
   > .links {
     margin-left: auto;
     display: flex;
     gap: 1rem;
-
-    > .address {
-      background-color: #303030;
-      padding: 3px 15px;
-      border-radius: 10px;
-      font-size: 0.9rem;
-    }
 
     a {
       color: rgb(181, 181, 181);

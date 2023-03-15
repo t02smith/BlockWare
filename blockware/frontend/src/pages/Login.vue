@@ -6,22 +6,11 @@
     </div>
 
     <h3>
-      🌍 Connecting to Store <strong>{{ addr }}</strong>
+      🌍 Connecting to Library <strong>{{ addr }}</strong>
     </h3>
 
     <div class="form">
       <form @submit.prevent="join" v-if="isJoining">
-        <!-- <div class="form-group">
-          <p>The address of your chosen BlockWare instance</p>
-          <input
-            type="text"
-            name=""
-            id=""
-            placeholder="Contract Address"
-            v-model="addr"
-          />
-        </div> -->
-
         <input
           type="password"
           name=""
@@ -43,13 +32,6 @@
         />
         <button type="submit">Deploy</button>
       </form>
-
-      <!-- <p @click="() => (isJoining = !isJoining)">
-        Click here to
-        {{
-          isJoining ? "deploy your own instance" : "join an existing instance"
-        }}
-      </p> -->
     </div>
   </div>
 </template>

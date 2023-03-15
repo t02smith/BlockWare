@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"sync"
 
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/spf13/viper"
@@ -31,6 +32,8 @@ type Library struct {
 
 	//
 	DownloadManager *DownloadManager
+
+	lock sync.Mutex
 }
 
 // NewLibrary create a new library
@@ -138,11 +141,13 @@ func (l *Library) GetBlockchainGames() []*Game {
 func (l *Library) GetDownloads() map[[32]byte]*Download {
 	ds := make(map[[32]byte]*Download)
 
+	l.lock.Lock()
 	for hash, g := range l.ownedGames {
 		if g.Download != nil {
 			ds[hash] = g.Download
 		}
 	}
+	l.lock.Unlock()
 
 	return ds
 }

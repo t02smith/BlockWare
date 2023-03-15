@@ -54,10 +54,20 @@
   </div>
 </template>
 <script setup>
-import { computed, ref } from "vue";
+import { computed, ref, onMounted, onUnmounted } from "vue";
 import { useGamesStore } from "../stores/games";
 
 const games = useGamesStore();
+
+const refreshInterval = ref(null);
+onMounted(() => {
+  refreshInterval.value = setInterval(() => games.refreshDownloads(), 5000);
+});
+
+onUnmounted(() => {
+  if (!refreshInterval.value) return;
+  clearInterval(refreshInterval.value);
+});
 
 const downloadGamePairs = computed(() => {
   if (games.downloads.length === 0) return [];

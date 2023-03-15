@@ -124,7 +124,10 @@ func (g *Game) SetupDownload() error {
 		}
 
 		d.TotalBlocks += len(p.BlocksRemaining)
+
+		d.progressLock.Lock()
 		d.Progress[htf.RootHash] = p
+		d.progressLock.Unlock()
 	})
 
 	if err != nil {
@@ -162,7 +165,11 @@ func (g *Game) CancelDownload() error {
 // InsertData insert data into a file for a given game download
 func (d *Download) insertData(fileHash, blockHash [32]byte, data []byte) error {
 	util.Logger.Debugf("Attempting to insert shard %x into %x", blockHash, fileHash)
+
+	d.progressLock.Lock()
 	file, ok := d.Progress[fileHash]
+	d.progressLock.Unlock()
+
 	if !ok {
 		util.Logger.Debugf("file %x not in download queue", fileHash)
 		return nil
@@ -224,6 +231,7 @@ func (d *Download) ContinueDownload(gameHash [32]byte, newRequest chan DownloadR
 			return
 		}
 
+		d.progressLock.Lock()
 		for _, file := range d.Progress {
 			util.Logger.Debugf("Requesting file %s for game %x", file.AbsolutePath, gameHash)
 
@@ -237,6 +245,7 @@ func (d *Download) ContinueDownload(gameHash [32]byte, newRequest chan DownloadR
 				file.lock.Unlock()
 			}
 		}
+		d.progressLock.Unlock()
 	}()
 }
 
@@ -276,7 +285,11 @@ func CleanFile(path string) error {
 
 // GetProgress get the total download progress as a percent
 func (d *Download) GetProgress() float32 {
-	return 1 - float32(len(d.Progress))/float32(d.TotalBlocks)
+	d.progressLock.Lock()
+	length := len(d.Progress)
+	d.progressLock.Unlock()
+
+	return 1 - float32(length)/float32(d.TotalBlocks)
 }
 
 // Finished whether any more blocks are still needed

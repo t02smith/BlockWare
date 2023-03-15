@@ -1,42 +1,36 @@
 <template>
   <div class="peers">
-    <div class="title">
-      <div class="title-card">
-        <div class="text">
-          <h1>Connect to New Peers</h1>
-          <p>
-            You and your peers will form a distributed network who will share
-            game data with each other.
-          </p>
-        </div>
+    <div class="side-panel">
+      <h3>
+        Connect to New Peers:
+        <hr style="opacity: 0.5" />
+      </h3>
 
-        <form class="new" @submit.prevent="connect">
-          <p>tcp://</p>
-          <input
-            type="text"
-            name=""
-            id=""
-            placeholder="hostname"
-            v-model="hostname"
-          />
-          <p>:</p>
-          <input
-            type="number"
-            name=""
-            id=""
-            placeholder="port"
-            v-model="port"
-          />
+      <form class="new" @submit.prevent="connect">
+        <h4>Connect to a <strong>Single Peer</strong>:</h4>
 
-          <button type="submit">connect</button>
-        </form>
-      </div>
+        <input
+          type="text"
+          name=""
+          id=""
+          placeholder="hostname (localhost)"
+          v-model="hostname"
+        />
 
+        <input
+          type="number"
+          name=""
+          id=""
+          placeholder="port (6750)"
+          v-model="port"
+        />
+
+        <button type="submit">connect</button>
+      </form>
+
+      <hr style="opacity: 0.5" />
       <form @submit.prevent="connectAll" class="many-peers">
-        <div class="header">
-          <p>Connect to <strong>many peers</strong> at once:</p>
-          <button type="submit">Connect</button>
-        </div>
+        <h4>Connect to <strong>Many Peers</strong>:</h4>
 
         <textarea
           name=""
@@ -48,19 +42,30 @@
 localhost:6751
 ..."
         ></textarea>
+
+        <button type="submit">Connect</button>
       </form>
     </div>
 
-    <!-- peer list -->
     <div class="content">
-      <h2>
-        <strong>{{ peers.peers ? peers.peers.length : 0 }}</strong> - Your Peers
-      </h2>
+      <div class="title">
+        <h2>Your Peers</h2>
+        <p>Below are the list of peers you're currently connected to.</p>
+        <p>
+          Peers are used to share game data and contribute to the distribution
+          of games uploaded to the <strong>BlockWare</strong> network.
+        </p>
+      </div>
 
-      <p v-if="!peers.peers">Nothing to show here 🥲</p>
+      <div class="peer-list">
+        <h3>
+          You are connected to
+          <strong>{{ peers.peers ? peers.peers.length : 0 }} peers</strong>!
+        </h3>
 
-      <div v-else>
-        <div v-for="p in peers.peers.slice(0, 15)" class="peer">
+        <p v-if="!peers.peers">Nothing to show here 🥲</p>
+
+        <div v-else v-for="p in peers.peers.slice(0, 15)" class="peer">
           <button
             class="disconnect"
             @click="() => disconnect(p.Hostname, p.Port)"
@@ -72,7 +77,10 @@ localhost:6751
             {{ p.Library ? p.Library.length : 0 }} games in common
           </p>
         </div>
-        <p v-if="peers.peers.length > 15" style="font-style: italic">
+        <p
+          v-if="peers.peers && peers.peers.length > 15"
+          style="font-style: italic"
+        >
           {{ peers.peers.length - 15 }} more peers connected...
         </p>
       </div>
@@ -114,128 +122,119 @@ function disconnect(hostname, port) {
 <style scoped lang="scss">
 .peers {
   display: flex;
-  flex-direction: column;
   gap: 1rem;
-  margin: 2rem;
+  height: 100%;
 
-  > .content {
-    .peer {
+  > .side-panel {
+    background-color: lighten(#131313, 5%);
+    height: 100%;
+    max-width: fit-content;
+    padding: 1rem 1rem;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    border-radius: 0 10px 0;
+    border: solid 2px rgba(0, 132, 255, 0.24);
+    border-left: none;
+    border-bottom: none;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+
+    > form {
       display: flex;
-      align-items: center;
+      flex-direction: column;
       gap: 0.5rem;
 
       > button {
-        background-color: transparent;
-        font-size: 1.2rem;
-        outline: none;
+        padding: 5px 15px;
+        font-weight: bold;
+        border-radius: 3px;
+        background-color: rgb(0, 132, 255);
+        color: white;
         border: none;
-        transition: 150ms;
+        outline: none;
+        width: fit-content;
+        align-self: flex-end;
         cursor: pointer;
+        transition: 150ms;
 
         &:hover {
-          opacity: 0.5;
+          opacity: 0.75;
+        }
+
+        &:focus {
+          background-color: rgb(20, 187, 20);
+        }
+      }
+    }
+
+    > .new {
+      > input {
+        padding: 5px 7px;
+        border-radius: 2px;
+        outline: none;
+        border: none;
+
+        &:focus {
+          font-weight: bold;
         }
       }
 
       > p {
-        font-size: 1.1rem;
+        background-color: gray;
       }
     }
-
-    ul {
-      margin-left: 1.5rem;
-    }
-  }
-
-  > .title {
-    display: grid;
-    grid-template-columns: 3fr 2fr;
 
     > .many-peers {
-      display: flex;
-      flex-direction: column;
-      margin-right: 2rem;
-
-      > .header {
-        display: flex;
-        align-items: center;
-        height: 30px;
-        margin: 0.6rem 0rem;
-
-        > p {
-          font-size: 1.1rem;
-        }
-
-        > button {
-          margin-left: auto;
-          color: white;
-          background-color: rgb(56, 121, 219);
-          font-weight: bold;
-          border-radius: 5px;
-          padding: 0.3rem 0.75rem;
-          border: none;
-          cursor: pointer;
-
-          &:hover {
-            background-color: darken(rgb(56, 121, 219), 4%);
-          }
-        }
-      }
-
-      textarea {
+      > textarea {
         outline: none;
         border: none;
-        padding: 0.5rem;
+        padding: 5px 2px;
         width: 100%;
         resize: none;
         border-radius: 2px;
+
+        &:focus {
+          font-weight: bold;
+        }
+      }
+    }
+  }
+
+  > .content {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+
+    > .title {
+      > h2 {
+        font-size: 2rem;
+      }
+
+      > p {
+        color: darken(white, 20%);
       }
     }
 
-    > .title-card {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-
-      > form {
+    > .peer-list {
+      > .peer {
         display: flex;
-        background-color: gray;
-        width: fit-content;
-        padding: 0.5rem;
-        border-radius: 5px;
+        align-items: center;
+        gap: 0.5rem;
+
+        > .disconnect {
+          background-color: transparent;
+          font-size: 1.2rem;
+          border: none;
+          transition: 150ms;
+          cursor: pointer;
+
+          &:hover {
+            opacity: 0.75;
+          }
+        }
 
         > p {
-          background-color: darken(white, 10%);
-          padding: 0.5rem 0.5rem;
-          font-size: 1rem;
-          color: black;
-
-          &:first-child {
-            border-radius: 5px 0 0 5px;
-          }
-        }
-
-        > input {
-          font-size: 1rem;
-          padding: 0.5rem;
-          outline: none;
-          border: none;
-
-          &[type="number"] {
-            width: 50px;
-          }
-        }
-
-        > button {
-          cursor: pointer;
-          font-size: 1rem;
-          padding: 0.5rem;
-          border-radius: 0 5px 5px 0;
-          background-color: rgb(56, 121, 219);
-          color: white;
-          font-weight: bold;
-          outline: none;
-          border: none;
+          font-size: 1.2rem;
         }
       }
     }

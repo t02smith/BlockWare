@@ -20,7 +20,7 @@
           v-if="selectedIsDownloading === 0"
           class="download new"
         >
-          <h3>💡 Download now</h3>
+          <h3>💡 Download</h3>
         </button>
 
         <div

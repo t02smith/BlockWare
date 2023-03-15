@@ -613,3 +613,22 @@ func (htf *HashTreeFile) Equals(htf2 *HashTreeFile) bool {
 
 	return true
 }
+
+func (ht *HashTree) ListFiles() []*HashTreeFile {
+	return ht.RootDir.listFiles(".")
+}
+
+func (htd *HashTreeDir) listFiles(absPath string) []*HashTreeFile {
+	var ls []*HashTreeFile
+
+	for _, f := range htd.Files {
+		f.AbsoluteFilename = filepath.Join(absPath, f.Filename)
+		ls = append(ls, f)
+	}
+
+	for _, sd := range htd.Subdirs {
+		ls = append(ls, sd.listFiles(filepath.Join(absPath, sd.Dirname))...)
+	}
+
+	return ls
+}

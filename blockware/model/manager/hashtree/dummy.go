@@ -5,6 +5,7 @@ import (
 	"errors"
 	"os"
 	"path/filepath"
+	"sync"
 
 	"github.com/t02smith/part-iii-project/toolkit/util"
 )
@@ -20,53 +21,42 @@ the user cannot have enough storage.
 
 */
 
-// CreateDummyFiles /*
 func (ht *HashTree) CreateDummyFiles(rootDir, title string, onCreate func(string, *HashTreeFile)) error {
 	err := os.Mkdir(filepath.Join(rootDir, title), 0777)
 	if err != nil && !os.IsExist(err) {
 		return err
 	}
 
-	err = ht.createDummyFilesFromDirectory(ht.RootDir, filepath.Join(rootDir, title), onCreate)
-	if err != nil {
-		return err
+	files := ht.ListFiles()
+	var wg sync.WaitGroup
+	wg.Add(len(files))
+
+	toCreate := make(chan *HashTreeFile, 5)
+	go func() {
+		for _, f := range files {
+			toCreate <- f
+		}
+	}()
+
+	for i := 0; i < 10; i++ {
+		go func() {
+			for f := range toCreate {
+				fileLocation := filepath.Join(rootDir, title, f.AbsoluteFilename)
+				err := setupFile(fileLocation, ht.ShardSize, uint(len(f.Hashes)))
+				if err != nil {
+					util.Logger.Errorf("error creating %s: %s", fileLocation, err)
+				}
+
+				onCreate(fileLocation, f)
+				wg.Done()
+			}
+		}()
 	}
 
+	wg.Wait()
+	close(toCreate)
 	return nil
 
-}
-
-// traverse a directory and create any dummy files and recursively traverse sub-dirs
-func (ht *HashTree) createDummyFilesFromDirectory(dir *HashTreeDir, path string, onCreate func(string, *HashTreeFile)) error {
-	util.Logger.Debugf("Generating files for folder %s", filepath.Join(path, dir.Dirname))
-
-	if len(dir.Dirname) > 0 {
-		err := os.Mkdir(filepath.Join(path, dir.Dirname), 0777)
-		if err != nil {
-			return err
-		}
-	}
-
-	// generate files
-	for _, f := range dir.Files {
-		fileLocation := filepath.Join(path, dir.Dirname, f.Filename)
-		err := setupFile(fileLocation, ht.ShardSize, uint(len(f.Hashes)))
-		if err != nil {
-			return err
-		}
-		onCreate(fileLocation, f)
-	}
-
-	// generate sub-dirs
-	newPath := filepath.Join(path, dir.Dirname)
-	for _, d := range dir.Subdirs {
-		err := ht.createDummyFilesFromDirectory(d, newPath, onCreate)
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
 }
 
 /*
@@ -76,6 +66,12 @@ to be filled in later
 */
 func setupFile(filename string, shardSize, shardCount uint) error {
 	util.Logger.Debugf("Creating dummy file %s", filename)
+
+	err := os.MkdirAll(filepath.Dir(filename), 0755)
+	if err != nil {
+		return err
+	}
+
 	file, err := os.Create(filename)
 	if err != nil {
 		return err

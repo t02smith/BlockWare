@@ -24,12 +24,6 @@ failure
 */
 
 func TestCreateDummyFiles(t *testing.T) {
-
-	// TODO
-
-}
-
-func _TestCreateDummyFiles(t *testing.T) {
 	tmpFile := "../../test/data/tmp/skeleton.txt"
 
 	smoke := t.Run("function setupFile", func(t *testing.T) {

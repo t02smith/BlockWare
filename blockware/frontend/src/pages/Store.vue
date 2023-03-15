@@ -26,11 +26,17 @@
 
     <div class="searched-game" v-if="searchedGame"></div>
 
-    <div class="featured">
+    <div class="categories">
       <CustomLibrary
         gameLinkTo="store/entry"
         :games="games.storeGames"
         name="Featured"
+      />
+
+      <CustomLibrary
+        gameLinkTo="store/entry"
+        :games="games.storeGames"
+        name="New Releases"
       />
     </div>
   </div>
@@ -68,19 +74,7 @@ async function searchForGame() {
   display: flex;
   flex-direction: column;
   padding: 2rem;
-
-  > .search {
-    align-self: center;
-    display: grid;
-    place-items: center;
-
-    > input {
-      padding: 5px 10px;
-      width: 500px;
-      border-radius: 4px;
-      outline: none;
-    }
-  }
+  height: 100%;
 
   > .title {
     display: flex;
@@ -100,10 +94,16 @@ async function searchForGame() {
     }
   }
 
-  > .featured {
-    > h3 {
-      color: orangered;
-      font-size: 1.4rem;
+  > .categories {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    height: 100%;
+
+    > .category {
+      > h3 {
+        color: orangered;
+        font-size: 1.4rem;
+      }
     }
   }
 

@@ -53,7 +53,7 @@ func (c *Controller) StartDownloadListener() {
 	go func() {
 		downloadChannel := peer.Peer().Library().DownloadManager.DownloadProgress
 		for range downloadChannel {
-			runtime.EventsEmit(c.ctx, "download-progress")
+
 		}
 	}()
 }

@@ -61,7 +61,7 @@ func (d *DownloadManager) Close() {
 // workers
 
 func shardInserterPool(capacity int, download *Download) chan InsertShardRequest {
-	util.Logger.Infof("Creating shard inserted pool")
+	util.Logger.Infof("Creating shard inserter pool")
 	input := make(chan InsertShardRequest, 25)
 
 	for w := 1; w <= capacity; w++ {

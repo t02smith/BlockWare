@@ -13,7 +13,11 @@
 
           <div class="header-text">
             <h2>{{ props.game.title }}</h2>
-            <h3>{{ props.game.dev }}</h3>
+            <div>
+              <h3>{{ props.game.dev }}</h3>
+              <h3>•</h3>
+              <h3>{{ props.game.version }}</h3>
+            </div>
           </div>
 
           <div class="slot">
@@ -99,8 +103,18 @@ onMounted(async () => {
             margin-bottom: -0.9rem;
           }
 
-          > h3 {
-            color: rgb(0, 183, 255);
+          > div {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+
+            > h3:nth-child(3) {
+              color: darken(white, 25%);
+            }
+
+            > h3:nth-child(1) {
+              color: rgb(0, 183, 255);
+            }
           }
         }
 

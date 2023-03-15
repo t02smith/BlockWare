@@ -177,7 +177,7 @@ func (d *Download) insertData(fileHash, blockHash [32]byte, data []byte) error {
 
 	offsets, ok := file.BlocksRemaining[blockHash]
 	if !ok {
-		util.Logger.Debugf("block %x not in download queue", blockHash)
+		util.Logger.Warnf("block %x not in download queue", blockHash)
 		return nil
 	}
 

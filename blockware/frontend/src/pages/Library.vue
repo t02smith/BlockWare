@@ -4,12 +4,18 @@
     <ul>
       <p>🎮 Your games:</p>
       <li
+        v-if="games.ownedGames"
         v-for="g in games.ownedGames"
         @click="() => (selected = g)"
         :class="`${selected === g && 'active'}`"
       >
-        <p>{{ g.title }}</p>
+        <p>
+          {{ g.title }}
+        </p>
+        <strong>{{ g.version }}</strong>
       </li>
+
+      <p class="empty" v-else>Nothing to show here 🥲</p>
     </ul>
 
     <!-- game details -->
@@ -131,6 +137,11 @@ async function uninstall() {
     max-width: 250px;
     overflow-y: auto;
 
+    > .empty {
+      color: darken(white, 20%);
+      text-align: left;
+    }
+
     > p {
       margin: 0.4rem 0.5rem;
       font-weight: bold;
@@ -145,6 +156,13 @@ async function uninstall() {
       font-size: 1.15rem;
       border-bottom: 1px solid rgb(85, 85, 85);
       transition: 150ms;
+      display: flex;
+      align-items: center;
+
+      > strong {
+        margin-left: auto;
+        font-size: 0.95rem;
+      }
 
       &:last-child {
         border-color: transparent;

@@ -61,7 +61,8 @@ const games = useGamesStore();
 
 const refreshInterval = ref(null);
 onMounted(() => {
-  refreshInterval.value = setInterval(() => games.refreshDownloads(), 5000);
+  games.refreshDownloads();
+  refreshInterval.value = setInterval(() => games.refreshDownloads(), 250);
 });
 
 onUnmounted(() => {

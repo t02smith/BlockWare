@@ -21,7 +21,7 @@
         :linkTo="props.gameLinkTo"
       />
       <div v-else class="no-games">
-        <h3>Ooops no games here...</h3>
+        <h3>Ooops nothing to see here 🥲</h3>
       </div>
     </div>
   </div>
@@ -49,6 +49,7 @@ const props = defineProps({
   background-color: lighten(#131313, 5%);
   border-radius: 10px;
   margin: 1rem;
+  height: 100%;
 
   > .games {
     display: flex;
@@ -71,6 +72,10 @@ const props = defineProps({
     padding: 0.5rem;
     background-color: lighten(#131313, 15%);
     border-radius: 10px 10px 0 0;
+
+    > h2 {
+      margin-left: 0.5rem;
+    }
 
     > .right {
       margin-left: auto;

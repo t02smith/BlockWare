@@ -6,9 +6,7 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
-	"path/filepath"
 
-	"github.com/spf13/viper"
 	"github.com/t02smith/part-iii-project/toolkit/model/manager/games"
 	"github.com/t02smith/part-iii-project/toolkit/model/net/tcp"
 	"github.com/t02smith/part-iii-project/toolkit/model/persistence/ethereum"
@@ -212,7 +210,7 @@ func handleSEND_BLOCK(cmd []string, client tcp.TCPConnection) error {
 	}
 
 	for _, l := range locations {
-		download.InserterPool <- games.InsertShardRequest{
+		download.InserterPool() <- games.InsertShardRequest{
 			FileHash:  l.File.RootHash,
 			BlockHash: sh,
 			Data:      data,
@@ -227,11 +225,7 @@ func handleSEND_BLOCK(cmd []string, client tcp.TCPConnection) error {
 	})
 	pd.Unlock()
 
-	game.OutputToFile(
-		filepath.Join(
-			viper.GetString("meta.directory"),
-			"games",
-			fmt.Sprintf("%x", game.RootHash)))
+	game.OutputToFile()
 
 	// send message as confirmation
 	Peer().library.DownloadManager.DownloadProgress <- games.DownloadRequest{

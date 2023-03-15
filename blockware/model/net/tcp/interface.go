@@ -9,4 +9,5 @@ type TCPConnection interface {
 	SendString(command string) error
 	SendStringf(command string, args ...any) error
 	Info() string
+	Close() error
 }

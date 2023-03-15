@@ -53,9 +53,9 @@ func NewDownloadManager() *DownloadManager {
 }
 
 func (d *DownloadManager) Close() {
-	close(d.DeferredRequests)
-	close(d.DownloadProgress)
-	close(d.RequestDownload)
+	// close(d.DeferredRequests)
+	// close(d.DownloadProgress)
+	// close(d.RequestDownload)
 }
 
 // workers

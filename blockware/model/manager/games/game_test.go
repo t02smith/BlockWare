@@ -161,3 +161,9 @@ func TestFetchShard(t *testing.T) {
 
 	gamesTestSetup()
 }
+
+func TestLoadGames(t *testing.T) {
+
+	LoadGames("../../../test/data/.toolkit/games")
+
+}

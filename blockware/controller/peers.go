@@ -83,3 +83,14 @@ func (c *Controller) ConnectToManyPeers(lines string) {
 		}()
 	}
 }
+
+func (c *Controller) Disconnect(hostname string, port uint) {
+	p := peer.Peer()
+	for con, data := range p.GetPeers() {
+		if data.Hostname == hostname && data.Port == port {
+			p.OnConnectionClose(con)
+		}
+	}
+
+	runtime.EventsEmit(c.ctx, "new-peer")
+}

@@ -59,12 +59,23 @@ localhost:6751
 
       <p v-if="!peers.peers">Nothing to show here 🥲</p>
 
-      <ul v-else>
-        <li v-for="p in peers.peers">
-          <strong>tcp://{{ p.Hostname }}:{{ p.Port }}</strong> -
-          {{ p.Library ? p.Library.length : 0 }} games in common
-        </li>
-      </ul>
+      <div v-else>
+        <div v-for="p in peers.peers.slice(0, 15)" class="peer">
+          <button
+            class="disconnect"
+            @click="() => disconnect(p.Hostname, p.Port)"
+          >
+            ❌
+          </button>
+          <p>
+            <strong>tcp://{{ p.Hostname }}:{{ p.Port }}</strong> -
+            {{ p.Library ? p.Library.length : 0 }} games in common
+          </p>
+        </div>
+        <p v-if="peers.peers.length > 15" style="font-style: italic">
+          {{ peers.peers.length - 15 }} more peers connected...
+        </p>
+      </div>
     </div>
   </div>
 </template>
@@ -95,6 +106,10 @@ async function connectAll() {
   peers.connectToAll(manyPeers.value);
   manyPeers.value = "";
 }
+
+function disconnect(hostname, port) {
+  peers.disconnect(hostname, port);
+}
 </script>
 <style scoped lang="scss">
 .peers {
@@ -104,6 +119,29 @@ async function connectAll() {
   margin: 2rem;
 
   > .content {
+    .peer {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+
+      > button {
+        background-color: transparent;
+        font-size: 1.2rem;
+        outline: none;
+        border: none;
+        transition: 150ms;
+        cursor: pointer;
+
+        &:hover {
+          opacity: 0.5;
+        }
+      }
+
+      > p {
+        font-size: 1.1rem;
+      }
+    }
+
     ul {
       margin-left: 1.5rem;
     }

@@ -18,16 +18,16 @@ func TestMain(m *testing.M) {
 	testutil.SetupTestConfig()
 	model.SetupToolkitEnvironment()
 
-	err := setupTestGame()
-	if err != nil {
-		log.Println(err)
-		gamesTestTeardown()
-		os.Exit(1)
-	}
+	// err := setupTestGame()
+	// if err != nil {
+	// 	log.Println(err)
+	// 	gamesTestTeardown()
+	// 	os.Exit(1)
+	// }
 
-	gamesTestSetup()
+	// gamesTestSetup()
 	code := m.Run()
-	gamesTestTeardown()
+	// gamesTestTeardown()
 
 	os.Exit(code)
 }

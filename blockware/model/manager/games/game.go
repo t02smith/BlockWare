@@ -26,20 +26,20 @@ import (
 type Game struct {
 
 	// game metadata
-	Title           string   `json:"title"`
-	Version         string   `json:"version"`
-	ReleaseDate     string   `json:"release"`
-	Developer       string   `json:"dev"`
-	RootHash        [32]byte `json:"rootHash"`
-	PreviousVersion [32]byte `json:"previousVersion"`
+	Title           string
+	Version         string
+	ReleaseDate     string
+	Developer       string
+	RootHash        [32]byte
+	PreviousVersion [32]byte
 
 	// IPFS
-	HashTreeIPFSAddress string      `json:"IPFSId"`
-	Assets              *GameAssets `json:"assets"`
+	HashTreeIPFSAddress string
+	Assets              *GameAssets
 
 	// blockchain related
-	Price    *big.Int       `json:"price"`
-	Uploader common.Address `json:"uploader"`
+	Price    *big.Int
+	Uploader common.Address
 
 	// the shard data
 	data *hash.HashTree
@@ -168,7 +168,7 @@ func (g *Game) readHashData() error {
 // OutputAllGameDataToFile output data to file
 func OutputAllGameDataToFile(g *Game) error {
 	gameFilename := filepath.Join(viper.GetString("meta.directory"), "games", fmt.Sprintf("%x", g.RootHash))
-	err := g.OutputToFile(gameFilename)
+	err := g.OutputToFile()
 	if err != nil {
 		return err
 	}
@@ -183,8 +183,9 @@ func OutputAllGameDataToFile(g *Game) error {
 	return nil
 }
 
-// OutputToFile output a game to file
-func (g *Game) OutputToFile(filename string) error {
+// OutputToFile output game metadata and download info to file
+func (g *Game) OutputToFile() error {
+	filename := filepath.Join(viper.GetString("meta.directory"), "games", fmt.Sprintf("%x", g.RootHash))
 	util.Logger.Debugf("Outputting game data to %s", filename)
 
 	f, err := os.Create(filename)
@@ -195,14 +196,26 @@ func (g *Game) OutputToFile(filename string) error {
 
 	writer := gzip.NewWriter(f)
 	encoder := gob.NewEncoder(writer)
+
+	if g.Download != nil {
+		g.Download.progressLock.Lock()
+	}
+
 	err = encoder.Encode(g)
 	if err != nil {
 		return err
 	}
 
-	writer.Flush()
-	util.Logger.Debugf("Successfully outputted game data to %s", filename)
+	if g.Download != nil {
+		g.Download.progressLock.Unlock()
+	}
 
+	err = writer.Flush()
+	if err != nil {
+		return err
+	}
+
+	util.Logger.Debugf("Successfully outputted game data to %s", filename)
 	return nil
 }
 
@@ -254,6 +267,10 @@ func LoadGames(gameDataLocation string) ([]*Game, error) {
 		if err != nil {
 			gameFile.Close()
 			continue
+		}
+
+		if gm.Download != nil {
+			gm.Download.inserterPool = shardInserterPool(5, gm.Download)
 		}
 
 		gameFile.Close()

@@ -121,8 +121,9 @@ func (ht *HashTree) OutputToFile(filename string) error {
 	if err != nil {
 		return err
 	}
+
 	defer func() {
-		err := file.Close()
+		err = file.Close()
 		if err != nil {
 			util.Logger.Errorf("Error closing file %s: %s", filename, err)
 		}

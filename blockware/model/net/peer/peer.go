@@ -150,13 +150,13 @@ func newPeer(config Config, serverHostname string, serverPort uint, installFolde
 		config:             config,
 	}
 
-	go peer.server.Start(onMessage, peer.onConnection, peer.onClose)
+	go peer.server.Start(onMessage, peer.onConnection, peer.OnConnectionClose)
 	return peer, nil
 }
 
 // ConnectToPeer form a connection to another peer
 func (p *peer) ConnectToPeer(hostname string, portNo uint) error {
-	client, err := tcp.InitTCPClient(hostname, portNo, onMessage, p.onConnection, p.onClose)
+	client, err := tcp.InitTCPClient(hostname, portNo, onMessage, p.onConnection, p.OnConnectionClose)
 	if err != nil {
 		return err
 	}
@@ -183,8 +183,9 @@ func (p *peer) onConnection(hostname string, port uint, peer tcp.TCPConnection) 
 }
 
 // run this function after closing a connection to an existing peer
-func (p *peer) onClose(peer tcp.TCPConnection) {
+func (p *peer) OnConnectionClose(peer tcp.TCPConnection) {
 	util.Logger.Infof("Closing connection to %s", peer.Info())
+	peer.Close()
 	p.DeletePeer(peer)
 }
 

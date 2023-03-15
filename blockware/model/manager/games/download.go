@@ -46,7 +46,7 @@ Starting a download will:
 type Download struct {
 
 	// progress of each file being downloaded
-	Progress     map[[32]byte]FileProgress
+	Progress     map[[32]byte]*FileProgress
 	progressLock sync.Mutex
 
 	// total number of blocks to install
@@ -56,7 +56,7 @@ type Download struct {
 	AbsolutePath string
 
 	//
-	InserterPool chan InsertShardRequest
+	inserterPool chan InsertShardRequest
 }
 
 // FileProgress the progress of a specific file's download
@@ -68,7 +68,7 @@ type FileProgress struct {
 	// block hash => position in file
 	BlocksRemaining map[[32]byte][]uint
 
-	lock *sync.Mutex
+	lock sync.Mutex
 }
 
 // DownloadRequest /*
@@ -92,12 +92,11 @@ func (g *Game) SetupDownload() error {
 
 	// create download obj
 	d := &Download{
-		Progress:     make(map[[32]byte]FileProgress),
-		TotalBlocks:  0,
-		InserterPool: make(chan InsertShardRequest),
+		Progress:    make(map[[32]byte]*FileProgress),
+		TotalBlocks: 0,
 	}
 
-	d.InserterPool = shardInserterPool(5, d)
+	d.inserterPool = shardInserterPool(5, d)
 
 	// generate dummy files
 	dir := viper.GetString("games.installFolder")
@@ -109,10 +108,9 @@ func (g *Game) SetupDownload() error {
 
 	util.Logger.Infof("Generating dummy files for %s-%s", g.Title, g.Version)
 	err = data.CreateDummyFiles(dir, g.Title, func(path string, htf *hash.HashTreeFile) {
-		p := FileProgress{
+		p := &FileProgress{
 			AbsolutePath:    path,
 			BlocksRemaining: make(map[[32]byte][]uint),
-			lock:            &sync.Mutex{},
 		}
 
 		for i, b := range htf.Hashes {
@@ -305,4 +303,8 @@ func (d *Download) Finished() bool {
 
 func (d *Download) GetProgressLock() *sync.Mutex {
 	return &d.progressLock
+}
+
+func (d *Download) InserterPool() chan InsertShardRequest {
+	return d.inserterPool
 }

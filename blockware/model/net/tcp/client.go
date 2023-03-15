@@ -69,7 +69,6 @@ func (c *TCPClient) listen(onMessage func([]string, TCPConnection) error, onClos
 		if err != nil {
 			if err == io.EOF {
 				onClose(c)
-				c.Close()
 				return
 			}
 
@@ -140,7 +139,7 @@ func (c *TCPClient) Info() string {
 }
 
 // close the tcp client
-func (c *TCPClient) Close() {
-	c.con.Close()
+func (c *TCPClient) Close() error {
 	c.closed = true
+	return c.con.Close()
 }

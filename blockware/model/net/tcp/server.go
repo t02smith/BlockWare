@@ -186,6 +186,6 @@ func (c *TCPServerClient) Info() string {
 }
 
 // close a connection with a TCP client
-func (c *TCPServerClient) Close() {
-	c.con.Close()
+func (c *TCPServerClient) Close() error {
+	return c.con.Close()
 }

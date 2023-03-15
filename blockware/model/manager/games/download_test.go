@@ -41,11 +41,11 @@ func TestContinueDownload(t *testing.T) {
 	channel := make(chan DownloadRequest)
 
 	download := Download{
-		Progress:    make(map[[32]byte]FileProgress),
+		Progress:    make(map[[32]byte]*FileProgress),
 		TotalBlocks: 1,
 	}
 
-	fileProgress := FileProgress{
+	fileProgress := &FileProgress{
 		AbsolutePath:    "test-file.x",
 		BlocksRemaining: make(map[[32]byte][]uint),
 	}

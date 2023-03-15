@@ -4,6 +4,7 @@ import {
   GetPeerInformation,
   ConnectToPeer,
   ConnectToManyPeers,
+  Disconnect,
 } from "../../wailsjs/go/controller/Controller";
 import { EventsOn } from "../../wailsjs/runtime/runtime";
 
@@ -18,6 +19,10 @@ export const usePeerStore = defineStore("peers", () => {
     peers.value = await GetPeerInformation();
   }
 
+  function disconnect(hostname, port) {
+    Disconnect(hostname, port);
+  }
+
   function connect(hostname, port) {
     ConnectToPeer(hostname, port);
   }
@@ -26,5 +31,5 @@ export const usePeerStore = defineStore("peers", () => {
     ConnectToManyPeers(peerLs);
   }
 
-  return { peers, connect, refreshPeers, connectToAll };
+  return { peers, connect, refreshPeers, connectToAll, disconnect };
 });

@@ -4,11 +4,9 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"path/filepath"
 	"sync"
 
 	"github.com/jedib0t/go-pretty/v6/table"
-	"github.com/spf13/viper"
 	"github.com/t02smith/part-iii-project/toolkit/util"
 )
 
@@ -59,6 +57,7 @@ func (l *Library) CreateDownload(g *Game) error {
 	}
 
 	util.Logger.Infof("Download created for %s:%x", g.Title, g.RootHash)
+	g.OutputToFile()
 	g.Download.ContinueDownload(g.RootHash, l.DownloadManager.RequestDownload)
 	return nil
 }
@@ -156,13 +155,14 @@ func (l *Library) GetDownloads() map[[32]byte]*Download {
 func (l *Library) Close() {
 	l.StopDownloads()
 
-	metaDir := viper.GetString("meta.directory")
+	l.lock.Lock()
 	for _, g := range l.ownedGames {
-		err := g.OutputToFile(filepath.Join(metaDir, "games", fmt.Sprintf("%x", g.RootHash)))
+		err := g.OutputToFile()
 		if err != nil {
 			util.Logger.Warnf("Error outputting game %x to file: %s", g.RootHash, err)
 		}
 	}
+	l.lock.Unlock()
 }
 
 // StopDownloads stop downloads from making requests

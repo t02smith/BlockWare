@@ -112,7 +112,7 @@ func (g *Game) SetupDownload() error {
 	}
 	g.Download = d
 
-	// d.inserterPool = shardInserterPool(int(shardInserterCount), g)
+	d.inserterPool = shardInserterPool(int(shardInserterCount), g)
 
 	// generate dummy files
 	dir := viper.GetString("games.installFolder")

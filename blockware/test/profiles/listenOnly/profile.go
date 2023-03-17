@@ -60,7 +60,7 @@ func Run() {
 	// 	Developer:   "tcs1g20",
 	// 	RootDir:     "../listenOnlyWithUpload/t02smith.github.io",
 	// 	Price:       big.NewInt(150),
-	// 	ShardSize:   16384,
+	// 	ShardSize:   4194304,
 	// 	AssetsDir:   "../../data/assets"},
 	// 	nil,
 	// )

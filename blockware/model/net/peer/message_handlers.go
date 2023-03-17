@@ -210,15 +210,11 @@ func handleSEND_BLOCK(cmd []string, client tcp.TCPConnection) error {
 	}
 
 	for _, l := range locations {
-		err = download.InsertData(l.File.RootHash, sh, data)
-		if err != nil {
-			return err
+		download.InserterPool() <- games.InsertShardRequest{
+			FileHash:  l.File.RootHash,
+			BlockHash: sh,
+			Data:      data,
 		}
-		// download.InserterPool() <- games.InsertShardRequest{
-		// 	FileHash:  l.File.RootHash,
-		// 	BlockHash: sh,
-		// 	Data:      data,
-		// }
 	}
 
 	pd := Peer().GetPeer(client)

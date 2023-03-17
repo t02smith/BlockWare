@@ -271,9 +271,9 @@ func LoadGames(gameDataLocation string) ([]*Game, error) {
 			continue
 		}
 
-		// if gm.Download != nil {
-		// 	gm.Download.inserterPool = shardInserterPool(int(shardInserterCount), &gm)
-		// }
+		if gm.Download != nil {
+			gm.Download.inserterPool = shardInserterPool(int(shardInserterCount), &gm)
+		}
 
 		gameFile.Close()
 		games = append(games, &gm)

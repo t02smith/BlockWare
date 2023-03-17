@@ -1,27 +1,34 @@
 
 \subsection{Persistence}
 
-The persistence layer is about storing public data that can be accessed by any user of the application at any point in time.
+The Persistence layer represents the public data that should be accessible by any user of the application at any point in time. 
 
 \subsubsection*{Ethereum}
 
-The smart contract will be written in Solidity \url{https://docs.soliditylang.org/en/v0.8.19/}, and will have to be able to store the data mentioned in Section~\ref{subsubsec:eth-data} as well as perform the following functions:
+An Ethereum Smart Contract, written in Solidity \url{https://docs.soliditylang.org/en/v0.8.19/}, will be used to store the set of data about games that is required for the identification of each game, see Section~\ref{subsubsec:eth-data}. The Smart Contract will also be used to perform the following:
 
-\begin{itemize}
-  \item \textbf{uploadGame} Upload a new game to the blockchain provided it doesn't already exist. Once uploaded, emit an event to let all peers aware of the new game.
-  \item \textbf{purchaseGame} A peer purchases a game they don't already own and transfer ETH to the original uploader and are added to the list of authorised users.
-\end{itemize}
+\begin{enumerate}
+  \item \textbf{Purchasing Games} Users will purchase games over the Ethereum network and will have their address added to the set of users who own a given game. This means all users can see whether a given peer owns a game before sending them the data.
+  \item \textbf{Uploading a Game} Users will need to be able to upload a game to the Ethereum network and have it be visible and purchasable by all users of the application.
+\end{enumerate}
 
 \vspace{2mm}\noindent
 The go-ethereum package \url{https://geth.ethereum.org/} will allow us to interact with the ethereum blockchain and Abigen \url{https://docs.avax.network/specs/abigen} will allow us to compile any smart contracts to Go code. This will allow us to interact with our smart contract on ethereum using a set of Go functions.
 
 \subsubsection*{IPFS}
 
-Storing data on the Ethereum platform is costly to the uploader and adds a greater storage burden on other nodes in the Ethereum network. As such, we only want to store the minimal amount of data required for the identification of a given game on Ethereum and can leverage IPFS for the storage and distribution of larger pieces of public data.
-\x
-This includes:
+Storing data on Ethereum is costly to the uploader, so it is important that the data we do store on it is important and minimal. However we still need to be able to store the following pieces of data such that they are publicly available:
 
 \begin{itemize}
   \item \textbf{Hash Tree} The tree representation of the game's data contents. Only users who purchase the game will need this.
   \item \textbf{Assets} Digital assets such as artwork, description, promotional work, etc.  
 \end{itemize}
+
+\vspace{2mm}\noindent
+IPFS is the perfect platform for this as we can easily identify any data using its CID and have any user retrieve it.
+
+\subsubsection*{Game Data}
+
+One limitation to IPFS is that the only way to store private data on it is to encrypt it. This means it would be difficult to manage and control access rights of data on IPFS over a large, distributed network where only a subset of users will actually be allowed access to it. 
+On top of this, we would not be able to track the contributions of individual nodes sharing data such that a game developer could reward a user for their contribution. 
+The lack of middleware support by IPFS shows that, to meet the requirements set out in Section~\ref{subsec:requirements}, we would need to develop a separate platform to share game data over. 

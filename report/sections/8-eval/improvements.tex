@@ -1,0 +1,19 @@
+\section{Improvements}
+
+\subsection{Redundant Data}
+
+One of the design choices was that each directory would be broken down into a tree of files each with an array of hashes that correspond to its contents. This presented several issues:
+
+\begin{itemize}
+  \item \textbf{File Size < Shard Size} This would mean that when we exchange the blockk over the network we could include a prefix with a given amount of \textit{empty} data. This is a waste of bandwidth and would slow the overall transfer of data around the network.
+  \item \textbf{At Least 1 Shard Per File} This meant that for a project with a large amount of files, we would also have a large amount of shards to consider. The combination of this with the first issue meant that we would be sending lots of redundant data over the network.
+\end{itemize}
+
+\vspace{2mm}\noindent
+Some possible solutions to these could be:
+
+\begin{itemize}
+  \item Represent a directory as a contiguous block of data with breakpoints to denote the start/end of files. This would be slower to search but would result in a more efficient data transfer as only the last block would contain redundant data. This could be paired with an index to identify file breakpoints within it for faster searching.
+  \item 
+\end{itemize}
+

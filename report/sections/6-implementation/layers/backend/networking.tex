@@ -27,8 +27,8 @@ Structured messages will typically come as part of a request/response pair invol
   \midrule
   BLOCK;$[gameHash]$;$[blockHash]$;
   & The user will request a block of data off of a user by sending the root hash of the game and the hash of the block being requested. The response will be a SEND\_BLOCK message.\\
-  SEND\_BLOCK;$[gameHash]$;\newline $[blockHash]$;$[data]$;
-  & The user sends a block of data in response to a BLOCK message.\\
+  SEND\_BLOCK;$[gameHash]$;\newline $[blockHash]$;$[compressedData]$;
+  & The user sends a block of data in response to a BLOCK message. The data is compressed using the \textit{compress/flate} package to reduce message size.\\
   \midrule
   VALIDATE\_REQ;$[message]$
   & The user is requesting for this message to be signed using the receiver's Ethereum private key. This is used to verify the receiver's identity and owned collection of games.\\

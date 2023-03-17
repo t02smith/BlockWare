@@ -1,0 +1,14 @@
+
+\subsubsection*{Optimisations}
+
+\paragraph*{Worker Pools}
+Tasks are queued down a FIFO channel and each one is collected by a single worker thread who will perform a specific task based upon what data was sent. This allowed us to have many worker threads listening on the same channel who will complete tasks in parallel to largely increase the performance of the application.
+
+\vspace{2mm}\noindent
+Some of the areas this pattern was used include:
+
+\begin{itemize}
+  \item Sharding files to create a hash tree,
+  \item To locate and request blocks from many downloads at once, and
+  \item To insert received data and free up the thread listening on a connection,
+\end{itemize}

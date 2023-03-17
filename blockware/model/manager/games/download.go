@@ -1,7 +1,6 @@
 package games
 
 import (
-	"bufio"
 	"bytes"
 	"crypto/sha256"
 	"errors"
@@ -42,6 +41,16 @@ Starting a download will:
 
 */
 
+type DownloadStage string
+
+const (
+	DS_NotStarted          DownloadStage = "Not started"
+	DS_GeneratingDummies   DownloadStage = "Setting up download"
+	DS_Downloading         DownloadStage = "Downloading data"
+	DS_FinishedDownloading DownloadStage = "Finished"
+	DS_Cancelled           DownloadStage = "Cancelled"
+)
+
 // Download A download manager for a game
 type Download struct {
 
@@ -57,6 +66,9 @@ type Download struct {
 
 	//
 	inserterPool chan InsertShardRequest
+
+	// the stage the download is in
+	Stage DownloadStage
 }
 
 // FileProgress the progress of a specific file's download
@@ -67,6 +79,8 @@ type FileProgress struct {
 
 	// block hash => position in file
 	BlocksRemaining map[[32]byte][]uint
+
+	Size int
 
 	lock sync.Mutex
 }
@@ -94,9 +108,11 @@ func (g *Game) SetupDownload() error {
 	d := &Download{
 		Progress:    make(map[[32]byte]*FileProgress),
 		TotalBlocks: 0,
+		Stage:       DS_GeneratingDummies,
 	}
+	g.Download = d
 
-	d.inserterPool = shardInserterPool(5, d)
+	// d.inserterPool = shardInserterPool(int(shardInserterCount), g)
 
 	// generate dummy files
 	dir := viper.GetString("games.installFolder")
@@ -111,6 +127,7 @@ func (g *Game) SetupDownload() error {
 		p := &FileProgress{
 			AbsolutePath:    path,
 			BlocksRemaining: make(map[[32]byte][]uint),
+			Size:            htf.Size,
 		}
 
 		for i, b := range htf.Hashes {
@@ -132,7 +149,7 @@ func (g *Game) SetupDownload() error {
 		return err
 	}
 
-	g.Download = d
+	d.Stage = DS_Downloading
 	return nil
 }
 
@@ -143,6 +160,7 @@ func (g *Game) CancelDownload() error {
 		return nil
 	}
 
+	g.Download.Stage = DS_Cancelled
 	util.Logger.Infof("Cancelling download for game %x", g.RootHash)
 
 	// * remove dummy files
@@ -161,8 +179,9 @@ func (g *Game) CancelDownload() error {
 // ? downloading data
 
 // InsertData insert data into a file for a given game download
-func (d *Download) insertData(fileHash, blockHash [32]byte, data []byte) error {
+func (g *Game) insertData(fileHash, blockHash [32]byte, data []byte) error {
 	util.Logger.Debugf("Attempting to insert shard %x into %x", blockHash, fileHash)
+	d := g.Download
 
 	d.progressLock.Lock()
 	file, ok := d.Progress[fileHash]
@@ -172,6 +191,7 @@ func (d *Download) insertData(fileHash, blockHash [32]byte, data []byte) error {
 		util.Logger.Debugf("file %x not in download queue", fileHash)
 		return nil
 	}
+
 	file.lock.Lock()
 	defer file.lock.Unlock()
 
@@ -200,10 +220,36 @@ func (d *Download) insertData(fileHash, blockHash [32]byte, data []byte) error {
 
 	if len(file.BlocksRemaining) == 0 {
 		util.Logger.Debugf("Download complete for file %s", file.AbsolutePath)
-		err := CleanFile(file.AbsolutePath)
+		err := CleanFile(file.AbsolutePath, file.Size)
 		if err != nil {
 			util.Logger.Errorf("Error cleaning file %s: %s", file.AbsolutePath, err)
 		}
+
+		// verify data
+		// data, err := g.GetData()
+		// if err != nil {
+		// 	return err
+		// }
+
+		// htf := data.GetFile(fileHash)
+		// if htf == nil {
+		// 	// ? shouldn't even make it this far but just in case
+		// 	return nil
+		// }
+
+		// correct, incorrectBlocks, err := hash.VerifyFile(htf, file.AbsolutePath, data.ShardSize)
+		// if err != nil {
+		// 	return err
+		// }
+
+		// if correct {
+		// 	return nil
+		// }
+
+		// util.Logger.Debugf("Found %d blocks in %s that are incorrect", len(incorrectBlocks), file.AbsolutePath)
+		// for blockHash, offset := range incorrectBlocks {
+		// 	file.BlocksRemaining[blockHash] = []uint{offset}
+		// }
 	}
 
 	return nil
@@ -250,31 +296,37 @@ func (d *Download) ContinueDownload(gameHash [32]byte, newRequest chan DownloadR
 // ? misc functions
 
 // CleanFile /*
-func CleanFile(path string) error {
+func CleanFile(path string, size int) error {
 	util.Logger.Debugf("Cleaning file %s", path)
-	file, err := os.OpenFile(path, os.O_RDWR, 0644)
+
+	// stat, err := os.Stat(path)
+	// if err != nil {
+	// 	return err
+	// }
+
+	file, err := os.OpenFile(path, os.O_RDWR, 0755)
 	if err != nil {
 		return err
 	}
 	defer file.Close()
 
-	reader := bufio.NewReader(file)
-	bytesToRemove, buf := 0, make([]byte, 1)
-	for {
-		file.Seek(int64(bytesToRemove), 0)
-		_, err := reader.Read(buf)
-		if err != nil {
-			return err
-		}
+	// reader := bufio.NewReader(file)
+	// bytesToRemove, buf := 0, make([]byte, 1)
+	// for {
+	// 	file.Seek(int64(bytesToRemove)-1, io.SeekEnd)
+	// 	_, err := reader.Read(buf)
+	// 	if err != nil {
+	// 		return err
+	// 	}
 
-		if buf[0] != 0x00 {
-			bytesToRemove++
-		} else {
-			break
-		}
-	}
+	// 	if buf[0] == 0x00 {
+	// 		bytesToRemove--
+	// 	} else {
+	// 		break
+	// 	}
+	// }
 
-	if err = file.Truncate(int64(bytesToRemove)); err != nil {
+	if err = file.Truncate(int64(size)); err != nil {
 		return err
 	}
 	util.Logger.Debugf("Cleaned file %s", path)

@@ -544,12 +544,6 @@ func TestHandleSEND_BLOCK(t *testing.T) {
 			Peer().library.ClearOwnedGames()
 		})
 
-		go func() {
-			for range Peer().library.DownloadManager.DownloadProgress {
-				continue
-			}
-		}()
-
 		gData, err := game.GetData()
 		if err != nil {
 			t.Fatal(err)

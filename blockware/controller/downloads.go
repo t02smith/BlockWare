@@ -48,16 +48,6 @@ func (a *Controller) IsDownloading(gh string) int {
 	return 2
 }
 
-// listen for incoming download progress alerts
-func (c *Controller) StartDownloadListener() {
-	go func() {
-		downloadChannel := peer.Peer().Library().DownloadManager.DownloadProgress
-		for range downloadChannel {
-
-		}
-	}()
-}
-
 // create a new download for a given game
 func (c *Controller) CreateDownload(gh string) {
 	util.Logger.Infof("Initiated download for %s", gh)

@@ -105,7 +105,9 @@ func CreateGame(newGame NewGame, progress chan int) (*Game, error) {
 	hasher.Write([]byte(newGame.Version))
 	hasher.Write([]byte(newGame.ReleaseDate))
 	hasher.Write([]byte(newGame.Developer))
-	hasher.Write(tree.RootDir.RootHash[:])
+
+	treeHash := tree.CalculateRootHash()
+	hasher.Write(treeHash[:])
 
 	gameRootHash := hasher.Sum([]byte{})
 
@@ -269,9 +271,9 @@ func LoadGames(gameDataLocation string) ([]*Game, error) {
 			continue
 		}
 
-		if gm.Download != nil {
-			gm.Download.inserterPool = shardInserterPool(5, gm.Download)
-		}
+		// if gm.Download != nil {
+		// 	gm.Download.inserterPool = shardInserterPool(int(shardInserterCount), &gm)
+		// }
 
 		gameFile.Close()
 		games = append(games, &gm)

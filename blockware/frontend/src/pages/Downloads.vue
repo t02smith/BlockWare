@@ -13,6 +13,7 @@
     <div class="download-table" v-if="downloadGamePairs.length > 0">
       <div class="table-header">
         <h2><strong>Game</strong></h2>
+        <h2>Status</h2>
         <h2>File's Left</h2>
         <h2>Block's Left</h2>
         <h2>Progress</h2>
@@ -30,6 +31,7 @@
           )
         }} -->
         <p>{{ download.Name }}</p>
+        <p>{{ download.Stage }}</p>
         <p>{{ filesLeft(download) }}</p>
         <p>
           {{ blocksLeft(download) }}
@@ -141,7 +143,9 @@ const pauseAll = ref(false);
 
   > * {
     display: grid;
-    grid-template-columns: 3fr 1fr 1fr 1fr;
+    grid-template-columns: 3fr 2fr 1fr 1fr 1fr;
+    gap: 5px;
+    text-align: right;
   }
 
   > .table-header {
@@ -177,6 +181,15 @@ const pauseAll = ref(false);
 
   p {
     font-size: 1.15rem;
+
+    &:first-child {
+      font-weight: bold;
+      text-align: left;
+    }
+  }
+
+  h2:first-child {
+    text-align: left;
   }
 }
 

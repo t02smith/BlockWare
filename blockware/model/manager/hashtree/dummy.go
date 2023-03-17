@@ -99,7 +99,7 @@ func InsertData(filename string, shardSize, offset uint, data []byte) error {
 		return errors.New("data should be the same length as the byte size")
 	}
 
-	file, err := os.OpenFile(filename, os.O_RDWR, 0644)
+	file, err := os.OpenFile(filename, os.O_RDWR, 0755)
 	if err != nil {
 		return err
 	}

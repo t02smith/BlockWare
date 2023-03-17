@@ -62,10 +62,6 @@ export function PurchaseGame(arg1) {
   return window['go']['controller']['Controller']['PurchaseGame'](arg1);
 }
 
-export function StartDownloadListener() {
-  return window['go']['controller']['Controller']['StartDownloadListener']();
-}
-
 export function UninstallGame(arg1) {
   return window['go']['controller']['Controller']['UninstallGame'](arg1);
 }

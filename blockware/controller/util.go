@@ -53,6 +53,7 @@ func downloadToAppDownload(d *games.Download, name string) *ControllerDownload {
 		TotalBlocks: d.TotalBlocks,
 		Progress:    make(map[string]ControllerFileProgress),
 		Name:        name,
+		Stage:       string(d.Stage),
 	}
 
 	lock := d.GetProgressLock()

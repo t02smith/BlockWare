@@ -16,6 +16,7 @@ import (
 	"github.com/spf13/viper"
 	"github.com/t02smith/part-iii-project/toolkit/model/manager/ignore"
 	"github.com/t02smith/part-iii-project/toolkit/util"
+	"golang.org/x/exp/slices"
 )
 
 /*
@@ -73,6 +74,9 @@ type HashTreeFile struct {
 	Filename string `json:"filename"`
 
 	AbsoluteFilename string
+
+	// size of file in bytes => used for truncation
+	Size int
 
 	// A list of SHA256 hashes that represent each shard of data in the file
 	Hashes [][32]byte `json:"hashes"`
@@ -343,6 +347,7 @@ func (htf *HashTreeFile) shardFile(shardSize uint) error {
 		return err
 	}
 
+	htf.Size = int(stat.Size())
 	if stat.Size() == 0 {
 		empty := make([]byte, shardSize)
 		htf.Hashes = append(htf.Hashes, sha256.Sum256(empty))
@@ -480,7 +485,7 @@ func (ht *HashTree) verifyDir(config *VerifyHashTreeConfig, currentDir string, d
 			}
 
 			// compare hashes
-			fileRes, err := ht.verifyFile(fileExists, filepath.Join(currentDir, directoryBeingVerified), name)
+			fileRes, _, err := VerifyFile(fileExists, filepath.Join(currentDir, directoryBeingVerified, name), ht.ShardSize)
 			if err != nil {
 				return false, err
 			}
@@ -497,18 +502,19 @@ func (ht *HashTree) verifyDir(config *VerifyHashTreeConfig, currentDir string, d
 }
 
 // verify whether a file's contents matches its expected contents from the hash tree
-func (ht *HashTree) verifyFile(htf *HashTreeFile, currentDirectory string, filename string) (bool, error) {
-	file, err := os.Open(filepath.Join(currentDirectory, filename))
+func VerifyFile(htf *HashTreeFile, filename string, shardSize uint) (bool, map[[32]byte]uint, error) {
+	file, err := os.Open(filename)
 	if err != nil {
-		return false, err
+		return false, nil, err
 	}
 	defer file.Close()
 
-	buffer := make([]byte, ht.ShardSize)
+	incorrect := make(map[[32]byte]uint)
+	buffer := make([]byte, shardSize)
 	reader := bufio.NewReader(file)
 	counter := 0
 
-	util.Logger.Debugf("Sharding file '%s'", filename)
+	util.Logger.Debugf("Verifying file '%s'", filename)
 	for {
 		_, err := reader.Read(buffer)
 		if err == io.EOF {
@@ -516,13 +522,13 @@ func (ht *HashTree) verifyFile(htf *HashTreeFile, currentDirectory string, filen
 		}
 
 		if err != nil {
-			return false, err
+			return false, nil, err
 		}
 
 		hash := sha256.Sum256(buffer)
 		if !bytes.Equal(hash[:], htf.Hashes[counter][:]) {
-			util.Logger.Errorf("Incorrect hash found in file %s/%s at block %d\n", currentDirectory, filename, counter)
-			return false, nil
+			util.Logger.Debugf("Incorrect hash found in file %s at block %d\n", filename, counter)
+			incorrect[htf.Hashes[counter]] = uint(counter)
 		}
 
 		counter++
@@ -531,7 +537,14 @@ func (ht *HashTree) verifyFile(htf *HashTreeFile, currentDirectory string, filen
 		}
 	}
 
-	return true, nil
+	// add any missing blocks
+	// for i := counter; counter < len(htf.Hashes); i++ {
+	// 	fmt.Println(counter, len(htf.Hashes), htf.Hashes)
+	// 	incorrect[htf.Hashes[i]] = uint(i)
+	// }
+	// fmt.Println()
+
+	return len(incorrect) == 0, incorrect, nil
 }
 
 // Utility
@@ -632,4 +645,70 @@ func (htd *HashTreeDir) listFiles(absPath string) []*HashTreeFile {
 	}
 
 	return ls
+}
+
+func (ht *HashTree) GetFile(hash [32]byte) *HashTreeFile {
+	return ht.RootDir.getFile(hash)
+}
+
+func (htd *HashTreeDir) getFile(hash [32]byte) *HashTreeFile {
+	for _, f := range htd.Files {
+		if bytes.Equal(f.RootHash[:], hash[:]) {
+			return f
+		}
+	}
+
+	for _, sd := range htd.Subdirs {
+		if res := sd.getFile(hash); res != nil {
+			return res
+		}
+	}
+
+	return nil
+}
+
+func (ht *HashTree) CalculateRootHash() [32]byte {
+	return ht.RootDir.calculateRootHash()
+
+}
+
+func (htd *HashTreeDir) calculateRootHash() [32]byte {
+	hasher := sha256.New()
+
+	//
+	var fs []*HashTreeFile
+	for _, f := range htd.Files {
+		fs = append(fs, f)
+	}
+
+	slices.SortFunc(fs, func(f1, f2 *HashTreeFile) bool {
+		return f1.Filename < f2.Filename
+	})
+
+	for _, f := range fs {
+		hasher.Write(f.RootHash[:])
+	}
+
+	//
+	var sds []*HashTreeDir
+	for _, sd := range htd.Subdirs {
+		sds = append(sds, sd)
+	}
+
+	slices.SortFunc(sds, func(f1, f2 *HashTreeDir) bool {
+		return f1.Dirname < f2.Dirname
+	})
+
+	for _, sd := range sds {
+		hash := sd.calculateRootHash()
+		hasher.Write(hash[:])
+	}
+
+	//
+	var rh [32]byte
+	hash := hasher.Sum([]byte{})
+	copy(rh[:], hash)
+
+	htd.RootHash = rh
+	return rh
 }

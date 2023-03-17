@@ -1,188 +1,243 @@
 <template>
-  <form @submit.prevent="submit" class="upload">
-    <Error :err="err" v-if="err.length > 0" />
-
-    <div class="success" v-if="success">✅ Game uploaded successfully</div>
-
-    <div class="title">
-      <h1>Upload your game here</h1>
-      <p>
-        Fill in the information below and add your game to a decentralised
-        network of games today
-      </p>
-    </div>
-
-    <div class="form-sections">
-      <!-- Game details -->
-      <div class="form-section">
-        <header>
-          <h2>Your Game</h2>
-          <p>
-            The metadata about your game to help identify it to other users.
-          </p>
-        </header>
-
-        <div class="form-inputs">
-          <!-- title -->
-          <div class="form-group">
-            <h3>Title</h3>
-            <input
-              type="text"
-              name=""
-              id=""
-              placeholder="Enter your game's title"
-              v-model="title"
-              :disabled="submitted"
-            />
-            <p>What is your game called?</p>
+  <div class="wrapper">
+    <form @submit.prevent="submit" class="upload">
+      <h2>Upload your content to <strong>BlockWare</strong></h2>
+      <div class="sections">
+        <div class="section initial">
+          <div class="title">
+            <h3>1. What are you uploading?</h3>
+            <div class="line"></div>
           </div>
 
-          <!-- version -->
-          <div class="form-group">
-            <h3>Version</h3>
-            <input
-              type="text"
-              name=""
-              id=""
-              placeholder="Enter your game's version"
-              v-model="version"
-              :disabled="submitted"
-            />
-            <p>What is the current version number?</p>
-          </div>
+          <div class="radio">
+            <div class="in">
+              <input
+                type="radio"
+                name=""
+                id="own-game"
+                value="own-game"
+                v-model="type"
+              />
+              <label for="own-game"><strong>A brand new game</strong></label>
+            </div>
 
-          <!-- Developer -->
-          <div class="form-group">
-            <h3>Developer</h3>
-            <input
-              type="text"
-              name=""
-              id=""
-              placeholder="Enter your name"
-              v-model="dev"
-              :disabled="submitted"
-            />
-            <p>What is your name?</p>
-          </div>
-
-          <!-- Price -->
-          <div class="form-group">
-            <h3>Price (in Wei)</h3>
-            <input
-              type="number"
-              name=""
-              id=""
-              placeholder="in Wei"
-              v-model="price"
-              :disabled="submitted"
-            />
-            <p>What is the current price? (in Wei)</p>
-          </div>
-
-          <!-- Price -->
-          <div class="form-group">
-            <h3>Assets Directory</h3>
-            <input
-              type="number"
-              name=""
-              id=""
-              placeholder="in Wei"
-              v-model="assets"
-              :disabled="submitted"
-            />
-            <p>Absolute directory of this game's assets folder</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="form-section">
-        <header>
-          <h2>Your Upload</h2>
-          <p>Details important to uploading your game to the network.</p>
-        </header>
-
-        <div class="form-inputs">
-          <!-- Shard size -->
-          <div class="form-group">
-            <h3>Shard Size (in Bytes)</h3>
-
-            <input
-              type="number"
-              name=""
-              id=""
-              placeholder="in bytes"
-              v-model="shardSize"
-              :disabled="submitted"
-            />
             <p>
-              What size blocks should each file be broken down into. A smaller
-              size means greater precision at the cost of performance and
-              file-size.
+              Upload the first ever version of your game to the BlockWare
+              network. Users will be able to find, buy and install your game
+              just make sure you seed it! Once uploaded, you will be able to
+              release as many updates as you desire and your users will help to
+              distribute your game for you. To incentivise this, make sure you
+              reward those users who contribute.
             </p>
           </div>
 
-          <!-- Root Directory -->
-          <div class="form-group">
-            <h3>Root Directory of Game</h3>
+          <div class="radio">
+            <div class="in">
+              <input
+                type="radio"
+                name=""
+                id="existing-game"
+                value="existing-game"
+                v-model="type"
+              />
+              <label for="existing-game"
+                ><strong>An update to an exiting game</strong></label
+              >
+            </div>
 
-            <input
-              type="text"
-              name=""
-              id=""
-              placeholder="absolute path"
-              v-model="file"
-              :disabled="submitted"
-            />
             <p>
-              Enter the root directory of your game. Each sub-folder will be
-              traversed and each file will be split into shards and hashed.
+              Already have a game? Have a life or death patch you need to
+              release? This is the option for you. Select which game you want to
+              update, and most of the info will already be filled out for you
+              just make sure to point to the right directory.
             </p>
+
+            <div class="to-update">
+              <select name="" id="">
+                <option value="0">Choose game:</option>
+
+                <option value="" v-for="g in games.ownedGames">
+                  {{ g.title }}
+                </option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="section details">
+          <div class="title">
+            <h3>2. Your game info:</h3>
+            <div class="line"></div>
           </div>
 
-          <!-- Worker count -->
-          <div class="form-group">
-            <h3>Hashing Workers</h3>
+          <div class="fields">
+            <div class="field">
+              <div class="info">
+                <h6>Title</h6>
+                <p>what is your game called?</p>
+              </div>
+              <input
+                type="text"
+                name=""
+                id=""
+                :disabled="type === 'existing-game'"
+                placeholder="title"
+                v-model="title"
+              />
+            </div>
 
-            <input
-              type="number"
-              min="1"
-              name=""
-              id=""
-              v-model="workers"
-              :disabled="submitted"
-            />
+            <div class="field">
+              <div class="info">
+                <h6>Developer</h6>
+                <p>what is your/your companies name?</p>
+              </div>
+              <input
+                type="text"
+                name=""
+                id=""
+                :disabled="type === 'existing-game'"
+                placeholder="developer"
+                v-model="dev"
+              />
+            </div>
+
+            <div class="field">
+              <div class="info">
+                <h6>Version</h6>
+                <p>what version are you releasing?</p>
+              </div>
+              <input
+                v-model="version"
+                type="text"
+                name=""
+                id=""
+                placeholder="version number"
+              />
+            </div>
+
+            <div class="field">
+              <div class="info">
+                <h6>Price</h6>
+                <p>How expensive is your game (in Wei)?</p>
+              </div>
+              <input
+                v-model="price"
+                type="number"
+                name=""
+                id=""
+                placeholder="price"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div class="section your-upload">
+          <div class="title">
+            <h3>3. Your upload:</h3>
+            <div class="line"></div>
+          </div>
+
+          <div class="fields">
+            <div class="field">
+              <div class="info">
+                <h6>Root Directory</h6>
+                <p>what is the absolute path for your game?</p>
+              </div>
+              <input
+                v-model="file"
+                type="text"
+                name=""
+                id=""
+                placeholder="root directory"
+              />
+            </div>
+
+            <div class="field">
+              <div class="info">
+                <h6>Assets Directory</h6>
+                <p>what is the absolute path for your game's assets?</p>
+              </div>
+              <input
+                v-model="assets"
+                type="text"
+                name=""
+                id=""
+                placeholder="asset directory"
+              />
+            </div>
+
+            <div class="field">
+              <div class="info">
+                <h6>Shard Size</h6>
+                <p>
+                  what size shards (in bytes) should each file be broken into?
+                </p>
+              </div>
+              <input
+                v-model="shardSize"
+                type="number"
+                name=""
+                id=""
+                placeholder="shard size"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div class="section summary">
+          <div class="title">
+            <h3>4. Summary</h3>
+            <div class="line"></div>
+          </div>
+
+          <div class="info">
             <p>
-              Workers allow you to shard many files at the same time. However, a
-              large amount of workers will cause performance issues.
+              Double check all the fields above and hit submit! After hitting
+              submit this application will:
             </p>
+            <ol>
+              <li>Create a hash tree of your application</li>
+              <li>Upload your hash tree and assets to IPFS</li>
+              <li>Upload your game metadata to Ethereum</li>
+              <li>Begin seeding your new game in the background</li>
+            </ol>
+          </div>
+
+          <div class="license">
+            <input type="checkbox" name="" id="license" />
+            <label for="license">
+              Click here to agree to BlockWare's game licesneing policy
+            </label>
+          </div>
+
+          <div class="submit">
+            <button type="submit">Upload your game!</button>
+
+            <div class="file-counter">
+              <div class="progress-bar">
+                <div
+                  class="progress"
+                  :style="`width: ${progressWidth}px;`"
+                ></div>
+              </div>
+
+              <p>{{ fileProgress }}/{{ fileCount }} files</p>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-
-    <footer>
-      <button :disabled="submitted" v-if="!submitted" type="submit">
-        Upload Now!
-      </button>
-      <button disabled v-else>Loading...</button>
-
-      <!-- progress -->
-      <div class="file-counter">
-        <!-- bar -->
-        <div class="progress-bar">
-          <div class="progress" :style="`width: ${progressWidth}px;`"></div>
-        </div>
-
-        <p>{{ fileProgress }}/{{ fileCount }} files</p>
-      </div>
-    </footer>
-  </form>
+    </form>
+  </div>
 </template>
 <script setup>
 import { onMounted, ref, computed } from "vue";
 import { UploadGame } from "../../wailsjs/go/controller/Controller";
 import { EventsOn } from "../../wailsjs/runtime/runtime";
-import Error from "../components/Error.vue";
+import { useGamesStore } from "../stores/games";
+
+const games = useGamesStore();
+
+const type = ref(null);
 
 const submitted = ref(false);
 const success = ref(false);
@@ -248,132 +303,205 @@ async function submit() {
 }
 </script>
 <style scoped lang="scss">
-.upload {
-  width: 100%;
+.wrapper {
   display: flex;
   flex-direction: column;
   align-items: center;
-
-  > * {
-    margin: 1rem;
-  }
-
-  > .title {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-
-    > p {
-      font-style: italic;
-      color: darken(white, 20%);
-    }
-  }
-
-  button {
-    background-color: rgb(0, 90, 170);
-    padding: 0.8rem 1.75rem;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-    font-weight: bold;
-    font-size: 1.25rem;
-    color: white;
-    transition: 150ms;
-    cursor: pointer;
-
-    &:hover {
-      scale: 1.01;
-    }
-
-    &:active {
-      scale: 0.99;
-    }
-  }
+  justify-content: center;
+  height: 100%;
+  overflow: hidden;
+  background-color: lighten(#131313, 2%);
 }
 
-.form-sections {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 2rem;
-  justify-items: center;
-  max-width: 1000px;
-  margin-bottom: 2rem;
+.upload {
+  background-color: #131313;
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  justify-content: center;
+  align-items: center;
+  width: 75%;
+  max-width: 1200px;
+  height: 100%;
+  overflow: hidden;
 
-  .form-section {
+  > h2 {
+    margin: 2rem;
+    font-size: 4rem;
     background-color: lighten(#131313, 5%);
     border-radius: 10px;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-    padding-bottom: 0.6rem;
-    max-width: 600px;
-    height: 100%;
+    padding: 0.5rem 1.25rem;
+  }
 
-    > header {
-      background-color: lighten(#131313, 15%);
-      padding: 0.5rem 1rem;
-      border-radius: 10px 10px 0 0;
+  > .sections {
+    overflow: auto;
 
-      > p {
-        font-style: italic;
-        color: darken(white, 15%);
-      }
-    }
+    > .section {
+      align-self: flex-start;
+      width: 100%;
 
-    .form-inputs {
-      padding: 0.5rem 1.3rem;
-      display: flex;
-      flex-direction: column;
-      gap: 0.6rem;
+      > .title {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        font-size: 2rem;
+        width: 100%;
 
-      > .form-group {
-        > input {
-          width: 95%;
-          padding: 0.6rem 0.4rem;
-          border-radius: 5px;
-          outline: none;
-          border: none;
+        > h3 {
+          width: fit-content;
         }
 
-        > p {
-          font-size: 0.9rem;
+        > .line {
+          background-color: white;
+          height: 3px;
+          margin-top: 10px;
+          flex: 1;
+        }
+      }
+
+      &.initial {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        > .radio {
+          padding: 0 1rem;
+          > .in {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+
+            > label {
+              font-size: 1.1rem;
+              font-weight: bold;
+            }
+          }
+
+          > p {
+            color: darken(white, 15%);
+          }
+        }
+
+        .to-update {
+          margin-top: 10px;
+
+          > select {
+            padding: 4px 10px;
+            border-radius: 5px;
+            font-weight: bold;
+            background-color: rgb(0, 131, 253);
+            border: none;
+            color: white;
+            cursor: pointer;
+            outline: none;
+
+            > * {
+              font-weight: bold;
+              cursor: pointer;
+              padding: 8px 10px;
+            }
+          }
+        }
+      }
+
+      &.details,
+      &.your-upload {
+        > .fields {
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+
+          > .field {
+            display: flex;
+            width: 100%;
+
+            > .info {
+              display: flex;
+              align-items: center;
+              gap: 5px;
+
+              > p {
+                color: darken(white, 25%);
+                font-style: italic;
+              }
+
+              > h6 {
+                font-size: 1.2rem;
+                color: rgb(0, 131, 253);
+                font-weight: bold;
+              }
+            }
+
+            > input {
+              margin-left: auto;
+              width: 250px;
+              padding: 3px 5px;
+              background-color: lighten(#131313, 10%);
+              border: none;
+              outline-color: darken(rgb(0, 131, 253), 25%);
+              outline-style: outset;
+              color: white;
+            }
+          }
+        }
+      }
+
+      &.summary {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+
+        > *:first-child {
+          margin-bottom: -1rem;
+        }
+
+        > .info {
+          > ol {
+            margin-left: 1rem;
+          }
+        }
+
+        > .license {
+          color: darken(white, 15%);
           font-style: italic;
-          color: rgb(218, 218, 218);
-          margin-top: 2px;
-          width: 95%;
-          padding: 0 3px;
+        }
+
+        > .submit {
+          display: flex;
+          align-items: center;
+
+          > button {
+            cursor: pointer;
+          }
+
+          .file-counter {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-left: auto;
+            margin-right: 1rem;
+
+            > .progress-bar {
+              position: relative;
+              background-color: gray;
+              border-radius: 3px;
+              width: 300px;
+              height: 20px;
+
+              > .progress {
+                position: absolute;
+                background-color: green;
+                height: 20px;
+              }
+            }
+
+            > p {
+              font-weight: bold;
+            }
+          }
         }
       }
     }
   }
-}
-
-.file-counter {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  margin-left: auto;
-
-  > .progress-bar {
-    position: relative;
-    background-color: gray;
-    border-radius: 3px;
-    width: 300px;
-    height: 20px;
-
-    > .progress {
-      position: absolute;
-      background-color: green;
-      height: 20px;
-    }
-  }
-
-  > p {
-    font-weight: bold;
-  }
-}
-
-footer {
-  display: flex;
-  align-items: center;
-  width: 100%;
-  max-width: 950px;
 }
 </style>

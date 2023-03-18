@@ -206,7 +206,7 @@
           <div class="license">
             <input type="checkbox" name="" id="license" />
             <label for="license">
-              Click here to agree to BlockWare's game licesneing policy
+              Click here to agree to BlockWare's game licensing policy
             </label>
           </div>
 
@@ -318,12 +318,11 @@ async function submit() {
   display: flex;
   flex-direction: column;
   padding: 1rem;
-  justify-content: center;
-  align-items: center;
+  padding-bottom: 3rem;
   width: 75%;
   max-width: 1200px;
   height: 100%;
-  overflow: hidden;
+  overflow: auto;
 
   > h2 {
     margin: 2rem;
@@ -335,8 +334,6 @@ async function submit() {
   }
 
   > .sections {
-    overflow: auto;
-
     > .section {
       align-self: flex-start;
       width: 100%;
@@ -472,6 +469,17 @@ async function submit() {
 
           > button {
             cursor: pointer;
+            background-color: rgb(0, 104, 0);
+            color: white;
+            font-weight: bold;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 1.15rem;
+            transition: 150ms;
+
+            &:hover {
+              background-color: lighten(rgb(0, 104, 0), 6%);
+            }
           }
 
           .file-counter {

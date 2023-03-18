@@ -16,6 +16,7 @@
         <h2>Status</h2>
         <h2>File's Left</h2>
         <h2>Block's Left</h2>
+        <h2>Total Blocks</h2>
         <h2>Progress</h2>
       </div>
 
@@ -36,6 +37,7 @@
         <p>
           {{ blocksLeft(download) }}
         </p>
+        <p>{{ download.TotalBlocks }}</p>
         <p>
           <strong>
             {{
@@ -143,7 +145,7 @@ const pauseAll = ref(false);
 
   > * {
     display: grid;
-    grid-template-columns: 3fr 2fr 1fr 1fr 1fr;
+    grid-template-columns: 3fr 2fr 1fr 1fr 1fr 1fr;
     gap: 5px;
     text-align: right;
   }

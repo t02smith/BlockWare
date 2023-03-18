@@ -75,6 +75,8 @@ type HashTreeFile struct {
 
 	AbsoluteFilename string
 
+	RelativeFilename string
+
 	// size of file in bytes => used for truncation
 	Size int
 
@@ -203,7 +205,7 @@ func (ht *HashTree) Hash() error {
 	}
 
 	wg, fileIn, errorChan := hasherPool(wc, fileCount, ht.ShardSize, ht.progress)
-	err = ht.RootDir.shardData(fileIn, ht.ShardSize)
+	err = ht.RootDir.shardDirectory(fileIn, ht.ShardSize)
 	if err != nil {
 		util.Logger.Error(err)
 	}
@@ -303,6 +305,7 @@ func (htd *HashTreeDir) traverseDirectory(rootPath string, relativePath string, 
 		htd.Files[name] = &HashTreeFile{
 			Filename:         name,
 			AbsoluteFilename: filepath.Join(rootPath, relativePath, htd.Dirname, name),
+			RelativeFilename: filepath.Join(relativePath, htd.Dirname, name),
 		}
 		counter++
 	}
@@ -323,13 +326,13 @@ func (htd *HashTreeDir) traverseDirectory(rootPath string, relativePath string, 
 // hashing
 
 // traverse a directory and shard all its files and sub-dirs
-func (htd *HashTreeDir) shardData(fileIn chan *HashTreeFile, shardSize uint) error {
+func (htd *HashTreeDir) shardDirectory(fileIn chan *HashTreeFile, shardSize uint) error {
 	for _, f := range htd.Files {
 		fileIn <- f
 	}
 
 	for _, subdir := range htd.Subdirs {
-		err := subdir.shardData(fileIn, shardSize)
+		err := subdir.shardDirectory(fileIn, shardSize)
 		if err != nil {
 			return err
 		}
@@ -351,7 +354,7 @@ func (htf *HashTreeFile) shardFile(shardSize uint) error {
 	if stat.Size() == 0 {
 		empty := make([]byte, shardSize)
 		htf.Hashes = append(htf.Hashes, sha256.Sum256(empty))
-		htf.RootHash = CalculateRootHash(htf.Hashes)
+		htf.RootHash = CalculateRootHash(htf.Hashes, htf.RelativeFilename)
 		return nil
 	}
 
@@ -387,7 +390,7 @@ func (htf *HashTreeFile) shardFile(shardSize uint) error {
 		}
 	}
 
-	htf.RootHash = CalculateRootHash(htf.Hashes)
+	htf.RootHash = CalculateRootHash(htf.Hashes, htf.RelativeFilename)
 	return nil
 }
 
@@ -550,7 +553,8 @@ func VerifyFile(htf *HashTreeFile, filename string, shardSize uint) (bool, map[[
 // Utility
 
 // CalculateRootHash calculate the root hash of a file by creating a MerkleTree of its shard hashes
-func CalculateRootHash(hashes [][32]byte) [32]byte {
+// that root hash is merged with the relative filename
+func CalculateRootHash(hashes [][32]byte, relativeFilename string) [32]byte {
 	oldLayer, newLayer := hashes, [][32]byte{}
 
 	for len(oldLayer) != 1 {
@@ -569,8 +573,8 @@ func CalculateRootHash(hashes [][32]byte) [32]byte {
 		newLayer = [][32]byte{}
 	}
 
-	return oldLayer[0]
-
+	rootHash := oldLayer[0]
+	return sha256.Sum256(append([]byte(relativeFilename), rootHash[:]...))
 }
 
 // GetProgress get the progress channel that shows how much of the directory has been hashed/processed

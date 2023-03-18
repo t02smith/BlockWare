@@ -7,4 +7,7 @@ toolkit.exe
 latex-template-main
 **/tmp/**
 !**/tmp/.gitkeep
+
 **/test/**/assets/*
+**/test/**/games/*
+**/test/**/hashes/*

@@ -70,7 +70,7 @@ func shardInserterWorker(id int, game *Game, input chan InsertShardRequest) {
 		util.Logger.Debugf("INSERT WORKER %d: attempting to insert %x", id, shard.BlockHash)
 		err := game.insertData(shard.FileHash, shard.BlockHash, shard.Data)
 		if err != nil {
-			util.Logger.Errorf("INSERT WORKER %d: error inserting shard %x => %s", id, shard.BlockHash, err)
+			util.Logger.Debugf("INSERT WORKER %d: error inserting shard %x => %s", id, shard.BlockHash, err)
 		}
 		util.Logger.Debugf("INSERT WORKER %d: Inserted %x", id, shard.BlockHash)
 	}

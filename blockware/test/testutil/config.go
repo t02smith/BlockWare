@@ -8,8 +8,8 @@ import (
 
 func SetupTestConfig() {
 	viper.Set("meta.hashes.workerCount", 5)
-	viper.Set("meta.directory", "../../test/data/.toolkit")
-	viper.Set("games.installFolder", "../../test/data/tmp")
+	viper.Set("meta.directory", "../../../test/data/.toolkit")
+	viper.Set("games.installFolder", "../../../test/data/tmp")
 
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 }

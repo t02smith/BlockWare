@@ -98,6 +98,11 @@ type DownloadRequest struct {
 // create a new download for an existing game
 func (g *Game) SetupDownload() error {
 
+	// has a download been started
+	if g.Download != nil {
+		return fmt.Errorf("download for game %x already exists", g.RootHash)
+	}
+
 	// read hash data if isn't already loaded
 	data, err := g.GetData()
 	if err != nil {
@@ -150,6 +155,7 @@ func (g *Game) SetupDownload() error {
 	}
 
 	d.Stage = DS_Downloading
+	util.Logger.Infof("Download setup for game %s", g.Title)
 	return nil
 }
 
@@ -166,7 +172,12 @@ func (g *Game) CancelDownload() error {
 	// * remove dummy files
 	util.Logger.Infof("Clearing dummy files from game %x", g.RootHash)
 
-	err := os.RemoveAll(g.Download.AbsolutePath)
+	_, err := os.Stat(g.Download.AbsolutePath)
+	if err != nil {
+		return err
+	}
+
+	err = os.RemoveAll(g.Download.AbsolutePath)
 	if err != nil {
 		return err
 	}
@@ -188,17 +199,27 @@ func (g *Game) insertData(fileHash, blockHash [32]byte, data []byte) error {
 	d.progressLock.Unlock()
 
 	if !ok {
-		util.Logger.Debugf("file %x not in download queue", fileHash)
-		return nil
+		return fmt.Errorf("file %x not in download queue", fileHash)
 	}
 
+	// is block needed
 	file.lock.Lock()
 	defer file.lock.Unlock()
 
 	offsets, ok := file.BlocksRemaining[blockHash]
 	if !ok {
-		util.Logger.Warnf("block %x not in download queue", blockHash)
-		return nil
+		return fmt.Errorf("block %x not in download queue", blockHash)
+	}
+
+	// verify the contents of the data
+	tree, err := g.GetData()
+	if err != nil {
+		return err
+	}
+
+	shardSize := tree.ShardSize
+	if len(data) != int(shardSize) {
+		return fmt.Errorf("data is not correct length. Got %d, expected %d", len(data), shardSize)
 	}
 
 	dataHash := sha256.Sum256(data)
@@ -206,51 +227,66 @@ func (g *Game) insertData(fileHash, blockHash [32]byte, data []byte) error {
 		return fmt.Errorf("block %x data does not match expected content", blockHash)
 	}
 
+	// insert data
 	for _, offset := range offsets {
-		err := hash.InsertData(file.AbsolutePath, uint(len(data)), uint(offset), data)
+		err := hash.InsertData(file.AbsolutePath, shardSize, uint(offset), data)
 		if err != nil {
 			return err
 		}
 	}
 
+	// remove block from download queue
 	d.progressLock.Lock()
 	delete(file.BlocksRemaining, blockHash)
 	util.Logger.Debugf("successfully inserted shard %x into %x", blockHash, fileHash)
 	d.progressLock.Unlock()
 
+	// check if file is completely downloaded
 	if len(file.BlocksRemaining) == 0 {
-		util.Logger.Debugf("Download complete for file %s", file.AbsolutePath)
-		err := CleanFile(file.AbsolutePath, file.Size)
+		err := g.completeFile(file)
 		if err != nil {
-			util.Logger.Errorf("Error cleaning file %s: %s", file.AbsolutePath, err)
+			return err
 		}
-
-		// verify data
-		// data, err := g.GetData()
-		// if err != nil {
-		// 	return err
-		// }
-
-		// htf := data.GetFile(fileHash)
-		// if htf == nil {
-		// 	// ? shouldn't even make it this far but just in case
-		// 	return nil
-		// }
-
-		// correct, incorrectBlocks, err := hash.VerifyFile(htf, file.AbsolutePath, data.ShardSize)
-		// if err != nil {
-		// 	return err
-		// }
-
-		// if correct {
-		// 	return nil
-		// }
-
-		// util.Logger.Debugf("Found %d blocks in %s that are incorrect", len(incorrectBlocks), file.AbsolutePath)
-		// for blockHash, offset := range incorrectBlocks {
-		// 	file.BlocksRemaining[blockHash] = []uint{offset}
-		// }
 	}
+
+	return nil
+}
+
+// to be run when a file has been downloaded
+// will tidy up the file and verify its contents
+func (g *Game) completeFile(file *FileProgress) error {
+	util.Logger.Debugf("Download complete for file %s", file.AbsolutePath)
+	err := CleanFile(file.AbsolutePath, file.Size)
+	if err != nil {
+		util.Logger.Errorf("Error cleaning file %s: %s", file.AbsolutePath, err)
+		return err
+	}
+
+	// verify data
+	// data, err := g.GetData()
+	// if err != nil {
+	// 	return err
+	// }
+
+	// htf := data.GetFile(fileHash)
+	// if htf == nil {
+	// 	// ? shouldn't even make it this far but just in case
+	// 	return nil
+	// }
+
+	// correct, incorrectBlocks, err := hash.VerifyFile(htf, file.AbsolutePath, data.ShardSize)
+	// if err != nil {
+	// 	return err
+	// }
+
+	// if correct {
+	// 	return nil
+	// }
+
+	// util.Logger.Debugf("Found %d blocks in %s that are incorrect", len(incorrectBlocks), file.AbsolutePath)
+	// for blockHash, offset := range incorrectBlocks {
+	// 	file.BlocksRemaining[blockHash] = []uint{offset}
+	// }
 
 	return nil
 }
@@ -299,32 +335,20 @@ func (d *Download) ContinueDownload(gameHash [32]byte, newRequest chan DownloadR
 func CleanFile(path string, size int) error {
 	util.Logger.Debugf("Cleaning file %s", path)
 
-	// stat, err := os.Stat(path)
-	// if err != nil {
-	// 	return err
-	// }
+	stat, err := os.Stat(path)
+	if err != nil {
+		return err
+	}
+
+	if stat.Size() < int64(size) {
+		return fmt.Errorf("file is too small to be truncated to %d", size)
+	}
 
 	file, err := os.OpenFile(path, os.O_RDWR, 0755)
 	if err != nil {
 		return err
 	}
 	defer file.Close()
-
-	// reader := bufio.NewReader(file)
-	// bytesToRemove, buf := 0, make([]byte, 1)
-	// for {
-	// 	file.Seek(int64(bytesToRemove)-1, io.SeekEnd)
-	// 	_, err := reader.Read(buf)
-	// 	if err != nil {
-	// 		return err
-	// 	}
-
-	// 	if buf[0] == 0x00 {
-	// 		bytesToRemove--
-	// 	} else {
-	// 		break
-	// 	}
-	// }
 
 	if err = file.Truncate(int64(size)); err != nil {
 		return err

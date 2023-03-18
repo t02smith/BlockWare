@@ -26,11 +26,6 @@
         :class="blocksLeft(download) === 0 && 'complete'"
         v-for="[hash, download] in downloadGamePairs"
       >
-        <!-- {{
-          Object.values(download.Progress).filter(
-            (f) => f.BlocksRemaining.length !== 0
-          )
-        }} -->
         <p>{{ download.Name }}</p>
         <p>{{ download.Stage }}</p>
         <p>{{ filesLeft(download) }}</p>
@@ -41,9 +36,11 @@
         <p>
           <strong>
             {{
-              Math.round(
-                (1 - blocksLeft(download) / download.TotalBlocks) * 1000
-              ) / 10
+              download.Stage === "Setting up download"
+                ? 0
+                : Math.round(
+                    (1 - blocksLeft(download) / download.TotalBlocks) * 1000
+                  ) / 10
             }}
             %</strong
           >

@@ -1,6 +1,7 @@
 package games
 
 import (
+	"bytes"
 	"errors"
 	"log"
 	"math/big"
@@ -13,17 +14,19 @@ import (
 	"github.com/t02smith/part-iii-project/toolkit/util"
 )
 
+var testGameRootHash [32]byte
+
 func TestMain(m *testing.M) {
 	util.InitLogger(true)
 	testutil.SetupTestConfig()
 	model.SetupToolkitEnvironment()
 
-	// err := setupTestGame()
-	// if err != nil {
-	// 	log.Println(err)
-	// 	gamesTestTeardown()
-	// 	os.Exit(1)
-	// }
+	err := setupTestGame()
+	if err != nil {
+		log.Println(err)
+		gamesTestTeardown()
+		os.Exit(1)
+	}
 
 	// gamesTestSetup()
 	code := m.Run()
@@ -41,6 +44,8 @@ func setupTestGame() error {
 		log.Printf("Error creating game: %s\n", err)
 		return err
 	}
+
+	testGameRootHash = game.RootHash
 
 	// write game to file
 	err = OutputAllGameDataToFile(game)
@@ -62,17 +67,26 @@ func fetchTestGame() (*Game, error) {
 		return nil, errors.New("No games present in the test folder")
 	}
 
-	g := games[0]
-	err = g.readHashData()
+	var testGame *Game
+	for _, g := range games {
+		if bytes.Equal(g.RootHash[:], testGameRootHash[:]) {
+			testGame = g
+		}
+	}
+	if testGame == nil {
+		util.Logger.Fatalf("error finding test game")
+	}
+
+	err = testGame.readHashData()
 	if err != nil {
 		return nil, err
 	}
 
-	return g, nil
+	return testGame, nil
 }
 
 // create a test download
-func setupTestDownload() (*Game, error) {
+func setupTestDownload(t *testing.T) (*Game, error) {
 	g, err := fetchTestGame()
 	if err != nil {
 		return nil, err
@@ -82,6 +96,10 @@ func setupTestDownload() (*Game, error) {
 	if err != nil && !os.IsExist(err) {
 		return nil, err
 	}
+
+	t.Cleanup(func() {
+		g.CancelDownload()
+	})
 
 	return g, nil
 }

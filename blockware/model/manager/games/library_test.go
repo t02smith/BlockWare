@@ -11,7 +11,7 @@ import (
 func TestGetGame(t *testing.T) {
 	testutil.ShortTest(t)
 	l := NewLibrary()
-	g, err := setupTestDownload()
+	g, err := setupTestDownload(t)
 	if err != nil {
 		t.Fatalf("Error generating test download %s", err)
 	}
@@ -37,7 +37,7 @@ func TestGetGame(t *testing.T) {
 func TestAddGame(t *testing.T) {
 	testutil.ShortTest(t)
 	l := NewLibrary()
-	g, err := setupTestDownload()
+	g, err := setupTestDownload(t)
 	if err != nil {
 		t.Fatalf("Error generating test download %s", err)
 		return
@@ -57,14 +57,14 @@ func TestAddGame(t *testing.T) {
 func TestLibraryFindBlock(t *testing.T) {
 	testutil.ShortTest(t)
 	l := NewLibrary()
-	g, err := setupTestDownload()
+	g, err := setupTestDownload(t)
 	if err != nil {
 		t.Fatalf("Error generating test download %s", err)
 	}
 	l.AddOwnedGame(g)
 
 	t.Run("success", func(t *testing.T) {
-		shardHash := g.data.RootDir.Files["test.txt"].RootHash
+		shardHash := g.data.RootDir.Files["test.txt"].Hashes[0]
 
 		found, data, err := l.FindBlock(g.RootHash, shardHash)
 		if err != nil {

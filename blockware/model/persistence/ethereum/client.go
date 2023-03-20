@@ -9,6 +9,7 @@ import (
 	"github.com/ethereum/go-ethereum/accounts"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/accounts/keystore"
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
 
@@ -104,6 +105,14 @@ func GenerateAuthInstance(privateKey string) (*bind.TransactOpts, error) {
 
 	util.Logger.Info("Auth instance generated")
 	return auth, nil
+}
+
+func Address() common.Address {
+	if _privateKey == nil {
+		return common.Address{}
+	}
+
+	return crypto.PubkeyToAddress(_privateKey.PublicKey)
 }
 
 // key store

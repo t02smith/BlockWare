@@ -28,6 +28,8 @@ onMounted(() => {
   EventsOn("update-owned-games", async () => await games.refreshOwnedGames());
   EventsOn("new-peer", async () => await peers.refreshPeers());
   EventsOn("update-downloads", async () => await games.refreshDownloads());
+
+  games.refreshOwnedGames();
 });
 </script>
 <style scoped lang="scss">

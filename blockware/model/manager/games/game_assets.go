@@ -2,6 +2,8 @@ package games
 
 import (
 	"fmt"
+	"io"
+	"os"
 	"path/filepath"
 
 	shell "github.com/ipfs/go-ipfs-api"
@@ -56,6 +58,9 @@ func (g *Game) UploadAssets() error {
 	}
 
 	g.Assets.Cid = cid
+	if err = g.CopyAssetsFolder(); err != nil {
+		util.Logger.Warnf("error copying assets folder %s", err)
+	}
 
 	util.Logger.Infof("Uploaded assets for %x to IPFS", g.RootHash)
 	return nil
@@ -76,5 +81,53 @@ func (g *Game) DownloadAssets() error {
 		return err
 	}
 
+	return nil
+}
+
+func (g *Game) CopyAssetsFolder() error {
+	util.Logger.Debugf("Copying asset folder %s", g.Assets.AbsolutePath)
+	dirname := filepath.Join(viper.GetString("meta.directory"), "assets", fmt.Sprintf("%x", g.RootHash))
+	err := os.Mkdir(dirname, 0644)
+	if err != nil {
+		return err
+	}
+
+	expectedFiles := []string{ASSET_COVER, ASSET_BACKGROUND, ASSET_DESCRIPTION}
+
+	_, err = os.Stat(g.Assets.AbsolutePath)
+	if err != nil {
+		return err
+	}
+
+	for _, f := range expectedFiles {
+		util.Logger.Debugf("copying %s", f)
+		err = func() error {
+			input, err := os.Open(filepath.Join(g.Assets.AbsolutePath, f))
+			if err != nil {
+				return err
+			}
+			defer input.Close()
+
+			output, err := os.Create(filepath.Join(dirname, f))
+			if err != nil {
+				return err
+			}
+			defer output.Close()
+
+			_, err = io.Copy(output, input)
+			if err != nil {
+				return err
+			}
+
+			return nil
+		}()
+
+		if err != nil {
+			return err
+		}
+
+	}
+
+	util.Logger.Debugf("copied asset folder %s", g.Assets.AbsolutePath)
 	return nil
 }

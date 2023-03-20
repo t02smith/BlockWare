@@ -17,6 +17,8 @@ export function DeployLibraryInstance(arg1:string):Promise<string>;
 
 export function Disconnect(arg1:string,arg2:number):Promise<void>;
 
+export function FetchOwnedGame(arg1:string):Promise<void>;
+
 export function GetDownloads():Promise<map[string]controller.ControllerDownload>;
 
 export function GetGameFromStoreByRootHash(arg1:string):Promise<controller.ControllerGame>;

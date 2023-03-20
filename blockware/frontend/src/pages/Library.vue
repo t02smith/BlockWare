@@ -2,11 +2,22 @@
   <div class="library">
     <!-- sidebar -->
     <ul>
-      <p>🎮 Your games:</p>
+      <div class="header">
+        <p>🎮 Your games:</p>
+        <button @click="() => (importPanelOpen = !importPanelOpen)">
+          {{ importPanelOpen ? "❌ close" : "🌍 import" }}
+        </button>
+      </div>
+
       <li
         v-if="games.ownedGames"
         v-for="g in games.ownedGames"
-        @click="() => (selected = g)"
+        @click="
+          () => {
+            selected = g;
+            importPanelOpen = false;
+          }
+        "
         :class="`${selected === g && 'active'}`"
       >
         <p>
@@ -20,6 +31,38 @@
 
     <!-- game details -->
     <div class="details-wrapper">
+      <form
+        @submit.prevent="
+          () => {
+            if (importGameHash.length !== 64) return;
+            games.importGame(importGameHash);
+            importGameHash = '';
+            importPanelOpen = false;
+          }
+        "
+        class="import-game"
+        :class="importPanelOpen ? 'open' : 'shut'"
+      >
+        <div class="text">
+          <h5>Import one of your owned games:</h5>
+          <p>
+            Enter the root hash of one of your owned games to add it to your
+            local library,
+          </p>
+        </div>
+
+        <div class="input">
+          <input
+            type="text"
+            name=""
+            id=""
+            placeholder="The game's hash"
+            v-model="importGameHash"
+          />
+          <button type="submit">import</button>
+        </div>
+      </form>
+
       <GameEntry :game="selected" v-if="selected">
         <button
           @click="createDownload"
@@ -74,6 +117,10 @@ const route = useRoute();
 const selected = ref(null);
 const selectedIsDownloading = ref(0);
 
+// import new game
+const importPanelOpen = ref(false);
+const importGameHash = ref("");
+
 watch(selected, async () => {
   if (!selected.value) return;
 
@@ -124,6 +171,64 @@ async function uninstall() {
     max-width: 1500px;
     justify-self: center;
     overflow-y: auto;
+    position: relative;
+    width: 100%;
+  }
+
+  .import-game {
+    z-index: 100;
+    top: 1.2rem;
+    position: absolute;
+    background-color: lighten(#131313, 7%);
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    border-radius: 5px;
+    padding: 0.75rem 1rem;
+    max-width: 325px;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    transition: 250ms;
+
+    &.open {
+      left: 1.5rem;
+    }
+
+    &.shut {
+      left: -25rem;
+    }
+
+    > .text {
+      > p {
+        font-style: italic;
+        font-size: 0.85rem;
+        color: darken(white, 12%);
+      }
+    }
+
+    > .input {
+      display: flex;
+      align-items: center;
+
+      input {
+        border-radius: 1px 0 0 1px;
+        padding: 2.5px 3px;
+        border: none;
+        height: 25px;
+        width: 250px;
+        outline: none;
+        background-color: darken(white, 5%);
+      }
+
+      button {
+        border-radius: 0 1px 1px 0;
+        border: none;
+        height: 30px;
+        width: 50px;
+        background-color: rgb(0, 131, 253);
+        font-weight: bold;
+        color: white;
+      }
+    }
   }
 
   ul {
@@ -136,16 +241,43 @@ async function uninstall() {
     border-left: none;
     max-width: 250px;
     overflow-y: auto;
+    min-width: 230px;
 
     > .empty {
       color: darken(white, 20%);
       text-align: left;
     }
 
-    > p {
-      margin: 0.4rem 0.5rem;
-      font-weight: bold;
-      text-align: center;
+    > .header {
+      display: flex;
+      padding: 12px 15px;
+      align-items: center;
+
+      > p {
+        font-weight: bold;
+      }
+
+      > button {
+        margin-left: auto;
+        background-color: lighten(#131313, 20%);
+        border: none;
+        padding: 5px 8px;
+        font-weight: bold;
+        border-radius: 6px;
+        margin-top: 4px;
+        cursor: pointer;
+        transition: 150ms;
+        color: rgb(0, 174, 255);
+        font-size: 0.7rem;
+
+        &:hover {
+          background-color: lighten(#131313, 25%);
+        }
+
+        &.active {
+          background-color: lighten(#131313, 20%);
+        }
+      }
     }
 
     > li {

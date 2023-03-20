@@ -62,11 +62,11 @@ func DeployLibraryContract(privateKey string) (*bind.TransactOpts, *library.Libr
 		util.Logger.Errorf("Error reading previous games: %s", err)
 	}
 
-	err = watchNewGameEvent()
-	if err != nil {
-		util.Logger.Errorf("Error watching for new games: %s", err)
-		return nil, nil, err
-	}
+	// err = watchNewGameEvent()
+	// if err != nil {
+	// 	util.Logger.Errorf("Error watching for new games: %s", err)
+	// 	return nil, nil, err
+	// }
 
 	return authInstance, libInstance, nil
 }
@@ -162,7 +162,7 @@ func uploadToEthereum(g *games.Game) error {
 
 	// upload data to IPFS
 	util.Logger.Infof("Uploading game data for %s to IPFS", g.Title)
-	err := g.UploadHashTreeToIPFS()
+	err := g.UploadHashTree()
 	if err != nil {
 		return err
 	}
@@ -207,42 +207,6 @@ func Upload(g *games.Game) error {
 
 	// * upload
 	return uploadToEthereum(g)
-}
-
-// Will listen for NewGame events emitted on ethereum
-func watchNewGameEvent() error {
-	newGameChannel := make(chan *library.LibraryNewGame)
-
-	sub, err := libInstance.WatchNewGame(&bind.WatchOpts{
-		Start:   nil,
-		Context: nil,
-	}, newGameChannel)
-
-	if err != nil {
-		return err
-	}
-
-	util.Logger.Info("Watching for new games")
-	go func() {
-		p := peer.Peer()
-		defer util.Logger.Info("Stopped watching for new games")
-		defer sub.Unsubscribe()
-
-		for {
-			select {
-			case err := <-sub.Err():
-				if err != nil {
-					util.Logger.Error(err)
-				}
-			case newGame := <-newGameChannel:
-				util.Logger.Infof("New game received with hash %x. Adding to library.", newGame.Hash)
-				p.Library().SetBlockchainGame(newGame.Hash, gameEntryToGame(&newGame.Game))
-			}
-		}
-
-	}()
-
-	return nil
 }
 
 // ReadPreviousGameEvents Will look at previous GameEntry events to fill store games
@@ -348,7 +312,7 @@ func Purchase(l *games.Library, rootHash [32]byte) error {
 	}
 
 	// ? fetch hash data
-	err = g.GetHashTreeFromIPFS()
+	err = g.DownloadHashTree()
 	if err != nil {
 		util.Logger.Warnf("Error getting hash tree from IPFS %s", err)
 	}
@@ -359,6 +323,54 @@ func Purchase(l *games.Library, rootHash [32]byte) error {
 	return nil
 }
 
+// check whether a user has purchased a game on the blockchain
 func HasPurchased(gameHash [32]byte, addr common.Address) (bool, error) {
 	return libInstance.HasPurchased(nil, gameHash, addr)
+}
+
+// fetch an owned game from blockchain
+func FetchOwnedGame(l *games.Library, gameHash [32]byte) error {
+	util.Logger.Infof("Fetching game data for %x", gameHash)
+	purchased, err := HasPurchased(gameHash, ethereum.Address())
+	if err != nil {
+		return err
+	}
+
+	if !purchased {
+		util.Logger.Warnf("User does not own game %x", gameHash)
+		return nil
+	}
+
+	game, err := libInstance.Games(nil, gameHash)
+	if err != nil {
+		return err
+	}
+
+	localGame := &games.Game{
+		Title:               game.Title,
+		Version:             game.Version,
+		ReleaseDate:         game.ReleaseDate,
+		Developer:           game.Developer,
+		RootHash:            game.RootHash,
+		HashTreeIPFSAddress: game.HashTreeIPFSAddress,
+		Assets: &games.GameAssets{
+			Cid: game.AssetsIPFSAddress,
+		},
+		Uploader:        game.Uploader,
+		Price:           game.Price,
+		PreviousVersion: game.PreviousVersion,
+	}
+
+	err = localGame.DownloadAllData()
+	if err != nil {
+		util.Logger.Warnf("error downloading game data %s", err)
+	}
+
+	err = l.AddOwnedGame(localGame)
+	if err != nil {
+		return err
+	}
+
+	util.Logger.Infof("Fetched game data for %x", gameHash)
+	return nil
 }

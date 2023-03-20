@@ -7,6 +7,7 @@ import {
   CreateDownload,
   PurchaseGame,
   ContinueAllDownloads,
+  FetchOwnedGame,
 } from "../../wailsjs/go/controller/Controller";
 import { EventsOn } from "../../wailsjs/runtime/runtime";
 
@@ -45,8 +46,9 @@ export const useGamesStore = defineStore("games", () => {
     await refreshDownloads();
   }
 
-  // add listeners for the progress of downloads
-  async function setupDownloadListeners() {}
+  function importGame(gameHash) {
+    FetchOwnedGame(gameHash);
+  }
 
   async function getStoreGames() {
     storeGames.value = await GetStoreGames();
@@ -67,5 +69,6 @@ export const useGamesStore = defineStore("games", () => {
     refreshOwnedGames,
     getStoreGames,
     purchase,
+    importGame,
   };
 });

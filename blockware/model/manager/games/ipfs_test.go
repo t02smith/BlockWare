@@ -19,7 +19,7 @@ func TestUploadAndDownloadDataToIPFS(t *testing.T) {
 
 	smoke := t.Run("upload data", func(t *testing.T) {
 
-		err := g.UploadHashTreeToIPFS()
+		err := g.UploadHashTree()
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -47,7 +47,7 @@ func TestUploadAndDownloadDataToIPFS(t *testing.T) {
 		cachedData := g.data
 		g.data = nil
 
-		err := g.GetHashTreeFromIPFS()
+		err := g.DownloadHashTree()
 		if err != nil {
 			t.Fatal(err)
 		}

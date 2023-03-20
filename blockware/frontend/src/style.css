@@ -45,3 +45,7 @@ strong {
   background: #252525;
   
 }
+
+button {
+  cursor: pointer;
+}

@@ -18,7 +18,7 @@ that it can be easily accessed by anyone, anywhere.
 */
 
 // Upload game data to IPFS
-func (g *Game) UploadHashTreeToIPFS() error {
+func (g *Game) UploadHashTree() error {
 	sh := shell.NewShell("localhost:5001")
 	data, err := g.GetData()
 	if err != nil {
@@ -43,12 +43,12 @@ func (g *Game) UploadHashTreeToIPFS() error {
 }
 
 // read game data from IPFS network
-func (g *Game) GetHashTreeFromIPFS() error {
+func (g *Game) DownloadHashTree() error {
 	if g.HashTreeIPFSAddress == "" {
 		return errors.New("ipfs id not stored")
 	}
 
-	util.Logger.Info("Reading game %s data from IPFS using cid=%s", g.Title, g.HashTreeIPFSAddress)
+	util.Logger.Infof("Reading game %s data from IPFS using cid=%s", g.Title, g.HashTreeIPFSAddress)
 	sh := shell.NewShell("localhost:5001")
 	data, err := sh.Cat(g.HashTreeIPFSAddress)
 	if err != nil {
@@ -64,6 +64,6 @@ func (g *Game) GetHashTreeFromIPFS() error {
 		return err
 	}
 
-	util.Logger.Info("Read game %s data from IPFS", g.Title)
+	util.Logger.Infof("Read game %s data from IPFS", g.Title)
 	return nil
 }

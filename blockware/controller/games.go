@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"bytes"
 	"fmt"
 	"math/big"
 	"time"
@@ -8,6 +9,7 @@ import (
 	"github.com/spf13/viper"
 	"github.com/t02smith/part-iii-project/toolkit/model/manager/games"
 	"github.com/t02smith/part-iii-project/toolkit/model/net/peer"
+	"github.com/t02smith/part-iii-project/toolkit/model/persistence/ethereum"
 	"github.com/t02smith/part-iii-project/toolkit/model/persistence/ethereum/library"
 	"github.com/t02smith/part-iii-project/toolkit/util"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
@@ -16,6 +18,7 @@ import (
 // get a list of owned games
 func (a *Controller) GetOwnedGames() []*ControllerGame {
 	gs := peer.Peer().Library().GetOwnedGames()
+	addr := ethereum.Address()
 	out := []*ControllerGame{}
 
 	for _, g := range gs {
@@ -31,6 +34,7 @@ func (a *Controller) GetOwnedGames() []*ControllerGame {
 			Uploader:        g.Uploader,
 			Download:        downloadToAppDownload(g.Download, g.Title),
 			AssetsFolder:    g.Assets.AbsolutePath,
+			IsOwner:         bytes.Equal(addr.Bytes(), g.Uploader.Bytes()),
 		})
 	}
 
@@ -143,6 +147,7 @@ func (c *Controller) GetGameFromStoreByRootHash(rh string) *ControllerGame {
 	}
 }
 
+// purchase a new game by its hash
 func (c *Controller) PurchaseGame(rh string) {
 	gh, err := hashStringToByte32(rh)
 	if err != nil {
@@ -160,6 +165,24 @@ func (c *Controller) PurchaseGame(rh string) {
 	runtime.EventsEmit(c.ctx, "update-owned-games")
 }
 
+// fetch an owned game from blockchain
+func (c *Controller) FetchOwnedGame(gh string) {
+	hash, err := hashStringToByte32(gh)
+	if err != nil {
+		c.controllerErrorf("Error fetching owned game %s", err)
+		return
+	}
+
+	err = library.FetchOwnedGame(peer.Peer().Library(), hash)
+	if err != nil {
+		c.controllerErrorf("Error fetching owned game %s", err)
+		return
+	}
+
+	runtime.EventsEmit(c.ctx, "update-owned-games")
+}
+
+// uninstall an owned game
 func (c *Controller) UninstallGame(rh string) {
 	gh, err := hashStringToByte32(rh)
 	if err != nil {

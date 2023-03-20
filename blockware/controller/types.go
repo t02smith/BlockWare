@@ -24,6 +24,7 @@ type ControllerGame struct {
 	Uploader common.Address `json:"uploader"`
 
 	Download *ControllerDownload `json:"download"`
+	IsOwner  bool
 }
 
 type ControllerDownload struct {

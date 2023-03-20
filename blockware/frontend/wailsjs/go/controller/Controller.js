@@ -30,6 +30,10 @@ export function Disconnect(arg1, arg2) {
   return window['go']['controller']['Controller']['Disconnect'](arg1, arg2);
 }
 
+export function FetchOwnedGame(arg1) {
+  return window['go']['controller']['Controller']['FetchOwnedGame'](arg1);
+}
+
 export function GetDownloads() {
   return window['go']['controller']['Controller']['GetDownloads']();
 }

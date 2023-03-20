@@ -53,13 +53,22 @@
             </p>
 
             <div class="to-update">
-              <select name="" id="">
-                <option value="0">Choose game:</option>
+              <select
+                name=""
+                id=""
+                :disabled="ownedGames.length === 0"
+                v-model="selectedOwnGame"
+              >
+                <option value="" disabled>Choose game:</option>
 
-                <option value="" v-for="g in games.ownedGames">
+                <option :value="g" v-for="g in ownedGames">
                   {{ g.title }}
                 </option>
               </select>
+
+              <p v-if="ownedGames && ownedGames.length === 0">
+                You own no games
+              </p>
             </div>
           </div>
         </div>
@@ -80,7 +89,7 @@
                 type="text"
                 name=""
                 id=""
-                :disabled="type === 'existing-game'"
+                :disabled="selectedOwnGame !== ''"
                 placeholder="title"
                 v-model="title"
               />
@@ -95,7 +104,7 @@
                 type="text"
                 name=""
                 id=""
-                :disabled="type === 'existing-game'"
+                :disabled="selectedOwnGame !== ''"
                 placeholder="developer"
                 v-model="dev"
               />
@@ -204,7 +213,7 @@
           </div>
 
           <div class="license">
-            <input type="checkbox" name="" id="license" />
+            <input type="checkbox" name="" id="license" v-model="license" />
             <label for="license">
               Click here to agree to BlockWare's game licensing policy
             </label>
@@ -230,7 +239,7 @@
   </div>
 </template>
 <script setup>
-import { onMounted, ref, computed } from "vue";
+import { onMounted, ref, computed, watch } from "vue";
 import { UploadGame } from "../../wailsjs/go/controller/Controller";
 import { EventsOn } from "../../wailsjs/runtime/runtime";
 import { useGamesStore } from "../stores/games";
@@ -252,9 +261,15 @@ const file = ref("");
 const workers = ref(5);
 const assets = ref("");
 
+const license = ref(false);
+
 // upload progress
 const fileCount = ref(0);
 const fileProgress = ref(0);
+
+//
+const ownedGames = computed(() => games.ownedGames.filter((g) => g.IsOwner));
+const selectedOwnGame = ref("");
 
 const progressWidth = computed(() =>
   fileProgress.value === 0 ? 0 : (fileProgress.value / fileCount.value) * 300
@@ -268,11 +283,27 @@ onMounted(async () => {
   EventsOn("file-progress", (count) => {
     fileProgress.value = count;
   });
+
+  games.refreshOwnedGames();
 });
+
+watch(selectedOwnGame, () => {
+  if (!selectedOwnGame.value) return;
+
+  selectOwnedGame(selectedOwnGame.value);
+});
+
+function selectOwnedGame(g) {
+  title.value = g.title;
+  version.value = g.version;
+  dev.value = g.dev;
+  price.value = g.price;
+}
 
 async function submit() {
   if (workers.value <= 0) workers.value = 1;
   if (shardSize.value <= 0) shardSize.value = 16384;
+  if (!license.value) return;
 
   submitted.value = true;
   err.value = await UploadGame(
@@ -381,6 +412,13 @@ async function submit() {
 
         .to-update {
           margin-top: 10px;
+          display: flex;
+          gap: 1rem;
+
+          > p {
+            font-style: italic;
+            color: red;
+          }
 
           > select {
             padding: 4px 10px;

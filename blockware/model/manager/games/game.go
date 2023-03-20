@@ -4,11 +4,9 @@ import (
 	"bytes"
 	"compress/gzip"
 	"crypto/sha256"
-	"encoding/base64"
 	"encoding/gob"
 	"errors"
 	"fmt"
-	"io"
 	"math/big"
 	"os"
 	"path/filepath"
@@ -19,6 +17,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/spf13/viper"
 	hash "github.com/t02smith/part-iii-project/toolkit/model/manager/hashtree"
+	"github.com/t02smith/part-iii-project/toolkit/model/persistence/ethereum"
 	"github.com/t02smith/part-iii-project/toolkit/util"
 )
 
@@ -67,6 +66,20 @@ func CreateGame(newGame NewGame, progress chan int) (*Game, error) {
 	if newGame.ShardSize == 0 {
 		util.Logger.Errorf("shard size should be > 0")
 		return nil, errors.New("invalid shard size")
+	}
+
+	if newGame.Price.Cmp(big.NewInt(0)) == -1 {
+		return nil, errors.New("price must be greater than 0")
+	}
+
+	_, err := os.Stat(newGame.RootDir)
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = os.Stat(newGame.AssetsDir)
+	if err != nil {
+		return nil, err
 	}
 
 	// check version format
@@ -125,7 +138,7 @@ func CreateGame(newGame NewGame, progress chan int) (*Game, error) {
 		HashTreeIPFSAddress: "",
 		Price:               newGame.Price,
 		PreviousVersion:     [32]byte{},
-		Uploader:            common.Address{},
+		Uploader:            ethereum.Address(),
 		Assets: &GameAssets{
 			AbsolutePath: newGame.AssetsDir,
 		},
@@ -151,9 +164,6 @@ func (g *Game) GetData() (*hash.HashTree, error) {
 // read a game's hash data from a file
 func (g *Game) readHashData() error {
 	dir := filepath.Join(viper.GetString("meta.directory"), "hashes")
-	if len(dir) == 0 {
-		return errors.New(".toolkit directory not specified")
-	}
 
 	hashFileName := fmt.Sprintf("%x.hash", g.RootHash)
 	data, err := hash.ReadHashTreeFromFile(filepath.Join(dir, hashFileName))
@@ -282,66 +292,6 @@ func LoadGames(gameDataLocation string) ([]*Game, error) {
 	return games, nil
 }
 
-// Serialisation
-
-// Serialise Turns a game into a base64 encoded, gzip compressed byte stream
-func (g *Game) Serialise() (string, error) {
-
-	// encode
-	b := bytes.Buffer{}
-	e := gob.NewEncoder(&b)
-
-	err := e.Encode(*g)
-	if err != nil {
-		return "", err
-	}
-
-	// compress
-	compressed := bytes.Buffer{}
-	compressor := gzip.NewWriter(&compressed)
-
-	compressor.Write(b.Bytes())
-	compressor.Close()
-
-	return base64.StdEncoding.EncodeToString(compressed.Bytes()), nil
-}
-
-// DeserializeGame Takes a serialised game and turns it into a struct
-func DeserializeGame(data string) (*Game, error) {
-	g := &Game{}
-
-	// from base64
-	decodedData, err := base64.StdEncoding.DecodeString(data)
-	if err != nil {
-		return nil, err
-	}
-
-	b := bytes.Buffer{}
-	_, err = b.Write(decodedData)
-	if err != nil {
-		return nil, err
-	}
-
-	// decompress
-	decompressor, err := gzip.NewReader(&b)
-	if err != nil {
-		return nil, err
-	}
-	decompressor.Close()
-
-	decompressed := bytes.Buffer{}
-	io.Copy(&decompressed, decompressor)
-
-	// decode
-	d := gob.NewDecoder(&decompressed)
-	err = d.Decode(g)
-	if err != nil {
-		return nil, err
-	}
-
-	return g, nil
-}
-
 // Equals compare two games
 func (g *Game) Equals(g2 *Game) bool {
 	return g.Title == g2.Title &&
@@ -374,4 +324,24 @@ func (g *Game) FetchShard(hash [32]byte) (bool, []byte, error) {
 // GetDownload Get a games download
 func (g *Game) GetDownload() *Download {
 	return g.Download
+}
+
+// downloads a game's assets and hash tree
+func (g *Game) DownloadAllData() error {
+	err := g.DownloadHashTree()
+	if err != nil {
+		return err
+	}
+
+	err = g.DownloadAssets()
+	if err != nil {
+		return err
+	}
+
+	err = OutputAllGameDataToFile(g)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

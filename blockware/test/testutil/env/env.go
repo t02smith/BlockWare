@@ -22,7 +22,10 @@ func CreateTestGame(t *testing.T, toRoot string) *games.Game {
 		Developer:   "google.com",
 		RootDir:     filepath.Join(toRoot, "./test/data/testdir"),
 		Price:       big.NewInt(0),
-		ShardSize:   256}, nil)
+		ShardSize:   256,
+		AssetsDir:   filepath.Join(toRoot, "./test/data/assets"),
+	}, nil)
+
 	if err != nil {
 		t.Fatal(err)
 	}

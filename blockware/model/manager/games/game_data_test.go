@@ -8,7 +8,20 @@ import (
 	"github.com/t02smith/part-iii-project/toolkit/test/testutil"
 )
 
-func TestUploadAndDownloadDataToIPFS(t *testing.T) {
+/*
+
+function: UploadHashTree + DownloadHashTree
+purpose: upload the hash tree of a game to distributed storage
+
+? Test cases
+success
+	#1 => tree uploaded successfully
+	#2 => tree downloaded successfully
+
+
+*/
+
+func TestUploadAndDownloadHashTree(t *testing.T) {
 	testutil.LongTest(t)
 	t.Skip() // TODO setup IPFS daemon on github workflow
 

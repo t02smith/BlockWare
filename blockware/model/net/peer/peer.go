@@ -124,13 +124,8 @@ func newPeer(config Config, serverHostname string, serverPort uint, installFolde
 
 	lib := games.NewLibrary()
 	for _, g := range gameLs {
-		err = lib.AddOwnedGame(g)
-		if err != nil && !os.IsNotExist(err) {
-			util.Logger.Error(err)
-		}
+		lib.AddOrUpdateOwnedGame(g)
 	}
-
-	lib.OutputGamesTable()
 
 	var knownPeers []string
 	if config.LoadPeersFromFile {

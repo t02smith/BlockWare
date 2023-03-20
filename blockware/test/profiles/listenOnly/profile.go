@@ -81,7 +81,7 @@ func Run() {
 		util.Logger.Fatalf("Error creating game: %s", err)
 	}
 
-	p.Library().AddOwnedGame(g)
+	p.Library().AddOrUpdateOwnedGame(g)
 	err = games.OutputAllGameDataToFile(g)
 	if err != nil {
 		util.Logger.Warnf("Error saving game to file %s", err)

@@ -110,7 +110,7 @@ func (c *Controller) UploadGame(title, version, dev, rootDir string, shardSize, 
 		return
 	}
 
-	peer.Peer().Library().AddOwnedGame(g)
+	peer.Peer().Library().AddOrUpdateOwnedGame(g)
 	err = games.OutputAllGameDataToFile(g)
 	if err != nil {
 		c.controllerErrorf("Error saving game to file %s", err)

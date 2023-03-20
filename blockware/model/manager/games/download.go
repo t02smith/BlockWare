@@ -115,7 +115,6 @@ func (g *Game) SetupDownload() error {
 		TotalBlocks: 0,
 		Stage:       DS_GeneratingDummies,
 	}
-	g.Download = d
 
 	d.inserterPool = shardInserterPool(int(shardInserterCount), g)
 
@@ -126,6 +125,14 @@ func (g *Game) SetupDownload() error {
 	}
 
 	d.AbsolutePath = filepath.Join(dir, g.Title)
+
+	_, err = os.Stat(d.AbsolutePath)
+	if err == nil {
+		// ! directory already exists => cannot start download
+		return fmt.Errorf("folder %s already found, cannot start download", d.AbsolutePath)
+	}
+
+	g.Download = d
 
 	util.Logger.Infof("Generating dummy files for %s-%s", g.Title, g.Version)
 	err = data.CreateDummyFiles(dir, g.Title, func(path string, htf *hash.HashTreeFile) {
@@ -162,8 +169,7 @@ func (g *Game) SetupDownload() error {
 // CancelDownload cancel an existing download
 func (g *Game) CancelDownload() error {
 	if g.Download == nil {
-		util.Logger.Warnf("Download not found for game %x", g.RootHash)
-		return nil
+		return fmt.Errorf("Download not found for game %x", g.RootHash)
 	}
 
 	g.Download.Stage = DS_Cancelled

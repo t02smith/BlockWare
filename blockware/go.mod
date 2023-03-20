@@ -5,7 +5,6 @@ go 1.18
 require (
 	github.com/ethereum/go-ethereum v1.10.26
 	github.com/ipfs/go-ipfs-api v0.3.0
-	github.com/jedib0t/go-pretty/v6 v6.4.4
 	github.com/spf13/viper v1.15.0
 	github.com/stretchr/testify v1.8.1
 	github.com/wailsapp/wails/v2 v2.3.1
@@ -45,7 +44,6 @@ require (
 	github.com/magiconair/properties v1.8.7 // indirect
 	github.com/mattn/go-colorable v0.1.12 // indirect
 	github.com/mattn/go-isatty v0.0.14 // indirect
-	github.com/mattn/go-runewidth v0.0.13 // indirect
 	github.com/minio/blake2b-simd v0.0.0-20160723061019-3f5f724cb5b1 // indirect
 	github.com/minio/sha256-simd v0.1.1 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
@@ -61,7 +59,6 @@ require (
 	github.com/pkg/browser v0.0.0-20210706143420-7d21f8c997e2 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
-	github.com/rivo/uniseg v0.2.0 // indirect
 	github.com/rjeczalik/notify v0.9.1 // indirect
 	github.com/samber/lo v1.27.1 // indirect
 	github.com/shirou/gopsutil v3.21.4-0.20210419000835-c7a38de76ee5+incompatible // indirect

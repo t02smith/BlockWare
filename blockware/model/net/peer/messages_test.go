@@ -30,10 +30,7 @@ failure
 
 func TestFetchBlockFromLibrary(t *testing.T) {
 	game := testenv.CreateTestGame(t, "../../../")
-	err := Peer().library.AddOwnedGame(game)
-	if err != nil {
-		t.Fatal(err)
-	}
+	Peer().library.AddOrUpdateOwnedGame(game)
 
 	t.Cleanup(func() {
 		Peer().library.ClearOwnedGames()
@@ -44,10 +41,7 @@ func TestFetchBlockFromLibrary(t *testing.T) {
 			t.Run("game not owned by user", func(t *testing.T) {
 				Peer().library.ClearOwnedGames()
 				t.Cleanup(func() {
-					err := Peer().library.AddOwnedGame(game)
-					if err != nil {
-						t.Fatal(err)
-					}
+					Peer().library.AddOrUpdateOwnedGame(game)
 				})
 
 				_, err := fetchBlockFromLibrary(game.RootHash, sha256.Sum256([]byte("asdas")))

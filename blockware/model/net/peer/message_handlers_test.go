@@ -69,7 +69,7 @@ func TestHandleLIBRARY(t *testing.T) {
 			var rh [32]byte
 			copy(rh[:], []byte("hello there"))
 
-			Peer().library.AddOwnedGame(&games.Game{
+			Peer().library.AddOrUpdateOwnedGame(&games.Game{
 				RootHash: rh,
 			})
 
@@ -206,7 +206,7 @@ func TestHandleGAMES(t *testing.T) {
 				data.Library = make(map[[32]byte]ownership)
 			})
 
-			Peer().library.AddOwnedGame(game)
+			Peer().library.AddOrUpdateOwnedGame(game)
 			mp.SendStringAndWait(25, generateGAMES(game))
 
 			assert.Equal(t, 1, len(data.Library), "Game not recognised")
@@ -268,10 +268,7 @@ func TestHandleBLOCK(t *testing.T) {
 	mp, _ := createMockPeer(t)
 
 	game := testenv.CreateTestGame(t, "../../../")
-	err := Peer().library.AddOwnedGame(game)
-	if err != nil {
-		t.Fatalf("Error adding game to library: %s", err)
-	}
+	Peer().library.AddOrUpdateOwnedGame(game)
 
 	t.Cleanup(func() {
 		Peer().library.ClearOwnedGames()
@@ -305,10 +302,7 @@ func TestHandleBLOCK(t *testing.T) {
 			t.Run("user doesn't own game", func(t *testing.T) {
 				Peer().library.ClearOwnedGames()
 				t.Cleanup(func() {
-					err = Peer().library.AddOwnedGame(game)
-					if err != nil {
-						t.Fatalf("Error during cleanup adding game to library: %s", err)
-					}
+					Peer().library.AddOrUpdateOwnedGame(game)
 				})
 
 				mp.SendStringAndWait(50, "BLOCK;%x;%x\n", game.RootHash, game.RootHash)
@@ -424,10 +418,7 @@ func TestHandleSEND_BLOCK(t *testing.T) {
 	mp, _ := createMockPeer(t)
 
 	game := testenv.CreateTestGame(t, "../../../")
-	err := Peer().library.AddOwnedGame(game)
-	if err != nil {
-		t.Fatalf("Error adding game to library: %s", err)
-	}
+	Peer().library.AddOrUpdateOwnedGame(game)
 
 	t.Cleanup(func() {
 		Peer().library.ClearOwnedGames()
@@ -539,7 +530,7 @@ func TestHandleSEND_BLOCK(t *testing.T) {
 		game := testenv.CreateTestGame(t, "../../../")
 		testenv.SetupTestDownload(t, game, "../../../")
 
-		Peer().library.AddOwnedGame(game)
+		Peer().library.AddOrUpdateOwnedGame(game)
 		t.Cleanup(func() {
 			Peer().library.ClearOwnedGames()
 		})

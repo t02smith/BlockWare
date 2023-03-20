@@ -86,7 +86,7 @@ func Run() {
 		util.Logger.Fatalf("Error creating game: %s", err)
 	}
 
-	p.Library().AddOwnedGame(g)
+	p.Library().AddOrUpdateOwnedGame(g)
 	err = library.Upload(g)
 	if err != nil {
 		util.Logger.Fatalf("Error uploading game to ETH %s", err)

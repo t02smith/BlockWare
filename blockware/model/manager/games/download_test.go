@@ -48,6 +48,10 @@ func TestSetupDownload(t *testing.T) {
 		})
 
 		err := g.SetupDownload()
+		t.Cleanup(func() {
+			g.CancelDownload()
+		})
+
 		assert.Nil(t, err)
 
 		assert.NotNil(t, g.Download)
@@ -143,7 +147,7 @@ func TestCancelDownload(t *testing.T) {
 				})
 
 				err := g.CancelDownload()
-				assert.Nil(t, err)
+				assert.NotNil(t, err)
 
 				_, err = os.Stat(path)
 				assert.Nil(t, err)

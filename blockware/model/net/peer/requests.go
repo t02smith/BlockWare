@@ -2,7 +2,6 @@ package peer
 
 import (
 	"github.com/t02smith/part-iii-project/toolkit/model"
-	"github.com/t02smith/part-iii-project/toolkit/model/manager/games"
 	"github.com/t02smith/part-iii-project/toolkit/util"
 )
 
@@ -51,10 +50,10 @@ func loadDeferredRequests() {
 
 	go func() {
 		util.Logger.Infof("loading %d deferred requests", len(cached))
-		defer close(cached)
-		manager.DeferredRequests = make(chan games.DownloadRequest)
-		for request := range cached {
-			manager.RequestDownload <- request
+		size := len(cached)
+
+		for i := 0; i < size; i++ {
+			manager.RequestDownload <- <-cached
 		}
 		util.Logger.Infof("deferred requests loaded")
 	}()

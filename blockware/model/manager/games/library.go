@@ -1,12 +1,9 @@
 package games
 
 import (
-	"errors"
 	"fmt"
-	"os"
 	"sync"
 
-	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/t02smith/part-iii-project/toolkit/util"
 )
 
@@ -48,7 +45,11 @@ func NewLibrary() *Library {
 func (l *Library) CreateDownload(g *Game) error {
 	util.Logger.Infof("Creating download for %s:%x", g.Title, g.RootHash)
 	if _, ok := l.ownedGames[g.RootHash]; !ok {
-		return errors.New("game not found in library, cannot add download")
+		return fmt.Errorf("game %x not found in library, cannot add download", g.RootHash)
+	}
+
+	if g.Download != nil {
+		return fmt.Errorf("download already started for game %x", g.RootHash)
 	}
 
 	err := g.SetupDownload()
@@ -80,37 +81,19 @@ func (l *Library) GetOwnedGames() []*Game {
 	return gs
 }
 
-//
-
 // AddOwnedGame add a game to the library
-func (l *Library) AddOwnedGame(g *Game) error {
+func (l *Library) AddOrUpdateOwnedGame(g *Game) {
 	l.ownedGames[g.RootHash] = g
-	return nil
 }
 
-// OutputGamesTable output a table representation of the games list to the console
-func (l *Library) OutputGamesTable() {
-	t := table.NewWriter()
-	t.SetOutputMirror(os.Stdout)
-	t.AppendHeader(table.Row{"#", "Title", "Version", "Release"})
-
-	counter := 1
-	for _, g := range l.ownedGames {
-		t.AppendRow(table.Row{fmt.Sprint(counter), g.Title, g.Version, g.ReleaseDate})
-		counter++
-	}
-
-	t.Render()
-}
-
-// FindBlock find a given block within a game in a player's library
-func (l *Library) FindBlock(gameHash [32]byte, hash [32]byte) (bool, []byte, error) {
+// FindAndRetrieveBlock find a given block within a game in a player's library
+func (l *Library) FindAndRetrieveBlock(gameHash [32]byte, blockHash [32]byte) (bool, []byte, error) {
 	g, ok := l.ownedGames[gameHash]
 	if !ok {
 		return false, nil, nil
 	}
 
-	return g.FetchShard(hash)
+	return g.FetchShard(blockHash)
 }
 
 // SetBlockchainGame store a details from a game on the blockchain store
@@ -200,10 +183,6 @@ func (l *Library) Uninstall(gameHash [32]byte) error {
 		return fmt.Errorf("game %x not owned", gameHash)
 	}
 	util.Logger.Infof("Uninstalling game %s", game.Title)
-
-	if game.Download == nil {
-		return fmt.Errorf("game %x not installed", gameHash)
-	}
 
 	err := game.CancelDownload()
 	if err != nil {

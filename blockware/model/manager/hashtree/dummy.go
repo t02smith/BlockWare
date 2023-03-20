@@ -22,7 +22,7 @@ the user cannot have enough storage.
 */
 
 func (ht *HashTree) CreateDummyFiles(rootDir, title string, onCreate func(string, *HashTreeFile)) error {
-	err := os.Mkdir(filepath.Join(rootDir, title), 0777)
+	err := os.Mkdir(filepath.Join(rootDir, title), 0655)
 	if err != nil && !os.IsExist(err) {
 		return err
 	}

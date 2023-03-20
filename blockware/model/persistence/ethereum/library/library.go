@@ -306,10 +306,7 @@ func Purchase(l *games.Library, rootHash [32]byte) error {
 	}
 
 	// * store game
-	err = l.AddOwnedGame(g)
-	if err != nil {
-		return err
-	}
+	l.AddOrUpdateOwnedGame(g)
 
 	// ? fetch hash data
 	err = g.DownloadHashTree()
@@ -366,11 +363,7 @@ func FetchOwnedGame(l *games.Library, gameHash [32]byte) error {
 		util.Logger.Warnf("error downloading game data %s", err)
 	}
 
-	err = l.AddOwnedGame(localGame)
-	if err != nil {
-		return err
-	}
-
+	l.AddOrUpdateOwnedGame(localGame)
 	util.Logger.Infof("Fetched game data for %x", gameHash)
 	return nil
 }

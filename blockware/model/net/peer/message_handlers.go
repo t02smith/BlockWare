@@ -130,7 +130,7 @@ func handleBLOCK(cmd []string, client tcp.TCPConnection) error {
 	// 	return fmt.Errorf("user does not own game %x", gh)
 	// }
 
-	found, data, err := Peer().library.FindBlock(gh, sh)
+	found, data, err := Peer().library.FindAndRetrieveBlock(gh, sh)
 	if err != nil {
 		return fmt.Errorf("error finding block %s", err)
 	}

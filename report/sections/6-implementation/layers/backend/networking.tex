@@ -35,6 +35,11 @@ Structured messages will typically come as part of a request/response pair invol
   VALIDATE\_RES;$[signed message]$
   & The user responds to a VALIDATE\_REQ message with a signed version of the given message. From this signature, the receiver can determine the address and public key of the user.\\
   \midrule
+  REQ\_RECEIPT
+  & A user will request a RECEIPT message from a peer detailing the data that has been sent by the user.\\
+  RECEIPT;$[signature]$;$[message]$
+  & A user will respond to a REQ\_RECEIPT message with a signed message detailing all of the blocks that the requester has sent to the user. This will allow for users to prove their contributions to the game developer who could then reward them.\\
+  \midrule
   ERROR;$[message]$
   & An error message that can be used to prompt a peer to resend a message.\\
   \bottomrule\bottomrule

@@ -1,19 +1,43 @@
-\section{Improvements}
+\section{Future Work}
 
-\subsection{Redundant Data}
+\subsection{Optimisations}
 
-One of the design choices was that each directory would be broken down into a tree of files each with an array of hashes that correspond to its contents. This presented several issues:
+There are several changes that we could make to improve the performance of the project as a whole and make the downloading of data more efficient. These include:
+
+\begin{enumerate}
+  \item \textbf{New Commands} We could extend the commands described in Section~\ref{subsubsec:commands} by including support for batch block requests. This would allow users to request many blocks at once and avoid the overhead of having to perform one request per block.  
+  \item \textbf{Better Block Selection} Currently blocks are not ranked in any way, and by considering the ideas set out in Section~\ref{subsec:bittorrent-download}, we could improve the download speed and overall availability and efficiency of data throughout the network.
+  \item \textbf{Represent Data Differently} The main issue with modelling our data as a Hash Tree is that each file needs to have at least one block. This means that for projects with a large amount of small files, we are substantially increasing the download time as blocks are requested one at a time.
+
+  One possible solution would be to represent the directory as a contiguous block of data that contains breakpoints between files and directories that can be indexed. This would mean we could reduce the overall number of blocks and reduce the amount of redundant data sent between nodes.
+\end{enumerate}
+
+\subsection{New Features}
+
+\subsubsection{Downloadable Content DLC}
+DLC was initially considered as a requirement for this project (\req{F-S3} \& \req{NF-S3}) but was not completed due to time constraints. DLC would be a necessary addition to this application to ensure the viability of it as a competitor to existing platforms. See the potential implementation details specified in Section
+
+\subsubsection{Discovery}
+
+\paragraph*{Content Discovery}
+The store aspect of the application is limited in that users have to know the root hash of the game to find the game's store page and purchase it. This could be achieved using several techniques:
 
 \begin{itemize}
-  \item \textbf{File Size < Shard Size} This would mean that when we exchange the blockk over the network we could include a prefix with a given amount of \textit{empty} data. This is a waste of bandwidth and would slow the overall transfer of data around the network.
-  \item \textbf{At Least 1 Shard Per File} This meant that for a project with a large amount of files, we would also have a large amount of shards to consider. The combination of this with the first issue meant that we would be sending lots of redundant data over the network.
+  \item \textbf{Indexing} Periodically generate an index of all games uploaded that allows users to easily search the store without having to make a large amount of requests to the blockchain. Games could also be ranked based upon factors like popularity of availability. 
+  \item \textbf{More Metadata} Add further metadata to games that allows them to be grouped and thus more easily searchable. For example, developers could add a set of tags to games to identify what type of game it is or what features it has.
 \end{itemize}
 
-\vspace{2mm}\noindent
-Some possible solutions to these could be:
+\paragraph*{Peer Discovery}\label{pg:discovery}
+Currently, there is not good way to discover peers who have the content that a user is interested in. This could be implemented using the following:
 
 \begin{itemize}
-  \item Represent a directory as a contiguous block of data with breakpoints to denote the start/end of files. This would be slower to search but would result in a more efficient data transfer as only the last block would contain redundant data. This could be paired with an index to identify file breakpoints within it for faster searching.
-  \item 
+  \item \textbf{Tracker} BitTorrent uses tracker's to store a list of peers who are interested in a particular piece of data. A similar technique could be implemented to allow users to easily find new peers but would require this data to be hosted somewhere.
+  \item \textbf{Neighbour Discovery} Query known peers if they know any users who are interested in a particular piece of content. However given that the network is fragmented, there is no guarantee that a peer could be found this way.
 \end{itemize}
+
+\subsubsection{Streamline Updates}
+
+At the moment, each update to a game is considered as a new game entirely and this has the limitation that a user will have to download the entirety of the game again and not just the updated sections. This also doesn't overwrite any existing data so the user will have to manually uninstall the older version.
+\x
+A future improvement would be to streamline this process so that for a given update, only the changed data is downloaded and it is overwritten in-place on the older version of the game. This would drastically reduce the bandwidth requirement for each update and require less manual work from the user.
 

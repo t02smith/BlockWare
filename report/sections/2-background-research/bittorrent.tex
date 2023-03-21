@@ -1,6 +1,5 @@
 
-\section{BitTorrent}
-\label{sec:bittorrent}
+\section{BitTorrent}\label{sec:bittorrent}
 
 It is an unrealistic to expect that every game uploaded to the network will be downloaded by every user so only a subset of users will have the game installed and available to share.
 In this section and Section~\ref{sec:lit-p2p}, I will look at how various peer-to-peer file-sharing networks allow users to discover and download content that is fragmented across the network.
@@ -9,8 +8,7 @@ BitTorrent~\cite{kaune_unraveling_2010,pouwelse_bittorrent_2005} is the most pop
 % \x
 % BitTorrent has been chosen in particular as this project will use many of the ideas that are presented by BitTorrent to help build this project. Like mentioned previously, BitTorrent is a highly scalable platform 
 
-\subsection*{Download Protocol}
-\label{subsec:bittorrent-download}
+\subsection*{Download Protocol}\label{subsec:bittorrent-download}
 
 For a user to download data from BitTorrent they would:
 
@@ -26,8 +24,7 @@ For a user to download data from BitTorrent they would:
   \item The node will continuously upload blocks it has while active.
 \end{enumerate}
 
-\subsection*{Availability}
-\label{subsec:availability}
+\subsection*{Availability}\label{subsec:availability}
 
 One of the most significant issues facing BitTorrent is the availability of torrents, where \textit{`38\% of torrents become unavailable in the first month'}~\cite{kaune_unraveling_2010} and that \textit{`the majority of users disconnect from the network within a few hours after the download has finished'}~\cite{pouwelse_bittorrent_2005}.
 This paper~\cite{neglia_availability_2007} looks at how the use of multiple trackers for the same content and DHTs can be used to boost availability.

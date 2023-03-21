@@ -1,0 +1,87 @@
+% chktex-file 2
+% chktex-file 1
+
+\section*{Requirements Met}
+
+\newcommand{\yes}{\hspace*{\fill}\textbf{\textcolor{Green}{yes}}}
+\newcommand{\no}{\hspace*{\fill}\textbf{\textcolor{red}{no}}}
+
+In Table~\ref{tab:req-complete}, I summarise the completeness for the requirements described in Section~\ref{subsec:requirements}.
+
+\begin{longtable}{p{.12\textwidth} p{.13\textwidth} p{.67\textwidth}}
+  \toprule
+  \textbf{Req.} & \textbf{Complete} & \textbf{Evidence/Reason}\\
+  \midrule\midrule
+  \reqref{F-M1}
+  & \yes
+  & Samrt contract acceptance testing.\\
+  \reqref{F-M2}
+  & \yes
+  & Backend/Networking acceptance testing.\\
+  \reqref{F-M3}
+  & \no
+  & Ignored due to time constraints. See Section~\ref{pg:discovery}.\\
+  \reqref{F-M4}
+  & \yes
+  & Backend acceptance testing.\\
+  \reqref{F-M5}
+  & \yes
+  & Backend/Networking acceptance testing. \\
+  \reqref{F-M6}
+  & \yes
+  & Backend acceptance testing.\\
+  \reqref{F-M7}
+  & \yes
+  & Backend/Data-Manager acceptance testing.\\
+  \reqref{F-M8}
+  & \yes
+  & Example deployment to Ethereum Test-Net. See Section~\ref{}\\
+  \reqref{F-M9}
+  & \yes
+  & Smart contract acceptance testing\\
+  \reqref{F-M10}
+  & \yes
+  & Persistence and Backend/Networking acceptance tests\\\midrule
+  \reqref{F-S1}
+  & \yes
+  & Backend acceptance tests.\\
+  \reqref{F-S2}
+  & \yes
+  & Backend/Networking tests.\\
+  \reqref{F-S3}
+  & \no
+  & Ignored due to time constraints.\\\midrule
+  \reqref{F-C1}
+  & \no
+  & Technically possible through the application but not tested.\\
+  \reqref{F-C2}
+  & \yes
+  & See Appendix~\ref{app:screenshots} for screenshots of the UI and Section~\ref{subsec:ui} for details.\\
+  \midrule\midrule
+  \reqref{NF-M1}
+  & \yes
+  & The application exclusively uses distributed platforms to communicate data (Ethereum, IFPS and the custom data sharing network).\\
+  \reqref{NF-M2}
+  & \yes
+  & The deployed contract is public and can be interacted with by any user with an Eth private key.\\
+  \reqref{NF-M3}
+  & \yes
+  & Each game upload contains the Ethereum address of the uploader. The address should be publicly related to the developer.\\
+  \reqref{NF-M4}
+  & \yes
+  & The metadata is stored on Ethereum and can be considered effectively immutable.\\\midrule
+  \reqref{NF-S1}
+  & \yes
+  & See benchmark tests in Section~\ref{sec:benchmark}\\
+  \reqref{NF-S2}
+  & \yes
+  & Unit tests for Smart Contract.\\
+  \reqref{NF-S3}
+  & \no
+  & Ignored due to time constraints.\\\midrule
+  \reqref{NF-C1}
+  & \yes
+  & This application uses a reactive frontend framework. See Appendix~\ref{app:screenshots}.
+  \\\bottomrule\bottomrule
+  \label{tab:req-complete}
+\end{longtable}

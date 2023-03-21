@@ -1,0 +1,19 @@
+\section{Development}
+
+\subsection{Overview}
+
+\paragraph*{Complexity}
+My overall impression of this project was that it was too complex and took a lot more time and effort than was initially expected when planning. Whilst use of agile development helped me organise my time and prioritise features, it still felt like it wasn't enough and that I should have reduced the scope and focused on a more minimal version of the application.
+
+
+
+\paragraph*{Test-Driven Development TDD}
+TDD was a critical part to the success of this project and helped me catch bugs when writing and extending the application. By having an automated test-suite, I could rapidly test large portions of my codebase and find where potential issues appeared. 
+\x
+However, one issue with writing tests in Go was that the test libraries used often didn't feel robust enough when compared to libraries from other languages (namely JUnit). To give some examples:
+
+\begin{itemize}
+  \item Dependency injection and mocking are much harder in Go and rely on an interface based approach. This would add a large amount of complexity and boilerplate to my codebase for the sake of writing tests. Instead it was generally easier to write tests that relied on several other components unrelated to the tested code.
+  \item There is no easy way to configure functions to run before/after all/each test. You can run functions before and after all tests in a package but not individual test files, and before/after each function have to specified in every test they're in. 
+  \item Tests are not easily groupable and tags can only be specified per file but not on a test by test basis. The standard package only supports categorising individual tests as \textit{short} or not.
+\end{itemize}

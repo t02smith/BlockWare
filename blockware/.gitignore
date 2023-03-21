@@ -11,3 +11,4 @@ latex-template-main
 **/test/**/assets/*
 **/test/**/games/*
 **/test/**/hashes/*
+**/test/**/peers/*

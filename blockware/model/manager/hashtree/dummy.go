@@ -42,7 +42,7 @@ func (ht *HashTree) CreateDummyFiles(rootDir, title string, onCreate func(string
 		go func() {
 			for f := range toCreate {
 				fileLocation := filepath.Join(rootDir, title, f.AbsoluteFilename)
-				err := setupFile(fileLocation, ht.ShardSize, uint(len(f.Hashes)))
+				err := setupFile(fileLocation, ht.ShardSize, len(f.Hashes), f.Size)
 				if err != nil {
 					util.Logger.Errorf("error creating %s: %s", fileLocation, err)
 				}
@@ -64,7 +64,7 @@ Create a dummy file
 A dummy file with N shards of size B will be filled with N*B NULL bytes
 to be filled in later
 */
-func setupFile(filename string, shardSize, shardCount uint) error {
+func setupFile(filename string, shardSize uint, shardCount int, fileSize int) error {
 	util.Logger.Debugf("Creating dummy file %s", filename)
 
 	err := os.MkdirAll(filepath.Dir(filename), 0755)
@@ -81,12 +81,19 @@ func setupFile(filename string, shardSize, shardCount uint) error {
 	emptyBuffer := make([]byte, shardSize)
 	writer := bufio.NewWriter(file)
 
-	for i := 0; i < int(shardCount); i++ {
-		_, err := writer.Write(emptyBuffer)
-		writer.Flush()
+	for i := 0; i < shardCount; i++ {
+		if i == shardCount-1 && fileSize%int(shardSize) != 0 {
+			_, err = writer.Write(emptyBuffer[:fileSize%int(shardSize)])
+		} else {
+			_, err = writer.Write(emptyBuffer)
+		}
+
 		if err != nil {
 			return err
 		}
+
+		writer.Flush()
+
 	}
 
 	util.Logger.Debugf("dummy file %s created", filename)

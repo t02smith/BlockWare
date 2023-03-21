@@ -27,7 +27,7 @@ func TestLoadDeferredRequests(t *testing.T) {
 
 	t.Run("success", func(t *testing.T) {
 		t.Run("no deferred requests", func(t *testing.T) {
-			loadDeferredRequests()
+			LoadDeferredRequests()
 			time.Sleep(10 * time.Millisecond)
 
 			assert.Zero(t, len(manager.RequestDownload))
@@ -46,7 +46,7 @@ func TestLoadDeferredRequests(t *testing.T) {
 			}()
 
 			time.Sleep(10 * time.Millisecond)
-			loadDeferredRequests()
+			LoadDeferredRequests()
 			time.Sleep(10 * time.Millisecond)
 
 			assert.Equal(t, 1, len(manager.RequestDownload))
@@ -65,7 +65,7 @@ func TestLoadDeferredRequests(t *testing.T) {
 			}()
 
 			time.Sleep(10 * time.Millisecond)
-			loadDeferredRequests()
+			LoadDeferredRequests()
 			time.Sleep(10 * time.Millisecond)
 
 			assert.Equal(t, 3, len(manager.RequestDownload))

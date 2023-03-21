@@ -628,3 +628,80 @@ func TestGnerateVALIDATE_REQ(t *testing.T) {
 		})
 	})
 }
+
+/*
+
+function: generateREQ_RECEIPT
+purpose: create a REQ_RECEIPT message for requesting your contributions
+
+? Test cases
+success
+	#1 => base case
+
+*/
+
+func TestGenerateREQ_RECEIPT(t *testing.T) {
+	t.Run("success", func(t *testing.T) {
+		res := generateREQ_RECEIPT()
+		assert.Equal(t, "REQ_RECEIPT\n", res)
+	})
+}
+
+/*
+
+function: generateRECEIPT
+purpose: generate a receipt message for requesting a user's contributions
+
+? Test cases
+success
+	#1 => no blocks given
+	#2 => one block given
+	#3 => many blocks given
+
+*/
+
+func TestGenerateRECEIPT(t *testing.T) {
+	t.Run("success", func(t *testing.T) {
+		t.Run("no blocks", func(t *testing.T) {
+			res := generateRECEIPT([][32]byte{})
+			assert.Equal(t, "RECEIPT;000000ffff010000ffff\n", res)
+		})
+
+		t.Run("one block", func(t *testing.T) {
+			block := sha256.Sum256([]byte("hello world"))
+			var b bytes.Buffer
+			w, _ := flate.NewWriter(&b, 6)
+			w.Write(block[:])
+			w.Flush()
+
+			res := generateRECEIPT([][32]byte{block})
+			assert.Equal(t, fmt.Sprintf("RECEIPT;%x010000ffff\n", b.Bytes()), res)
+		})
+
+		t.Run("many blocks", func(t *testing.T) {
+			blocks := [][32]byte{
+				sha256.Sum256([]byte("hello world")),
+				sha256.Sum256([]byte("tom smith")),
+				sha256.Sum256([]byte("blockware")),
+				sha256.Sum256([]byte("testing testing")),
+			}
+
+			res := generateRECEIPT(blocks)
+			parts := strings.Split(res[:len(res)-1], ";")
+
+			data, err := hex.DecodeString(parts[1])
+			assert.Nil(t, err)
+
+			var b bytes.Buffer
+			r := flate.NewReader(bytes.NewReader(data))
+
+			b.ReadFrom(r)
+			r.Close()
+
+			assert.Equal(t, 128, len(b.Bytes()))
+			for i, block := range blocks {
+				assert.True(t, bytes.Equal(block[:], b.Bytes()[i*32:(i+1)*32]))
+			}
+		})
+	})
+}

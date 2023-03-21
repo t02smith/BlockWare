@@ -44,7 +44,7 @@ func (p *peer) listenToDownloadRequests() {
 /*
 queues all deferred requests
 */
-func loadDeferredRequests() {
+func LoadDeferredRequests() {
 	manager := Peer().Library().DownloadManager
 	cached := manager.DeferredRequests
 

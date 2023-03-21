@@ -96,7 +96,7 @@ func handleGAMES(cmd []string, client tcp.TCPConnection) error {
 	// if new games are detected we can start trying to process
 	// deferred requests
 	if changes {
-		loadDeferredRequests()
+		LoadDeferredRequests()
 	}
 
 	return nil
@@ -286,6 +286,63 @@ func handleVALIDATE_RES(cmd []string, client tcp.TCPConnection) error {
 	} else {
 		client.SendString(generateLIBRARY())
 	}
+
+	return nil
+}
+
+// REQ_RECEIPT
+
+func generateREQ_RECEIPT() string {
+	return "REQ_RECEIPT\n"
+}
+
+func handleREQ_RECEIPT(cmd []string, client tcp.TCPConnection) error {
+	p := Peer()
+
+	// 1 flush all contributions to file
+	p.contributions.writeContributions()
+
+	// 2 read contributions from user
+	pd := p.GetPeer(client)
+	if pd.Validator == nil {
+		util.Logger.Warnf("peer not validated => cannot generate receipt")
+		return nil
+	}
+	addr := crypto.PubkeyToAddress(*pd.Validator.PublicKey)
+
+	blocks, err := GetContributionsFromPeer(addr)
+	if err != nil {
+		return err
+	}
+
+	client.SendString(generateRECEIPT(blocks))
+	return nil
+}
+
+//
+
+func generateRECEIPT(blocks [][32]byte) string {
+	var buffer bytes.Buffer
+	w, _ := flate.NewWriter(&buffer, 6)
+
+	for _, b := range blocks {
+		w.Write(b[:])
+
+	}
+	w.Flush()
+	w.Close()
+
+	return fmt.Sprintf("RECEIPT;%x\n", buffer.Bytes())
+}
+
+func handleRECEIPT(cmd []string, client tcp.TCPConnection) error {
+	data, _ := hex.DecodeString(cmd[1])
+
+	var b bytes.Buffer
+	r := flate.NewReader(bytes.NewReader(data))
+
+	b.ReadFrom(r)
+	r.Close()
 
 	return nil
 }

@@ -5,6 +5,8 @@ import (
 	"bytes"
 	"os"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 /*
@@ -14,7 +16,9 @@ purpose: create skeleton files from a given hash tree
 
 ? Test cases
 success
-	| #1 => all files created
+	| #1 => fileSize % shardSize == 0
+	| #2 => fileSize % shardSize != 0
+	| #3 => empty file
 
 failure
 	| illegal arguments
@@ -29,24 +33,34 @@ func TestCreateDummyFiles(t *testing.T) {
 	smoke := t.Run("function setupFile", func(t *testing.T) {
 
 		t.Run("success", func(t *testing.T) {
-			err := setupFile(tmpFile, 64, 100)
-			if err != nil {
-				t.Errorf("%s", err)
+
+			inputs := []struct {
+				name       string
+				shardSize  uint
+				shardCount int
+				fileSize   int
+			}{
+				{"fileSize % shardSize == 0", 64, 100, 6400},
+				{"fileSize % shardSize != 0", 64, 101, 6452},
+				{"empty file", 0, 0, 0},
 			}
 
-			file, err := os.Stat(tmpFile)
-			if err != nil {
-				t.Errorf("%s", err)
+			for _, in := range inputs {
+				t.Run(in.name, func(t *testing.T) {
+					err := setupFile(tmpFile, in.shardSize, in.shardCount, in.fileSize)
+					assert.Nil(t, err)
+
+					t.Cleanup(func() {
+						os.Remove(tmpFile)
+					})
+
+					file, err := os.Stat(tmpFile)
+					assert.Nil(t, err)
+
+					assert.Equal(t, in.fileSize, int(file.Size()))
+				})
 			}
 
-			if file.Size() != 6400 {
-				t.Errorf("Incorrect filesize.\nExpected: %d\nGot: %d", 6400, file.Size())
-			}
-
-			err = os.Remove(tmpFile)
-			if err != nil {
-				t.Errorf("Error removing tmp file")
-			}
 		})
 
 		t.Run("illegal arguments", func(t *testing.T) {
@@ -59,26 +73,13 @@ func TestCreateDummyFiles(t *testing.T) {
 	if !smoke {
 		t.FailNow()
 	}
-
-	smoke = t.Run("function createDummyFilesFromDirectory", func(t *testing.T) {
-		// TODO
-	})
-
-	if !smoke {
-		t.FailNow()
-	}
-
-	t.Run("function CreateDummyFiles", func(t *testing.T) {
-		// TODO
-	})
-
 }
 
 // Inserting shards
 
 func TestInsertData(t *testing.T) {
 	tmpFile := "../../../test/data/tmp/skeleton.txt"
-	err := setupFile(tmpFile, 64, 100)
+	err := setupFile(tmpFile, 64, 100, 6400)
 	if err != nil {
 		t.Fatalf("error setting up dummy file %s", err)
 	}

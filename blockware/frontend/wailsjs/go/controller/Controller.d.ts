@@ -33,6 +33,8 @@ export function IsDownloading(arg1:string):Promise<number>;
 
 export function JoinLibraryInstance(arg1:string,arg2:string):Promise<void>;
 
+export function LoadDeferredRequests():Promise<void>;
+
 export function PurchaseGame(arg1:string):Promise<void>;
 
 export function UninstallGame(arg1:string):Promise<void>;

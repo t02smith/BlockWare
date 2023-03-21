@@ -48,4 +48,5 @@ strong {
 
 button {
   cursor: pointer;
+  border: none;
 }

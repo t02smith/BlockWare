@@ -94,3 +94,7 @@ func (c *Controller) Disconnect(hostname string, port uint) {
 
 	runtime.EventsEmit(c.ctx, "new-peer")
 }
+
+func (c *Controller) LoadDeferredRequests() {
+	peer.LoadDeferredRequests()
+}

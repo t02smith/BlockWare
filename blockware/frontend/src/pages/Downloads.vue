@@ -3,10 +3,15 @@
     <div class="header">
       <h1>Downloads</h1>
 
-      <div class="options" v-if="games.downloads.length > 0">
+      <div class="options">
         <button @click="() => (pauseAll = !pauseAll)">
           {{ pauseAll ? "▶️" : "⏸️" }}
         </button>
+
+        <div>
+          <p>Download stuck?</p>
+          <button @click="games.loadDeferredRequests">Click here!</button>
+        </div>
       </div>
     </div>
 
@@ -112,13 +117,18 @@ const pauseAll = ref(false);
     margin: 1rem 3rem;
     display: flex;
     justify-content: center;
+    align-items: center;
 
     > h1 {
-      align-self: flex-start;
+      font-size: 3rem;
     }
 
     > .options {
       margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+
       > button {
         background-color: transparent;
         border: none;
@@ -132,6 +142,44 @@ const pauseAll = ref(false);
 
         &:active {
           scale: 0.99;
+        }
+      }
+
+      > div {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        background-color: lighten(#131313, 12%);
+        padding: 10px;
+        border-radius: 3px;
+        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2),
+          0 6px 20px 0 rgba(0, 0, 0, 0.19);
+        gap: 5px;
+
+        > p {
+          font-style: italic;
+          font-weight: bold;
+          color: darken(white, 20%);
+        }
+
+        > button {
+          width: fit-content;
+          padding: 5px 10px;
+          font-weight: bold;
+          font-size: 1.1rem;
+          background-color: red;
+          color: white;
+          border-radius: 3px;
+          transition: 150ms;
+
+          &:hover {
+            background-color: darken(red, 5%);
+          }
+
+          &:active {
+            background-color: darken(red, 10%);
+          }
         }
       }
     }

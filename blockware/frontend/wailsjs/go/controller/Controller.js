@@ -62,6 +62,10 @@ export function JoinLibraryInstance(arg1, arg2) {
   return window['go']['controller']['Controller']['JoinLibraryInstance'](arg1, arg2);
 }
 
+export function LoadDeferredRequests() {
+  return window['go']['controller']['Controller']['LoadDeferredRequests']();
+}
+
 export function PurchaseGame(arg1) {
   return window['go']['controller']['Controller']['PurchaseGame'](arg1);
 }

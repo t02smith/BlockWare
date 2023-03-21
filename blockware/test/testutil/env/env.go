@@ -45,6 +45,10 @@ func SetupTestDownload(t *testing.T, game *games.Game, toRoot string) {
 	oldFolder := viper.GetString("games.installFolder")
 	viper.Set("game.installFolder", filepath.Join(toRoot, "./test/data/tmp"))
 
+	if game.Download != nil {
+		game.CancelDownload()
+	}
+
 	err := game.SetupDownload()
 	if err != nil {
 		t.Fatalf("Error setting up download: %s", err)

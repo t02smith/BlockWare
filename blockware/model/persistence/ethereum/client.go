@@ -45,7 +45,7 @@ func StartClient(addr string) (*ethclient.Client, *accounts.Account, error) {
 	once.Do(func() {
 		client, err := ethclient.Dial(addr)
 		if err != nil {
-			util.Logger.Info(err)
+			util.Logger.Fatal(err)
 		}
 
 		util.Logger.Infof("Connection to ETH network at %s made", addr)

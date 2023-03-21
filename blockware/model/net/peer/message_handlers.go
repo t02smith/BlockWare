@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/t02smith/part-iii-project/toolkit/model/manager/games"
 	"github.com/t02smith/part-iii-project/toolkit/model/net/tcp"
 	"github.com/t02smith/part-iii-project/toolkit/model/persistence/ethereum"
@@ -224,6 +225,10 @@ func handleSEND_BLOCK(cmd []string, client tcp.TCPConnection) error {
 		BlockHash: sh,
 	})
 	pd.Unlock()
+
+	if pd.Validator != nil {
+		Peer().contributions.addContribution(crypto.PubkeyToAddress(*pd.Validator.PublicKey), sh)
+	}
 
 	game.OutputToFile()
 

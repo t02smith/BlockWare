@@ -49,6 +49,8 @@ type peer struct {
 	peers   map[tcp.TCPConnection]*peerData
 	peersMU sync.Mutex
 
+	contributions *contributions
+
 	// data
 	installFolder string
 	library       *games.Library
@@ -71,6 +73,9 @@ type Config struct {
 
 	// whether to enforce address validation
 	SkipValidation bool
+
+	// track contributions sent by peers
+	TrackContributions bool
 }
 
 // * functions
@@ -143,6 +148,7 @@ func newPeer(config Config, serverHostname string, serverPort uint, installFolde
 		library:            lib,
 		knownPeerAddresses: knownPeers,
 		config:             config,
+		contributions:      newContributions(),
 	}
 
 	go peer.server.Start(onMessage, peer.onConnection, peer.OnConnectionClose)

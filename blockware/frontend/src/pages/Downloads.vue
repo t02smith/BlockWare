@@ -102,6 +102,7 @@ const pauseAll = ref(false);
   flex-direction: column;
   max-width: 2000px;
   align-self: center;
+  overflow-y: auto;
 
   > * {
     margin: 0rem 1rem;

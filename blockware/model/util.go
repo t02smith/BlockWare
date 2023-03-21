@@ -51,6 +51,13 @@ func SetupToolkitEnvironment() error {
 		return err
 	}
 
+	// look for assets directory
+	peerDir := filepath.Join(toolkitDir, "peers")
+	err = CreateDirectoryIfNotExist(peerDir)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 

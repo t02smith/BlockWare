@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/ethereum/go-ethereum/accounts/keystore"
-	"github.com/t02smith/part-iii-project/toolkit/model"
+	model "github.com/t02smith/part-iii-project/toolkit/model/util"
 )
 
 func TestStartClient(t *testing.T) {

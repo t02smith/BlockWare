@@ -11,14 +11,6 @@ import (
 	"github.com/t02smith/part-iii-project/toolkit/test/testutil"
 )
 
-func TestMain(m *testing.M) {
-	beforeAll()
-	code := m.Run()
-	afterAll()
-
-	os.Exit(code)
-}
-
 // start peer
 
 func TestConnectToPeer(t *testing.T) {
@@ -28,7 +20,7 @@ func TestConnectToPeer(t *testing.T) {
 	it.SendString("test message\n")
 	time.Sleep(25 * time.Millisecond)
 
-	assert.Equal(t, 1, len(testPeer.peers), "Mock peer not tracked/connected")
+	assert.Equal(t, 1, len(Peer().peers), "Mock peer not tracked/connected")
 
 	assert.NotEqual(t, "test message", mp.GetLastMessage(), "Test message not received got "+mp.GetLastMessage())
 }

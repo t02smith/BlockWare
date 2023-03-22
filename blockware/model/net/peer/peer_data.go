@@ -5,10 +5,10 @@ import (
 	"sort"
 	"sync"
 
-	"github.com/t02smith/part-iii-project/toolkit/model"
 	"github.com/t02smith/part-iii-project/toolkit/model/manager/games"
 	"github.com/t02smith/part-iii-project/toolkit/model/net/tcp"
 	"github.com/t02smith/part-iii-project/toolkit/model/persistence/ethereum"
+	model "github.com/t02smith/part-iii-project/toolkit/model/util"
 	"github.com/t02smith/part-iii-project/toolkit/util"
 )
 

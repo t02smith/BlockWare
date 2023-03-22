@@ -2,6 +2,7 @@ node_modules
 frontend/dist
 blockware.exe
 toolkit.exe
+toolkit
 
 # profile data
 latex-template-main

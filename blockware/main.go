@@ -5,14 +5,14 @@ package main
 
 import (
 	"embed"
-	"flag"
 	"log"
+	"os"
 
 	"github.com/spf13/viper"
 	"github.com/t02smith/part-iii-project/toolkit/controller"
-	"github.com/t02smith/part-iii-project/toolkit/model"
 	"github.com/t02smith/part-iii-project/toolkit/model/net/peer"
 	"github.com/t02smith/part-iii-project/toolkit/model/persistence/ethereum"
+	model "github.com/t02smith/part-iii-project/toolkit/model/util"
 	"github.com/t02smith/part-iii-project/toolkit/test/profiles"
 	"github.com/t02smith/part-iii-project/toolkit/util"
 	"github.com/wailsapp/wails/v2"
@@ -24,26 +24,8 @@ import (
 var assets embed.FS
 
 func main() {
-
-	// * FLAGS
-	profile := flag.Uint("profile", 0, "Run the application as a profile. (default off | see profiles.go for details)")
-	contractAddr := flag.String("contract", "", "The address of the deployed contract")
-	showDebugLogs := flag.Bool("debug", false, "whether debug logs should be displayed")
-
-	flag.Parse()
-	util.InitLogger(*showDebugLogs)
-
-	// ? run a profile
-	if *profile != 0 {
-		// if *contractAddr == "" {
-		// 	util.Logger.Fatal("invalid contract address")
-		// }
-
-		util.Logger.Infof("profile %d selected", *profile)
-		err := profiles.RunProfile(profiles.Profile(*profile), *contractAddr)
-		if err != nil {
-			util.Logger.Fatalf("Error running profile %d: %s", *profile, err)
-		}
+	if profileRan := profiles.ProfileCLI(); profileRan {
+		os.Exit(0)
 	}
 
 	// * setup

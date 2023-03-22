@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/t02smith/part-iii-project/toolkit/test/testutil"
 )
 
 func produceTestHashTree() (*HashTree, error) {
@@ -24,7 +23,6 @@ func produceTestHashTree() (*HashTree, error) {
 }
 
 func TestFindShard(t *testing.T) {
-	testutil.ShortTest(t)
 
 	ht, err := produceTestHashTree()
 	if err != nil {
@@ -50,8 +48,6 @@ func TestFindShard(t *testing.T) {
 // Test getting a shard
 
 func TestGetShard(t *testing.T) {
-	testutil.ShortTest(t)
-
 	ht, err := produceTestHashTree()
 	if err != nil {
 		t.Fatalf("error making test hash tree %s", err)

@@ -44,15 +44,10 @@ Data:
 var PrivateKey string = testutil.Accounts[1][1]
 
 func Run() {
-	// _, err := generateLargeFile()
-	// if err != nil {
-	// 	util.Logger.Fatalf("Error generating large file: %s", err)
-	// }
-
-	// ? PRE-LAUNCH CHECKS
-	_, err := os.Stat("t02smith.github.io")
-	if err != nil {
-		util.Logger.Fatalf("t02smith.github.io not found. Run 'make' to fetch it")
+	if _, err := os.Stat("../../data/tmp/games/profile-2"); err != nil {
+		if err = testutil.GenerateLargeFolder("profile-2", "../../data/tmp/games/", 80_000_000, 500); err != nil {
+			util.Logger.Fatal(err)
+		}
 	}
 
 	p := peer.Peer()
@@ -63,7 +58,7 @@ func Run() {
 		Version:     "4.7.1",
 		ReleaseDate: time.Date(2002, time.January, 10, 0, 0, 0, 0, time.UTC).String(),
 		Developer:   "tcs1g20",
-		RootDir:     "./t02smith.github.io",
+		RootDir:     "../../data/tmp/games/profile-2",
 		Price:       big.NewInt(150),
 		ShardSize:   4194304,
 		AssetsDir:   "../../data/assets"},

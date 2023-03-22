@@ -9,7 +9,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/t02smith/part-iii-project/toolkit/model"
+	model "github.com/t02smith/part-iii-project/toolkit/model/util"
 	"github.com/t02smith/part-iii-project/toolkit/test/testutil"
 	"github.com/t02smith/part-iii-project/toolkit/util"
 )

@@ -87,7 +87,7 @@ func (g *Game) DownloadAssets() error {
 func (g *Game) CopyAssetsFolder() error {
 	util.Logger.Debugf("Copying asset folder %s", g.Assets.AbsolutePath)
 	dirname := filepath.Join(viper.GetString("meta.directory"), "assets", fmt.Sprintf("%x", g.RootHash))
-	err := os.Mkdir(dirname, 0644)
+	err := os.Mkdir(dirname, 0755)
 	if err != nil {
 		return err
 	}

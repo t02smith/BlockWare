@@ -24,6 +24,9 @@ build-profiles:
 	cd frontend && npm install && npm build
 	go build
 
+clear-listenonly-runners:
+	rm -rf ./test/profiles/listenOnly/.toolkit-*
+
 
 # CODE LINES
 

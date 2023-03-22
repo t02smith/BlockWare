@@ -2,15 +2,16 @@ package profiles
 
 import (
 	"errors"
+	"flag"
 	"fmt"
 	"os"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/spf13/viper"
-	"github.com/t02smith/part-iii-project/toolkit/model"
 	"github.com/t02smith/part-iii-project/toolkit/model/net/peer"
 	"github.com/t02smith/part-iii-project/toolkit/model/persistence/ethereum"
 	"github.com/t02smith/part-iii-project/toolkit/model/persistence/ethereum/library"
+	model "github.com/t02smith/part-iii-project/toolkit/model/util"
 	deployEth "github.com/t02smith/part-iii-project/toolkit/test/profiles/deploy"
 	listenOnly "github.com/t02smith/part-iii-project/toolkit/test/profiles/listenOnly"
 	listenOnlyUpload "github.com/t02smith/part-iii-project/toolkit/test/profiles/listenOnlyWithUpload"
@@ -38,6 +39,38 @@ const (
 	_listenOnly           Profile = 2
 	_deploy               Profile = 3
 )
+
+func ProfileCLI() bool {
+	// * FLAGS
+	profile := flag.Uint("profile", 0, "Run the application as a profile. (default off | see profiles.go for details)")
+	contractAddr := flag.String("contract", "", "The address of the deployed contract")
+	showDebugLogs := flag.Bool("debug", false, "whether debug logs should be displayed")
+	port := flag.Uint("port", 6051, "what port should the profile run on")
+
+	flag.Parse()
+	util.InitLogger(*showDebugLogs)
+
+	// * setup config
+	viper.AddConfigPath(".")
+	viper.ReadInConfig()
+	util.Logger.Debugf("config loaded: %s", viper.AllSettings())
+
+	viper.Set("net.port", *port)
+	viper.Set("meta.directory", fmt.Sprintf(".toolkit-%d", *port))
+
+	// ? run a profile
+	if *profile != 0 {
+		util.Logger.Infof("profile %d selected", *profile)
+		err := RunProfile(Profile(*profile), *contractAddr)
+		if err != nil {
+			util.Logger.Fatalf("Error running profile %d: %s", *profile, err)
+		}
+
+		return true
+	}
+
+	return false
+}
 
 // run a given profile by its ID number
 func RunProfile(profileNumber Profile, contractAddr string) error {
@@ -87,12 +120,7 @@ func SetupProfile(path, privateKey string, contractAddr common.Address, config p
 		return err
 	}
 
-	// * setup config
-	viper.AddConfigPath(".")
-	viper.ReadInConfig()
-	util.Logger.Debugf("config loaded: %s", viper.AllSettings())
-
-	err = os.RemoveAll(".toolkit")
+	err = os.RemoveAll(viper.GetString("meta.directory"))
 	if err != nil {
 		return err
 	}

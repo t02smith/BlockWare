@@ -12,10 +12,6 @@ import (
 	"github.com/t02smith/part-iii-project/toolkit/util"
 )
 
-var (
-	testPeer *peer
-)
-
 const (
 	PEER_PORT uint = 7887
 )
@@ -28,23 +24,31 @@ const (
 
 */
 
+func TestMain(m *testing.M) {
+	beforeAll()
+	code := m.Run()
+	afterAll()
+
+	os.Exit(code)
+}
+
 func beforeAll() {
 	util.InitLogger(true)
 
 	// config
 	viper.Set("meta.directory", "../../../test/data/tmp/.toolkit")
 	viper.Set("games.installFolder", "../../../test/data/tmp")
+	viper.Set("meta.hashes.workerCount", 5)
 
-	tp, err := StartPeer(Config{false, false, false, true, true}, "localhost", 7887, "../../../test/data/tmp", "../../../test/data/.toolkit")
+	_, err := StartPeer(Config{false, false, false, true, false}, "localhost", 7887, "../../../test/data/tmp", "../../../test/data/.toolkit")
 	if err != nil {
 		log.Printf("Error starting test peer")
 		os.Exit(1)
 	}
-	testPeer = tp
 }
 
 func afterAll() {
-	testPeer.Close()
+	Peer().Close()
 	testutil.ClearTmp("../../../")
 }
 
@@ -63,6 +67,6 @@ func createMockPeer(t *testing.T) (*testutil.MockPeer, tcp.TCPConnection) {
 		mp.Close()
 	})
 
-	clients := testPeer.server.Clients()
+	clients := Peer().server.Clients()
 	return mp, clients[len(clients)-1]
 }

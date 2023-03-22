@@ -57,10 +57,10 @@ func DeployLibraryContract(privateKey string) (*bind.TransactOpts, *library.Libr
 	libInstance = instance
 	util.Logger.Info("Deployed library")
 
-	err = ReadPreviousGameEvents()
-	if err != nil {
-		util.Logger.Errorf("Error reading previous games: %s", err)
-	}
+	// err = ReadPreviousGameEvents()
+	// if err != nil {
+	// 	util.Logger.Errorf("Error reading previous games: %s", err)
+	// }
 
 	// err = watchNewGameEvent()
 	// if err != nil {

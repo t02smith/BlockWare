@@ -45,6 +45,7 @@ contract Library {
         // check input data
         require(_game.rootHash.length > 0, "no root hash given");
         require(bytes(_game.hashTreeIPFSAddress).length > 0, "no IPFS address given for hash treee");
+        require(bytes(_game.assetsIPFSAddress).length > 0, "no IPFS address given for the assets ");
 
         // look for previous version
         if (_game.previousVersion != 0) {

@@ -22,9 +22,12 @@ The first consideration is what kind of data we are going to be storing and wher
 
   \vspace{1mm}
   Due to this data's moderate size and the fact that not every user will need to view every game's hash tree, there is no need to upload this to the blockchain as this will add an unnecessary expense in publishing games. IPFS is ideal for this as we do not need to restrict access to the data but still need to easily share it and we can simply include the IPFS ID within our game metadata stored on the blockchain.
+
+  \vspace{1mm}
+  Swarm~\cite{hartman_swarm_1999} was also considered but wasn't chosen as it would further couple the project with Ethereum and isn't as mature or widely used as IPFS.
   \x
   Game Data
-  & \textit{avg. 60GB}
+  & \textit{avg. 44GB~\footnote{Calculated based off of the top 30 games from \url{https://steamdb.info/charts/} on 22/03/2022}}
   & Peers
   & This will be the actual data for the game that is used to run it. To play a game, a user will need access to all of its data. More information about this is in Section~\ref{subsubsec:upload-content}.
 

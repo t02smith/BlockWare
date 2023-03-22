@@ -1,3 +1,26 @@
-\section{Validation Testing}
+% chktex-file 44
 
-To ensure that this application meets the requirements as described in Section~\ref{subsec:requirements}, each requirement will be given a specific automated test that aims to prove the completeness of the requirement.
+\section{Acceptence Testing}
+
+To ensure that this application meets the requirements as described in Section~\ref{subsec:requirements}, each requirement will be given a set of tests that aim prove its completeness. The type of tests will vary based upon the requirement. 
+\x
+The following acceptence tests will be included:
+
+\begin{longtable}{ | p{.05\textwidth} | p{.3\textwidth} | p{.6\textwidth} |  }
+  \hline
+  \textbf{Id} & \textbf{Requirements} & \textbf{Description}\\\hline
+  1
+  & \reqref{F-M1} \reqref{F-M8} \reqref{F-M9} \reqref{F-M10} \reqref{F-C2} \reqref{NF-M4} \reqref{NF-S2} \reqref{NF-C1}
+  & A user walkthrough that shows a user uploading a game and that game being visible on the store to a separate user. A separate user will then purchase that game.
+  \newline Unit tests are also provided to show the correct functionality of the Smart Contract.
+  \\\hline
+  2 
+  & \reqref{F-M2} \reqref{F-M5} \reqref{F-M6} \reqref{F-M7} \reqref{F-M10} \reqref{F-S2} \reqref{F-C2} \reqref{NF-M2} \reqref{NF-C1} 
+  & A user walkthrough that shows a user connecting to a peer and downloading a game off of them and those files being successfully downloaded.
+  \newline Integration tests show the processing for verifying a user and data sent over the network.
+  \\\hline
+  3
+  &
+  & Benchmark tests to show the scalability of downloading a game by varying given conditions.
+  \\\hline
+\end{longtable}

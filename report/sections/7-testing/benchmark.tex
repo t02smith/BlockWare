@@ -1,54 +1,88 @@
+% chktex-file 44
+
 \section{Benchmarking}\label{sec:benchmark}
 
-\subsection*{Strategy}
+The key benchmark to evaluate in this project is related to how game downloads scale by varying the following factors:
 
-Benchmarking tests will be used to demonstrate how the scalability and performance of my application in a live environment, by tracking how it performs in a series of increasingly expensive tasks, ran using a consistent set of hardware outlined in the test specification.
+\begin{enumerate}
+  \item how many of the peers we are connected to have the data we need,
+  \item how large is the game (in terms of average file size and number of files), and
+  \item the shard size used to create the hash tree.
+\end{enumerate}
 
-\subsection*{Tests \& Results}
+\subsection*{Number of Peers}
 
-\subsubsection*{Generating Hash Trees}
+For each run, we will create a project with 500 files, each of size 80MB~\footnote{These numbers were chosen to match our average game size from Section~\ref{subsec:design-data}, where $500\times 80MB = 40GB$} and a shard size of $2^{22}$ = 4MiB. We will then run $N$ peers locally to simulate a perfect network connection.
 
-The generation of hash trees as described in Section~\ref{subsubsec:hash-tree}, can be an expensive computational task depending on two factors:
+\begin{longtable}{ | r | r | }
+  \hline
+  \textbf{Peer Count $N$} & \textbf{Time (ms)} \\\hline
+  1
+  &
+  \\\hline
+  2
+  &
+  \\\hline
+  4
+  &
+  \\\hline
+  8
+  &
+  \\\hline
+  \caption{How varying peer count affects download speed}
+\end{longtable}
 
-\begin{itemize}
-  \item the number of files (or leaf nodes) present in the hash tree,
-  \item the average size of files included.
-\end{itemize}
+\subsection*{Game Size}
 
-\vspace{1mm}\noindent
-Whilst varying the number of worker threads performing the algorithm affects the time it takes to complete, it will not be investigated as the same computational effort is still required regardless of the number of threads performing it.
-
-\paragraph*{Varying File Count}
-For each run, we will create a project with $N$ files of a constant size $S=TBD$ and run the hash tree algorithm using a pool of 5 workers.
+For each run, we will create a project with $F$ files of size $S$MB, such that $F\times S = 40GB$, and a shard size of 4MiB. We will then run 1 peer locally to simulate a perfect network connection.
 
 \begin{longtable}{ | r | r | r | r | }
   \hline
-  \textbf{Run No.} & \textbf{File Count} & \textbf{Time (seconds)} & \textbf{Hash Tree Size (KB)}\\\hline
-  1
-  &
-  &
+  \textbf{File Count $F$} & \textbf{File Size $S$ (MB)} & \textbf{Time (ms)} \\\hline
+  100
+  & 400
   &
   \\\hline
-  \caption{How varying file count affects hash tree generation time and size}
+  50
+  & 800
+  &
+  \\\hline
+  25
+  & 1,600
+  &
+  \\\hline
+  5
+  & 8,000
+  &
+  \\\hline
+  1
+  & 40,000
+  &
+  \\\hline
+  \caption{How varying file count and size affects download speed}
 \end{longtable}
 
-\paragraph*{Varying Average File Size}
-For each run, we will create a project with $N=TBD$ files all of size $S$ and run the hash tree algorithm using a pool of 5 workers.
+\subsection*{Shard Size}
 
-\begin{longtable}{ | r | r | r | r | }
+For each run we will create a new project with 500 files, each of size 80MB, and a shard size of $B$MiB. We will then run 1 peer locally to simulate a perfect network connection.
+
+\begin{longtable}{ | r | r | }
   \hline
-  \textbf{Run No.} & \textbf{avg. File Size (MB)} & \textbf{Time (seconds)} & \textbf{Hash Tree Size (KB)}\\\hline
+  \textbf{Shard Size $B$ (MiB)} & \textbf{Time (ms)} \\\hline
   1
   &
-  &
+  \\\hline
+  2
   &
   \\\hline
-  \caption{How varying the average file size affects hash tree generation time and size}
+  4
+  &
+  \\\hline
+  8
+  &
+  \\\hline
+  16
+  &
+  \\\hline
+  \caption{How varying the shard size of the hash tree affects download speed}
 \end{longtable}
-
-% \begin{enumerate}
-%   \item \textbf{Large Downloads} How does a peer fare downloading and uploading an extremely large game?
-%   \item \textbf{Many Peers} How does a peer cope with having many concurrent peers all sending messages to them?
-%   \item \textbf{Hashing Tree Generation} How does a peer cope with generating a large hash tree?
-% \end{enumerate}
- 

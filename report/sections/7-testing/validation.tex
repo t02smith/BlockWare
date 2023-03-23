@@ -2,7 +2,7 @@
 
 \section{Acceptence Testing}
 
-To ensure that this application meets the requirements as described in Section~\ref{subsec:requirements}, each requirement will be given a set of tests that aim prove its completeness. The type of tests will vary based upon the requirement. 
+To ensure that this application meets the requirements as described in Section~\ref{subsec:requirements}, each requirement will be given a set of tests that aim prove its completeness. The type of tests will vary based upon the requirement and be ran using various devices connect to each other over the internet \reqref{NF-M1} \reqref{NF-M2} and interacting with a Smart Contract deployed to an ethereum test-net \reqref{F-M8}.
 \x
 The following acceptence tests will be included:
 
@@ -10,17 +10,26 @@ The following acceptence tests will be included:
   \hline
   \textbf{Id} & \textbf{Requirements} & \textbf{Description}\\\hline
   1
-  & \reqref{F-M1} \reqref{F-M8} \reqref{F-M9} \reqref{F-M10} \reqref{F-C2} \reqref{NF-M4} \reqref{NF-S2} \reqref{NF-C1}
+  & \reqref{F-M1} \reqref{F-M9} \reqref{F-M10} \reqref{F-C2} \reqref{NF-M4} \reqref{NF-S2} \reqref{NF-C1}
   & A user walkthrough that shows a user uploading a game and that game being visible on the store to a separate user. A separate user will then purchase that game.
   \newline Unit tests are also provided to show the correct functionality of the Smart Contract.
   \\\hline
   2 
-  & \reqref{F-M2} \reqref{F-M5} \reqref{F-M6} \reqref{F-M7} \reqref{F-M10} \reqref{F-S2} \reqref{F-C2} \reqref{NF-M2} \reqref{NF-C1} 
-  & A user walkthrough that shows a user connecting to a peer and downloading a game off of them and those files being successfully downloaded.
+  & \reqref{F-M2} \reqref{F-M5} \reqref{F-M6} \reqref{F-M7} \reqref{F-M10} \reqref{F-S2} \reqref{F-C2} \reqref{NF-C1} 
+  & A user walkthrough that shows a user connecting to a peer and downloading a game off of them and those files being successfully downloaded. This assumes that the user has successfully purchased the game.
   \newline Integration tests show the processing for verifying a user and data sent over the network.
   \\\hline
   3
-  &
-  & Benchmark tests to show the scalability of downloading a game by varying given conditions.
+  & \reqref{F-M6} \reqref{F-M7} \reqref{NF-S1} 
+  & Benchmark tests to show the scalability of downloading a game by varying given conditions. See Section~\ref{sec:benchmark}.
+  \\\hline
+  4
+  & \reqref{F-S2}
+  & A user walkthrough in which a user does not validate their Ethereum address when connecting to peers. The user attempts to download blocks off of their peers but is rejected due to not being verified.
+  \\\hline
+  5
+  & \reqref{F-M4} \reqref{NF-S2} \reqref{NF-M3} \reqref{NF-M4}
+  & User walkthroughs showing two attempted uploads for a given game that already exists on the network. The first by the owner showing the process of selecting their previous game and uploading an update and another by a non-owner attempting the same thing.
+  \newline Unit tests for the Smart Contract can also show functionality.
   \\\hline
 \end{longtable}

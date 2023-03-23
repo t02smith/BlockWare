@@ -10,3 +10,19 @@ Profiles are minimal versions of the application that can be run on external dev
   \item \textbf{Spam} This client will spam the peer with expensive messages, such as requesting a block, and should trigger the client to disconnect the spammer.
   \item \textbf{Unreliable} This client will represent an unreliable peer who will take a long time to respond to messasges and may reply with the wrong contents at random. 
 \end{itemize}
+
+\subsection*{Deployed Implementation}
+
+\subsubsection*{Distributing Instances}
+
+To prove that the application could work in a live environment, we will need to deploy a set of instances of the application to different devices that communicate over the internet. An example deployment might consist of instances deployed to:
+
+\begin{itemize}
+  \item a local machine to initiate tests,
+  \item a VPS running on a cloud service provider,
+  \item 
+\end{itemize}
+
+\subsubsection*{Ethereum Test-Net}
+
+The Library Smart Contract, from Section~\ref{subsubsec:impl-eth}, will need to be deployed to an Ethereum test-net to allow instances of the application, that are distributed over the 

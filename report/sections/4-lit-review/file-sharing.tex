@@ -16,11 +16,15 @@ The main issues involving these networks are:
   \textbf{System} & \textbf{Description of Solution}
   \\\midrule\midrule
   IPFS~\cite{benet_ipfs_2014}
-  & IPFS is a content-addressable, block storage system which forms a Merkle DAG, a data structure that allows the construction of versioned file systems, blockchains and a Permanent Web.
+  & IPFS is a set of protocols for transferring and organising data over a content-addressable, peer-to-peer network. Data uploaded to an IPFS network is addressed using it content identfier CID, which is a cryptographic hash based upon its content. IPFS is open source and has many different implementations, such as Estuary or Kubo.
   %
   \x
   BitTorrent~\cite{pouwelse_bittorrent_2005}
-  & BitTorrent is a p2p file-sharing system that has user bartering for chunks of data in a tit-for-tat fashion, which provides incentive for users to contribute to the network. More on BitTorrent can be found in Section~\ref{sec:bittorrent}
+  & BitTorrent is a p2p file-sharing system that has user bartering for chunks of data in a tit-for-tat fashion, which provides incentive for users to contribute to the network. More on BitTorrent can be found in Section~\ref{sec:bittorrent}.
+  %
+  \x
+  Swarm~\cite{hartman_swarm_1999}
+  & Swarm is a distributed storage solution linked with Ethereum that has many similarities with IPFS~\cite{pouwelse_bittorrent_2005}. It uses an incentive mechanism, Swap (Swarm Accounting Protocol), that keeps track of data sent and received by each node in the network and then the payment owed for their contribution.
   %
   \x
   AFS~\cite{morris_andrew_1986,howard_scale_1988}

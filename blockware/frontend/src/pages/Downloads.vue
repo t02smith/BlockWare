@@ -4,9 +4,9 @@
       <h1>Downloads</h1>
 
       <div class="options">
-        <button @click="() => (pauseAll = !pauseAll)">
+        <!-- <button @click="() => (pauseAll = !pauseAll)">
           {{ pauseAll ? "▶️" : "⏸️" }}
-        </button>
+        </button> -->
 
         <div>
           <p>Download stuck?</p>
@@ -22,16 +22,17 @@
 
         <h2>Timer</h2>
         <h2>Block's Left</h2>
-        <h2>Total Blocks</h2>
+
         <h2>Progress</h2>
       </div>
 
       <router-link
         :to="`/library?game=${hash}`"
         class="table-row"
-        :class="blocksLeft(download) === 0 && 'complete'"
+        :class="`${download.Finished && 'finished'}`"
         v-for="[hash, download] in downloadGamePairs"
       >
+        <p class="indicator">{{ download.Finished ? "✅" : "⌛" }}</p>
         <p>{{ download.Name }}</p>
         <p>{{ download.Stage }}</p>
 
@@ -40,7 +41,7 @@
         <p>
           {{ blocksLeft(download) }}
         </p>
-        <p>{{ download.TotalBlocks }}</p>
+
         <p>
           <strong>
             {{
@@ -206,7 +207,7 @@ const pauseAll = ref(false);
 
   > * {
     display: grid;
-    grid-template-columns: 3fr 2fr 1fr 1fr 1fr 1fr;
+    grid-template-columns: 3fr 1fr 1fr 1fr 1fr;
     gap: 5px;
     text-align: right;
   }
@@ -215,7 +216,7 @@ const pauseAll = ref(false);
     color: darken(white, 25%);
     background-color: lighten(#131313, 10%);
     padding: 0.4rem 0.85rem;
-    border-radius: 10px;
+    border-radius: 3px;
     margin-bottom: 1rem;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
   }
@@ -223,11 +224,19 @@ const pauseAll = ref(false);
   > .table-row {
     padding: 0.25rem 1rem;
     text-decoration: none;
-    border-radius: 10px;
+    border-radius: 3px;
     color: white;
     transition: 150ms;
+    position: relative;
 
-    &.complete {
+    > .indicator {
+      position: absolute;
+      left: -2.2rem;
+      top: -1px;
+      font-size: 1.5rem;
+    }
+
+    &.finished {
       background-color: rgba(0, 252, 0, 0.185);
 
       &:hover {
@@ -245,7 +254,7 @@ const pauseAll = ref(false);
   p {
     font-size: 1.15rem;
 
-    &:first-child {
+    &:nth-child(2) {
       font-weight: bold;
       text-align: left;
     }

@@ -179,7 +179,7 @@ func (p *peer) onConnection(hostname string, port uint, peer tcp.TCPConnection) 
 
 	// ? start address verification handshake
 	if !p.config.SkipValidation {
-		pd.validatePeer()
+		pd.ValidatePeer()
 	}
 }
 

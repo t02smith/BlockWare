@@ -218,3 +218,72 @@ func TestOutputToFile(t *testing.T) {
 
 	})
 }
+
+/*
+
+function: checkGameDownload
+purpose: check and verify the existence of a download
+
+? Test cases
+success
+	#1 => no download started
+	#2 => download exists but folder not found
+	#3 => download not finished and inserter pool created
+
+*/
+
+func TestCheckGameDownload(t *testing.T) {
+	g, err := fetchTestGame()
+	if err != nil {
+		t.Fatal(err)
+	}
+	old := g.Download
+
+	t.Run("success", func(t *testing.T) {
+		t.Run("no download started", func(t *testing.T) {
+			t.Cleanup(func() {
+				g.Download = old
+			})
+			g.Download = nil
+
+			g.checkGameDownload()
+			assert.Nil(t, g.Download)
+		})
+
+		t.Run("no download folder found", func(t *testing.T) {
+			t.Cleanup(func() {
+				g.Download = old
+			})
+			g.Download = &Download{
+				AbsolutePath: "./fake/path/dont/make/this/folder/pls",
+			}
+
+			g.checkGameDownload()
+			assert.Nil(t, g.Download)
+		})
+
+		t.Run("download not finished", func(t *testing.T) {
+			t.Cleanup(func() {
+				g.Download = old
+			})
+			g.Download = &Download{
+				AbsolutePath: ".",
+				Progress:     make(map[[32]byte]*FileProgress),
+			}
+
+			h := sha256.Sum256([]byte("hello"))
+			g.Download.Progress[h] = &FileProgress{
+				AbsolutePath:    "./download.go",
+				Size:            100,
+				BlocksRemaining: make(map[[32]byte][]uint),
+			}
+			g.Download.Progress[h].BlocksRemaining[h] = []uint{0}
+
+			g.checkGameDownload()
+
+			assert.NotNil(t, g.Download.inserterPool)
+			close(g.Download.inserterPool)
+		})
+
+	})
+}

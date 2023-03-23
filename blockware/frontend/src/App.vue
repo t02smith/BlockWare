@@ -25,9 +25,9 @@ const games = useGamesStore();
 const peers = usePeerStore();
 
 onMounted(() => {
-  EventsOn("update-owned-games", async () => await games.refreshOwnedGames());
-  EventsOn("new-peer", async () => await peers.refreshPeers());
-  EventsOn("update-downloads", async () => await games.refreshDownloads());
+  EventsOn("update-owned-games", () => games.refreshOwnedGames());
+  EventsOn("new-peer", () => peers.refreshPeers());
+  EventsOn("update-downloads", () => games.refreshDownloads());
 
   games.refreshOwnedGames();
 });

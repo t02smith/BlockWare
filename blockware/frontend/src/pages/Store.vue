@@ -9,23 +9,6 @@
       </p>
     </div>
 
-    <form class="search" @submit.prevent="searchForGame">
-      <h3>Find a Game</h3>
-
-      <div class="input">
-        <input
-          v-model="search"
-          type="text"
-          name=""
-          id=""
-          placeholder="The game's root hash"
-        />
-        <button type="submit">Search</button>
-      </div>
-    </form>
-
-    <div class="searched-game" v-if="searchedGame"></div>
-
     <div class="categories">
       <CustomLibrary
         gameLinkTo="store/entry"
@@ -33,11 +16,31 @@
         name="Featured"
       />
 
-      <CustomLibrary
-        gameLinkTo="store/entry"
-        :games="games.storeGames"
-        name="New Releases"
-      />
+      <form class="search" @submit.prevent="searchForGame">
+        <div class="header">
+          <h3>Search for a Game</h3>
+          <p>Fill in the details below to discover a new game</p>
+        </div>
+
+        <div class="fields">
+          <div class="input">
+            <p><strong>Have a game's root hash?</strong></p>
+            <input
+              v-model="search"
+              type="text"
+              name=""
+              id=""
+              placeholder="The game's root hash"
+            />
+            <button type="submit">Search</button>
+          </div>
+        </div>
+
+        <div class="fields">
+          <p><strong>Enter some info about the game:</strong></p>
+          <marquee behavior="" direction=""> ⚠️ TODO ⚠️</marquee>
+        </div>
+      </form>
     </div>
   </div>
 </template>
@@ -107,29 +110,39 @@ async function searchForGame() {
     }
   }
 
-  > .search {
+  .search {
     display: flex;
-    align-items: center;
-    justify-content: center;
+    flex-direction: column;
+    margin: 1rem;
     gap: 1rem;
 
-    > .input {
-      input {
-        padding: 0.5rem 0.75rem;
-        width: 300px;
-        border-radius: 5px 0 0 5px;
-        border: none;
-        outline: none;
-      }
+    > .header {
+      display: flex;
+      flex-direction: column;
+    }
 
-      button {
-        border-radius: 0 5px 5px 0;
-        border: none;
-        padding: 0.5rem 0.75rem;
-        background-color: rgb(0, 132, 255);
-        font-weight: bold;
-        color: white;
-        cursor: pointer;
+    > .fields {
+      > .input {
+        p {
+          margin-bottom: 3px;
+        }
+
+        input {
+          padding: 0.5rem 0.75rem;
+          width: 300px;
+          border-radius: 2px 0 0 2px;
+          border: none;
+        }
+
+        button {
+          border-radius: 0 2px 2px 0;
+          border: none;
+          padding: 0.5rem 0.75rem;
+          background-color: rgb(0, 132, 255);
+          font-weight: bold;
+          color: white;
+          cursor: pointer;
+        }
       }
     }
   }

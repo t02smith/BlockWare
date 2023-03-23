@@ -50,3 +50,10 @@ button {
   cursor: pointer;
   border: none;
 }
+
+marquee {
+  background-color: rgba(255, 0, 0, 0.966);
+  color: black;
+  font-weight: bold;
+  font-size: 2rem;
+}

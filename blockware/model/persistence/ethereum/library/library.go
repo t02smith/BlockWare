@@ -10,7 +10,6 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/t02smith/part-iii-project/toolkit/build/contracts/library"
 	"github.com/t02smith/part-iii-project/toolkit/model/manager/games"
-	"github.com/t02smith/part-iii-project/toolkit/model/net/peer"
 	"github.com/t02smith/part-iii-project/toolkit/model/persistence/ethereum"
 	"github.com/t02smith/part-iii-project/toolkit/util"
 )
@@ -56,17 +55,6 @@ func DeployLibraryContract(privateKey string) (*bind.TransactOpts, *library.Libr
 
 	libInstance = instance
 	util.Logger.Info("Deployed library")
-
-	// err = ReadPreviousGameEvents()
-	// if err != nil {
-	// 	util.Logger.Errorf("Error reading previous games: %s", err)
-	// }
-
-	// err = watchNewGameEvent()
-	// if err != nil {
-	// 	util.Logger.Errorf("Error watching for new games: %s", err)
-	// 	return nil, nil, err
-	// }
 
 	return authInstance, libInstance, nil
 }
@@ -207,31 +195,6 @@ func Upload(g *games.Game) error {
 
 	// * upload
 	return uploadToEthereum(g)
-}
-
-// ReadPreviousGameEvents Will look at previous GameEntry events to fill store games
-func ReadPreviousGameEvents() error {
-	util.Logger.Info("Reading previous games from eth")
-	newGameIterator, err := libInstance.FilterNewGame(&bind.FilterOpts{
-		End:     nil,
-		Start:   1,
-		Context: nil,
-	})
-	if err != nil {
-		return err
-	}
-
-	lib := peer.Peer().Library()
-	count := 0
-	for newGameIterator.Next() {
-		g := newGameIterator.Event.Game
-		util.Logger.Infof("Found game %s", g.Title)
-		lib.SetBlockchainGame(g.RootHash, gameEntryToGame(&g))
-		count++
-	}
-
-	util.Logger.Infof("Finished reading previous games from eth. Found %d games.", count)
-	return nil
 }
 
 // translates from the ethereum version to the locally used struct

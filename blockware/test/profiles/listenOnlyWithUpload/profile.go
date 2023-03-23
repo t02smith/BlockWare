@@ -44,38 +44,38 @@ Data:
 var PrivateKey string = testutil.Accounts[1][1]
 
 func Run() {
-	if _, err := os.Stat("../../data/tmp/games/profile-2"); err != nil {
-		if err = testutil.GenerateLargeFolder("profile-2", "../../data/tmp/games/", 80_000_000, 500); err != nil {
-			util.Logger.Fatal(err)
-		}
-	}
+	// if _, err := os.Stat("../../data/tmp/games/profile-2"); err != nil {
+	// 	if err = testutil.GenerateLargeFolder("profile-2", "../../data/tmp/games/", 80_000_000, 500); err != nil {
+	// 		util.Logger.Fatal(err)
+	// 	}
+	// }
 
 	p := peer.Peer()
 
 	// * create & upload game
-	g, err := games.CreateGame(games.NewGame{
-		Title:       "t02smith.github.io",
-		Version:     "4.7.1",
-		ReleaseDate: time.Date(2002, time.January, 10, 0, 0, 0, 0, time.UTC).String(),
-		Developer:   "tcs1g20",
-		RootDir:     "../../data/tmp/games/profile-2",
-		Price:       big.NewInt(150),
-		ShardSize:   4194304,
-		AssetsDir:   "../../data/assets"},
-		nil,
-	)
-
 	// g, err := games.CreateGame(games.NewGame{
-	// 	Title:       "Transformers",
+	// 	Title:       "t02smith.github.io",
 	// 	Version:     "4.7.1",
 	// 	ReleaseDate: time.Date(2002, time.January, 10, 0, 0, 0, 0, time.UTC).String(),
 	// 	Developer:   "tcs1g20",
-	// 	RootDir:     "C:\\Games\\Transformers - Fall of Cybertron",
+	// 	RootDir:     "../../data/tmp/games/profile-2",
 	// 	Price:       big.NewInt(150),
 	// 	ShardSize:   4194304,
 	// 	AssetsDir:   "../../data/assets"},
 	// 	nil,
 	// )
+
+	g, err := games.CreateGame(games.NewGame{
+		Title:       "website",
+		Version:     "4.7.1",
+		ReleaseDate: time.Date(2002, time.January, 10, 0, 0, 0, 0, time.UTC).String(),
+		Developer:   "tcs1g20",
+		RootDir:     "./t02smith.github.io",
+		Price:       big.NewInt(150),
+		ShardSize:   4194304,
+		AssetsDir:   "../../data/assets"},
+		nil,
+	)
 
 	if err != nil {
 		util.Logger.Fatalf("Error creating game: %s", err)

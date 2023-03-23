@@ -281,10 +281,7 @@ func LoadGames(gameDataLocation string) ([]*Game, error) {
 			continue
 		}
 
-		if gm.Download != nil {
-			gm.Download.inserterPool = shardInserterPool(int(shardInserterCount), &gm)
-		}
-
+		gm.checkGameDownload()
 		gameFile.Close()
 		games = append(games, &gm)
 	}
@@ -344,4 +341,23 @@ func (g *Game) DownloadAllData() error {
 	}
 
 	return nil
+}
+
+// check whether a download exists and can be found
+func (g *Game) checkGameDownload() {
+	if g.Download == nil {
+		return
+	}
+
+	// ? check download location
+	_, err := os.Stat(g.Download.AbsolutePath)
+	if errors.Is(err, os.ErrNotExist) {
+		util.Logger.Warnf("%s download folder missing", g.Title)
+		g.Download = nil
+		return
+	}
+
+	if !g.Download.Finished() {
+		g.Download.inserterPool = shardInserterPool(int(shardInserterCount), g)
+	}
 }

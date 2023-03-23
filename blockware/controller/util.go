@@ -46,17 +46,25 @@ func downloadToGameDownloads(ds map[[32]byte]*games.Download) map[string]*Contro
 }
 
 func downloadToAppDownload(d *games.Download, name string) *ControllerDownload {
-	if d == nil || d.Finished() {
+	if d == nil {
 		return nil
 	}
 
-	diff := time.Since(d.StartTime)
+	finished := d.Finished()
+	var diff time.Duration
+	if finished && d.EndTime != nil {
+		diff = d.EndTime.Sub(d.StartTime)
+	} else {
+		diff = time.Since(d.StartTime)
+	}
+
 	x := &ControllerDownload{
 		TotalBlocks: d.TotalBlocks,
 		Progress:    make(map[string]ControllerFileProgress),
 		Name:        name,
 		Stage:       string(d.Stage),
-		ElapsedTime: fmt.Sprintf("%d:%d:%d", int(diff.Hours()), int(diff.Minutes()), int(diff.Seconds())),
+		ElapsedTime: fmt.Sprintf("%02d:%02d:%02d", int(diff.Hours()), int(diff.Minutes())%60, int(diff.Seconds())%60),
+		Finished:    finished,
 	}
 
 	lock := d.GetProgressLock()

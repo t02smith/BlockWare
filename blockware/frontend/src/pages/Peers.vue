@@ -55,6 +55,12 @@ localhost:6751
           Peers are used to share game data and contribute to the distribution
           of games uploaded to the <strong>BlockWare</strong> network.
         </p>
+        <br />
+        <p>🔒 = We have verified the peer's Eth address</p>
+        <p>
+          ⛔ = We have't received verification.
+          <strong> Click it to resend.</strong>
+        </p>
       </div>
 
       <div class="peer-list">
@@ -72,6 +78,16 @@ localhost:6751
           >
             ❌
           </button>
+
+          <p v-if="p.Validated">🔒</p>
+          <button
+            class="validation"
+            @click="() => peers.resendValidation(p.Hostname, p.Port)"
+            v-else
+          >
+            ⛔
+          </button>
+
           <p>
             <strong>tcp://{{ p.Hostname }}:{{ p.Port }}</strong> -
             {{ p.Library ? p.Library.length : 0 }} games in common
@@ -138,6 +154,7 @@ function disconnect(hostname, port) {
     display: flex;
     flex-direction: column;
     gap: 1rem;
+    min-width: 200px;
 
     > form {
       display: flex;
@@ -151,7 +168,6 @@ function disconnect(hostname, port) {
         background-color: rgb(0, 132, 255);
         color: white;
         border: none;
-        outline: none;
         width: fit-content;
         align-self: flex-end;
         cursor: pointer;
@@ -171,7 +187,6 @@ function disconnect(hostname, port) {
       > input {
         padding: 5px 7px;
         border-radius: 2px;
-        outline: none;
         border: none;
 
         &:focus {
@@ -186,7 +201,6 @@ function disconnect(hostname, port) {
 
     > .many-peers {
       > textarea {
-        outline: none;
         border: none;
         padding: 5px 2px;
         width: 100%;
@@ -206,6 +220,8 @@ function disconnect(hostname, port) {
     gap: 1rem;
 
     > .title {
+      max-width: min(100%, 900px);
+
       > h2 {
         font-size: 2rem;
       }
@@ -221,7 +237,8 @@ function disconnect(hostname, port) {
         align-items: center;
         gap: 0.5rem;
 
-        > .disconnect {
+        > .disconnect,
+        .validation {
           background-color: transparent;
           font-size: 1.2rem;
           border: none;

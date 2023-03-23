@@ -59,7 +59,8 @@ const backgroundHover = `linear-gradient(144deg, ${props.colorB} 0%, ${props.col
   color: white;
   transition: 150ms;
 
-  &:hover {
+  &:hover,
+  &:focus {
     scale: 1.05;
     z-index: 100;
   }

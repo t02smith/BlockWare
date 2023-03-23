@@ -3,8 +3,9 @@ package ethereum
 import (
 	"crypto/ecdsa"
 	"fmt"
-	"github.com/t02smith/part-iii-project/toolkit/util"
 	"time"
+
+	"github.com/t02smith/part-iii-project/toolkit/util"
 
 	"github.com/ethereum/go-ethereum/crypto"
 )
@@ -98,10 +99,17 @@ func CheckAddressValidation(validator *AddressValidator, receivedSig []byte) (bo
 	return validator.valid, nil
 }
 
+// getter for message field
 func (a *AddressValidator) Message() []byte {
 	return a.message
 }
 
+// getter for Valild field
 func (a *AddressValidator) Valid() bool {
 	return a.valid
+}
+
+// force set a validation
+func (a *AddressValidator) SetValid(value bool) {
+	a.valid = value
 }

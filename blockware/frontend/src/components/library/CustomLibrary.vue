@@ -91,7 +91,6 @@ const props = defineProps({
       .refresh {
         background-color: transparent;
         border: none;
-        outline: none;
         color: darken(white, 20%);
         transition: 150ms;
         cursor: pointer;

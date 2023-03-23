@@ -58,6 +58,13 @@ func SetupToolkitEnvironment() error {
 		return err
 	}
 
+	// look for assets directory
+	keyStoreDir := filepath.Join(toolkitDir, "keystores")
+	err = CreateDirectoryIfNotExist(keyStoreDir)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 

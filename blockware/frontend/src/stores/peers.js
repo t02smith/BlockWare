@@ -5,6 +5,7 @@ import {
   ConnectToPeer,
   ConnectToManyPeers,
   Disconnect,
+  ResendValidation,
 } from "../../wailsjs/go/controller/Controller";
 import { EventsOn } from "../../wailsjs/runtime/runtime";
 
@@ -31,5 +32,16 @@ export const usePeerStore = defineStore("peers", () => {
     ConnectToManyPeers(peerLs);
   }
 
-  return { peers, connect, refreshPeers, connectToAll, disconnect };
+  function resendValidation(hostname, port) {
+    ResendValidation(hostname, poort);
+  }
+
+  return {
+    peers,
+    connect,
+    refreshPeers,
+    connectToAll,
+    disconnect,
+    resendValidation,
+  };
 });

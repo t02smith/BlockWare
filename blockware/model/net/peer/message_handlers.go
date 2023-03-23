@@ -121,15 +121,17 @@ func handleBLOCK(cmd []string, client tcp.TCPConnection) error {
 		return fmt.Errorf("error reading shard hash on BLOCK cmd: %s", err)
 	}
 
-	// pd := Peer().peers[client]
-	// ownsGame, err := pd.checkOwnership(gh)
-	// if err != nil {
-	// 	return err
-	// }
+	if !Peer().config.SkipValidation {
+		pd := Peer().peers[client]
+		ownsGame, err := pd.checkOwnership(gh)
+		if err != nil {
+			return err
+		}
 
-	// if !ownsGame {
-	// 	return fmt.Errorf("user does not own game %x", gh)
-	// }
+		if !ownsGame {
+			return fmt.Errorf("user does not own game %x", gh)
+		}
+	}
 
 	found, data, err := Peer().library.FindAndRetrieveBlock(gh, sh)
 	if err != nil {

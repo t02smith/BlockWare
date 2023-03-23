@@ -120,7 +120,6 @@ async function join() {
         min-width: 350px;
         height: 20px;
         border-radius: 5px 0 0 5px;
-        outline: none;
         border: none;
       }
 
@@ -129,7 +128,6 @@ async function join() {
         font-weight: bold;
         width: fit-content;
         padding: 10px;
-        outline: none;
         border: none;
         border-radius: 0 5px 5px 0;
         color: white;

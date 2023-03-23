@@ -215,7 +215,6 @@ async function uninstall() {
         border: none;
         height: 25px;
         width: 250px;
-        outline: none;
         background-color: darken(white, 5%);
       }
 

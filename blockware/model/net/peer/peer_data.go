@@ -5,9 +5,12 @@ import (
 	"sort"
 	"sync"
 
+	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/t02smith/part-iii-project/toolkit/model/manager/games"
 	"github.com/t02smith/part-iii-project/toolkit/model/net/tcp"
 	"github.com/t02smith/part-iii-project/toolkit/model/persistence/ethereum"
+	"github.com/t02smith/part-iii-project/toolkit/model/persistence/ethereum/library"
+
 	model "github.com/t02smith/part-iii-project/toolkit/model/util"
 	"github.com/t02smith/part-iii-project/toolkit/util"
 )
@@ -43,7 +46,7 @@ type peerData struct {
 }
 
 // validate the identity of a given peer
-func (pd *peerData) validatePeer() {
+func (pd *peerData) ValidatePeer() {
 	if pd.Validator != nil && pd.Validator.Valid() {
 		return
 	}
@@ -55,10 +58,11 @@ func (pd *peerData) validatePeer() {
 func (pd *peerData) checkOwnership(gameHash [32]byte) (bool, error) {
 	// ? has the user's address been validated
 	if pd.Validator == nil || !pd.Validator.Valid() {
-		pd.validatePeer()
+		pd.ValidatePeer()
 		return false, nil
 	}
 
+	util.Logger.Debugf("Verifying ownership of game %x for user %s", gameHash, pd.Peer.Info())
 	checked, ok := pd.Library[gameHash]
 	if !ok {
 		return false, nil
@@ -70,20 +74,19 @@ func (pd *peerData) checkOwnership(gameHash [32]byte) (bool, error) {
 	case notOwned:
 		return false, nil
 	case unknown:
-		return true, nil
-		// addr := crypto.PubkeyToAddress(*pd.Validator.PublicKey)
-		// verified, err := library.HasPurchased(gameHash, addr)
-		// if err != nil {
-		// 	return false, err
-		// }
+		addr := crypto.PubkeyToAddress(*pd.Validator.PublicKey)
+		verified, err := library.HasPurchased(gameHash, addr)
+		if err != nil {
+			return false, err
+		}
 
-		// if verified {
-		// 	pd.Library[gameHash] = owned
-		// } else {
-		// 	pd.Library[gameHash] = notOwned
-		// }
+		if verified {
+			pd.Library[gameHash] = owned
+		} else {
+			pd.Library[gameHash] = notOwned
+		}
 
-		// return verified, nil
+		return verified, nil
 	}
 
 	return false, nil

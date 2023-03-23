@@ -33,6 +33,7 @@ type ControllerDownload struct {
 	TotalBlocks int
 	Stage       string
 	ElapsedTime string
+	Finished    bool
 }
 
 type ControllerFileProgress struct {
@@ -41,7 +42,8 @@ type ControllerFileProgress struct {
 }
 
 type ControllerPeerData struct {
-	Hostname string
-	Port     uint
-	Library  []string
+	Hostname  string
+	Port      uint
+	Library   []string
+	Validated bool
 }

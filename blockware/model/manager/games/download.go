@@ -73,6 +73,7 @@ type Download struct {
 
 	// when the download was started
 	StartTime time.Time
+	EndTime   *time.Time
 }
 
 // FileProgress the progress of a specific file's download
@@ -272,6 +273,8 @@ func (g *Game) completeFile(file *FileProgress) error {
 		util.Logger.Errorf("Error cleaning file %s: %s", file.AbsolutePath, err)
 		return err
 	}
+	now := time.Now()
+	g.Download.EndTime = &now
 
 	// verify data
 	// data, err := g.GetData()
@@ -379,6 +382,9 @@ func (d *Download) GetProgress() float32 {
 
 // Finished whether any more blocks are still needed
 func (d *Download) Finished() bool {
+	d.progressLock.Lock()
+	defer d.progressLock.Unlock()
+
 	for _, d := range d.Progress {
 		if len(d.BlocksRemaining) > 0 {
 			return false

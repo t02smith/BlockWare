@@ -428,7 +428,6 @@ async function submit() {
             border: none;
             color: white;
             cursor: pointer;
-            outline: none;
 
             > * {
               font-weight: bold;

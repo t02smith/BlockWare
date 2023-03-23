@@ -70,6 +70,10 @@ export function PurchaseGame(arg1) {
   return window['go']['controller']['Controller']['PurchaseGame'](arg1);
 }
 
+export function ResendValidation(arg1, arg2) {
+  return window['go']['controller']['Controller']['ResendValidation'](arg1, arg2);
+}
+
 export function UninstallGame(arg1) {
   return window['go']['controller']['Controller']['UninstallGame'](arg1);
 }

@@ -12,6 +12,7 @@ import (
 
 // get information about peers
 func (a *Controller) GetPeerInformation() []ControllerPeerData {
+	util.Logger.Info("ajshjkashdjkahdashd")
 	var ps []ControllerPeerData
 
 	p := peer.Peer()
@@ -27,9 +28,10 @@ func (a *Controller) GetPeerInformation() []ControllerPeerData {
 		}
 
 		ps = append(ps, ControllerPeerData{
-			Hostname: data.Hostname,
-			Port:     data.Port,
-			Library:  games,
+			Hostname:  data.Hostname,
+			Port:      data.Port,
+			Library:   games,
+			Validated: data.Validator != nil && data.Validator.Valid(),
 		})
 	}
 
@@ -97,4 +99,13 @@ func (c *Controller) Disconnect(hostname string, port uint) {
 
 func (c *Controller) LoadDeferredRequests() {
 	peer.LoadDeferredRequests()
+}
+
+func (c *Controller) ResendValidation(hostname string, port uint) {
+	p := peer.Peer()
+	for _, data := range p.GetPeers() {
+		if data.Hostname == hostname && data.Port == port {
+			data.ValidatePeer()
+		}
+	}
 }

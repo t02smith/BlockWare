@@ -3,6 +3,7 @@ package controller
 import (
 	"encoding/hex"
 	"fmt"
+	"time"
 
 	"github.com/t02smith/part-iii-project/toolkit/model/manager/games"
 	"github.com/t02smith/part-iii-project/toolkit/model/net/peer"
@@ -49,11 +50,13 @@ func downloadToAppDownload(d *games.Download, name string) *ControllerDownload {
 		return nil
 	}
 
+	diff := time.Since(d.StartTime)
 	x := &ControllerDownload{
 		TotalBlocks: d.TotalBlocks,
 		Progress:    make(map[string]ControllerFileProgress),
 		Name:        name,
 		Stage:       string(d.Stage),
+		ElapsedTime: fmt.Sprintf("%d:%d:%d", int(diff.Hours()), int(diff.Minutes()), int(diff.Seconds())),
 	}
 
 	lock := d.GetProgressLock()

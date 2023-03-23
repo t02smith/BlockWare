@@ -19,7 +19,8 @@
       <div class="table-header">
         <h2><strong>Game</strong></h2>
         <h2>Status</h2>
-        <h2>File's Left</h2>
+
+        <h2>Timer</h2>
         <h2>Block's Left</h2>
         <h2>Total Blocks</h2>
         <h2>Progress</h2>
@@ -33,7 +34,9 @@
       >
         <p>{{ download.Name }}</p>
         <p>{{ download.Stage }}</p>
-        <p>{{ filesLeft(download) }}</p>
+
+        <p>{{ download.ElapsedTime }}</p>
+
         <p>
           {{ blocksLeft(download) }}
         </p>
@@ -66,6 +69,7 @@ import { useGamesStore } from "../stores/games";
 const games = useGamesStore();
 
 const refreshInterval = ref(null);
+
 onMounted(() => {
   games.refreshDownloads();
   refreshInterval.value = setInterval(() => games.refreshDownloads(), 250);
@@ -80,7 +84,18 @@ const downloadGamePairs = computed(() => {
   if (games.downloads.length === 0) return [];
   return Object.keys(games.downloads)
     .filter((hash) => games.downloads[hash] !== null)
-    .map((hash) => [hash, games.downloads[hash]]);
+    .map((hash) => {
+      let dl = games.downloads[hash];
+
+      const start = new Date(dl.StartTime);
+      const diff = new Date() - start;
+
+      dl.timer = `${Math.floor(diff / 1000 / 60)}:${Math.floor(
+        (diff / 1000) % 60
+      )}`;
+
+      return [hash, dl];
+    });
 });
 
 function blocksLeft(download) {

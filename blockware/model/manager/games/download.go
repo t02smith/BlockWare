@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"sync"
+	"time"
 
 	"github.com/spf13/viper"
 	hash "github.com/t02smith/part-iii-project/toolkit/model/manager/hashtree"
@@ -69,6 +70,9 @@ type Download struct {
 
 	// the stage the download is in
 	Stage DownloadStage
+
+	// when the download was started
+	StartTime time.Time
 }
 
 // FileProgress the progress of a specific file's download
@@ -162,6 +166,7 @@ func (g *Game) SetupDownload() error {
 	}
 
 	d.Stage = DS_Downloading
+	d.StartTime = time.Now()
 	util.Logger.Infof("Download setup for game %s", g.Title)
 	return nil
 }

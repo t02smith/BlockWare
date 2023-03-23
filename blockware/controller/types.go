@@ -32,6 +32,7 @@ type ControllerDownload struct {
 	Progress    map[string]ControllerFileProgress
 	TotalBlocks int
 	Stage       string
+	ElapsedTime string
 }
 
 type ControllerFileProgress struct {

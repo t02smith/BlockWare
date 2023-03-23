@@ -15,18 +15,13 @@ compile-library:
 	solc --bin ./contracts/library.sol -o build/bin --overwrite
 	abigen --bin=./build/bin/Library.bin --abi=./build/abi/Library.abi --pkg=library --out=./build/contracts/library/library.go
 
-setup-profiles:
-	cp ./build/bin/blockware.exe ./test/profiles/1
-	cp ./build/bin/blockware.exe ./test/profiles/2
-	cp ./build/bin/blockware.exe ./test/profiles/3
-
-build-profiles:
-	cd frontend && npm install && npm build
-	go build
+# profiles
 
 clear-listenonly-runners:
 	rm -rf ./test/profiles/listenOnly/.toolkit-*
 
+stop-bg-processes:
+	pkill -f toolkit
 
 # CODE LINES
 

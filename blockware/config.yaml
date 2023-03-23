@@ -3,14 +3,13 @@ eth:
 games:
     installfolder: ./test/data/tmp
 meta:
-    directory: .toolkit-6051
+    directory: ./test/data/.toolkit
     hashes:
         shardsize: 16384
         workercount: 5
     log: stdout
     threadpoolsize: 10
 net:
-    "\0\0\0\0\0\0\0\0peers": false
     port: 6051
     useknownpeers: false
 user:

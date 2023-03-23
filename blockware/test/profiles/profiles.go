@@ -55,11 +55,11 @@ func ProfileCLI() bool {
 	viper.ReadInConfig()
 	util.Logger.Debugf("config loaded: %s", viper.AllSettings())
 
-	viper.Set("net.port", *port)
-	viper.Set("meta.directory", fmt.Sprintf(".toolkit-%d", *port))
-
 	// ? run a profile
 	if *profile != 0 {
+		viper.Set("net.port", *port)
+		viper.Set("meta.directory", fmt.Sprintf(".toolkit-%d", *port))
+
 		util.Logger.Infof("profile %d selected", *profile)
 		err := RunProfile(Profile(*profile), *contractAddr)
 		if err != nil {

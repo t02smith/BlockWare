@@ -95,10 +95,7 @@ failure
 */
 
 func TestGetData(t *testing.T) {
-	g, err := fetchTestGame()
-	if err != nil {
-		t.Fatal(err)
-	}
+	g := fetchTestGame(t)
 
 	t.Run("success", func(t *testing.T) {
 		tree := g.data
@@ -138,10 +135,7 @@ failure
 */
 
 func TestReadHashData(t *testing.T) {
-	g, err := fetchTestGame()
-	if err != nil {
-		t.Fatal(err)
-	}
+	g := fetchTestGame(t)
 
 	t.Run("success", func(t *testing.T) {
 		tree := g.data
@@ -197,10 +191,7 @@ failure
 
 func TestOutputToFile(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
-		g, err := fetchTestGame()
-		if err != nil {
-			t.Fatal(err)
-		}
+		g := fetchTestGame(t)
 
 		viper.Set("meta.directory", "../../../test/data/tmp")
 		os.Mkdir("../../../test/data/tmp/games", 0644)
@@ -209,7 +200,7 @@ func TestOutputToFile(t *testing.T) {
 			testutil.ClearTmp("../../../")
 		})
 
-		err = g.OutputToFile()
+		err := g.OutputToFile()
 		assert.Nil(t, err, err)
 
 		stat, err := os.Stat(fmt.Sprintf("../../../test/data/tmp/games/%x", g.RootHash))
@@ -233,10 +224,7 @@ success
 */
 
 func TestCheckGameDownload(t *testing.T) {
-	g, err := fetchTestGame()
-	if err != nil {
-		t.Fatal(err)
-	}
+	g := fetchTestGame(t)
 	old := g.Download
 
 	t.Run("success", func(t *testing.T) {

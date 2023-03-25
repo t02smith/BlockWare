@@ -126,9 +126,7 @@ func InsertData(filename string, shardSize, offset uint, data []byte) error {
 		return err
 	}
 
-	err = writer.Flush()
-	if err != nil {
-		util.Logger.Error(err)
+	if err := writer.Flush(); err != nil {
 		return err
 	}
 

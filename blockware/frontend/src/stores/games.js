@@ -12,6 +12,13 @@ import {
 } from "../../wailsjs/go/controller/Controller";
 import { EventsOn } from "../../wailsjs/runtime/runtime";
 
+/**
+ * Manage the collection of games known by the application.
+ * Includes:
+ * - games owned by the user
+ * - games being downloaded
+ * - games that are present on the store
+ */
 export const useGamesStore = defineStore("games", () => {
   // what games do they own
   const ownedGames = ref([]);
@@ -22,7 +29,7 @@ export const useGamesStore = defineStore("games", () => {
   // games in the blockware store
   const storeGames = ref([]);
 
-  // setup
+  // setup => refresh data
   onMounted(() => {
     refreshOwnedGames();
     refreshDownloads();
@@ -47,20 +54,34 @@ export const useGamesStore = defineStore("games", () => {
     await refreshDownloads();
   }
 
+  /**
+   * Import a new game that the user owns but doesn't have locally
+   * @param {String} gameHash its unique root hash
+   */
   function importGame(gameHash) {
     FetchOwnedGame(gameHash);
   }
 
+  /**
+   * Fetch some games from the store
+   */
   async function getStoreGames() {
     storeGames.value = await GetStoreGames();
   }
 
+  /**
+   * Purchase a game from the store
+   * @param {String} gameHash its unique root hash
+   */
   async function purchase(gameHash) {
     if (ownedGames.value.find((g) => g.rootHash === gameHash)) return;
 
     await PurchaseGame(gameHash);
   }
 
+  /**
+   * Load any requests that have bee postponed
+   */
   function loadDeferredRequests() {
     LoadDeferredRequests();
   }

@@ -244,38 +244,61 @@ import { UploadGame } from "../../wailsjs/go/controller/Controller";
 import { EventsOn } from "../../wailsjs/runtime/runtime";
 import { useGamesStore } from "../stores/games";
 
+/*
+
+Upload a new game to the network by filling in its
+information. Users may release a new game or an update
+to an existing game
+
+*/
+
+// Pinia stores
 const games = useGamesStore();
 
-const type = ref(null);
+// form managers
 
+// true whilst the form is being submitted but not complete
 const submitted = ref(false);
+
+// whether the upload was a success
 const success = ref(false);
+
+// an err from the upload
 const err = ref("");
 
+// input fields
+
+// 1 => new game OR update
+const type = ref(null);
+
+// for tracking the user's owned games
+const ownedGames = computed(() => games.ownedGames.filter((g) => g.IsOwner));
+const selectedOwnGame = ref("");
+
+// 2 => Game details
 const title = ref("");
 const version = ref("");
 const dev = ref("");
 const price = ref(0);
-const shardSize = ref(16384);
-const file = ref("");
-const workers = ref(5);
 const assets = ref("");
+const file = ref("");
 
+// 3 => upload details
+const shardSize = ref(16384);
+const workers = ref(5);
+
+// 4 => accept license
 const license = ref(false);
 
-// upload progress
+// upload progress for progress bar
 const fileCount = ref(0);
 const fileProgress = ref(0);
-
-//
-const ownedGames = computed(() => games.ownedGames.filter((g) => g.IsOwner));
-const selectedOwnGame = ref("");
-
 const progressWidth = computed(() =>
   fileProgress.value === 0 ? 0 : (fileProgress.value / fileCount.value) * 300
 );
 
 onMounted(async () => {
+  // listen to progress bar events
   EventsOn("file-count", (count) => {
     fileCount.value = count;
     fileProgress.value = 0;
@@ -287,12 +310,17 @@ onMounted(async () => {
   games.refreshOwnedGames();
 });
 
+//
 watch(selectedOwnGame, () => {
   if (!selectedOwnGame.value) return;
 
   selectOwnedGame(selectedOwnGame.value);
 });
 
+/*
+Select an owned game to update
+Will prevent certain fields from being changed
+*/
 function selectOwnedGame(g) {
   title.value = g.title;
   version.value = g.version;
@@ -300,11 +328,16 @@ function selectOwnedGame(g) {
   price.value = g.price;
 }
 
+/*
+Upload the user's new game
+*/
 async function submit() {
+  // validate input
   if (workers.value <= 0) workers.value = 1;
   if (shardSize.value <= 0) shardSize.value = 16384;
   if (!license.value) return;
 
+  // submit
   submitted.value = true;
   err.value = await UploadGame(
     title.value,
@@ -317,6 +350,7 @@ async function submit() {
     assets.value
   );
 
+  // reset fields
   if (err.value.length > 0) {
     title.value = "";
     version.value = "";

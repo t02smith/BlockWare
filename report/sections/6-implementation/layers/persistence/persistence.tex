@@ -1,7 +1,7 @@
 
 \subsection{Persistence}
 
-The Persistence layer represents the public data that should be accessible by any user of the application at any point in time. 
+The Persistence layer shows how the data for the application is divided across several mediums; namely the \textbf{Ethereum Smart Contract}, \textbf{IPFS}, and a \textbf{P2P Network}. Each component stores a different kind of data and the justification for these platforms is given below.
 
 \subsubsection*{Ethereum}\label{subsubsec:impl-eth}
 
@@ -32,4 +32,6 @@ This project will use the IPFS implementation Kubo \url{https://github.com/ipfs/
 
 One limitation to IPFS is that the only way to store private data on it is to encrypt it. This means it would be difficult to manage and control access rights of data on IPFS over a large, distributed network where only a subset of users will actually be allowed access to it. 
 On top of this, we would not be able to track the contributions of individual nodes sharing data such that a game developer could reward a user for their contribution. 
-The lack of middleware support by IPFS shows that, to meet the requirements set out in Section~\ref{subsec:requirements}, we would need to develop a separate platform to share game data over. 
+\x
+The lack of middleware support by IPFS shows that, to meet the requirements set out in Section~\ref{subsec:requirements}, we would need to develop a separate platform to share game data over.
+The details of this network and how data is managed within it is detailed in Section~\ref{subsec:backend}

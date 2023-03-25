@@ -40,7 +40,7 @@ func beforeAll() {
 	viper.Set("games.installFolder", "../../../test/data/tmp")
 	viper.Set("meta.hashes.workerCount", 5)
 
-	_, err := StartPeer(Config{false, false, false, true, false}, "localhost", 7887, "../../../test/data/tmp", "../../../test/data/.toolkit")
+	_, err := StartPeer(Config{false, false, false, true, false}, "localhost", 7887, "../../../test/data/tmp", "../../../test/data/tmp/.toolkit")
 	if err != nil {
 		log.Printf("Error starting test peer")
 		os.Exit(1)

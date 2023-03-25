@@ -23,10 +23,7 @@ success
 func TestUploadAndDownloadHashTree(t *testing.T) {
 	t.Skip() // TODO setup IPFS daemon on github workflow
 
-	g, err := fetchTestGame()
-	if err != nil {
-		t.Fatal(err)
-	}
+	g := fetchTestGame(t)
 
 	smoke := t.Run("upload data", func(t *testing.T) {
 

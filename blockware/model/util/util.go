@@ -25,43 +25,37 @@ func SetupToolkitEnvironment() error {
 	}
 
 	// toolkit root directory
-	err := CreateDirectoryIfNotExist(toolkitDir)
-	if err != nil {
+	if err := CreateDirectoryIfNotExist(toolkitDir); err != nil {
 		return err
 	}
 
 	// look for games directory
 	gamesDir := filepath.Join(toolkitDir, "games")
-	err = CreateDirectoryIfNotExist(gamesDir)
-	if err != nil {
+	if err := CreateDirectoryIfNotExist(gamesDir); err != nil {
 		return err
 	}
 
 	// look for hash directory
 	hashDir := filepath.Join(toolkitDir, "hashes")
-	err = CreateDirectoryIfNotExist(hashDir)
-	if err != nil {
+	if err := CreateDirectoryIfNotExist(hashDir); err != nil {
 		return err
 	}
 
 	// look for assets directory
 	assetsDir := filepath.Join(toolkitDir, "assets")
-	err = CreateDirectoryIfNotExist(assetsDir)
-	if err != nil {
+	if err := CreateDirectoryIfNotExist(assetsDir); err != nil {
 		return err
 	}
 
 	// look for assets directory
 	peerDir := filepath.Join(toolkitDir, "peers")
-	err = CreateDirectoryIfNotExist(peerDir)
-	if err != nil {
+	if err := CreateDirectoryIfNotExist(peerDir); err != nil {
 		return err
 	}
 
 	// look for assets directory
-	keyStoreDir := filepath.Join(toolkitDir, "keystores")
-	err = CreateDirectoryIfNotExist(keyStoreDir)
-	if err != nil {
+	receiptsDir := filepath.Join(toolkitDir, "receipts")
+	if err := CreateDirectoryIfNotExist(receiptsDir); err != nil {
 		return err
 	}
 
@@ -77,9 +71,7 @@ func CreateDirectoryIfNotExist(dir string) error {
 
 	if os.IsNotExist(err) {
 		util.Logger.Infof("Directory %s not found. Creating directory", dir)
-		err = os.Mkdir(dir, 0755)
-
-		if err != nil {
+		if err := os.Mkdir(dir, 0755); err != nil {
 			return err
 		}
 	} else {
@@ -138,8 +130,7 @@ func ZipDirectory(archivePath, outputLocation string) error {
 			return err
 		}
 
-		_, err = writer.Write(data)
-		if err != nil {
+		if _, err := writer.Write(data); err != nil {
 			return err
 		}
 
@@ -150,8 +141,7 @@ func ZipDirectory(archivePath, outputLocation string) error {
 	if err != nil {
 		file.Close()
 		util.Logger.Errorf("Error creating archive from %s: %s", archivePath, err)
-		_err := os.Remove(outputLocation)
-		if _err != nil {
+		if _err := os.Remove(outputLocation); _err != nil {
 			util.Logger.Errorf("Error clearing archive file %s", err)
 		}
 
@@ -171,8 +161,7 @@ func UnzipArchive(archive string, outputFolder string) error {
 	}
 	defer reader.Close()
 
-	err = os.Mkdir(outputFolder, 0755)
-	if err != nil {
+	if err := os.Mkdir(outputFolder, 0755); err != nil {
 		return err
 	}
 
@@ -191,8 +180,7 @@ func UnzipArchive(archive string, outputFolder string) error {
 				fileDir = filepath[:lastIndex]
 			}
 
-			err = os.MkdirAll(fileDir, f.Mode())
-			if err != nil {
+			if err := os.MkdirAll(fileDir, f.Mode()); err != nil {
 				return err
 			}
 
@@ -201,8 +189,7 @@ func UnzipArchive(archive string, outputFolder string) error {
 				return err
 			}
 
-			_, err = io.Copy(f, rc)
-			if err != nil {
+			if _, err := io.Copy(f, rc); err != nil {
 				return err
 			}
 

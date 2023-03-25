@@ -7,20 +7,20 @@
 
     <div class="quick-links-wrapper">
       <div class="text">
-        <p>{{ text }}</p>
+        <p>{{ linkInfo }}</p>
         <p><strong> 1.0.0 </strong></p>
       </div>
 
-      <div class="quick-links" @mouseleave="() => (text = '')">
+      <div class="quick-links" @mouseleave="() => (linkInfo = '')">
         <Icon
-          v-for="i in icons"
+          v-for="i in links"
           :colorA="i.colorA"
           :colorB="i.colorB"
           :name="i.name"
           :icon="i.icon"
           :link="i.link"
           class="icon"
-          @mouseover="() => (text = i.description)"
+          @mouseover="() => (linkInfo = i.description)"
         />
       </div>
     </div>
@@ -30,9 +30,17 @@
 import { ref } from "vue";
 import Icon from "../components/home/Icon.vue";
 
-const text = ref("");
+/*
 
-const icons = [
+Home page with links to other major pages
+
+*/
+
+// info text shown when hovering over each link
+const linkInfo = ref("");
+
+// links to other pages
+const links = [
   {
     name: "Library",
     icon: "🎮",

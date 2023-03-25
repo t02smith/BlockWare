@@ -3,6 +3,8 @@ package peer
 import (
 	"crypto/sha256"
 	"fmt"
+	model "github.com/t02smith/part-iii-project/toolkit/model/util"
+	"github.com/t02smith/part-iii-project/toolkit/test/testutil"
 	"strings"
 	"testing"
 	"time"
@@ -29,6 +31,13 @@ failure
 */
 
 func TestFetchBlockFromLibrary(t *testing.T) {
+	if err := model.SetupToolkitEnvironment(); err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() {
+		testutil.ClearTmp("../../../")
+	})
+
 	game := testenv.CreateTestGame(t, "../../../")
 	Peer().library.AddOrUpdateOwnedGame(game)
 
@@ -110,7 +119,7 @@ func TestOnMessage(t *testing.T) {
 		t.Run("unrecognised message", func(t *testing.T) {
 			err := onMessage(strings.Split("FAKE_MESSAGE;error message", ";"), tcp)
 			assert.NotNil(t, err, "error expected")
-			assert.Equal(t, fmt.Sprintf("unrecognised message: %s", "FAKE_MESSAGE;error message"), err.Error(), "incorrect err message")
+			assert.Equal(t, fmt.Sprintf("unknown cmd '%s'", "FAKE_MESSAGE"), err.Error(), "incorrect err message")
 		})
 	})
 

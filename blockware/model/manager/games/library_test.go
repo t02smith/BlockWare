@@ -15,10 +15,7 @@ import (
 
 func setupTestLibrary(t *testing.T) (*Library, *Game) {
 	lib := NewLibrary()
-	testGame, err := fetchTestGame()
-	if err != nil {
-		t.Fatal(err)
-	}
+	testGame := fetchTestGame(t)
 
 	lib.AddOrUpdateOwnedGame(testGame)
 	t.Cleanup(func() {
@@ -251,10 +248,7 @@ success
 
 func TestAddOrUpdateOwnedGame(t *testing.T) {
 	lib := NewLibrary()
-	testGame, err := fetchTestGame()
-	if err != nil {
-		t.Fatal(err)
-	}
+	testGame := fetchTestGame(t)
 
 	t.Cleanup(func() {
 		lib.Close()

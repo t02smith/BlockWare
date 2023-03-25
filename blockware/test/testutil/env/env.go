@@ -30,8 +30,7 @@ func CreateTestGame(t *testing.T, toRoot string) *games.Game {
 		t.Fatal(err)
 	}
 
-	err = games.OutputAllGameDataToFile(game)
-	if err != nil {
+	if err := games.OutputAllGameDataToFile(game); err != nil {
 		t.Fatal(err)
 	}
 

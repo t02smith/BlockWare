@@ -78,7 +78,6 @@ var gameII library.LibraryGameEntry = library.LibraryGameEntry{
 
 func TestLibrarySmartContract(t *testing.T) {
 	ops, lib := deployContract(t)
-
 	/*
 
 		Smart Contract function: library.uploadGame
@@ -174,9 +173,9 @@ func TestLibrarySmartContract(t *testing.T) {
 				_, err := lib.PurchaseGame(ops, sha256.Sum256([]byte("fake game")))
 				assert.Nil(t, err)
 
-				purchased, err := lib.HasPurchased(nil, gameI.RootHash, ethereum.Address())
+				purchased, err := lib.HasPurchased(nil, sha256.Sum256([]byte("fake game")), ethereum.Address())
 				assert.Nil(t, err)
-				assert.False(t, purchased)
+				assert.False(t, purchased, purchased)
 			})
 
 			t.Run("game already owned", func(t *testing.T) {

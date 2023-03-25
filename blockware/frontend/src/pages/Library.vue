@@ -94,12 +94,18 @@
 <script setup>
 import { ref, watch, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import GameEntry from "../components/store/GameEntry.vue";
+import GameEntry from "../components/library/GameEntry.vue";
 import {
   IsDownloading,
   UninstallGame,
 } from "../../wailsjs/go/controller/Controller";
 import { useGamesStore } from "../stores/games";
+
+/*
+
+Show the user's owned games and allow them to manage downloads
+
+*/
 
 const props = defineProps({
   store: {
@@ -134,6 +140,7 @@ watch(selected, async () => {
   selectedIsDownloading.value = await IsDownloading(selected.value.rootHash);
 });
 
+// load game mentioned in query parameter if it exists
 onMounted(async () => {
   const gameHash = route.query.game;
   if (!gameHash) {
@@ -146,11 +153,17 @@ onMounted(async () => {
   selected.value = games.ownedGames.find((g) => gameHash === g.rootHash);
 });
 
+/*
+start a download for an owned game
+*/
 function createDownload() {
   games.createDownload(selected.value.rootHash);
   selectedIsDownloading.value = 2;
 }
 
+/*
+uninstall a downloaded game
+*/
 async function uninstall() {
   await UninstallGame(selected.value.rootHash);
   selectedIsDownloading.value = await IsDownloading(selected.value.rootHash);

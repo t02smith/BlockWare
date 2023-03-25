@@ -33,6 +33,33 @@ VALIDATE_RES => respond to a validation request
 
 */
 
+func getHandlerByCommand(cmd string) func([]string, tcp.TCPConnection) error {
+	switch cmd {
+	case "LIBRARY":
+		return handleLIBRARY
+	case "GAMES":
+		return handleGAMES
+	case "BLOCK":
+		return handleBLOCK
+	case "SEND_BLOCK":
+		return handleSEND_BLOCK
+	case "ERROR":
+		return handleERROR
+	case "VALIDATE_REQ":
+		return handleVALIDATE_REQ
+	case "VALIDATE_RES":
+		return handleVALIDATE_RES
+	case "REQ_RECEIPT":
+		return handleREQ_RECEIPT
+	case "RECEIPT":
+		return handleRECEIPT
+	}
+
+	return func(s []string, t tcp.TCPConnection) error {
+		return fmt.Errorf("unknown cmd '%s'", cmd)
+	}
+}
+
 // LIBRARY
 
 func generateLIBRARY() string {
@@ -244,6 +271,11 @@ func generateERROR(msg string, args ...any) string {
 	return fmt.Sprintf("ERROR;%s\n", fmt.Sprintf(msg, args...))
 }
 
+func handleERROR(cmd []string, tcp tcp.TCPConnection) error {
+	util.Logger.Errorf("Error received %s", cmd[1])
+	return nil
+}
+
 // VALIDATE_REQ <message>
 
 func generateVALIDATE_REQ(message []byte) string {
@@ -329,22 +361,48 @@ func generateRECEIPT(blocks [][32]byte) string {
 
 	for _, b := range blocks {
 		w.Write(b[:])
-
 	}
+
 	w.Flush()
 	w.Close()
 
-	return fmt.Sprintf("RECEIPT;%x\n", buffer.Bytes())
+	sig, _ := ethereum.SignMessage(buffer.Bytes())
+	return fmt.Sprintf("RECEIPT;%x;%x\n", sig, buffer.Bytes())
 }
 
 func handleRECEIPT(cmd []string, client tcp.TCPConnection) error {
-	data, _ := hex.DecodeString(cmd[1])
+	data, _ := hex.DecodeString(cmd[2])
 
 	var b bytes.Buffer
 	r := flate.NewReader(bytes.NewReader(data))
 
 	b.ReadFrom(r)
 	r.Close()
+
+	// check signature of data matches expected user
+	pd := Peer().peers[client]
+	if pd.Validator == nil || !pd.Validator.Valid() {
+		return fmt.Errorf("user not verified. ignoring receipt")
+	}
+
+	sig, err := hex.DecodeString(cmd[1])
+	if err != nil {
+		return err
+	}
+
+	pubKeyBytes := crypto.FromECDSAPub(pd.Validator.PublicKey)
+	hash := crypto.Keccak256Hash(b.Bytes())
+
+	sigPublicKey, err := crypto.Ecrecover(hash.Bytes(), sig)
+	if err != nil {
+		return err
+	}
+
+	if !bytes.Equal(pubKeyBytes, sigPublicKey) {
+		return fmt.Errorf("public keys do not match => throwing receipt")
+	}
+
+	// TODO do something ??
 
 	return nil
 }

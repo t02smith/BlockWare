@@ -12,6 +12,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/t02smith/part-iii-project/toolkit/model/persistence/ethereum"
+	model "github.com/t02smith/part-iii-project/toolkit/model/util"
+
 	"github.com/stretchr/testify/assert"
 	"github.com/t02smith/part-iii-project/toolkit/model/manager/games"
 	hash "github.com/t02smith/part-iii-project/toolkit/model/manager/hashtree"
@@ -265,6 +268,13 @@ failure
 */
 
 func TestHandleBLOCK(t *testing.T) {
+	if err := model.SetupToolkitEnvironment(); err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() {
+		testutil.ClearTmp("../../../")
+	})
+
 	mp, _ := createMockPeer(t)
 
 	game := testenv.CreateTestGame(t, "../../../")
@@ -415,6 +425,13 @@ failure
 */
 
 func TestHandleSEND_BLOCK(t *testing.T) {
+	if err := model.SetupToolkitEnvironment(); err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() {
+		testutil.ClearTmp("../../../")
+	})
+
 	mp, _ := createMockPeer(t)
 
 	game := testenv.CreateTestGame(t, "../../../")
@@ -618,7 +635,7 @@ success
 
 */
 
-func TestGnerateVALIDATE_REQ(t *testing.T) {
+func TestGenerateVALIDATE_REQ(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		t.Run("base case", func(t *testing.T) {
 			msg := []byte("hello world - blockware")
@@ -661,10 +678,29 @@ success
 */
 
 func TestGenerateRECEIPT(t *testing.T) {
+	if _, _, err := ethereum.StartClient("http://localhost:8545"); err != nil {
+		t.Fatal(err)
+	}
+
+	if _, err := ethereum.GenerateAuthInstance(testutil.Accounts[0][1]); err != nil {
+		t.Fatal(err)
+	}
+
 	t.Run("success", func(t *testing.T) {
 		t.Run("no blocks", func(t *testing.T) {
 			res := generateRECEIPT([][32]byte{})
-			assert.Equal(t, "RECEIPT;000000ffff010000ffff\n", res)
+
+			bs, err := hex.DecodeString("000000ffff010000ffff")
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			sig, err := ethereum.SignMessage(bs)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			assert.Equal(t, fmt.Sprintf("RECEIPT;%x;%x\n", sig, bs), res)
 		})
 
 		t.Run("one block", func(t *testing.T) {
@@ -675,7 +711,18 @@ func TestGenerateRECEIPT(t *testing.T) {
 			w.Flush()
 
 			res := generateRECEIPT([][32]byte{block})
-			assert.Equal(t, fmt.Sprintf("RECEIPT;%x010000ffff\n", b.Bytes()), res)
+
+			bs, err := hex.DecodeString(fmt.Sprintf("%x010000ffff", b.Bytes()))
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			sig, err := ethereum.SignMessage(bs)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			assert.Equal(t, fmt.Sprintf("RECEIPT;%x;%x010000ffff\n", sig, b.Bytes()), res)
 		})
 
 		t.Run("many blocks", func(t *testing.T) {
@@ -689,7 +736,7 @@ func TestGenerateRECEIPT(t *testing.T) {
 			res := generateRECEIPT(blocks)
 			parts := strings.Split(res[:len(res)-1], ";")
 
-			data, err := hex.DecodeString(parts[1])
+			data, err := hex.DecodeString(parts[2])
 			assert.Nil(t, err)
 
 			var b bytes.Buffer
@@ -698,10 +745,31 @@ func TestGenerateRECEIPT(t *testing.T) {
 			b.ReadFrom(r)
 			r.Close()
 
+			// check blocks included
 			assert.Equal(t, 128, len(b.Bytes()))
 			for i, block := range blocks {
-				assert.True(t, bytes.Equal(block[:], b.Bytes()[i*32:(i+1)*32]))
+				assert.True(t, bytes.Equal(block[:], b.Bytes()[i*32:(i+1)*32]), "block")
 			}
+
+			// check signature
+			var buffer bytes.Buffer
+			w, _ := flate.NewWriter(&buffer, 6)
+
+			for _, b := range blocks {
+				w.Write(b[:])
+			}
+
+			w.Flush()
+			w.Close()
+
+			sig, err := ethereum.SignMessage(buffer.Bytes())
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			_sig2, _ := hex.DecodeString(parts[1])
+
+			assert.True(t, bytes.Equal(_sig2, sig), "signature")
 		})
 	})
 }

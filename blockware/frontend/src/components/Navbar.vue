@@ -19,6 +19,11 @@
 <script setup>
 import { useEthStore } from "../stores/eth";
 
+/*
+Standard navbar with links to all major pages
+*/
+
+// used to get the contract address
 const eth = useEthStore();
 </script>
 <style scoped lang="scss">

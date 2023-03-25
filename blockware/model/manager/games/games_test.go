@@ -2,10 +2,10 @@ package games
 
 import (
 	"bytes"
-	"errors"
-	"log"
+	"fmt"
 	"math/big"
 	"os"
+	"path/filepath"
 	"testing"
 	"time"
 
@@ -21,13 +21,6 @@ func TestMain(m *testing.M) {
 	testutil.SetupTestConfig()
 	model.SetupToolkitEnvironment()
 
-	err := setupTestGame()
-	if err != nil {
-		log.Println(err)
-		gamesTestTeardown()
-		os.Exit(1)
-	}
-
 	// gamesTestSetup()
 	code := m.Run()
 	// gamesTestTeardown()
@@ -36,13 +29,12 @@ func TestMain(m *testing.M) {
 }
 
 // create a test game and store it in long term storage
-func setupTestGame() error {
+func setupTestGame(t *testing.T) {
 	datetime := time.Date(2002, 1, 10, 0, 0, 0, 0, time.UTC).String()
 	game, err := CreateGame(NewGame{"toolkit", "1.0.4", datetime, "google.com", "../../../test/data/testdir", big.NewInt(0), 256, "../../../test/data/assets"}, nil)
 
 	if err != nil {
-		log.Printf("Error creating game: %s\n", err)
-		return err
+		t.Fatal(err)
 	}
 
 	testGameRootHash = game.RootHash
@@ -50,21 +42,25 @@ func setupTestGame() error {
 	// write game to file
 	err = OutputAllGameDataToFile(game)
 	if err != nil {
-		log.Printf("Error writing game to file: %s\n", err)
-		return err
+		t.Fatal(err)
 	}
 
-	return nil
+	t.Cleanup(func() {
+		os.Remove(filepath.Join("meta.directory", "games", fmt.Sprintf("%x", game.RootHash)))
+		os.Remove(filepath.Join("meta.directory", "hashes", fmt.Sprintf("%x.hash", game.RootHash)))
+	})
+
 }
 
-func fetchTestGame() (*Game, error) {
+func fetchTestGame(t *testing.T) *Game {
 	games, err := LoadGames("../../../test/data/.toolkit/games")
 	if err != nil {
-		return nil, err
+		t.Fatal(err)
 	}
 
 	if len(games) == 0 {
-		return nil, errors.New("No games present in the test folder")
+		setupTestGame(t)
+		return fetchTestGame(t)
 	}
 
 	var testGame *Game
@@ -73,35 +69,34 @@ func fetchTestGame() (*Game, error) {
 			testGame = g
 		}
 	}
+
 	if testGame == nil {
-		util.Logger.Fatalf("error finding test game")
+		setupTestGame(t)
+		return fetchTestGame(t)
 	}
 
 	err = testGame.readHashData()
 	if err != nil {
-		return nil, err
+		t.Fatal(err)
 	}
 
-	return testGame, nil
+	return testGame
 }
 
 // create a test download
-func setupTestDownload(t *testing.T) (*Game, error) {
-	g, err := fetchTestGame()
-	if err != nil {
-		return nil, err
-	}
+func setupTestDownload(t *testing.T) *Game {
+	g := fetchTestGame(t)
 
-	err = g.SetupDownload()
+	err := g.SetupDownload()
 	if err != nil && !os.IsExist(err) {
-		return nil, err
+		t.Fatal(err)
 	}
 
 	t.Cleanup(func() {
 		g.CancelDownload()
 	})
 
-	return g, nil
+	return g
 }
 
 // setup/teardown functions

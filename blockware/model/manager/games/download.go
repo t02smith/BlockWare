@@ -254,9 +254,8 @@ func (g *Game) insertData(fileHash, blockHash [32]byte, data []byte) error {
 	d.progressLock.Unlock()
 
 	// check if file is completely downloaded
-	if len(file.BlocksRemaining) == 0 {
-		err := g.completeFile(file)
-		if err != nil {
+	if len(file.BlocksRemaining) > 0 {
+		if err = g.completeFile(fileHash, file); err != nil {
 			return err
 		}
 	}
@@ -266,41 +265,40 @@ func (g *Game) insertData(fileHash, blockHash [32]byte, data []byte) error {
 
 // to be run when a file has been downloaded
 // will tidy up the file and verify its contents
-func (g *Game) completeFile(file *FileProgress) error {
+func (g *Game) completeFile(fileHash [32]byte, file *FileProgress) error {
 	util.Logger.Debugf("Download complete for file %s", file.AbsolutePath)
-	err := CleanFile(file.AbsolutePath, file.Size)
-	if err != nil {
-		util.Logger.Errorf("Error cleaning file %s: %s", file.AbsolutePath, err)
+	if err := CleanFile(file.AbsolutePath, file.Size); err != nil {
 		return err
 	}
+
 	now := time.Now()
 	g.Download.EndTime = &now
 
 	// verify data
-	// data, err := g.GetData()
-	// if err != nil {
-	// 	return err
-	// }
+	data, err := g.GetData()
+	if err != nil {
+		return err
+	}
 
-	// htf := data.GetFile(fileHash)
-	// if htf == nil {
-	// 	// ? shouldn't even make it this far but just in case
-	// 	return nil
-	// }
+	htf := data.GetFile(fileHash)
+	if htf == nil {
+		// ? shouldn't even make it this far but just in case
+		return nil
+	}
 
-	// correct, incorrectBlocks, err := hash.VerifyFile(htf, file.AbsolutePath, data.ShardSize)
-	// if err != nil {
-	// 	return err
-	// }
+	correct, incorrectBlocks, err := hash.VerifyFile(htf, file.AbsolutePath, data.ShardSize)
+	if err != nil {
+		return err
+	}
 
-	// if correct {
-	// 	return nil
-	// }
+	if correct {
+		return nil
+	}
 
-	// util.Logger.Debugf("Found %d blocks in %s that are incorrect", len(incorrectBlocks), file.AbsolutePath)
-	// for blockHash, offset := range incorrectBlocks {
-	// 	file.BlocksRemaining[blockHash] = []uint{offset}
-	// }
+	util.Logger.Warnf("Found %d blocks in %s that are incorrect", len(incorrectBlocks), file.AbsolutePath)
+	for blockHash, offset := range incorrectBlocks {
+		file.BlocksRemaining[blockHash] = []uint{offset}
+	}
 
 	return nil
 }

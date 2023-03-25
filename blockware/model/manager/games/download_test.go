@@ -37,10 +37,7 @@ func TestSetupDownload(t *testing.T) {
 		gamesTestTeardown()
 	})
 
-	g, err := fetchTestGame()
-	if err != nil {
-		t.Fatal(err)
-	}
+	g := fetchTestGame(t)
 
 	t.Run("success", func(t *testing.T) {
 		t.Cleanup(func() {
@@ -111,15 +108,12 @@ func TestCancelDownload(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 
 		// setup
-		g, err := setupTestDownload(t)
-		if err != nil {
-			t.Fatal(err)
-		}
+		g := setupTestDownload(t)
 
 		path := g.Download.AbsolutePath
 
 		//
-		err = g.CancelDownload()
+		err := g.CancelDownload()
 
 		assert.Nil(t, err)
 		assert.Nil(t, g.Download)
@@ -132,11 +126,7 @@ func TestCancelDownload(t *testing.T) {
 
 	t.Run("failure", func(t *testing.T) {
 		t.Run("illegal arguments", func(t *testing.T) {
-			g, err := setupTestDownload(t)
-			if err != nil {
-				t.Fatal(err)
-			}
-
+			g := setupTestDownload(t)
 			path := g.Download.AbsolutePath
 
 			t.Run("download not active", func(t *testing.T) {
@@ -192,10 +182,7 @@ func TestInsertData(t *testing.T) {
 		gamesTestTeardown()
 	})
 
-	g, err := setupTestDownload(t)
-	if err != nil {
-		t.Fatal(err)
-	}
+	g := setupTestDownload(t)
 
 	t.Run("success", func(t *testing.T) {
 		// setup
@@ -374,4 +361,85 @@ func TestContinueDownload(t *testing.T) {
 	})
 
 	close(channel)
+}
+
+/*
+
+function: Game.completeFile
+purpose: clean and verify a file after downloading all data
+
+? Test cases
+success
+	#1 => file finished && file cleaned and verified correctly
+	#2 => file not finished
+
+failure
+	#1 => file not valid
+	#2 => file not found
+
+*/
+
+func TestCompleteFile(t *testing.T) {
+	g := setupTestDownload(t)
+
+	data, err := g.GetData()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	fileHash := data.RootDir.Files["test.txt"].RootHash
+	file := g.Download.Progress[fileHash]
+
+	t.Run("success", func(t *testing.T) {
+		t.Run("download finished", func(t *testing.T) {
+			oldBR := file.BlocksRemaining
+			file.BlocksRemaining = make(map[[32]byte][]uint)
+
+			oldPath := file.AbsolutePath
+			file.AbsolutePath = "../../../test/data/testdir/test.txt"
+
+			t.Cleanup(func() {
+				file.AbsolutePath = oldPath
+				file.BlocksRemaining = oldBR
+			})
+
+			err := g.completeFile(fileHash, file)
+			assert.Nil(t, err, err)
+		})
+	})
+
+	t.Run("failure", func(t *testing.T) {
+		t.Run("file not found", func(t *testing.T) {
+			oldPath := file.AbsolutePath
+			file.AbsolutePath = "../../../test/data/testdir/fake/file"
+
+			t.Cleanup(func() {
+				file.AbsolutePath = oldPath
+			})
+
+			err := g.completeFile(fileHash, file)
+			assert.NotNil(t, err)
+			assert.ErrorIs(t, err, os.ErrNotExist)
+		})
+
+		t.Run("file not valid", func(t *testing.T) {
+			oldBR := file.BlocksRemaining
+			file.BlocksRemaining = make(map[[32]byte][]uint)
+
+			oldPath := file.AbsolutePath
+			file.AbsolutePath = "../../../test/data/testfiles/bad-verify.txt"
+
+			t.Cleanup(func() {
+				file.AbsolutePath = oldPath
+				file.BlocksRemaining = oldBR
+			})
+
+			// will fail verification and add all wrong blocks back to progress
+			err := g.completeFile(fileHash, file)
+			assert.Nil(t, err)
+
+			assert.NotZero(t, file.BlocksRemaining)
+			assert.Equal(t, len(oldBR), len(file.BlocksRemaining))
+		})
+	})
 }

@@ -213,8 +213,7 @@ func (g *Game) OutputToFile() error {
 		g.Download.progressLock.Lock()
 	}
 
-	err = encoder.Encode(g)
-	if err != nil {
+	if err = encoder.Encode(g); err != nil {
 		return err
 	}
 
@@ -222,8 +221,7 @@ func (g *Game) OutputToFile() error {
 		g.Download.progressLock.Unlock()
 	}
 
-	err = writer.Flush()
-	if err != nil {
+	if err := writer.Flush(); err != nil {
 		return err
 	}
 

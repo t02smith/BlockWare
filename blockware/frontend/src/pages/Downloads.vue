@@ -67,20 +67,33 @@
 import { computed, ref, onMounted, onUnmounted } from "vue";
 import { useGamesStore } from "../stores/games";
 
+/*
+
+Show the user's list of completed and in progress downloads
+
+*/
+
+// hooks
 const games = useGamesStore();
 
+// interval function to trigger download progress request
 const refreshInterval = ref(null);
 
+// start interval for download refresh
 onMounted(() => {
   games.refreshDownloads();
   refreshInterval.value = setInterval(() => games.refreshDownloads(), 250);
 });
 
+// stop interval for download refresh
 onUnmounted(() => {
   if (!refreshInterval.value) return;
   clearInterval(refreshInterval.value);
 });
 
+// For each download <hash, download data>
+// hash is used for identifying game
+// download date shows the data left to be downloaded
 const downloadGamePairs = computed(() => {
   if (games.downloads.length === 0) return [];
   return Object.keys(games.downloads)
@@ -99,6 +112,9 @@ const downloadGamePairs = computed(() => {
     });
 });
 
+/*
+returns how many blocks are left to be downloaded
+*/
 function blocksLeft(download) {
   if (!download) return 0;
   return Object.values(download.Progress).reduce(
@@ -107,13 +123,7 @@ function blocksLeft(download) {
   );
 }
 
-function filesLeft(download) {
-  if (!download) return 0;
-  return Object.values(download.Progress).filter(
-    (f) => f.BlocksRemaining.length !== 0
-  ).length;
-}
-
+// TODO
 const pauseAll = ref(false);
 </script>
 <style scoped lang="scss">

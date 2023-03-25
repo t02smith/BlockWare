@@ -28,11 +28,19 @@
 import { ref, onMounted, computed } from "vue";
 import { useRoute } from "vue-router";
 import { useGamesStore } from "../stores/games";
-import GameEntry from "../components/store/GameEntry.vue";
+import GameEntry from "../components/library/GameEntry.vue";
 
-const route = useRoute();
+/*
+
+A store page for a given game that will show users the description
+and allow them to purchase it
+
+*/
+
+// pinia stores
 const games = useGamesStore();
 
+// selected game
 const game = ref(null);
 const ownsGame = computed(() =>
   games.ownedGames.find((g) => g.rootHash === game.rootHash)
@@ -40,6 +48,10 @@ const ownsGame = computed(() =>
 
 //
 
+// The game is identified by its root hash in the URL
+const route = useRoute();
+
+// attempt to fetch that game to display it
 onMounted(async () => {
   const gameHash = route.query.game;
   if (!gameHash) return;
@@ -47,6 +59,9 @@ onMounted(async () => {
   game.value = games.storeGames.find((g) => gameHash === g.rootHash);
 });
 
+/*
+purchase the currently on display game if there is oen
+*/
 async function purchase() {
   if (!game.value) return;
 

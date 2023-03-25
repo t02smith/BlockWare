@@ -50,16 +50,28 @@ import CustomLibrary from "../components/library/CustomLibrary.vue";
 import { useGamesStore } from "../stores/games";
 import { useRouter } from "vue-router";
 
+/*
+
+Store page to allow users to find new games
+Mostly unfinished for this project :()
+
+*/
+
+// hooks
 const games = useGamesStore();
 const router = useRouter();
 
+// update games on mount
 onMounted(() => {
   games.getStoreGames();
 });
 
-// search
+// root hash to search for a game
 const search = ref("");
 
+/*
+Open the store page for a game using its root hash
+*/
 async function searchForGame() {
   if (search.value.length === 0) return;
 

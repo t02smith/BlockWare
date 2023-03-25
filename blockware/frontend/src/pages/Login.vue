@@ -40,21 +40,39 @@ import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { useEthStore } from "../stores/eth";
 
+/*
+
+Connect to the BlockWare network
+
+*/
+
+// user's private key
 const key = ref(
   "af9668cd6ebc3ba4c0e5036c284e128ed66e18ba9e4ed87b2c0c6d9642f2b879"
 );
+
+// address of the deployed smart contract
 const addr = ref("0x750cf6392175f94ff5014803a0bb6b79de543337");
+
+// join existing network OR deploy new one
 const isJoining = ref(true);
 
+// hooks
 const eth = useEthStore();
 const router = useRouter();
 
+/*
+Deploy a new instance
+*/
 async function create() {
   await eth.deployNewLibInstance(key.value);
   key.value = "";
   router.push("/home");
 }
 
+/*
+Join an existing instance
+*/
 async function join() {
   await eth.joinLibInstance(addr.value, key.value);
   addr.value = "";

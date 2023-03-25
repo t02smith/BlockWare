@@ -23,11 +23,11 @@ func beforeEachAfterEach(t *testing.T) {
 	t.Helper()
 
 	// * setup
-	testutil.ClearTmp("../")
+	testutil.ClearTmp("../../")
 
 	// * teardown
 	t.Cleanup(func() {
-		testutil.ClearTmp("../")
+		testutil.ClearTmp("../../")
 	})
 }
 
@@ -56,24 +56,23 @@ func TestCreateDirectoryIfNotExistCorrect(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 
 		created := t.Run("folder created", func(t *testing.T) {
-			err := CreateDirectoryIfNotExist("../test/data/tmp/hello-there")
+			err := CreateDirectoryIfNotExist("../../test/data/tmp/hello-there")
 			assert.Nil(t, err, err)
 
-			f, err := os.Stat("../test/data/tmp/hello-there")
+			f, err := os.Stat("../../test/data/tmp/hello-there")
 			assert.Nil(t, err, err)
 			assert.True(t, f.IsDir(), "created data object is not a directory")
 		})
 
 		// ! create folder if previous test fails
 		if !created {
-			err := os.Mkdir("../test/data/tmp/hello-there", 0644)
-			if err != nil {
+			if err := os.Mkdir("../../test/data/tmp/hello-there", 0644); err != nil {
 				t.Fatal(err)
 			}
 		}
 
 		t.Run("folder already exists", func(t *testing.T) {
-			err := CreateDirectoryIfNotExist("../test/data/tmp/hello-there")
+			err := CreateDirectoryIfNotExist("../../test/data/tmp/hello-there")
 			assert.Nil(t, err, err)
 		})
 
@@ -89,7 +88,7 @@ func TestCreateDirectoryIfNotExistCorrect(t *testing.T) {
 
 			t.Run("file exists with same name", func(t *testing.T) {
 				assert.NotNil(t,
-					CreateDirectoryIfNotExist("../test/data/tmp/.gitkeep"),
+					CreateDirectoryIfNotExist("../../test/data/tmp/.gitkeep"),
 					"Should fail if a file exists with that name")
 			})
 		})
@@ -117,14 +116,14 @@ failure
 
 func TestSetupToolkitEnvironment(t *testing.T) {
 	beforeEachAfterEach(t)
-	viper.Set("meta.directory", "../test/data/tmp/.toolkit")
+	viper.Set("meta.directory", "../../test/data/tmp/.toolkit")
 
 	t.Run("failure", func(t *testing.T) {
 		t.Run("illegal arguments", func(t *testing.T) {
 			t.Run("invalid input directory", func(t *testing.T) {
 				viper.Set("meta.directory", "./fake/directory/shouldnt/exist")
 				t.Cleanup(func() {
-					viper.Set("meta.directory", "../test/data/tmp/.toolkit")
+					viper.Set("meta.directory", "../../test/data/tmp/.toolkit")
 				})
 
 				assert.NotNil(t, SetupToolkitEnvironment(), "should catch invalid root directory")
@@ -200,13 +199,13 @@ func TestSetupToolkitEnvironment(t *testing.T) {
 	}
 
 	// assert directories created
-	_, err = os.Stat("../test/data/tmp/.toolkit")
+	_, err = os.Stat("../../test/data/tmp/.toolkit")
 	if err != nil {
 		t.Error(err)
 		return
 	}
 
-	_, err = os.Stat("../test/data/tmp/.toolkit/hashes")
+	_, err = os.Stat("../../test/data/tmp/.toolkit/hashes")
 	if err != nil {
 		t.Error(err)
 		return
@@ -237,7 +236,7 @@ func TestZipDirectory(t *testing.T) {
 		t.Run("illegal arguments", func(t *testing.T) {
 
 			t.Run("archive path", func(t *testing.T) {
-				err := ZipDirectory("./fake/directory/for/test", "../test/data/tmp/testdir.zip")
+				err := ZipDirectory("./fake/directory/for/test", "../../test/data/tmp/testdir.zip")
 				assert.NotNil(t, err, "Fake direcotry not discovered")
 
 				t.Run("teardown", func(t *testing.T) {
@@ -248,7 +247,7 @@ func TestZipDirectory(t *testing.T) {
 			})
 
 			t.Run("output path", func(t *testing.T) {
-				err := ZipDirectory("../test/data/testdir", "./fake/file/to/output/to.zip")
+				err := ZipDirectory("../../test/data/testdir", "./fake/file/to/output/to.zip")
 				assert.NotNil(t, err, "Invalid output location not caught")
 
 			})
@@ -257,16 +256,16 @@ func TestZipDirectory(t *testing.T) {
 	})
 
 	t.Run("success", func(t *testing.T) {
-		err := ZipDirectory("../test/data/testdir", "../test/data/tmp/testdir.zip")
+		err := ZipDirectory("../../test/data/testdir", "../../test/data/tmp/testdir.zip")
 		if err != nil {
 			t.Fatal(err)
 		}
 
 		// ? archive created
-		stat, err := os.Stat("../test/data/tmp/testdir.zip")
+		stat, err := os.Stat("../../test/data/tmp/testdir.zip")
 		assert.Nil(t, err, err)
 		assert.Greater(t, stat.Size(), int64(0), "Data not written to archive")
 	})
 
-	testutil.ClearTmp("../")
+	testutil.ClearTmp("../../")
 }

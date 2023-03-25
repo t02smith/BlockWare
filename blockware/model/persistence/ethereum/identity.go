@@ -66,8 +66,7 @@ func ProduceAddressValidation(message []byte) ([]byte, error) {
 	}
 
 	util.Logger.Info("Generating signature")
-	hash := crypto.Keccak256Hash(message)
-	signature, err := crypto.Sign(hash.Bytes(), _privateKey)
+	signature, err := SignMessage(message)
 	if err != nil {
 		return nil, err
 	}
@@ -112,4 +111,14 @@ func (a *AddressValidator) Valid() bool {
 // force set a validation
 func (a *AddressValidator) SetValid(value bool) {
 	a.valid = value
+}
+
+func SignMessage(msg []byte) ([]byte, error) {
+	hash := crypto.Keccak256Hash(msg)
+	signature, err := crypto.Sign(hash.Bytes(), _privateKey)
+	if err != nil {
+		return nil, err
+	}
+
+	return signature, nil
 }

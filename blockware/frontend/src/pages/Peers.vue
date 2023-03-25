@@ -107,15 +107,23 @@ localhost:6751
 import { ref } from "vue";
 import { usePeerStore } from "../stores/peers";
 
+/*
+
+Allow users to connect to and manage their connections with
+peers.
+
+*/
+
+// Peers pinia store
 const peers = usePeerStore();
 
-// connect form
+// connect to single peer
 const hostname = ref("");
 const port = ref(null);
 
-//
-const manyPeers = ref("");
-
+/*
+connect to the single peer 
+*/
 async function connect() {
   if (hostname.value.length === 0 || !port.value) return;
 
@@ -124,6 +132,12 @@ async function connect() {
   port.value = null;
 }
 
+// conenct to many peers
+const manyPeers = ref("");
+
+/*
+connect to all peers listed in the manyPeers field
+*/
 async function connectAll() {
   if (manyPeers.value.length === 0) return;
 
@@ -131,6 +145,9 @@ async function connectAll() {
   manyPeers.value = "";
 }
 
+/*
+disconnect to an existing peer
+*/
 function disconnect(hostname, port) {
   peers.disconnect(hostname, port);
 }

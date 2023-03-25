@@ -41,6 +41,7 @@ P = [1, 2, 4, 8, 16] peers
 */
 
 func BenchmarkDownloadGame_PeerCount(b *testing.B) {
+	b.Skip()
 
 	// 500 * 80MB files = 40GB game
 	err := testutil.GenerateLargeFolder("peer-count", "../../../test/data/tmp/games", 80_000_000, 500)

@@ -2,13 +2,16 @@
 
 \section{Benchmarking}\label{sec:benchmark}
 
-The key benchmark to evaluate in this project is related to how game downloads scale by varying the following factors:
+Benchmarking is being used in this project to determine the overall performance and scalability of the application, whilst also being useful in identifying any bottlenecks or how the end user can optimise their inputs. The key benchmark being assessed is related to how the application scales downloading games by varying the following factors:
 
 \begin{enumerate}
   \item how many of the peers we are connected to have the data we need,
   \item how large is the game (in terms of average file size and number of files), and
   \item the shard size used to create the hash tree.
 \end{enumerate}
+
+\vspace{2mm}\noindent
+All benchmarks will need to be ran on the same machine to ensure consistency.
 
 \subsection*{Number of Peers}
 
@@ -31,6 +34,8 @@ For each run, we will create a project with 500 files, each of size 80MB~\footno
   \\\hline
   \caption{How varying peer count affects download speed}
 \end{longtable}
+
+It is clear that the overhead of managing more peers will have an effect on performance. Using UDP over TCP could help us when scaling to a larger number of peers.
 
 \subsection*{Game Size}
 

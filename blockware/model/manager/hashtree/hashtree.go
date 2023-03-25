@@ -506,6 +506,15 @@ func (ht *HashTree) verifyDir(config *VerifyHashTreeConfig, currentDir string, d
 
 // verify whether a file's contents matches its expected contents from the hash tree
 func VerifyFile(htf *HashTreeFile, filename string, shardSize uint) (bool, map[[32]byte]uint, error) {
+	stat, err := os.Stat(filename)
+	if err != nil {
+		return false, nil, err
+	}
+
+	if stat.Size() != int64(htf.Size) {
+		return false, nil, fmt.Errorf("invalid file size for file %s", filename)
+	}
+
 	file, err := os.Open(filename)
 	if err != nil {
 		return false, nil, err

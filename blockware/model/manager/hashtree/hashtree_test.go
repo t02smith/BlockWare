@@ -4,10 +4,26 @@ import (
 	"bytes"
 	"crypto/sha256"
 	"fmt"
+	"github.com/stretchr/testify/assert"
+	"os"
 	"testing"
 
 	"github.com/spf13/viper"
 )
+
+func createTestHashTree(t *testing.T) *HashTree {
+	ht1, err := NewHashTree("../../../test/data/testdir", 256, nil)
+	if err != nil {
+		t.Fatalf("error creating new hash tree %s", err)
+	}
+
+	err = ht1.Hash()
+	if err != nil {
+		t.Fatalf("error hashing hash tree %s", err)
+	}
+
+	return ht1
+}
 
 // NewHashTree
 
@@ -163,16 +179,7 @@ func TestHash(t *testing.T) {
 // verifyTree
 
 func TestVerifyDir(t *testing.T) {
-
-	ht1, err := NewHashTree("../../../test/data/testdir", 256, nil)
-	if err != nil {
-		t.Fatalf("error creating new hash tree %s", err)
-	}
-
-	err = ht1.Hash()
-	if err != nil {
-		t.Fatalf("error hashing hash tree %s", err)
-	}
+	ht1 := createTestHashTree(t)
 
 	t.Run("compare to same directory", func(t *testing.T) {
 		res, err := ht1.VerifyTree(&VerifyHashTreeConfig{false, false, 0}, "../../../test/data/testdir")
@@ -198,6 +205,179 @@ func TestVerifyDir(t *testing.T) {
 
 	t.Run("test config options", func(t *testing.T) {
 		// TODO
+	})
+
+}
+
+/*
+
+function: HashTree.Equals
+purpose: compare two hash trees
+
+? Test cases
+success
+	#1 => equal
+	#2 => not equal
+
+*/
+
+func TestHashTreeEquals(t *testing.T) {
+	ht := createTestHashTree(t)
+
+	t.Run("success", func(t *testing.T) {
+		t.Run("equal", func(t *testing.T) {
+			assert.True(t, ht.Equals(ht))
+		})
+
+		t.Run("not equal", func(t *testing.T) {
+			ht2 := *ht
+			ht2.ShardSize = 104
+			assert.False(t, ht.Equals(&ht2))
+		})
+	})
+}
+
+/*
+
+function: HashTree.OutputToFile
+purpose: serialise and output a hash tree to a file
+
+? Test cases
+success
+	#1 => file successfully outputted
+
+failure
+	#1 => directory doesn't exist
+
+*/
+
+func TestHashTreeOutputToFile(t *testing.T) {
+	ht := createTestHashTree(t)
+
+	t.Run("success", func(t *testing.T) {
+		err := ht.OutputToFile("../../../test/data/tmp/output-test")
+		assert.Nil(t, err)
+		t.Cleanup(func() {
+			os.Remove("../../../test/data/tmp/output-test")
+		})
+
+		stat, err := os.Stat("../../../test/data/tmp/output-test")
+		assert.Nil(t, err)
+		assert.NotZero(t, stat.Size())
+
+		fromFile, err := ReadHashTreeFromFile("../../../test/data/tmp/output-test")
+		assert.Nil(t, err)
+		assert.True(t, ht.Equals(fromFile))
+	})
+
+	t.Run("failure", func(t *testing.T) {
+		err := ht.OutputToFile("./fake/directory/pls/fail")
+		assert.NotNil(t, err)
+		assert.ErrorIs(t, err, os.ErrNotExist)
+	})
+}
+
+/*
+
+function: ReadHashTreeFromFile
+purpose: deserialise a hash tree from a file
+
+? Test cases
+success
+	#1 => correct hash tree parsed
+
+failure
+	#1 => file not found
+
+*/
+
+func TestReadHashTreeFromFile(t *testing.T) {
+	ht := createTestHashTree(t)
+
+	t.Run("success", func(t *testing.T) {
+		if err := ht.OutputToFile("../../../test/data/tmp/test-readhtfromfile"); err != nil {
+			t.Fatal(err)
+		}
+		t.Cleanup(func() {
+			os.Remove("../../../test/data/tmp/test-readhtfromfile")
+		})
+
+		ht2, err := ReadHashTreeFromFile("../../../test/data/tmp/test-readhtfromfile")
+		assert.Nil(t, err)
+		assert.True(t, ht.Equals(ht2))
+	})
+
+	t.Run("failure", func(t *testing.T) {
+		t.Run("file not found", func(t *testing.T) {
+			ht2, err := ReadHashTreeFromFile("./fake/test/file")
+			assert.Nil(t, ht2)
+			assert.NotNil(t, err)
+			assert.ErrorIs(t, err, os.ErrNotExist)
+		})
+	})
+}
+
+/*
+
+function: HashTreeDir.Equals
+purpose: compare two hash tree directories
+
+? Test cases
+success
+	#1 => equal
+	not equal
+		#1 => different files
+		#2 => different dirs
+
+*/
+
+func TestHashTreeDirEquals(t *testing.T) {
+	htd := createTestHashTree(t).RootDir
+
+	t.Run("success", func(t *testing.T) {
+		t.Run("equal", func(t *testing.T) {
+			assert.True(t, htd.Equals(htd))
+		})
+
+		t.Run("not equal", func(t *testing.T) {
+			t.Run("quick checks", func(t *testing.T) {
+				t.Run("root hashes", func(t *testing.T) {
+					htd2 := *htd
+					htd2.RootHash = sha256.Sum256([]byte("hello there world"))
+					assert.False(t, htd.Equals(&htd2))
+				})
+
+				t.Run("file count", func(t *testing.T) {
+					htd2 := *htd
+					htd2.Files = make(map[string]*HashTreeFile)
+					assert.False(t, htd.Equals(&htd2))
+				})
+
+				t.Run("subdir count", func(t *testing.T) {
+					htd2 := *htd
+					htd2.Subdirs = make(map[string]*HashTreeDir)
+					assert.False(t, htd.Equals(&htd2))
+				})
+			})
+
+			t.Run("different files", func(t *testing.T) {
+				htd2 := *htd
+				htd2.Files = make(map[string]*HashTreeFile)
+				htd2.Files["test.txt"] = &HashTreeFile{
+					RootHash: sha256.Sum256([]byte("test")),
+				}
+				assert.False(t, htd.Equals(&htd2))
+			})
+
+			t.Run("different subdirs", func(t *testing.T) {
+				htd2 := *htd
+				htd2.Subdirs = make(map[string]*HashTreeDir)
+				htd2.Subdirs["subdir"] = &HashTreeDir{
+					RootHash: sha256.Sum256([]byte("test")),
+				}
+				assert.False(t, htd.Equals(&htd2))
+			})
+		})
 	})
 
 }

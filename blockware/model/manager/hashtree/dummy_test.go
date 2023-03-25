@@ -4,7 +4,10 @@ import (
 	"bufio"
 	"bytes"
 	"os"
+	"path/filepath"
+	"sync"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -12,7 +15,164 @@ import (
 /*
 
 function: CreateDummyFiles
-purpose: create skeleton files from a given hash tree
+purpose: create a set of dummy files from a given directory
+
+? Test cases
+success
+	#1 => all files created
+
+failure
+	#1 => root dir not found
+	#2
+
+*/
+
+func TestCreateDummyFiles(t *testing.T) {
+	ht, err := NewHashTree("../../../test/data/testdir", 1024, nil)
+	if err != nil {
+		t.Fatalf("NewHashTree failed on valid input")
+	}
+
+	if err := ht.Hash(); err != nil {
+		t.Fatal(err)
+	}
+
+	t.Run("success", func(t *testing.T) {
+		counter := 0
+		var counterLock sync.Mutex
+
+		fs := ht.ListFiles()
+
+		err := ht.CreateDummyFiles("../../../test/data/tmp", "dummyTest", func(s string, file *HashTreeFile) {
+			counterLock.Lock()
+			counter++
+			counterLock.Unlock()
+		})
+		t.Cleanup(func() {
+			os.RemoveAll("../../../test/data/tmp/dummyTest")
+		})
+
+		assert.Nil(t, err)
+		assert.Equal(t, len(fs), counter)
+
+		for _, f := range fs {
+			stat, err := os.Stat(filepath.Join("../../../test/data/tmp/dummyTest", f.RelativeFilename))
+			assert.Nil(t, err)
+			assert.Equal(t, f.Size, int(stat.Size()))
+		}
+	})
+
+	t.Run("failure", func(t *testing.T) {
+		t.Run("root dir not found", func(t *testing.T) {
+			err := ht.CreateDummyFiles("./not/found/dont/make", "fake", func(s string, file *HashTreeFile) {
+			})
+
+			assert.NotNil(t, err)
+			assert.ErrorIs(t, err, os.ErrNotExist)
+		})
+	})
+}
+
+/*
+
+function: pushFilesToCreateDummies
+purpose: push all a hash trees files down a channel
+
+? Test cases
+success
+	#1 => all files pushed
+
+*/
+
+func TestPushFilesToCreateDummies(t *testing.T) {
+	ht, err := NewHashTree("../../../test/data/testdir", 1024, nil)
+	if err != nil {
+		t.Fatalf("NewHashTree failed on valid input")
+	}
+
+	if err := ht.Hash(); err != nil {
+		t.Fatal(err)
+	}
+
+	t.Run("success", func(t *testing.T) {
+		fs := ht.ListFiles()
+
+		toCreate := make(chan *HashTreeFile, len(fs))
+		t.Cleanup(func() {
+			close(toCreate)
+		})
+
+		pushFilesToCreateDummies(ht, toCreate)
+
+		for i := 0; i < len(fs); i++ {
+			f, found := <-toCreate, false
+			for _, file := range fs {
+				if file.Equals(f) {
+					found = true
+					break
+				}
+			}
+
+			if !found {
+				t.Errorf("File %s not expected", f.AbsoluteFilename)
+			}
+		}
+	})
+}
+
+/*
+
+function: dummyFileCreatorWorker
+purpose: create files based upon input from channel
+
+? Test cases
+success
+	#1 => files created
+
+*/
+
+func TestDummyFileCreatorWorker(t *testing.T) {
+	htf := &HashTreeFile{
+		Filename:         "test.txt",
+		AbsoluteFilename: "../../../test/data/testdir/test.txt",
+		RelativeFilename: "./test.txt",
+	}
+
+	if err := htf.shardFile(4); err != nil {
+		t.Fatal(err)
+	}
+
+	t.Run("success", func(t *testing.T) {
+		onCreateCalled := false
+		var wg sync.WaitGroup
+		wg.Add(1)
+		toCreate := make(chan *HashTreeFile, 10)
+
+		toCreate <- htf
+		go dummyFileCreatorWorker("../../../test/data/tmp", 4, &wg, toCreate, func(s string, file *HashTreeFile) {
+			onCreateCalled = true
+		})
+
+		time.Sleep(25 * time.Millisecond)
+		close(toCreate)
+
+		t.Cleanup(func() {
+			os.Remove("../../../test/data/tmp/test.txt")
+		})
+
+		assert.True(t, onCreateCalled)
+		stat, err := os.Stat("../../../test/data/tmp/test.txt")
+		assert.Nil(t, err)
+		assert.Equal(t, htf.Size, int(stat.Size()))
+
+		wg.Wait()
+	})
+}
+
+/*
+
+function: setupFile
+purpose: create skeleton file from given hashes
 
 ? Test cases
 success
@@ -27,7 +187,7 @@ failure
 
 */
 
-func TestCreateDummyFiles(t *testing.T) {
+func TestSetupFile(t *testing.T) {
 	tmpFile := "../../test/data/tmp/skeleton.txt"
 
 	smoke := t.Run("function setupFile", func(t *testing.T) {

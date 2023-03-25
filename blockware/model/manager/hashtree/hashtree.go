@@ -41,13 +41,13 @@ An example structure of a Hash Tree is:
 type HashTree struct {
 
 	// the directory object for the root folder
-	RootDir *HashTreeDir `json:"rootdir"`
+	RootDir *HashTreeDir
 
 	// what size should each shard of data be in bytes
-	ShardSize uint `json:"shardsize"`
+	ShardSize uint
 
 	// the local physical location of the root directory
-	RootDirLocation string `json:"location"`
+	RootDirLocation string
 
 	// a channel for viewing the progress of a hash
 	progress chan int
@@ -57,34 +57,34 @@ type HashTree struct {
 type HashTreeDir struct {
 
 	// the path relative to the root directory location
-	Dirname string `json:"dirname"`
+	Dirname string
 
 	// the SHA256 hash of the directories contents
-	RootHash [32]byte `json:"roothash"`
+	RootHash [32]byte
 
 	// all subdirectories recursively stored
-	Subdirs map[string]*HashTreeDir `json:"subdirs"`
+	Subdirs map[string]*HashTreeDir
 
 	// all files within this folder
-	Files map[string]*HashTreeFile `json:"files"`
+	Files map[string]*HashTreeFile
 }
 
 // HashTreeFile Describes a singular tracked files
 type HashTreeFile struct {
-	Filename string `json:"filename"`
+	Filename string
 
+	// filepaths for current system and relative to root directory
 	AbsoluteFilename string
-
 	RelativeFilename string
 
 	// size of file in bytes => used for truncation
 	Size int
 
 	// A list of SHA256 hashes that represent each shard of data in the file
-	Hashes [][32]byte `json:"hashes"`
+	Hashes [][32]byte
 
 	// The hash produced by the Merkle Tree of each file
-	RootHash [32]byte `json:"roothash"`
+	RootHash [32]byte
 }
 
 // VerifyHashTreeConfig /*
@@ -127,23 +127,15 @@ func (ht *HashTree) OutputToFile(filename string) error {
 	if err != nil {
 		return err
 	}
-
-	defer func() {
-		err = file.Close()
-		if err != nil {
-			util.Logger.Errorf("Error closing file %s: %s", filename, err)
-		}
-	}()
+	defer file.Close()
 
 	writer := gzip.NewWriter(file)
 	encoder := gob.NewEncoder(writer)
-	err = encoder.Encode(ht)
-	if err != nil {
+	if err := encoder.Encode(ht); err != nil {
 		return err
 	}
 
-	err = writer.Flush()
-	if err != nil {
+	if err := writer.Flush(); err != nil {
 		return err
 	}
 
@@ -158,12 +150,7 @@ func ReadHashTreeFromFile(filename string) (*HashTree, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer func() {
-		err := file.Close()
-		if err != nil {
-			util.Logger.Errorf("Error closing file %s: %s", filename, err)
-		}
-	}()
+	defer file.Close()
 
 	ht := &HashTree{
 		RootDirLocation: filename,

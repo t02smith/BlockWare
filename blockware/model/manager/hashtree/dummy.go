@@ -32,31 +32,35 @@ func (ht *HashTree) CreateDummyFiles(rootDir, title string, onCreate func(string
 	wg.Add(len(files))
 
 	toCreate := make(chan *HashTreeFile, 5)
-	go func() {
-		for _, f := range files {
-			toCreate <- f
-		}
-	}()
+	go pushFilesToCreateDummies(ht, toCreate)
 
 	for i := 0; i < 10; i++ {
-		go func() {
-			for f := range toCreate {
-				fileLocation := filepath.Join(rootDir, title, f.AbsoluteFilename)
-				err := setupFile(fileLocation, ht.ShardSize, len(f.Hashes), f.Size)
-				if err != nil {
-					util.Logger.Errorf("error creating %s: %s", fileLocation, err)
-				}
-
-				onCreate(fileLocation, f)
-				wg.Done()
-			}
-		}()
+		go dummyFileCreatorWorker(filepath.Join(rootDir, title), ht.ShardSize, &wg, toCreate, onCreate)
 	}
 
 	wg.Wait()
 	close(toCreate)
 	return nil
 
+}
+
+func dummyFileCreatorWorker(rootDir string, shardSize uint, wg *sync.WaitGroup, toCreate chan *HashTreeFile, onCreate func(string, *HashTreeFile)) {
+	for f := range toCreate {
+		fileLocation := filepath.Join(rootDir, f.RelativeFilename)
+		err := setupFile(fileLocation, shardSize, len(f.Hashes), f.Size)
+		if err != nil {
+			util.Logger.Errorf("error creating %s: %s", fileLocation, err)
+		}
+
+		onCreate(fileLocation, f)
+		wg.Done()
+	}
+}
+
+func pushFilesToCreateDummies(ht *HashTree, toCreate chan *HashTreeFile) {
+	for _, f := range ht.ListFiles() {
+		toCreate <- f
+	}
 }
 
 /*
@@ -112,17 +116,14 @@ func InsertData(filename string, shardSize, offset uint, data []byte) error {
 	}
 	defer file.Close()
 
-	_, err = file.Seek(int64(offset*shardSize), 0)
-	if err != nil {
+	if _, err := file.Seek(int64(offset*shardSize), 0); err != nil {
 		return err
 	}
 
 	util.Logger.Debugf("Writing shard to %s:%d", filename, offset)
 	writer := bufio.NewWriter(file)
 
-	_, err = writer.Write(data)
-	if err != nil {
-		util.Logger.Error(err)
+	if _, err := writer.Write(data); err != nil {
 		return err
 	}
 

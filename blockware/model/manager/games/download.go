@@ -50,6 +50,7 @@ const (
 	DS_Downloading         DownloadStage = "Downloading data"
 	DS_FinishedDownloading DownloadStage = "Finished"
 	DS_Cancelled           DownloadStage = "Cancelled"
+	DS_Verifying           DownloadStage = "Verifying"
 )
 
 // Download A download manager for a game
@@ -120,6 +121,7 @@ func (g *Game) SetupDownload() error {
 		TotalBlocks: 0,
 		Stage:       DS_GeneratingDummies,
 	}
+	g.Download = d
 
 	d.inserterPool = shardInserterPool(int(shardInserterCount), g)
 
@@ -129,7 +131,7 @@ func (g *Game) SetupDownload() error {
 		return errors.New("game install folder not found")
 	}
 
-	d.AbsolutePath = filepath.Join(dir, g.Title)
+	d.AbsolutePath = filepath.Join(dir, fmt.Sprintf("%s-%s", g.Title, g.Version))
 
 	_, err = os.Stat(d.AbsolutePath)
 	if err == nil {
@@ -137,10 +139,8 @@ func (g *Game) SetupDownload() error {
 		return fmt.Errorf("folder %s already found, cannot start download", d.AbsolutePath)
 	}
 
-	g.Download = d
-
 	util.Logger.Infof("Generating dummy files for %s-%s", g.Title, g.Version)
-	err = data.CreateDummyFiles(dir, g.Title, func(path string, htf *hash.HashTreeFile) {
+	err = data.CreateDummyFiles(dir, fmt.Sprintf("%s-%s", g.Title, g.Version), func(path string, htf *hash.HashTreeFile) {
 		p := &FileProgress{
 			AbsolutePath:    path,
 			BlocksRemaining: make(map[[32]byte][]uint),
@@ -248,16 +248,19 @@ func (g *Game) insertData(fileHash, blockHash [32]byte, data []byte) error {
 	}
 
 	// remove block from download queue
-	d.progressLock.Lock()
 	delete(file.BlocksRemaining, blockHash)
 	util.Logger.Debugf("successfully inserted shard %x into %x", blockHash, fileHash)
-	d.progressLock.Unlock()
 
 	// check if file is completely downloaded
-	if len(file.BlocksRemaining) > 0 {
+	if len(file.BlocksRemaining) == 0 {
 		if err = g.completeFile(fileHash, file); err != nil {
 			return err
 		}
+
+		if d.Finished() {
+			g.Download.Stage = DS_FinishedDownloading
+		}
+
 	}
 
 	return nil
@@ -398,4 +401,10 @@ func (d *Download) GetProgressLock() *sync.Mutex {
 
 func (d *Download) InserterPool() chan InsertShardRequest {
 	return d.inserterPool
+}
+
+func (fp *FileProgress) removeFile(hash [32]byte) {
+	fp.lock.Lock()
+	defer fp.lock.Unlock()
+	delete(fp.BlocksRemaining, hash)
 }

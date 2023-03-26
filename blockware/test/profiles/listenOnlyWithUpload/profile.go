@@ -65,7 +65,7 @@ func Run() {
 	// 	nil,
 	// )
 
-	g, err := games.CreateGame(games.NewGame{
+	g1, err := games.CreateGame(games.NewGame{
 		Title:       "website",
 		Version:     "4.7.1",
 		ReleaseDate: time.Date(2002, time.January, 10, 0, 0, 0, 0, time.UTC).String(),
@@ -81,13 +81,40 @@ func Run() {
 		util.Logger.Fatalf("Error creating game: %s", err)
 	}
 
-	p.Library().AddOrUpdateOwnedGame(g)
-	err = library.Upload(g)
+	g2, err := games.CreateGame(games.NewGame{
+		Title:       "Snake",
+		Version:     "1.17.4",
+		ReleaseDate: time.Date(2002, time.January, 10, 0, 0, 0, 0, time.UTC).String(),
+		Developer:   "Tom Smith",
+		RootDir:     "../../../model",
+		Price:       big.NewInt(10),
+		ShardSize:   4194304,
+		AssetsDir:   "../../data/assets"},
+		nil,
+	)
+
+	if err != nil {
+		util.Logger.Fatalf("Error creating game: %s", err)
+	}
+
+	p.Library().AddOrUpdateOwnedGame(g1)
+	err = library.Upload(g1)
 	if err != nil {
 		util.Logger.Fatalf("Error uploading game to ETH %s", err)
 	}
 
-	err = games.OutputAllGameDataToFile(g)
+	err = games.OutputAllGameDataToFile(g1)
+	if err != nil {
+		util.Logger.Warnf("Error saving game to file %s", err)
+	}
+
+	p.Library().AddOrUpdateOwnedGame(g2)
+	err = library.Upload(g2)
+	if err != nil {
+		util.Logger.Fatalf("Error uploading game to ETH %s", err)
+	}
+
+	err = games.OutputAllGameDataToFile(g2)
 	if err != nil {
 		util.Logger.Warnf("Error saving game to file %s", err)
 	}

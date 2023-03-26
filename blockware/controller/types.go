@@ -29,11 +29,11 @@ type ControllerGame struct {
 
 type ControllerDownload struct {
 	Name        string
-	Progress    map[string]ControllerFileProgress
 	TotalBlocks int
 	Stage       string
 	ElapsedTime string
 	Finished    bool
+	BlocksLeft  int
 }
 
 type ControllerFileProgress struct {

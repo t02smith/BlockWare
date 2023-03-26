@@ -60,28 +60,17 @@ func downloadToAppDownload(d *games.Download, name string) *ControllerDownload {
 
 	x := &ControllerDownload{
 		TotalBlocks: d.TotalBlocks,
-		Progress:    make(map[string]ControllerFileProgress),
 		Name:        name,
 		Stage:       string(d.Stage),
 		ElapsedTime: fmt.Sprintf("%02d:%02d:%02d", int(diff.Hours()), int(diff.Minutes())%60, int(diff.Seconds())%60),
 		Finished:    finished,
+		BlocksLeft:  0,
 	}
 
 	lock := d.GetProgressLock()
 	lock.Lock()
-	for fHash, f := range d.Progress {
-		fProgress := &ControllerFileProgress{
-			AbsolutePath:    f.AbsolutePath,
-			BlocksRemaining: []string{},
-		}
-
-		if len(f.BlocksRemaining) > 0 {
-			for b := range f.BlocksRemaining {
-				fProgress.BlocksRemaining = append(fProgress.BlocksRemaining, fmt.Sprintf("%x", b))
-			}
-		}
-
-		x.Progress[fmt.Sprintf("%x", fHash)] = *fProgress
+	for _, f := range d.Progress {
+		x.BlocksLeft += len(f.BlocksRemaining)
 	}
 	lock.Unlock()
 

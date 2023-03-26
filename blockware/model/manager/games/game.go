@@ -344,6 +344,8 @@ func (g *Game) DownloadAllData() error {
 // check whether a download exists and can be found
 func (g *Game) checkGameDownload() {
 	if g.Download == nil {
+		// ! check a download exists at would be location
+
 		return
 	}
 

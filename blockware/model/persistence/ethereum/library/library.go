@@ -111,8 +111,13 @@ func fetchGamesFromEthereum() ([]*games.Game, error) {
 	}
 	util.Logger.Infof("Found %d games. Fetching game metadata.", gameSize)
 
+	limit := big.NewInt(10)
+	if limit.Cmp(gameSize) == 1 {
+		limit = gameSize
+	}
+
 	one := big.NewInt(1)
-	for i := big.NewInt(0); i.Cmp(gameSize) < 0; i.Add(i, one) {
+	for i := big.NewInt(0); i.Cmp(limit) < 0; i.Add(i, one) {
 		gameHash, err := libInstance.GameHashes(nil, i)
 		if err != nil {
 			util.Logger.Warnf("Error getting game hash %s", err)

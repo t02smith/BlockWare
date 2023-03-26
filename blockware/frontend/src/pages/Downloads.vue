@@ -7,7 +7,6 @@
         <!-- <button @click="() => (pauseAll = !pauseAll)">
           {{ pauseAll ? "▶️" : "⏸️" }}
         </button> -->
-
         <div>
           <p>Download stuck?</p>
           <button @click="games.loadDeferredRequests">Click here!</button>
@@ -19,10 +18,8 @@
       <div class="table-header">
         <h2><strong>Game</strong></h2>
         <h2>Status</h2>
-
         <h2>Timer</h2>
         <h2>Block's Left</h2>
-
         <h2>Progress</h2>
       </div>
 
@@ -39,7 +36,7 @@
         <p>{{ download.ElapsedTime }}</p>
 
         <p>
-          {{ blocksLeft(download) }}
+          {{ download.BlocksLeft }}
         </p>
 
         <p>
@@ -48,7 +45,7 @@
               download.Stage === "Setting up download"
                 ? 0
                 : Math.round(
-                    (1 - blocksLeft(download) / download.TotalBlocks) * 1000
+                    (1 - download.BlocksLeft / download.TotalBlocks) * 1000
                   ) / 10
             }}
             %</strong
@@ -111,17 +108,6 @@ const downloadGamePairs = computed(() => {
       return [hash, dl];
     });
 });
-
-/*
-returns how many blocks are left to be downloaded
-*/
-function blocksLeft(download) {
-  if (!download) return 0;
-  return Object.values(download.Progress).reduce(
-    (acc, f) => acc + f.BlocksRemaining.length,
-    0
-  );
-}
 
 // TODO
 const pauseAll = ref(false);
@@ -238,6 +224,7 @@ const pauseAll = ref(false);
     color: white;
     transition: 150ms;
     position: relative;
+    margin: 10px 0;
 
     > .indicator {
       position: absolute;

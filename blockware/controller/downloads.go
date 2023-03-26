@@ -10,7 +10,9 @@ import (
 
 // get a list of downloads
 func (a *Controller) GetDownloads() map[string]*ControllerDownload {
-	ds := peer.Peer().Library().GetDownloads()
+	lib := peer.Peer().Library()
+	ds := lib.GetDownloads()
+
 	return downloadToGameDownloads(ds)
 }
 

@@ -192,3 +192,11 @@ func (l *Library) Uninstall(gameHash [32]byte) error {
 	util.Logger.Infof("Game %s uninstalled", game.Title)
 	return nil
 }
+
+func (l *Library) Lock() {
+	l.lock.Lock()
+}
+
+func (l *Library) Unlock() {
+	l.lock.Unlock()
+}

@@ -89,8 +89,7 @@ func Peer() *peer {
 func StartPeer(config Config, serverHostname string, serverPort uint, installFolder, toolkitFolder string) (*peer, error) {
 	util.Logger.Info("Starting peer")
 	once.Do(func() {
-		err := model.SetupToolkitEnvironment()
-		if err != nil {
+		if err := model.SetupToolkitEnvironment(); err != nil {
 			util.Logger.Errorf("Error setting up toolkit dir: %s", err)
 			return
 		}

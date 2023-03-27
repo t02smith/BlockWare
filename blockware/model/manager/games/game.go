@@ -180,14 +180,13 @@ func (g *Game) readHashData() error {
 // OutputAllGameDataToFile output data to file
 func OutputAllGameDataToFile(g *Game) error {
 	gameFilename := filepath.Join(viper.GetString("meta.directory"), "games", fmt.Sprintf("%x", g.RootHash))
-	err := g.OutputToFile()
-	if err != nil {
+	if err := g.OutputToFile(); err != nil {
 		return err
 	}
 
 	// output game data
-	err = g.data.OutputToFile(filepath.Join(viper.GetString("meta.directory"), "hashes", fmt.Sprintf("%x.hash", g.RootHash)))
-	if err != nil {
+	if err := g.data.OutputToFile(
+		filepath.Join(viper.GetString("meta.directory"), "hashes", fmt.Sprintf("%x.hash", g.RootHash))); err != nil {
 		return err
 	}
 
@@ -345,7 +344,6 @@ func (g *Game) DownloadAllData() error {
 func (g *Game) checkGameDownload() {
 	if g.Download == nil {
 		// ! check a download exists at would be location
-
 		return
 	}
 

@@ -259,6 +259,10 @@ func Purchase(l *games.Library, rootHash [32]byte) error {
 
 	// * purchase the game
 	util.Logger.Infof("Game %x found => proceeding to purchase", rootHash)
+
+	// add value to message for purchase
+	authInstance.Value = g.Price
+	defer func() { authInstance.Value = big.NewInt(0) }()
 	txn, err := libInstance.PurchaseGame(authInstance, rootHash)
 	if err != nil {
 		return err
@@ -277,13 +281,11 @@ func Purchase(l *games.Library, rootHash [32]byte) error {
 	l.AddOrUpdateOwnedGame(g)
 
 	// ? fetch hash data
-	err = g.DownloadHashTree()
-	if err != nil {
+	if err := g.DownloadHashTree(); err != nil {
 		util.Logger.Warnf("Error getting hash tree from IPFS %s", err)
 	}
 
 	games.OutputAllGameDataToFile(g)
-
 	util.Logger.Info("Game purchased successfully")
 	return nil
 }

@@ -5,6 +5,9 @@ contract Library {
     // triggered every time a game is uploaded
     event NewGame(bytes32 hash, GameEntry game);
 
+    // when a user purchases a game
+    event Purchase(bytes32, address, bytes);
+
     // game root hash => entry
     mapping(bytes32 => GameEntry) public games;
 
@@ -67,16 +70,17 @@ contract Library {
      * Purchase a new game
      * @param _game the root hash of the game
      */
-    // TODO payment always fails :/
+
     function purchaseGame(bytes32 _game) external payable {
       require(bytes(games[_game].title).length > 0, "game not found");
-      
-      // uint gamePrice = games[_game].price;
-      // address uploader = games[_game].uploader;
       require(purchases[_game][msg.sender] == 0, "user already owns game");
+      require(games[_game].price == msg.value, "unexpected price => value should equal the game's pricce");
+      
+      (bool sent, bytes memory data) = games[_game].uploader.call{value: msg.value}(bytes(games[_game].title));
+      require(sent, "Failed to transfer Ether");
 
-      // require(payable(uploader).send(gamePrice), "payment failed");
       purchases[_game][msg.sender] = 1;
+      emit Purchase(_game, msg.sender, data);
     }
 
     /**

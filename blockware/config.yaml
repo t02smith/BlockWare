@@ -1,5 +1,5 @@
 eth:
-    address: ws://localhost:8545
+    address: http://localhost:8545
 games:
     installfolder: ./test/data/tmp
 meta:

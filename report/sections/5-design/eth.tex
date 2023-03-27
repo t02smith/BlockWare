@@ -13,10 +13,10 @@ To satisfy \reqref{NF-M1} and \reqref{NF-M2}, we will need to use a public block
 
 \vspace{2mm}\noindent Ethereum is a public blockchain that allows developers to publish their own distributed applications to it. It comes with an extensive development toolchain so is an obvious choice for this project \reqref{F-M8}.
 
-\subsubsection*{Data to Store}
+\subsubsection*{Uploading Games}
 \label{subsubsec:eth-data}
 
-To satisfy \reqref{F-M1}, the data stored on the blockchain will be used for the identification games and will consist of the following fields, where \textit{italic} fields will be automatically-generated for the user:
+To satisfy \reqref{F-M1}, the data stored on the blockchain will be used for the identification games and will consist of the following fields, where \textit{italic} fields will be automatically-generated for the user when executing the upload function:
 
 \begin{longtable}{ p{.2\textwidth} p{.75\textwidth} }
   \toprule
@@ -32,7 +32,8 @@ To satisfy \reqref{F-M1}, the data stored on the blockchain will be used for the
   price & The price of the game in Wei\\
   \textit{uploader} & The Ethereum address of the developer.\\
   \textit{root hash} & The root hash of the game that uniquely identifies it and is based upon its contents.\\
-  \textit{IPFS address} & The ID of the hash tree of IPFS that can be used to download the hash tree before starting a download of a game.\\\midrule
+  \textit{Hash Tree CID} & Required for downloading the Hash Tree folder of IPFS.\\
+  \textit{Assets CID} & Required for downloading the assets folder of IPFS.\\\midrule
   \multicolumn{2}{c}{\cellcolor{green}\textit{Other}} 
   \\\midrule
   \textit{library} & A mapping for storing all games uploaded to the network, where a game's root hash is the key used to find its information.\\
@@ -41,7 +42,6 @@ To satisfy \reqref{F-M1}, the data stored on the blockchain will be used for the
   \\\bottomrule\bottomrule
   \caption{All the data to be stored on the Ethereum blockchain}
 \end{longtable}
-
 
 \subsubsection*{Purchasing Content}
 

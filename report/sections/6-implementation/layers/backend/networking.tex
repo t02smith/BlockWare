@@ -3,14 +3,11 @@
 Users running this application will be a part of a distributed network of peers by creating and maintaining a set of TCP connections with other users in the network and will communicate by sending structured messages to each other. Section~\ref{subsubsec:commands} describes these commands in detail.
 
 \paragraph*{Address Verification}
-
-To verify the Ethereum address of each peer, and thus which games they own and are allowed to be sent the data of, we will request a signed message using the peer's Ethereum private key (See the VALIDATE\_REQ and VALIDATE\_RES commands).
-\x
-When two peer's initiate a connection they will need to perform a handshake that will allow them identify each other according to their Ethereum addresses. 
+When two peers connect they will perform a handshake to exchange their Ethereum addresses and public keys by sending signed messages to each other. This will allow a peer to identify what games another peer is allowed access to.
 
 \paragraph*{Message Handling}
 
-The main responsibility of this section is to respond to requests sent by the Data Manager by sending and tracking messages to other peers to gain the necessary information. Each message should be tracked by the peer for a given time period and resent if an appropriate response has not been received. Any duplicate requests sent by the data manager will be ignored if a pending request is active. 
+The main responsibility of this section is to respond to requests sent by the Data Manager by sending and tracking messages to other peers to fetch the requested data. Each message should be tracked by the peer for a given time period and resent if an appropriate response has not been received. Any duplicate requests sent by the data manager will be ignored if a pending request is active. 
 
 \paragraph*{Commands}\label{subsubsec:commands}
 

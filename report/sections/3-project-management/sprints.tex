@@ -1,0 +1,142 @@
+\section{Sprint Plans}
+
+\newcommand{\yes}{\cellcolor{green!30}YES}
+\newcommand{\no}{\cellcolor{red!30}NO}
+
+
+For each sprint we will detail the planned requirements, whether they were completed or not, as well as any general comments about that sprint.
+
+\subsection{Sprint 1}
+
+The P2P distribution network was expected to be one of the most complex parts of the application so Sprint 1 was focused on getting the basics of it working.
+
+\begin{longtable}{ | p{.08\textwidth} | p{.34\textwidth} | p{.13\textwidth} | p{.34\textwidth} | }
+  \hline
+  \hdr{Req.} & \hdr{Description} & \hdr{Complete} & \hdr{Evidence}
+  \\\hline
+  \reqref{F-M2}
+  & Downloading blocks from peers
+  & \yes
+  & Acceptence \& benchmark tests
+  \\\hline
+  \reqref{F-M5}
+  & Upload blocks to peers
+  & \yes
+  & Acceptence tests
+  \\\hline
+  \reqref{F-M6}
+  & Download the entire game
+  & \yes
+  & Acceptence tests
+  \\\hline
+  \reqref{F-M7}
+  & Verify downloaded data
+  & \yes
+  & Acceptence \& unit tests
+  \\\hline
+  \reqref{F-M11}
+  & Maintain TCP connections
+  & \yes
+  & Unit tests
+  \\\hline
+  \reqref{F-M12}
+  & Generate Hash Trees
+  & \yes
+  & Unit tests
+  \\\hline
+\end{longtable}
+
+\subsection{Sprint 2}
+
+Sprint 2 was largely spent on two main aspects: creating the Smart Contract to store game metadata and start working on a user interface to show to the user. This sprint had a slower start due to me not being familiar with writing Smart Contracts and having difficulty in finding and learning a suitable GUI framework.
+
+\begin{longtable}{ | p{.08\textwidth} | p{.34\textwidth} | p{.13\textwidth} | p{.34\textwidth} | }
+  \hline
+  \hdr{Req.} & \hdr{Description} & \hdr{Complete} & \hdr{Evidence}
+  \\\hline
+  \reqref{F-M1}
+  & Store data on Ethereum
+  & \yes
+  & Smart Contract unit tests
+  \\\hline
+  \reqref{F-M8}
+  & Connect to the Ethereum network
+  & \yes
+  & Smart Contract unit tests
+  \\\hline
+  \reqref{F-M9}
+  & Purchasing games
+  & \yes
+  & Smart Contract unit tests
+  \\\hline
+  \reqref{F-M10}
+  & Proving a game purchase
+  & \yes
+  & Smart Contract unit tests
+  \\\hline
+  \reqref{F-C2}
+  & Provide a simple GUI
+  & \yes
+  & See Appendix~\ref{app:screenshots} for screenshots
+  \\\hline
+  \reqref{NF-M3}
+  & Uploaders are publically identifiable
+  & \yes
+  & Smart Contract unit tests
+  \\\hline
+  \reqref{NF-M4}
+  & Game data cannot be changed
+  & \yes
+  & Data on Ethereum is effectively immutable
+  \\\hline
+  \reqref{NF-S2}
+  & Only the original uploader can release an update
+  & \yes
+  & Smart Contract unit tests
+  \\\hline
+  \reqref{NF-C1}
+  & Intuitive GUI
+  & \yes
+  & See Appendix~\ref{app:screenshots} for screenshots
+  \\\hline
+\end{longtable}
+
+\subsection{Sprint 3}
+
+\begin{longtable}{ | p{.08\textwidth} | p{.34\textwidth} | p{.13\textwidth} | p{.34\textwidth} | }
+  \hline
+  \hdr{Req.} & \hdr{Description} & \hdr{Complete} & \hdr{Evidence}
+  \\\hline
+  \reqref{F-S1}
+  & Proving the amount of data seeded
+  & \yes
+  & 
+  \\\hline
+  \reqref{F-S2}
+  & Validate a user's ownership of a game before sending data 
+  & \yes
+  &
+  \\\hline
+\end{longtable}
+
+\subsection{Incomplete Requirements}
+
+There were several requirements, which were left incomplete due to a variety of reasons.
+
+\begin{longtable}{ | p{.11\textwidth} | p{.29\textwidth} | p{.5\textwidth} | }
+  \hline
+  \hdr{Req.} & \hdr{Description} & \hdr{Reasoning}
+  \\\hline
+  \reqref{F-M3}
+  & Discover peers based upon what games they own
+  & This requirement was left incomplete intentionally due to the complexity it would have brought to the project. A solution could include using trackers, similar to BitTorrent, or a neighbour discovery algorithm.
+  \\\hline
+  \reqref{F-S3}
+  & Allow for the distribution of DLC 
+  & \multirow{2}{.5\textwidth}{DLC was left out of scope due to a combination of time constraints and an inefficienies within the update system that I felt should be resolved before implementing the DLC system. }
+  \\\cline{1-2}
+  \reqref{NF-S3}
+  & Only the original uploader can release DLC for their game
+  & 
+  \\\hline  
+\end{longtable}

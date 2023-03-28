@@ -4,7 +4,7 @@ import (
 	"github.com/t02smith/part-iii-project/toolkit/util"
 )
 
-const shardInserterCount uint8 = 5
+const shardInserterCount uint8 = 10
 
 /*
 	 <RequestDownload>  <--  [peer joins]
@@ -47,8 +47,8 @@ func NewDownloadManager() *DownloadManager {
 }
 
 func (d *DownloadManager) Close() {
-	// close(d.DeferredRequests)
-	// close(d.RequestDownload)
+	close(d.DeferredRequests)
+	close(d.RequestDownload)
 }
 
 // workers

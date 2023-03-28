@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"sort"
 	"sync"
+	"time"
 
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/t02smith/part-iii-project/toolkit/model/manager/games"
@@ -11,7 +12,6 @@ import (
 	"github.com/t02smith/part-iii-project/toolkit/model/persistence/ethereum"
 	"github.com/t02smith/part-iii-project/toolkit/model/persistence/ethereum/library"
 
-	model "github.com/t02smith/part-iii-project/toolkit/model/util"
 	"github.com/t02smith/part-iii-project/toolkit/util"
 )
 
@@ -40,7 +40,7 @@ type peerData struct {
 	Validator *ethereum.AddressValidator
 
 	//
-	sentRequests map[games.DownloadRequest]model.Void
+	sentRequests map[games.DownloadRequest]time.Time
 
 	lock sync.Mutex
 }

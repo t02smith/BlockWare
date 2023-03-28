@@ -1,7 +1,8 @@
 package peer
 
 import (
-	model "github.com/t02smith/part-iii-project/toolkit/model/util"
+	"time"
+
 	"github.com/t02smith/part-iii-project/toolkit/util"
 )
 
@@ -27,14 +28,45 @@ func (p *peer) listenToDownloadRequests() {
 				continue
 			}
 
-			// * at least one peer has it
-			chosen := ps[0]
-			chosen.SendString(generateBLOCK(request.GameHash, request.BlockHash))
+			resend := false
+			var chosenPD *peerData = nil
 
-			chosenPD := p.GetPeer(chosen)
+			for _, peerCon := range ps {
+				peerData := p.GetPeer(peerCon)
+
+				peerData.lock.Lock()
+				if sentAt, ok := peerData.sentRequests[request]; ok {
+					// ? we've already sent them this request
+					if time.Since(sentAt).Seconds() >= 5 {
+						// ? request time out => send again
+						util.Logger.Info("Request timeout. Sending to new Peer.")
+						delete(peerData.sentRequests, request)
+
+					} else {
+						// ? request still to be timed out
+						resend = false
+						peerData.lock.Unlock()
+						break
+					}
+				} else {
+					// ? request not sent to this peer
+					if chosenPD == nil {
+						resend = true
+						chosenPD = peerData
+					}
+				}
+				peerData.lock.Unlock()
+			}
+
+			if !resend {
+				continue
+			}
+
+			// * at least one peer has it
+			chosenPD.Peer.SendString(generateBLOCK(request.GameHash, request.BlockHash))
 
 			chosenPD.Lock()
-			chosenPD.sentRequests[request] = model.Void{}
+			chosenPD.sentRequests[request] = time.Now()
 			chosenPD.Unlock()
 		}
 		util.Logger.Info("stopped listening to incoming download requests")

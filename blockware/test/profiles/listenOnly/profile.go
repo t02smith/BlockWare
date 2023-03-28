@@ -54,7 +54,7 @@ func Run() {
 	// )
 
 	g, err := games.CreateGame(games.NewGame{
-		Title:       "Transformers",
+		Title:       "benchmark",
 		Version:     "4.7.1",
 		ReleaseDate: time.Date(2002, time.January, 10, 0, 0, 0, 0, time.UTC).String(),
 		Developer:   "tcs1g20",

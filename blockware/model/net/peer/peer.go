@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/spf13/viper"
 	"github.com/t02smith/part-iii-project/toolkit/model/manager/games"
@@ -172,7 +173,7 @@ func (p *peer) onConnection(hostname string, port uint, peer tcp.TCPConnection) 
 		Port:         port,
 		Peer:         peer,
 		Library:      make(map[[32]byte]ownership),
-		sentRequests: make(map[games.DownloadRequest]model.Void, maxRequestsPerPeer),
+		sentRequests: make(map[games.DownloadRequest]time.Time, 100),
 	}
 	p.setPeerData(peer, pd)
 

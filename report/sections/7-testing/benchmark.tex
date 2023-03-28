@@ -1,6 +1,9 @@
 % chktex-file 44
 
+\newpage
 \section{Benchmarking}\label{sec:benchmark}
+
+Benchmarking is being used to determine the overall performance and scalability of the application
 
 Benchmarking is being used in this project to determine the overall performance and scalability of the application, whilst also being useful in identifying any bottlenecks or how the end user can optimise their inputs. The key benchmark being assessed is related to how the application scales downloading games by varying the following factors:
 
@@ -11,83 +14,160 @@ Benchmarking is being used in this project to determine the overall performance 
 \end{enumerate}
 
 \vspace{2mm}\noindent
-All benchmarks will need to be ran on the same machine to ensure consistency.
+To ensure the consistency and correctness of results, all benchmarks will be ran on the same machine, running the same OS, and be completed multiple times. The test data is a collection of pseudo-randomly generated files that meet the criteria specified in each benchmark.
 
 \subsection*{Number of Peers}
 
+This benchmark allows us to observe how the application scales when dealing with many peers at the same time and how if affects the overall performance of the application.
+\x
 For each run, we will create a project with 500 files, each of size 80MB~\footnote{These numbers were chosen to match our average game size from Section~\ref{subsec:design-data}, where $500\times 80MB = 40GB$} and a shard size of $2^{22}$ = 4MiB. We will then run $N$ peers locally to simulate a perfect network connection.
 
-\begin{longtable}{ | r | r | }
-  \hline
-  \hdr{Peer Count $N$} & \hdr{Time (ms)} \\\hline
-  1
-  &
-  \\\hline
-  2
-  &
-  \\\hline
-  4
-  &
-  \\\hline
-  8
-  &
-  \\\hline
+\begin{longtable}{l|llll|}
+  \cline{2-5}
+  & \multicolumn{4}{c|}{\hdr{Runtime (s)}}                                                    \\ \hline
+  \multicolumn{1}{|l|}{\hdr{Peer Count}} 
+  & \multicolumn{1}{l|}{\hdr{1}} 
+  & \multicolumn{1}{l|}{\hdr{2}} 
+  & \multicolumn{1}{l|}{\hdr{3}} & \hdr{avg.}  \\ \hline
+  \multicolumn{1}{|l|}{1} & 
+  \multicolumn{1}{l|}{56} & 
+  \multicolumn{1}{l|}{65} & 
+  \multicolumn{1}{l|}{63} &  
+  61.3
+  \\ \hline
+  \multicolumn{1}{|l|}{2} & 
+  \multicolumn{1}{l|}{65} & 
+  \multicolumn{1}{l|}{64} & 
+  \multicolumn{1}{l|}{60} &  
+  63
+  \\ \hline
+  \multicolumn{1}{|l|}{4} & 
+  \multicolumn{1}{l|}{66} & 
+  \multicolumn{1}{l|}{65} & 
+  \multicolumn{1}{l|}{65} &  
+  65.7
+  \\ \hline
+  \multicolumn{1}{|l|}{8} & 
+  \multicolumn{1}{l|}{66} & 
+  \multicolumn{1}{l|}{62} & 
+  \multicolumn{1}{l|}{60} &  
+  62.7
+  \\ \hline
   \caption{How varying peer count affects download speed}
 \end{longtable}
 
-It is clear that the overhead of managing more peers will have an effect on performance. Using UDP over TCP could help us when scaling to a larger number of peers.
+\noindent Taking into account a degree of error, it is clear that increasing the number of peers does not reduce the download time. This indicates that a bottleneck may exist elsewhere in the application such as inserting received data. This is supported by the observation that downloads got much slower towards the end and would often take \~15 seconds for the last 10\%; however, this could also be caused by the file verification that is ran once an entire file is downloaded.
+\x
+However, this result also shows that many peers can be supported without an impact on performance. However, maintaining TCP connections will be expensive for a very large number of peers so a UDP implementation should be a consideration moving forward. 
 
 \subsection*{Game Size}
 
+This benchmark will be useful in discovering an optimal strategy for determining the directory structure of games uploaded to the network to allow developers to optimise their uploads to give the greatest download speed. 
+\x
 For each run, we will create a project with $F$ files of size $S$MB, such that $F\times S = 40GB$, and a shard size of 4MiB. We will then run 1 peer locally to simulate a perfect network connection.
 
-\begin{longtable}{ | r | r | r | r | }
+\begin{longtable}{rr|llll|}
   \hline
-  \hdr{File Count $F$} & \hdr{File Size $S$ (MB)} & \hdr{Time (ms)} \\\hline
-  100
+  \multicolumn{2}{|c|}{\hdr{File}}
+  & \multicolumn{4}{c|}{\hdr{Runtime (s)}}
+  \\\hline
+  \multicolumn{1}{|l|}{\hdr{Count}} 
+  & \hdr{Size}
+  & \multicolumn{1}{l|}{\hdr{1}} 
+  & \multicolumn{1}{l|}{\hdr{2}} 
+  & \multicolumn{1}{l|}{\hdr{3}} 
+  & \hdr{avg.}
+  \\ \hline
+  \multicolumn{1}{|r|}{200} 
+  & 200
+  & \multicolumn{1}{l|}{} 
+  & \multicolumn{1}{l|}{} 
+  & \multicolumn{1}{l|}{} 
+  &  
+  \\\hline
+  \multicolumn{1}{|r|}{100} 
   & 400
-  &
+  & \multicolumn{1}{l|}{} 
+  & \multicolumn{1}{l|}{} 
+  & \multicolumn{1}{l|}{} 
+  &  
   \\\hline
-  50
+  \multicolumn{1}{|r|}{50} 
   & 800
-  &
+  & \multicolumn{1}{l|}{} 
+  & \multicolumn{1}{l|}{} 
+  & \multicolumn{1}{l|}{} 
+  &  
   \\\hline
-  25
+  \multicolumn{1}{|r|}{25} 
   & 1,600
-  &
+  & \multicolumn{1}{l|}{} 
+  & \multicolumn{1}{l|}{} 
+  & \multicolumn{1}{l|}{} 
+  &  
   \\\hline
-  5
+  \multicolumn{1}{|r|}{5} 
   & 8,000
-  &
+  & \multicolumn{1}{l|}{} 
+  & \multicolumn{1}{l|}{} 
+  & \multicolumn{1}{l|}{} 
+  &  
   \\\hline
-  1
+  \multicolumn{1}{|r|}{1} 
   & 40,000
-  &
+  & \multicolumn{1}{l|}{} 
+  & \multicolumn{1}{l|}{} 
+  & \multicolumn{1}{l|}{} 
+  &  
   \\\hline
   \caption{How varying file count and size affects download speed}
 \end{longtable}
 
 \subsection*{Shard Size}
 
+This benchmark will be useful in determining an optimal shard size to use that maximises download speed.
+\x
 For each run we will create a new project with 500 files, each of size 80MB, and a shard size of $B$MiB. We will then run 1 peer locally to simulate a perfect network connection.
 
-\begin{longtable}{ | r | r | }
-  \hline
-  \hdr{Shard Size $B$ (MiB)} & \hdr{Time (ms)} \\\hline
-  1
-  &
+\begin{longtable}{r|llll|}
+  \cline{2-5}
+  & \multicolumn{4}{l|}{\hdr{Runtime (s)}}
+  \\ \hline
+  \multicolumn{1}{|l|}{\hdr{Shard Size (bytes)}} 
+  & \multicolumn{1}{l|}{\hdr{1}} 
+  & \multicolumn{1}{l|}{\hdr{2}} 
+  & \multicolumn{1}{l|}{\hdr{3}} 
+  & \hdr{avg.}
   \\\hline
-  2
-  &
+  \multicolumn{1}{|r|}{1,048,576} 
+  & \multicolumn{1}{l|}{} 
+  & \multicolumn{1}{l|}{} 
+  & \multicolumn{1}{l|}{} 
+  & 
   \\\hline
-  4
-  &
+  \multicolumn{1}{|r|}{2,097,152} 
+  & \multicolumn{1}{l|}{} 
+  & \multicolumn{1}{l|}{} 
+  & \multicolumn{1}{l|}{} 
+  & 
   \\\hline
-  8
-  &
+  \multicolumn{1}{|r|}{4,194,304} 
+  & \multicolumn{1}{l|}{} 
+  & \multicolumn{1}{l|}{} 
+  & \multicolumn{1}{l|}{} 
+  & 
   \\\hline
-  16
-  &
+  \multicolumn{1}{|r|}{8,388,608} 
+  & \multicolumn{1}{l|}{} 
+  & \multicolumn{1}{l|}{} 
+  & \multicolumn{1}{l|}{} 
+  & 
+  \\\hline
+  \multicolumn{1}{|r|}{16,777,216} 
+  & \multicolumn{1}{l|}{} 
+  & \multicolumn{1}{l|}{} 
+  & \multicolumn{1}{l|}{} 
+  & 
   \\\hline
   \caption{How varying the shard size of the hash tree affects download speed}
 \end{longtable}

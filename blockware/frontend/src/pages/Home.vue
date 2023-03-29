@@ -1,5 +1,7 @@
 <template>
   <div class="home">
+    <Error />
+
     <div class="title">
       <h1><strong>Block</strong>Ware</h1>
       <h2>by Tom Smith</h2>
@@ -28,6 +30,7 @@
 </template>
 <script setup>
 import { ref } from "vue";
+import Error from "../components/Error.vue";
 import Icon from "../components/home/Icon.vue";
 
 /*

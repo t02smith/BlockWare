@@ -45,7 +45,7 @@ func (a *Controller) GetPeerInformation() []ControllerPeerData {
 func (c *Controller) ConnectToPeer(hostname string, port uint) {
 	err := peer.Peer().ConnectToPeer(hostname, port)
 	if err != nil {
-		c.controllerErrorf("Error connecting to peer %s", err)
+		c.controllerErrorf("Error connecting to peer %s:%d", hostname, port)
 		return
 	}
 
@@ -77,7 +77,7 @@ func (c *Controller) ConnectToManyPeers(lines string) {
 		go func() {
 			err = p.ConnectToPeer(peerInfo[0], uint(port))
 			if err != nil {
-				util.Logger.Warnf("Error conneting to peer %s: %s", err)
+				util.Logger.Warnf("Error conneting to peer %s:%d", peerInfo[0], port)
 				return
 			}
 			runtime.EventsEmit(c.ctx, "new-peer")
@@ -88,7 +88,7 @@ func (c *Controller) ConnectToManyPeers(lines string) {
 func (c *Controller) ConnectFromFile(filepath string) {
 	ps, err := peer.LoadPeersFromFile(filepath)
 	if err != nil {
-		c.controllerError("error reading peer file")
+		c.controllerErrorf("error reading peer file at %s", filepath)
 		return
 	}
 

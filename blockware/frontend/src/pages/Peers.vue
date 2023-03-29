@@ -60,6 +60,7 @@ localhost:6751
     <div class="content">
       <div class="title">
         <h2>Your Peers</h2>
+        <Error />
         <p>Below are the list of peers you're currently connected to.</p>
         <p>
           Peers are used to share game data and contribute to the distribution
@@ -117,9 +118,10 @@ localhost:6751
   </div>
 </template>
 <script setup>
-import { ref, onMounted, onUnmounted } from "vue";
+import { ref } from "vue";
 import { usePeerStore } from "../stores/peers";
 import { SelectTxtFile } from "../../wailsjs/go/controller/Controller.js";
+import Error from "../components/Error.vue";
 
 /*
 

@@ -1,8 +1,9 @@
 <template>
   <div class="wrapper">
+    <Error />
     <GameEntry v-if="game" :game="game">
       <div class="purchase">
-        <strong>{{ game.price }} ETH</strong>
+        <strong>{{ game.price }} Wei</strong>
 
         <router-link
           :to="`/library?game=${game.rootHash}`"
@@ -29,6 +30,7 @@ import { ref, onMounted, computed } from "vue";
 import { useRoute } from "vue-router";
 import { useGamesStore } from "../stores/games";
 import GameEntry from "../components/library/GameEntry.vue";
+import Error from "../components/Error.vue";
 
 /*
 

@@ -2,6 +2,7 @@
   <div class="wrapper">
     <form @submit.prevent="submit" class="upload">
       <h2>Upload your content to <strong>BlockWare</strong></h2>
+      <Error />
       <div class="sections">
         <div class="section initial">
           <div class="title">
@@ -163,15 +164,14 @@
             <div class="field">
               <div class="info">
                 <h6>Assets Directory</h6>
-                <p>what is the absolute path for your game's assets?</p>
+                <p>required files: cover.png, description.md</p>
               </div>
-              <input
-                v-model="assets"
-                type="text"
-                name=""
-                id=""
-                placeholder="asset directory"
-              />
+              <button
+                value=""
+                @click="async () => (assets = await SelectFolder())"
+              >
+                {{ assets === "" ? "Upload Folder" : assets }}
+              </button>
             </div>
 
             <div class="field">
@@ -244,6 +244,7 @@ import {
   SelectFolder,
 } from "../../wailsjs/go/controller/Controller";
 import { EventsOn } from "../../wailsjs/runtime/runtime";
+import Error from "../components/Error.vue";
 import { useGamesStore } from "../stores/games";
 
 /*

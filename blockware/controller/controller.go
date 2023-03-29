@@ -40,7 +40,7 @@ func (c *Controller) Startup(ctx context.Context) {
 func (c *Controller) DeployLibraryInstance(privateKey string) string {
 	_, _, err := library.DeployLibraryContract(privateKey)
 	if err != nil {
-		c.controllerErrorf("Error deploying instance %s", err.Error())
+		c.controllerErrorf("Error deploying contract instance")
 		return ""
 	}
 
@@ -52,6 +52,6 @@ func (c *Controller) JoinLibraryInstance(address, privateKey string) {
 	addr := common.HexToAddress(address)
 	err := library.ConnectToLibraryInstance(addr, privateKey)
 	if err != nil {
-		c.controllerErrorf("Error joining lib instance %s", err.Error())
+		c.controllerErrorf("Error joining library instance")
 	}
 }

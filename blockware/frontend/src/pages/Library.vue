@@ -63,6 +63,8 @@
         </div>
       </form>
 
+      <Error />
+
       <GameEntry :game="selected" v-if="selected">
         <button
           @click="createDownload"
@@ -100,6 +102,7 @@ import {
   UninstallGame,
 } from "../../wailsjs/go/controller/Controller";
 import { useGamesStore } from "../stores/games";
+import Error from "../components/Error.vue";
 
 /*
 

@@ -53,6 +53,7 @@ const key = ref(
 
 // address of the deployed smart contract
 const addr = ref("0x750cf6392175f94ff5014803a0bb6b79de543337");
+// const addr = ref("0x2899Dab55A4A20D698062bBF4d4ce9f1073Ce052");
 
 // join existing network OR deploy new one
 const isJoining = ref(true);

@@ -14,6 +14,8 @@
       </div>
     </div>
 
+    <Error />
+
     <div class="download-table" v-if="downloadGamePairs.length > 0">
       <div class="table-header">
         <h2><strong>Game</strong></h2>
@@ -62,6 +64,7 @@
 </template>
 <script setup>
 import { computed, ref, onMounted, onUnmounted } from "vue";
+import Error from "../components/Error.vue";
 import { useGamesStore } from "../stores/games";
 
 /*

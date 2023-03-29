@@ -2,6 +2,7 @@
   <div class="store">
     <div class="title">
       <h2>Welcome to the <strong>BlockWare Store</strong></h2>
+      <Error />
       <p>
         Here you can view all the games uploaded to BlockWare and purchase them
         for yourself. Enjoy the selection and be sure to send any feedback to
@@ -49,6 +50,7 @@ import { onMounted, ref } from "vue";
 import CustomLibrary from "../components/library/CustomLibrary.vue";
 import { useGamesStore } from "../stores/games";
 import { useRouter } from "vue-router";
+import Error from "../components/Error.vue";
 
 /*
 

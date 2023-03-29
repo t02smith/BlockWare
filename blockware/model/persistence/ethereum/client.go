@@ -82,7 +82,7 @@ func GenerateAuthInstance(privateKey string) (*bind.TransactOpts, error) {
 	}
 
 	util.Logger.Info("Getting chain ID")
-	chainID, err := _ethClient.ChainID(context.TODO())
+	chainID, err := _ethClient.ChainID(context.Background())
 	if err != nil {
 		util.Logger.Info(err)
 	}
@@ -100,7 +100,7 @@ func GenerateAuthInstance(privateKey string) (*bind.TransactOpts, error) {
 
 	auth.Nonce = big.NewInt(int64(nonce))
 	auth.Value = big.NewInt(0)
-	auth.GasLimit = uint64(3000000)
+	auth.GasLimit = uint64(300)
 	auth.GasPrice = gasPrice
 
 	util.Logger.Info("Auth instance generated")

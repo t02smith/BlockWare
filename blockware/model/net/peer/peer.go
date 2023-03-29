@@ -134,7 +134,7 @@ func newPeer(config Config, serverHostname string, serverPort uint, installFolde
 
 	var knownPeers []string
 	if config.LoadPeersFromFile {
-		knownPeers, err = loadPeersFromFile()
+		knownPeers, err = LoadPeersFromFile(filepath.Join(viper.GetString("meta.directory"), "peers.txt"))
 		if err != nil {
 			util.Logger.Warnf("Error fetching known peers from file %s", err)
 		}
@@ -198,9 +198,9 @@ func (p *peer) GetServerInfo() (string, uint) {
 // * known peers
 
 // load peers from file containing peer info
-func loadPeersFromFile() ([]string, error) {
+func LoadPeersFromFile(path string) ([]string, error) {
 	util.Logger.Info("Attempting to read peer list from file")
-	file, err := os.Open(filepath.Join(viper.GetString("meta.directory"), "peers.txt"))
+	file, err := os.Open(path)
 	if err != nil {
 		return nil, err
 	}
@@ -229,7 +229,7 @@ func loadPeersFromFile() ([]string, error) {
 
 // attempts to form connections to the list of known peers
 func (p *peer) connectToKnownPeers() {
-	ps, err := loadPeersFromFile()
+	ps, err := LoadPeersFromFile(filepath.Join(viper.GetString("meta.directory"), "peers.txt"))
 	if err != nil {
 		util.Logger.Warnf("Error reading from peers file %s", err)
 		return
@@ -265,7 +265,7 @@ func (p *peer) connectToKnownPeers() {
 // save current list of peers to file
 func (p *peer) savePeersToFile() error {
 	util.Logger.Info("Writing peers to file")
-	file, err := os.Create(filepath.Join(viper.GetString("meta.directory"), "peers.txt"))
+	file, err := os.OpenFile(filepath.Join(viper.GetString("meta.directory"), "peers.txt"), os.O_APPEND|os.O_RDWR|os.O_CREATE, 0755)
 	if err != nil {
 		return err
 	}

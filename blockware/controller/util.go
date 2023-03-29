@@ -31,6 +31,29 @@ func (c *Controller) controllerErrorf(err string, args ...any) {
 	c.controllerError(fmt.Sprintf(err, args...))
 }
 
+func (c *Controller) SelectTxtFile() string {
+	res, err := runtime.OpenFileDialog(c.ctx, runtime.OpenDialogOptions{
+		Filters: []runtime.FileFilter{{Pattern: "*.txt"}},
+	})
+
+	if err != nil {
+		c.controllerError("Error opening folder")
+		return ""
+	}
+
+	return res
+}
+func (c *Controller) SelectFolder() string {
+	res, err := runtime.OpenDirectoryDialog(c.ctx, runtime.OpenDialogOptions{})
+
+	if err != nil {
+		c.controllerError("Error opening folder")
+		return ""
+	}
+
+	return res
+}
+
 // misc
 
 func downloadToGameDownloads(ds map[[32]byte]*games.Download) map[string]*ControllerDownload {

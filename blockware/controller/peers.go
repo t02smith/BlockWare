@@ -12,7 +12,6 @@ import (
 
 // get information about peers
 func (a *Controller) GetPeerInformation() []ControllerPeerData {
-	util.Logger.Info("ajshjkashdjkahdashd")
 	var ps []ControllerPeerData
 
 	p := peer.Peer()
@@ -77,6 +76,42 @@ func (c *Controller) ConnectToManyPeers(lines string) {
 
 		go func() {
 			err = p.ConnectToPeer(peerInfo[0], uint(port))
+			if err != nil {
+				util.Logger.Warnf("Error conneting to peer %s: %s", err)
+				return
+			}
+			runtime.EventsEmit(c.ctx, "new-peer")
+		}()
+	}
+}
+
+func (c *Controller) ConnectFromFile(filepath string) {
+	ps, err := peer.LoadPeersFromFile(filepath)
+	if err != nil {
+		c.controllerError("error reading peer file")
+		return
+	}
+
+	for _, newPeer := range ps {
+		peerInfo := strings.Split(newPeer, ":")
+
+		if len(peerInfo) != 2 {
+			continue
+		}
+
+		// ! remove carriage return if it exists
+		if peerInfo[1][len(peerInfo[1])-1] == '\r' {
+			peerInfo[1] = peerInfo[1][:len(peerInfo[1])-1]
+		}
+
+		port, err := strconv.ParseUint(peerInfo[1], 10, 16)
+		if err != nil {
+			util.Logger.Warnf("Error parsing peer details for peer %s: %s", newPeer, err)
+			continue
+		}
+
+		go func() {
+			err = peer.Peer().ConnectToPeer(peerInfo[0], uint(port))
 			if err != nil {
 				util.Logger.Warnf("Error conneting to peer %s: %s", err)
 				return

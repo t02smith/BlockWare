@@ -150,15 +150,14 @@
             <div class="field">
               <div class="info">
                 <h6>Root Directory</h6>
-                <p>what is the absolute path for your game?</p>
+                <p>select the root directory of your game</p>
               </div>
-              <input
-                v-model="file"
-                type="text"
-                name=""
-                id=""
-                placeholder="root directory"
-              />
+              <button
+                value=""
+                @click="async () => (file = await SelectFolder())"
+              >
+                {{ file === "" ? "Upload Folder" : file }}
+              </button>
             </div>
 
             <div class="field">
@@ -240,7 +239,10 @@
 </template>
 <script setup>
 import { onMounted, ref, computed, watch } from "vue";
-import { UploadGame } from "../../wailsjs/go/controller/Controller";
+import {
+  UploadGame,
+  SelectFolder,
+} from "../../wailsjs/go/controller/Controller";
 import { EventsOn } from "../../wailsjs/runtime/runtime";
 import { useGamesStore } from "../stores/games";
 
@@ -500,15 +502,23 @@ async function submit() {
               }
             }
 
-            > input {
+            > input,
+            button {
               margin-left: auto;
               width: 250px;
               padding: 3px 5px;
               background-color: lighten(#131313, 10%);
+              outline: none;
               border: none;
-              outline-color: darken(rgb(0, 131, 253), 25%);
-              outline-style: outset;
               color: white;
+            }
+
+            > button {
+              width: 260px;
+
+              &:hover {
+                color: rgb(0, 131, 253);
+              }
             }
           }
         }

@@ -6,6 +6,7 @@ import {
   ConnectToManyPeers,
   Disconnect,
   ResendValidation,
+  ConnectFromFile,
 } from "../../wailsjs/go/controller/Controller";
 import { EventsOn } from "../../wailsjs/runtime/runtime";
 
@@ -56,6 +57,10 @@ export const usePeerStore = defineStore("peers", () => {
     ConnectToManyPeers(peerLs);
   }
 
+  function connectFromFile(filepath) {
+    ConnectFromFile(filepath);
+  }
+
   /**
    * Resend a validation method to a given peer
    * A validation message is used to verify a peer's Eth address
@@ -73,5 +78,6 @@ export const usePeerStore = defineStore("peers", () => {
     connectToAll,
     disconnect,
     resendValidation,
+    connectFromFile,
   };
 });

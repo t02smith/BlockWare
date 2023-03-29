@@ -33,7 +33,7 @@ func TestLoadPeersFromFile(t *testing.T) {
 	})
 
 	t.Run("file not found", func(t *testing.T) {
-		_, err := loadPeersFromFile()
+		_, err := LoadPeersFromFile("../../../test/data/tmp/peers.txt")
 		assert.NotNil(t, err, "file not found error expected")
 	})
 
@@ -49,7 +49,7 @@ func TestLoadPeersFromFile(t *testing.T) {
 	f.Close()
 
 	t.Run("success", func(t *testing.T) {
-		ps, err := loadPeersFromFile()
+		ps, err := LoadPeersFromFile("../../../test/data/tmp/peers.txt")
 		assert.Nil(t, err, "no error expected loading peers")
 
 		assert.Equal(t, 2, len(ps), "incorrect number of peers found")
@@ -71,7 +71,7 @@ func TestSavePeersToFile(t *testing.T) {
 		err := Peer().savePeersToFile()
 		assert.Nil(t, err, "no error expected")
 
-		_, err = loadPeersFromFile()
+		_, err = LoadPeersFromFile("../../../test/data/tmp/peers.txt")
 		assert.Nil(t, err, "no error expected")
 
 		// assert.Equal(t, 1, len(ps), "only mock peer expected")

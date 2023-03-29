@@ -3,6 +3,8 @@
 import {map[string]controller} from '../models';
 import {controller} from '../models';
 
+export function ConnectFromFile(arg1:string):Promise<void>;
+
 export function ConnectToManyPeers(arg1:string):Promise<void>;
 
 export function ConnectToPeer(arg1:string,arg2:number):Promise<void>;
@@ -38,6 +40,10 @@ export function LoadDeferredRequests():Promise<void>;
 export function PurchaseGame(arg1:string):Promise<void>;
 
 export function ResendValidation(arg1:string,arg2:number):Promise<void>;
+
+export function SelectFolder():Promise<string>;
+
+export function SelectTxtFile():Promise<string>;
 
 export function UninstallGame(arg1:string):Promise<void>;
 

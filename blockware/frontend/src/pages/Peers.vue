@@ -45,6 +45,16 @@ localhost:6751
 
         <button type="submit">Connect</button>
       </form>
+      <hr style="opacity: 0.5" />
+      <form
+        @submit.prevent="
+          async () => peers.connectFromFile(await SelectTxtFile())
+        "
+        class="file-peers"
+      >
+        <h4>Open and connect to a <strong>list of peers</strong>:</h4>
+        <button type="submit">Upload File</button>
+      </form>
     </div>
 
     <div class="content">
@@ -64,10 +74,13 @@ localhost:6751
       </div>
 
       <div class="peer-list">
-        <h3>
-          You are connected to
-          <strong>{{ peers.peers ? peers.peers.length : 0 }} peers</strong>!
-        </h3>
+        <div class="header">
+          <h3>
+            You are connected to
+            <strong>{{ peers.peers ? peers.peers.length : 0 }} peers</strong>!
+          </h3>
+          <button @click="peers.refreshPeers">♻️</button>
+        </div>
 
         <p v-if="!peers.peers">Nothing to show here 🥲</p>
 
@@ -104,8 +117,9 @@ localhost:6751
   </div>
 </template>
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted, onUnmounted } from "vue";
 import { usePeerStore } from "../stores/peers";
+import { SelectTxtFile } from "../../wailsjs/go/controller/Controller.js";
 
 /*
 
@@ -193,10 +207,6 @@ function disconnect(hostname, port) {
         &:hover {
           opacity: 0.75;
         }
-
-        &:focus {
-          background-color: rgb(20, 187, 20);
-        }
       }
     }
 
@@ -229,6 +239,11 @@ function disconnect(hostname, port) {
         }
       }
     }
+
+    > .file-peers {
+      display: flex;
+      flex-direction: column;
+    }
   }
 
   > .content {
@@ -249,6 +264,17 @@ function disconnect(hostname, port) {
     }
 
     > .peer-list {
+      > .header {
+        display: flex;
+        align-items: center;
+
+        > button {
+          margin-left: auto;
+          background-color: transparent;
+          font-size: 1.5rem;
+        }
+      }
+
       > .peer {
         display: flex;
         align-items: center;

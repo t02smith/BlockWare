@@ -14,3 +14,25 @@ This application uses the Model-View-Controller MVC pattern to structure the app
 \input{sections/5-design/components/persistence/persistence.tex}
 \input{sections/5-design/components/backend/backend.tex}
 \input{sections/5-design/components/ui/frontend.tex}
+
+\newpage
+
+\section{Downloading a Game}
+
+Figure~\ref{fig:p2p-interactions} shows the standard sequence of events used for a user to download a game from this application. The developer will upload a game that is purchased by a user; this user will then proceed to download the game off of the developer using the commands described in Section~\ref{subsubsec:commands}.
+\x
+Some important notes about this interaction are:
+
+\begin{itemize}
+  \item Identity verification happens immediately after forming a connection.
+  \item Deferred requests are attempted when connecting to a new peer and after a timeout.
+  \item Game ownership is checked upon the first BLOCK request.
+\end{itemize}
+
+\begin{figure}[!ht]
+  \centering
+  \includegraphics[width=\textwidth]{assets/images/diagrams/p2p-sequence.png}
+  \caption{A sequence diagram showing the main interactions needed to download a game}
+  \label{fig:p2p-interactions}
+\end{figure}
+

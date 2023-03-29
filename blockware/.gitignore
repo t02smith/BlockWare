@@ -13,3 +13,4 @@ latex-template-main
 **/test/**/games/*
 **/test/**/hashes/*
 **/test/**/peers/*
+**/profiles/**/.toolkit-*

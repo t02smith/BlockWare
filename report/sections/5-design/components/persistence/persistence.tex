@@ -1,16 +1,16 @@
 
-\section{Persistence}
+\subsection{Persistence}
 
 The Persistence layer shows how the data for the application is divided across several mediums; namely the \textbf{Ethereum Smart Contract}, \textbf{IPFS}, and a \textbf{P2P Network}. Each component stores a different, which is outlined in Section~\ref{subsec:design-data}
 
-\subsection{Ethereum}\label{subsubsec:impl-eth}
+\subsubsection{Ethereum}\label{subsubsec:impl-eth}
 
 An Ethereum Smart Contract, written in Solidity \url{https://docs.soliditylang.org/en/v0.8.19/}, will be used to store the set of data about games that is required for the identification of each game. The Smart Contract will also be used to perform the following:
 \x
 The Geth go-ethereum package \url{https://geth.ethereum.org/} will allow us to interact with the ethereum blockchain and Abigen \url{https://docs.avax.network/specs/abigen} will allow us to compile any smart contracts to Go code. This will allow us to interact with our smart contract on ethereum using a set of Go functions. For development, Ganache \url{https://github.com/trufflesuite/ganache} was used to create a local Ethereum instance and Geth was used to connect to an Ethereum test net.
 
 
-\subsection{IPFS}
+\subsubsection{IPFS}
 
 This project will use the IPFS implementation Kubo \url{https://github.com/ipfs/kubo}, due to it being the most widely used implementation of IPFS. We will use the go-ipfs-api library \url{https://github.com/ipfs/go-ipfs-api} to interact with Kubo and upload/download the data specified above.
 

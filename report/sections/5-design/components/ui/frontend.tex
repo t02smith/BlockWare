@@ -1,4 +1,6 @@
-\section{Frontend}
+\subsection{Frontend \& Controller}
+
+\subsubsection{Frontend}
 
 This application will have a GUI where users can interact with the platform and will need to include the following pages:
 
@@ -10,5 +12,13 @@ This application will have a GUI where users can interact with the platform and 
   \item \textbf{Peers} Where users can manage their list of connected peers.
 \end{itemize}
 
-\vspace{2mm}\noindent
-Wails \url{https://wails.io/} was chosen to create the GUI because it allows us to use a reactive web-based framework. This meant building the UI was straight-forward and allowed me to use tools that I was familiar with; namely: Vue.js v3 \url{https://vuejs.org/}, Pinia \url{https://pinia.vuejs.org/}, and SCSS \url{https://sass-lang.com/}.
+
+\subsubsection{Controller}
+
+The Controller will be the interface functions used for communication between the frontend and backend. Each function should be used to trigger an action/process or fetch some data. Some example Controller functions will include:
+
+\begin{itemize}
+  \item \textbf{PurchaseGame} Purchase a game off of Ethereum and add the metadata to the user's library.
+  \item \textbf{StartDownload} Create a download for one of the user's owned games and start looking for blocks of data for it.
+  \item \textbf{UploadGame} Upload a game to Ethereum given a set of input parameters.
+\end{itemize}

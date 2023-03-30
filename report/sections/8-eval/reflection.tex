@@ -1,13 +1,19 @@
 \section{Reflection}
 
-\subsection{What Went Well}
+\subsection{Risk Assessment}
 
+\paragraph*{Difficulty with blockchain development}
+As expected there were several difficuluties with blockchain development:
 
+\begin{itemize}
+  \item A decent amount of the documentation is minimal or outdated. As blockchain development is a smaller field there are little in the ways of forum postings.
+  \item Some of the libraries used had bugs in them that hindered development. For example, I could deploy the smart contract to the Sepolia testnet from Remix easily but not through Geth. 
+\end{itemize}
 
-\subsection{What Could Have Gone Better}
-
-\paragraph*{Complexity}
-Overall, I felt that this project felt too large and I had to commit an extremely large amount of time to complete the application and its tests. This resulted in a massive codebase.
+\paragraph*{The application is not finished}
+Section~\ref{} details the requirements that were not finished and Section~\ref{} discusses the limitations with my current implementation. It was expected that this project would not be entirely finished but a lot of the major requirements were met.
+\x
+The application ended up being incredibly large and took a lot more time to implement and test than expected. Table~\ref{tab:cloc} shows a breakdown of the source code.
 
 \begin{longtable}{ | r | r | r | r | }
   \hline
@@ -34,15 +40,19 @@ Overall, I felt that this project felt too large and I had to commit an extremel
   & 46
   \\\hline
   \caption{The lines of code written for this project calculated using CLOC \url{https://github.com/AlDanial/cloc}}
+  \label{tab:cloc}
 \end{longtable}
+
+\subsection{What Went Well}
+
+
+
+\subsection{What Could Have Gone Better}
+
+\paragraph*{Complexity}
+Overall, I felt that this project felt too large and I had to commit an extremely large amount of time to complete the application and its tests. This resulted in a massive codebase.
+
+
 
 \paragraph*{Large Scale Testing}
 Like anticipated in Section~\ref{sec:risk-assessment}, this application was hard to test at a large enough scale to emulate real world usage.
-
-\paragraph*{Blockchain Development}
-In my experience developing the blockchain component of this project was difficult for several reasons:
-
-\begin{itemize}
-  \item \textbf{Poor Documentation} I found that I would often be frustrated with the documentation or guides that I would come across as they would be outdated or poorly structured.
-   
-\end{itemize}

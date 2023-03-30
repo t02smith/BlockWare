@@ -7,13 +7,17 @@ The backend code for this application was written based upon the design from Sec
   \toprule
   \textbf{Tool} & \textbf{Description \& Reasoning}
   \\\midrule\midrule
-  Go
+  Go~\cite{noauthor_go_nodate}
   & Go was chosen because of its simple syntax, high performance, strong standard library and third party packages for interacting with Ethereum.
   \\
-  go-ipfs-api
+  go-ipfs-api~\cite{noauthor_go-ipfs-api_2023}
   & A Go package used for interacting with the Kubo implementation of IPFS that gave an easy interface for downloading and uploading data to Kubo.\\
-  go-ethereum
-  & A collection of tools used for interacting with Ethereum including an Ethereum CLI client Geth, and a tool for converting Ethereum contracts into Go packages.
+  go-ethereum~\cite{noauthor_go-ethereum_nodate}
+  & A collection of tools used for interacting with Ethereum including an Ethereum CLI client Geth, and a tool for converting Ethereum contracts into Go packages.\\
+  Zap~\cite{noauthor_zap_2023}
+  & A logging library that is much faster than the standard library implementation and has better customisation. \\
+  Viper~\cite{noauthor_viper_nodate}
+  & A configuration file management library that helps read, write, and access configuration options written to file.
   \\\bottomrule\bottomrule
   \caption{The tools used to develop the backend}
 \end{longtable}
@@ -26,22 +30,47 @@ To write and deploy a smart contract that met the criteria specified in Section~
   \toprule
   \textbf{Tool} & \textbf{Description \& Reasoning}
   \\\midrule\midrule
-  Solidity
+  Solidity~\cite{noauthor_solidity_nodate}
   & The language used to write smart contracts for the Ethereum blockchain.\\
-  Sepolia
+  Sepolia~\cite{noauthor_sepolia_nodate}
   & An Ethereum test-net that used to deploy my smart contract to. One of the main benefits was that it provides a fast transaction time for quick feedback.\\
-  Alchemy
+  Alchemy~\cite{noauthor_alchemy_nodate}
   & Alchemy provides useful tools for interacting with Ethereum and specifically Sepolia, such as an ETH faucet and an RPC URL.\\
-  MetaMask
+  MetaMask~\cite{noauthor_crypto_nodate}
   & A browser-based wallet that can easily be conencted to other tools such as Alchemy or Remix.\\
-  Remix
+  Remix~\cite{noauthor_remix_nodate}
   & A browser-based IDE for writing smart contracts that allows for easy deployment.
   \\\bottomrule\bottomrule
   \caption{The tools used for deployment of my smart contract}
 \end{longtable}
 
 \vspace{2mm}\noindent
-The contract was successfully deployed to Sepolia and the details of it can be viewed at \url{https://sepolia.etherscan.io/address/0x2899dab55a4a20d698062bbf4d4ce9f1073ce052}.
+The contract was successfully deployed~\cite{etherscanio_deployed_nodate} to the Sepolia test-net and can be interacted with by any user.
+
+\section{Frontend}
+
+\begin{longtable}{p{0.15\textwidth} p{0.7\textwidth}}
+  \toprule
+  \textbf{Tool} & \textbf{Description \& Reasoning}
+  \\\midrule\midrule
+  Wails~\cite{noauthor_wails_nodate}
+  & Allows you to add a webkit frontend to a Go application, so that you can use a modern web framework. This allowed me to easily create a reactive UI using tools I was previously familiar with.
+
+  Wails allows you to implement a controller using functions written in that can be called from the frontend and can emit events that trigger actions in the frontend.
+  \\
+  Vue.js v3~\cite{noauthor_vuejs_nodate}
+  & A reactive, component based web-framework that allows me to create reusable components that react to changes in state and can trigger events at different points in a components lifecycle.
+  
+  The Vue Router~\cite{noauthor_vue_nodate} package was used to add multiple pages to the application and markdown-it~\cite{noauthor_markdown-it_2023} was used to render markdown files.
+  \\
+  Pinia~\cite{noauthor_pinia_nodate}
+  & A state management tool for Vue.js that boosts the reusabiltiy of components and reduces the overall complexity of the frontend. 
+  \\
+  SASS~\cite{noauthor_sass_nodate}
+  & An extension of CSS that is used to style DOM elements. This was essential in making the UI look nice and be accessible.
+  \\
+  \bottomrule\bottomrule
+\end{longtable}
 
 \section{Other Tools}
 
@@ -51,47 +80,15 @@ The following tools were also used throughout development:
   \toprule
   \textbf{Tool} & \textbf{Description \& Reasoning}
   \\\midrule\midrule
-  Git
-  & A version control system used in conjunction with GitHub. Creating periodic commits meant I always had a recent backup available and could easily backtrack to help find issues. Use of a GitHub Actions helped remind me that not all of my tests passed at all times :(.\\
-  LaTeX
+  Git~\cite{noauthor_git_nodate}\newline GitHub~\cite{noauthor_github_nodate}
+  & A version control system used in conjunction with GitHub. Creating periodic commits meant I always had a recent backup available and could easily backtrack to help find issues.
+  Use of a GitHub Actions helped remind me that not all of my tests passed at all times :(.\\
+  LaTeX~\cite{noauthor_latex_nodate}
   & Used for the write-up of this document. LaTeX was useful in creating a large document and has many packages that help with referencing and design.\\
-  VSCode
+  VSCode~\cite{noauthor_visual_nodate}
   & My code editor of choice for this project as it allowed me to seamlessly work on both my frontend and backend code at once.\\
-  Lucidchart
+  Lucidchart~\cite{noauthor_lucidchart_nodate}
   & Lucidchart was used to create all of the diagrams for this project.
   \\\bottomrule\bottomrule
   \caption{General purpose tools used for this project}
 \end{longtable}
-
-% \begin{longtable}[ht]{|m{.15\textwidth}|m{.15\textwidth}|p{.65\textwidth}|}
-%   \hline
-%   \hdr{Component} 
-%   & \hdr{Name}
-%   & \hdr{Description \& Reasoning}  \\ \hline
-%   \multirow{2}{.15\textwidth}{Backend} 
-%   & Golang
-%   & \url{https://go.dev/}\newline Google's Go was used due to its simple syntax, high performance, strong standard library and third party packages for interacting with the Ethereum blockchain.
-%   \\ \cline{2-3} 
-%   & go-ipfs-api
-%   & \url{https://github.com/ipfs/go-ipfs-api}\newline Used for interacting with the Kubo IPFS instance for downloading/updating data.
-%   \\ \hline
-%   Controller
-%   & \multirow{2}{.15\textwidth}{Wails}
-%   & \multirow{2}{.65\textwidth}{Wails allowed me to write a webkit frontend for my Golang backend code using a modern reactive UI framework. It allows you to write controller functions in Go that can be called by the frontend.}\newline
-%   \\\cline{1-1}
-%   \multirow{4}{.15\textwidth}{Frontend}
-%   & 
-%   & \newline
-%   \\\cline{2-3}
-%   & Vue.js v3
-%   & \url{https://vuejs.org/}\newline A components based web-framework that offers great state and components lifecycle hooks to create a reactive and complex user interface.
-%   \\\cline{2-3}
-%   & Pinia
-%   & \url{https://pinia.vuejs.org/}\newline The recommended state management tool for Vue.js. It allows us to simplify Vue components and improve the usability of them.
-%   \\\cline{2-3}
-%   & SCSS
-%   & \url{https://sass-lang.com/}\newline An extension of CSS for styling my Vue.js components that includes lots of quality of life improvements. 
-%   \\\hline
-%   \caption{The list of tools used during development}
-% \end{longtable}
-

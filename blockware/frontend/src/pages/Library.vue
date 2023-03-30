@@ -20,6 +20,10 @@
         "
         :class="`${selected === g && 'active'}`"
       >
+        <img
+          :src="`http://localhost:3003/${directory}/assets/${g.rootHash}/cover.png`"
+          alt=""
+        />
         <p>
           {{ g.title }}
         </p>
@@ -100,6 +104,7 @@ import GameEntry from "../components/library/GameEntry.vue";
 import {
   IsDownloading,
   UninstallGame,
+  GetDirectory,
 } from "../../wailsjs/go/controller/Controller";
 import { useGamesStore } from "../stores/games";
 import Error from "../components/Error.vue";
@@ -130,6 +135,8 @@ const selectedIsDownloading = ref(0);
 const importPanelOpen = ref(false);
 const importGameHash = ref("");
 
+const directory = ref("");
+
 watch(selected, async () => {
   if (!selected.value) return;
 
@@ -145,6 +152,8 @@ watch(selected, async () => {
 
 // load game mentioned in query parameter if it exists
 onMounted(async () => {
+  directory.value = await GetDirectory();
+
   const gameHash = route.query.game;
   if (!gameHash) {
     if (games.ownedGames.length === 0) return;
@@ -298,15 +307,25 @@ async function uninstall() {
     > li {
       cursor: pointer;
       transition: 100ms;
-      padding: 0.5rem 0.75rem;
+      height: fit-content;
       font-weight: bold;
       font-size: 1.15rem;
-      border-bottom: 1px solid rgb(85, 85, 85);
       transition: 150ms;
       display: flex;
       align-items: center;
 
+      > img {
+        width: 50px;
+        height: 50px;
+        object-fit: cover;
+      }
+
+      > p {
+        padding: 10px 5px;
+      }
+
       > strong {
+        padding: 10px 5px;
         margin-left: auto;
         font-size: 0.95rem;
       }

@@ -256,7 +256,7 @@ func handleSEND_BLOCK(cmd []string, client tcp.TCPConnection) error {
 	pd.Unlock()
 
 	if pd.Validator != nil {
-		Peer().contributions.addContribution(crypto.PubkeyToAddress(*pd.Validator.PublicKey), sh)
+		Peer().contributions.addContribution(crypto.PubkeyToAddress(*pd.Validator.PublicKey), gh, sh)
 	}
 
 	game.OutputToFile()
@@ -333,6 +333,11 @@ func generateREQ_RECEIPT() string {
 func handleREQ_RECEIPT(cmd []string, client tcp.TCPConnection) error {
 	p := Peer()
 
+	gameHash, err := stringTo32ByteArr(cmd[1])
+	if err != nil {
+		return err
+	}
+
 	// 1 flush all contributions to file
 	p.contributions.writeContributions()
 
@@ -344,18 +349,18 @@ func handleREQ_RECEIPT(cmd []string, client tcp.TCPConnection) error {
 	}
 	addr := crypto.PubkeyToAddress(*pd.Validator.PublicKey)
 
-	blocks, err := GetContributionsFromPeer(addr)
+	blocks, err := GetContributionsFromPeer(addr, gameHash)
 	if err != nil {
 		return err
 	}
 
-	client.SendString(generateRECEIPT(blocks))
+	client.SendString(generateRECEIPT(gameHash, blocks))
 	return nil
 }
 
 //
 
-func generateRECEIPT(blocks [][32]byte) string {
+func generateRECEIPT(game [32]byte, blocks [][32]byte) string {
 	var buffer bytes.Buffer
 	w, _ := flate.NewWriter(&buffer, 6)
 
@@ -367,11 +372,20 @@ func generateRECEIPT(blocks [][32]byte) string {
 	w.Close()
 
 	sig, _ := ethereum.SignMessage(buffer.Bytes())
-	return fmt.Sprintf("RECEIPT;%x;%x\n", sig, buffer.Bytes())
+	return fmt.Sprintf("RECEIPT;%x;%x;%x\n", game, sig, buffer.Bytes())
 }
 
 func handleRECEIPT(cmd []string, client tcp.TCPConnection) error {
-	data, _ := hex.DecodeString(cmd[2])
+	game, err := stringTo32ByteArr(cmd[1])
+	if err != nil {
+		return err
+	}
+	_ = game
+
+	data, err := hex.DecodeString(cmd[3])
+	if err != nil {
+		return err
+	}
 
 	var b bytes.Buffer
 	r := flate.NewReader(bytes.NewReader(data))
@@ -385,7 +399,7 @@ func handleRECEIPT(cmd []string, client tcp.TCPConnection) error {
 		return fmt.Errorf("user not verified. ignoring receipt")
 	}
 
-	sig, err := hex.DecodeString(cmd[1])
+	sig, err := hex.DecodeString(cmd[2])
 	if err != nil {
 		return err
 	}

@@ -1,7 +1,9 @@
 package peer
 
 import (
+	"bufio"
 	"errors"
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
@@ -21,8 +23,8 @@ can be tracked.
 var contributionThresholdBeforeWrite uint = 5
 
 type contributions struct {
-	// what blocks have they sent us
-	blocks map[common.Address][][32]byte
+	// what blocks have they sent us from which games
+	games map[common.Address]map[[32]byte][][32]byte
 
 	// to protect concurrent access of the blocks map
 	lock sync.Mutex
@@ -34,8 +36,8 @@ type contributions struct {
 // create a new contributions tracker
 func newContributions() *contributions {
 	return &contributions{
-		blocks: make(map[common.Address][][32]byte),
-		total:  0,
+		games: make(map[common.Address]map[[32]byte][][32]byte),
+		total: 0,
 	}
 }
 
@@ -51,29 +53,36 @@ func (c *contributions) writeContributions() int {
 	}
 
 	counter := 0
-	for addr, blocks := range c.blocks {
-		if len(blocks) == 0 {
+	for addr, games := range c.games {
+		if len(games) == 0 {
 			continue
 		}
 
-		f, err := os.OpenFile(filepath.Join(peersDirectory, addr.Hex()), os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
-		if err != nil {
-			util.Logger.Warnf("error writing to file peer file %s", err)
+		if _, err := os.Stat(filepath.Join(peersDirectory, addr.Hex())); errors.Is(err, os.ErrNotExist) {
+			if err := os.Mkdir(filepath.Join(peersDirectory, addr.Hex()), 0755); err != nil {
+				util.Logger.Error(err)
+				return -1
+			}
 		}
 
-		for _, b := range blocks {
-			_, err := f.Write(b[:])
+		for hash, blocks := range games {
+			f, err := os.OpenFile(filepath.Join(peersDirectory, addr.Hex(), fmt.Sprintf("%x", hash)), os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
 			if err != nil {
-				util.Logger.Warnf("err writing to peer file %s", err)
-				continue
+				util.Logger.Warnf("error writing to peer file %s", err)
 			}
 
-			counter++
+			writer := bufio.NewWriter(f)
+			for _, b := range blocks {
+				writer.Write(b[:])
+				counter++
+			}
+
+			writer.Flush()
+			f.Close()
 		}
 
-		f.Close()
 	}
-	c.blocks = make(map[common.Address][][32]byte)
+	c.games = make(map[common.Address]map[[32]byte][][32]byte)
 	c.total = 0
 
 	util.Logger.Debugf("Written %d contributions to file", counter)
@@ -81,13 +90,19 @@ func (c *contributions) writeContributions() int {
 }
 
 // add a new contribution from a given address
-func (c *contributions) addContribution(addr common.Address, block [32]byte) {
+func (c *contributions) addContribution(addr common.Address, game, block [32]byte) {
 	c.lock.Lock()
 
-	if blocks, ok := c.blocks[addr]; ok {
-		c.blocks[addr] = append(blocks, block)
+	if games, ok := c.games[addr]; ok {
+		if _, ok := games[game]; ok {
+			c.games[addr][game] = append(c.games[addr][game], block)
+		} else {
+			c.games[addr][game] = [][32]byte{block}
+		}
 	} else {
-		c.blocks[addr] = [][32]byte{block}
+		c.games[addr] = make(map[[32]byte][][32]byte)
+		c.games[addr][game] = [][32]byte{block}
+
 	}
 
 	c.total++
@@ -100,11 +115,15 @@ func (c *contributions) addContribution(addr common.Address, block [32]byte) {
 	}
 }
 
-func GetContributionsFromPeer(addr common.Address) ([][32]byte, error) {
+func GetContributionsFromPeer(addr common.Address, game [32]byte) ([][32]byte, error) {
 	var blocks [][32]byte
 
-	f, err := os.Open(filepath.Join(viper.GetString("meta.directory"), "peers", addr.Hex()))
+	f, err := os.Open(filepath.Join(viper.GetString("meta.directory"), "peers", addr.Hex(), fmt.Sprintf("%x", game)))
 	if err != nil {
+		if errors.Is(err, os.ErrNotExist) {
+			return [][32]byte{}, nil
+		}
+
 		return nil, err
 	}
 	defer f.Close()

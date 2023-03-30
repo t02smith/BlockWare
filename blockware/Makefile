@@ -27,3 +27,9 @@ stop-bg-processes:
 
 cloc:
 	cloc.exe --exclude-dir=node_modules,.git --include-ext=go,vue,sol,js .
+
+cloc-non-test:
+	cloc.exe --exclude-dir=node_modules,.git --include-ext=go --not-match-f='_test.go' .
+
+cloc-test:
+	cloc.exe --exclude_dir=node_modeules,.git --match-f='_test.go' .

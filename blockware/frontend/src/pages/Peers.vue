@@ -80,7 +80,27 @@ localhost:6751
             You are connected to
             <strong>{{ peers.peers ? peers.peers.length : 0 }} peers</strong>!
           </h3>
-          <button @click="peers.refreshPeers">♻️</button>
+
+          <div class="right">
+            <form action="">
+              <select
+                name=""
+                id=""
+                :disabled="games.ownedGames.length === 0"
+                v-model="receiptGame"
+              >
+                <option value="" disabled>Choose game:</option>
+
+                <option :value="g" v-for="g in games.ownedGames">
+                  {{ g.title }}
+                </option>
+              </select>
+              <button type="submit" :disabled="!receiptGame">
+                Get Receipts
+              </button>
+            </form>
+            <button @click="peers.refreshPeers">♻️</button>
+          </div>
         </div>
 
         <p v-if="!peers.peers">Nothing to show here 🥲</p>
@@ -120,6 +140,7 @@ localhost:6751
 <script setup>
 import { ref } from "vue";
 import { usePeerStore } from "../stores/peers";
+import { useGamesStore } from "../stores/games";
 import { SelectTxtFile } from "../../wailsjs/go/controller/Controller.js";
 import Error from "../components/Error.vue";
 
@@ -132,6 +153,10 @@ peers.
 
 // Peers pinia store
 const peers = usePeerStore();
+const games = useGamesStore();
+
+//
+const receiptGame = ref(null);
 
 // connect to single peer
 const hostname = ref("");
@@ -270,10 +295,47 @@ function disconnect(hostname, port) {
         display: flex;
         align-items: center;
 
-        > button {
+        > .right {
           margin-left: auto;
-          background-color: transparent;
-          font-size: 1.5rem;
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+
+          > form {
+            display: flex;
+            padding: 5px;
+            border-radius: 5px;
+            background-color: lighten(#131313, 5%);
+
+            > button {
+              border-radius: 0 5px 5px 0;
+              padding: 0 5px;
+              background-color: #131313;
+              color: white;
+            }
+
+            > select {
+              padding: 4px 10px;
+              border-radius: 5px 0 0 5px;
+              font-weight: bold;
+              background-color: rgb(0, 131, 253);
+              border: none;
+              outline: none;
+              color: white;
+              cursor: pointer;
+
+              > * {
+                font-weight: bold;
+                cursor: pointer;
+                padding: 8px 10px;
+              }
+            }
+          }
+
+          > button {
+            background-color: transparent;
+            font-size: 1.5rem;
+          }
         }
       }
 

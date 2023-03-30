@@ -66,6 +66,7 @@ func main() {
 		Bind: []interface{}{
 			controller,
 		},
+		Logger: nil,
 	})
 
 	if err != nil {

@@ -686,9 +686,11 @@ func TestGenerateRECEIPT(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	game := sha256.Sum256([]byte("test game"))
+
 	t.Run("success", func(t *testing.T) {
 		t.Run("no blocks", func(t *testing.T) {
-			res := generateRECEIPT([][32]byte{})
+			res := generateRECEIPT(game, [][32]byte{})
 
 			bs, err := hex.DecodeString("000000ffff010000ffff")
 			if err != nil {
@@ -700,7 +702,7 @@ func TestGenerateRECEIPT(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			assert.Equal(t, fmt.Sprintf("RECEIPT;%x;%x\n", sig, bs), res)
+			assert.Equal(t, fmt.Sprintf("RECEIPT;%x;%x;%x\n", game, sig, bs), res)
 		})
 
 		t.Run("one block", func(t *testing.T) {
@@ -710,7 +712,7 @@ func TestGenerateRECEIPT(t *testing.T) {
 			w.Write(block[:])
 			w.Flush()
 
-			res := generateRECEIPT([][32]byte{block})
+			res := generateRECEIPT(game, [][32]byte{block})
 
 			bs, err := hex.DecodeString(fmt.Sprintf("%x010000ffff", b.Bytes()))
 			if err != nil {
@@ -722,7 +724,7 @@ func TestGenerateRECEIPT(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			assert.Equal(t, fmt.Sprintf("RECEIPT;%x;%x010000ffff\n", sig, b.Bytes()), res)
+			assert.Equal(t, fmt.Sprintf("RECEIPT;%x;%x;%x010000ffff\n", game, sig, b.Bytes()), res)
 		})
 
 		t.Run("many blocks", func(t *testing.T) {
@@ -733,10 +735,10 @@ func TestGenerateRECEIPT(t *testing.T) {
 				sha256.Sum256([]byte("testing testing")),
 			}
 
-			res := generateRECEIPT(blocks)
+			res := generateRECEIPT(game, blocks)
 			parts := strings.Split(res[:len(res)-1], ";")
 
-			data, err := hex.DecodeString(parts[2])
+			data, err := hex.DecodeString(parts[3])
 			assert.Nil(t, err)
 
 			var b bytes.Buffer
@@ -767,7 +769,7 @@ func TestGenerateRECEIPT(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			_sig2, _ := hex.DecodeString(parts[1])
+			_sig2, _ := hex.DecodeString(parts[2])
 
 			assert.True(t, bytes.Equal(_sig2, sig), "signature")
 		})

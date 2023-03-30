@@ -1,0 +1,84 @@
+
+\input{sections/5-design/analysis/stakeholders.tex}
+
+\subsection{Requirements}
+\label{subsec:requirements}
+
+
+Tables~\ref{tab:functional-requirements} and~\ref{tab:non-functional-requirements} show the functional and non-functional requirements of this project organized using MoSCoW prioritisation. Each requirement is allocated some of the following tags to indicate the area of the application that it may refer to:
+
+\subsubsection*{Functional}
+
+\begin{longtable}{ p{.1\textwidth} p{.8\textwidth} }
+  \toprule
+  \textbf{ID} & \textbf{Description}
+  \\\midrule\midrule
+  \multicolumn{2}{c}{\cellcolor{red!70}\textit{Must}}                                              \\\midrule
+  \req{F-M1}
+  & Developers must be able to release games by uploading metadata to the Ethereum blockchain.\\
+  \req{F-M2}
+  & Developers must be able to release updates to their existing games.\\
+  \req{F-M3}
+  & An owner of an existing game must be an owner of all future updates to that game.\\
+  \req{F-M4} 
+  & This application must include a smart contract that is deployable to the Ethereum blockchain~\footnote{This project will only test deploying to an Ethereum test network}.\\
+  \req{F-M5}
+  & Users must be able to purchase games off of develoeprs.\\
+  \req{F-M6}
+  & Users must be able to prove they have purchased a game.\\
+  \req{F-M7}
+  & Users must be able to create and maintain many concurrent connections to other users.\\
+  \req{F-M8}
+  & A user must be able to communicate with other users by exchanging structured messages.\\
+  \req{F-M9}
+  & A user must be able to upload and download data to and from other users.\\
+  \req{F-M10}
+  & A user must be able to verify the integrity of all data that they download.\\
+  \req{F-M11}
+  & A user must be able to download games in their entirety.\\
+  \midrule\multicolumn{2}{c}{\cellcolor{orange!70}\textit{Should}}\\\midrule
+  \req{F-S1}
+  & Users should only upload game data to users who own that game.\\
+  \req{F-S2}
+  & Users should interact with the application using a GUI.\\
+  \req{F-S3}
+  & Users should be able to prove the amount of data they have uploaded to other users.\\
+  \midrule\multicolumn{2}{c}{\cellcolor{green}\textit{Could}}\\\midrule
+  \req{F-C1}
+  & Developers could be able to release downloadable content (DLC) for their games.\\
+  \bottomrule\bottomrule
+  \caption{These requirements define the functions of the application in terms of a behavioural specification }
+  \label{tab:functional-requirements}
+\end{longtable}
+
+\subsubsection*{Non-Functional}
+
+\begin{longtable}{ p{.1\textwidth} p{.8\textwidth} }
+  \toprule
+  \textbf{ID} & \textbf{Description}
+  \\\midrule\midrule
+  \multicolumn{2}{c}{\cellcolor{red!70}\textit{Must}}                                              \\\midrule
+  \req{NF-M1}
+  & This application must be decentralised and cannot be controlled by any singular party.\\
+  \req{NF-M2}
+  & Any user must be able to join and contribute to he network.\\
+  \req{NF-M3}
+  & Developers who upload games to the network must be publically identifiable.\\
+  \req{NF-M4}
+  & The data required to download a game must be immutable.\\
+  \req{NF-M5} 
+  & Only the original uploader must be able to make any changes or release any updates to a game.\\
+  \midrule\multicolumn{2}{c}{\cellcolor{orange!70}\textit{Should}}\\\midrule
+  \req{NF-S1}
+  & This application must be scalable, such that many users can upload and download the same game at the same time.\\
+  \req{NF-S2}
+  & This application's GUI should be intuitive to use for new users.\\
+  \midrule\multicolumn{2}{c}{\cellcolor{green}\textit{Could}}\\\midrule
+  \req{NF-C1}
+  & This application could include measures to prevent/stop the distribution of illegal content.\\
+  \req{NF-C2}
+  & The GUI could include detailed support and or instructions for new users.\\
+  \bottomrule\bottomrule
+  \caption{Requirements that specify the criteria used to judge the operation of this application}
+%   \label{tab:non-functional-requirements}
+\end{longtable}

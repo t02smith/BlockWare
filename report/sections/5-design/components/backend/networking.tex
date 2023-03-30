@@ -1,6 +1,8 @@
 \subsubsection{Networking}
 
 Users running this application will be a part of a distributed network of peers by creating and maintaining a set of TCP connections with other users in the network and will communicate by sending structured messages to each other. Section~\ref{subsubsec:commands} describes these commands in detail.
+\x
+The use of TCP will add a computational overhead to maintain proportional to the number of peers, which is not ideal for inactive channels. A UDP approach would be more scalable but would add greater complexity to the project.
 
 \paragraph*{Address Verification}
 When two peers connect they will perform a handshake to exchange their Ethereum addresses and public keys by sending signed messages to each other. This will allow a peer to identify what games another peer is allowed access to.

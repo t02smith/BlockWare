@@ -14,6 +14,7 @@ const router = new createRouter({
     },
     { path: "/downloads", component: () => import("./pages/Downloads.vue") },
     { path: "/peers", component: () => import("./pages/Peers.vue") },
+    { path: "/help", component: () => import("./pages/Help.vue") },
   ],
 });
 

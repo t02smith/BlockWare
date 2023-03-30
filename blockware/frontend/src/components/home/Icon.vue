@@ -66,11 +66,11 @@ const backgroundHover = `linear-gradient(144deg, ${props.colorB} 0%, ${props.col
   }
 
   > .icon {
-    width: 200px;
-    height: 200px;
+    width: 170px;
+    height: 170px;
     display: grid;
     place-items: center;
-    font-size: 8rem;
+    font-size: 6.75rem;
     border: 2px solid gray;
 
     &:hover {

@@ -1,3 +1,5 @@
+contract:
+    address: 0x750cf6392175f94ff5014803a0bb6b79de543337
 eth:
     address: http://localhost:8545
 games:
@@ -8,11 +10,13 @@ meta:
         shardsize: 16384
         workercount: 5
     log: stdout
-    threadpoolsize: 10
 net:
-    port: 6051
-    useknownpeers: false
+    peer:
+        continuedownloads: true
+        dovalidation: true
+        serveassets: true
+        useknownpeers: false
+    port: 6749
 user:
     info:
-        domain: t02smith.com
-        name: tom
+        name: ""

@@ -32,11 +32,16 @@
         />
         <button type="submit">Deploy</button>
       </form>
+
+      <p>
+        Need some help?
+        <router-link to="/help"><strong>Click Here!</strong></router-link>
+      </p>
     </div>
   </div>
 </template>
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { useEthStore } from "../stores/eth";
 
@@ -50,9 +55,12 @@ Connect to the BlockWare network
 const key = ref(
   "af9668cd6ebc3ba4c0e5036c284e128ed66e18ba9e4ed87b2c0c6d9642f2b879"
 );
+// const key = ref(
+//   "a368fddde78a49b3e415b280ebd36003b0aa93ab07bc97b5aabeaf70835fe778"
+// );
 
 // address of the deployed smart contract
-const addr = ref("0x750cf6392175f94ff5014803a0bb6b79de543337");
+const addr = ref("");
 // const addr = ref("0x2899Dab55A4A20D698062bBF4d4ce9f1073Ce052");
 
 // join existing network OR deploy new one
@@ -61,6 +69,10 @@ const isJoining = ref(true);
 // hooks
 const eth = useEthStore();
 const router = useRouter();
+
+onMounted(async () => {
+  addr.value = await eth.getContractAddress();
+});
 
 /*
 Deploy a new instance
@@ -162,13 +174,19 @@ async function join() {
     }
 
     > p {
+      margin-top: 1rem;
       font-size: 0.9rem;
       color: darken(white, 20%);
       font-style: italic;
       cursor: pointer;
 
-      &:hover {
-        text-decoration: underline;
+      a {
+        text-decoration: none;
+        color: white;
+
+        &:hover {
+          text-decoration: underline;
+        }
       }
     }
   }

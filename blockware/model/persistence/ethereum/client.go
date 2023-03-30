@@ -100,7 +100,7 @@ func GenerateAuthInstance(privateKey string) (*bind.TransactOpts, error) {
 
 	auth.Nonce = big.NewInt(int64(nonce))
 	auth.Value = big.NewInt(0)
-	auth.GasLimit = uint64(300)
+	auth.GasLimit = uint64(3000000)
 	auth.GasPrice = gasPrice
 
 	util.Logger.Info("Auth instance generated")

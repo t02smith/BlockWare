@@ -30,7 +30,7 @@ func main() {
 
 	// * setup
 	util.Logger.Info("No profile selected => Running default application")
-	SetupConfig()
+	util.SetupConfig()
 	defer viper.WriteConfig()
 
 	model.SetupToolkitEnvironment()
@@ -74,72 +74,14 @@ func main() {
 
 }
 
-// VIPER CONFIG
-
-func SetupConfig() {
-
-	viper.SetConfigName("config")
-	viper.SetConfigType("yaml")
-
-	// viper.AddConfigPath("$HOME/.toolkit")
-	viper.AddConfigPath(".")
-
-	defaultConfig()
-	err := viper.ReadInConfig()
-	if err != nil {
-		util.Logger.Warnf("Error reading config file %s", err)
-	}
-
-	err = viper.SafeWriteConfig()
-	if err != nil {
-		util.Logger.Warnf("Error creating config file %s", err)
-	}
-
-}
-
-func defaultConfig() {
-
-	// toolkit meta info
-
-	// where toolkit data is stored
-	viper.SetDefault("meta.directory", "./test/data/.toolkit")
-
-	viper.SetDefault("meta.log", "stdout")
-
-	// max amount of threads to use
-	viper.SetDefault("meta.threadPoolSize", 10)
-
-	// where hashes are stored inside the toolkit folder
-
-	// default shard size when hashing
-	viper.SetDefault("meta.hashes.shardSize", 16384)
-
-	// how many threads should be hashing at any given time
-	viper.SetDefault("meta.hashes.workerCount", 5)
-
-	// game info
-	viper.SetDefault("games.installFolder", "./test/data/tmp")
-
-	// user info
-	viper.SetDefault("user.info.domain", "t02smith.com")
-	viper.SetDefault("user.info.name", "tom")
-
-	// eth
-	viper.SetDefault("eth.address", "ws://localhost:8545")
-
-	// net
-	viper.SetDefault("net.port", 6749)
-	viper.SetDefault("net.useKnownPeers", false)
-}
-
 func startPeer() error {
 	util.Logger.Info("Attempting to start peer")
 	_, err := peer.StartPeer(
 		peer.Config{
-			ContinueDownloads: true,
+			ContinueDownloads: viper.GetBool("net.peer.continuedownloads"),
 			LoadPeersFromFile: false,
-			ServeAssets:       true,
-			SkipValidation:    false,
+			ServeAssets:       viper.GetBool("net.peer.serveassets"),
+			SkipValidation:    viper.GetBool("net.peer.dovalidation"),
 		},
 		"localhost",
 		viper.GetUint("net.port"),

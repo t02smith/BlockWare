@@ -4,15 +4,22 @@
       <img src="../assets/images/icon.png" alt="" />
       <h4>BlockWare</h4>
 
-      <h3 class="address">🌍 Using library {{ eth.contractAddress }}</h3>
+      <h3 class="address" v-if="eth.contractAddress">
+        🌍 Using library {{ eth.contractAddress }}
+      </h3>
     </router-link>
 
     <div class="links">
-      <router-link to="/library">🕹️ Library</router-link>
-      <router-link to="/downloads">🎁 Downloads</router-link>
-      <router-link to="/upload">🆕 Upload</router-link>
-      <router-link to="/store">💵 Store</router-link>
-      <router-link to="/peers">🫂 Peers</router-link>
+      <router-link v-if="eth.connected" to="/library">🕹️ Library</router-link>
+      <router-link v-if="eth.connected" to="/downloads"
+        >🎁 Downloads</router-link
+      >
+      <router-link v-if="eth.connected" to="/upload">🆕 Upload</router-link>
+      <router-link v-if="eth.connected" to="/store">💵 Store</router-link>
+      <router-link v-if="eth.connected" to="/peers">🫂 Peers</router-link>
+
+      <router-link v-if="!eth.connected" to="/">🔒 Connect</router-link>
+      <router-link to="/help">❓ Help</router-link>
     </div>
   </nav>
 </template>
@@ -73,7 +80,7 @@ nav {
   > .links {
     margin-left: auto;
     display: flex;
-    gap: 1rem;
+    gap: 0.5rem;
 
     a {
       color: rgb(181, 181, 181);

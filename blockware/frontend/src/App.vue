@@ -10,9 +10,8 @@
   </div>
 </template>
 <script setup>
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted } from "vue";
 import { useRoute } from "vue-router";
-import Error from "./components/Error.vue";
 import Navbar from "./components/Navbar.vue";
 import { useGamesStore } from "./stores/games";
 import { usePeerStore } from "./stores/peers";

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/spf13/viper"
 	"github.com/t02smith/part-iii-project/toolkit/model/manager/games"
 	"github.com/t02smith/part-iii-project/toolkit/model/net/peer"
 	"github.com/t02smith/part-iii-project/toolkit/util"
@@ -31,6 +32,7 @@ func (c *Controller) controllerErrorf(err string, args ...any) {
 	c.controllerError(fmt.Sprintf(err, args...))
 }
 
+// open a dialog to select a file and return its absolute path
 func (c *Controller) SelectTxtFile() string {
 	res, err := runtime.OpenFileDialog(c.ctx, runtime.OpenDialogOptions{
 		Filters: []runtime.FileFilter{{Pattern: "*.txt"}},
@@ -43,6 +45,8 @@ func (c *Controller) SelectTxtFile() string {
 
 	return res
 }
+
+// open a dialog to select a folder and returns its absolute path
 func (c *Controller) SelectFolder() string {
 	res, err := runtime.OpenDirectoryDialog(c.ctx, runtime.OpenDialogOptions{})
 
@@ -52,6 +56,15 @@ func (c *Controller) SelectFolder() string {
 	}
 
 	return res
+}
+
+// get the toolkit directory
+func (c *Controller) GetDirectory() string {
+	return viper.GetString("meta.directory")
+}
+
+func (c *Controller) GetContractAddress() string {
+	return viper.GetString("contract.address")
 }
 
 // misc

@@ -84,6 +84,14 @@ const links = [
     link: "/peers",
     description: "Manage connections with your peers",
   },
+  {
+    name: "Help",
+    icon: "❓",
+    colorA: "#005eff",
+    colorB: "#ffffff",
+    link: "/help",
+    description: "Learn more about BlockWare",
+  },
 ];
 </script>
 <style scoped lang="scss">

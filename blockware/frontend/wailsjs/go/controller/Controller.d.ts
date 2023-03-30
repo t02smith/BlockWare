@@ -21,6 +21,10 @@ export function Disconnect(arg1:string,arg2:number):Promise<void>;
 
 export function FetchOwnedGame(arg1:string):Promise<void>;
 
+export function GetContractAddress():Promise<string>;
+
+export function GetDirectory():Promise<string>;
+
 export function GetDownloads():Promise<map[string]controller.ControllerDownload>;
 
 export function GetGameFromStoreByRootHash(arg1:string):Promise<controller.ControllerGame>;

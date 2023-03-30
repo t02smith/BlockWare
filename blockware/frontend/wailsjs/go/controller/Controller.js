@@ -38,6 +38,14 @@ export function FetchOwnedGame(arg1) {
   return window['go']['controller']['Controller']['FetchOwnedGame'](arg1);
 }
 
+export function GetContractAddress() {
+  return window['go']['controller']['Controller']['GetContractAddress']();
+}
+
+export function GetDirectory() {
+  return window['go']['controller']['Controller']['GetDirectory']();
+}
+
 export function GetDownloads() {
   return window['go']['controller']['Controller']['GetDownloads']();
 }

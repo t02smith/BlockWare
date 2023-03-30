@@ -13,7 +13,7 @@ The main responsibility of this section is to respond to requests sent by the Da
 
 \paragraph*{Commands}\label{subsubsec:commands}
 
-Structured messages will typically come as part of a request/response pair involving the sharing of information between peers.
+Structured messages \reqref{F-M8} will typically come as part of a request/response pair involving the sharing of information between peers.
 
 \begin{longtable}{p{.4\textwidth} p{.57\textwidth}}
   \toprule
@@ -25,19 +25,19 @@ Structured messages will typically come as part of a request/response pair invol
   & The user sends a list of their games as a series of unique root hashes. These root hashes will map to games on the blockchain.\\
   \midrule
   BLOCK;$[gameHash]$;$[blockHash]$;
-  & The user will request a block of data off of a user by sending the root hash of the game and the hash of the block being requested. The response will be a SEND\_BLOCK message.\\
+  & The user will request a block of data off of a user by sending the root hash of the game and the hash of the block being requested. The response will be a SEND\_BLOCK message \reqref{F-M9}.\\
   SEND\_BLOCK;$[gameHash]$;\newline $[blockHash]$;$[compressedData]$;
-  & The user sends a block of data in response to a BLOCK message. The data is compressed using the \textit{compress/flate} package to reduce message size.\\
+  & The user sends a block of data in response to a BLOCK message \reqref{F-M9}. The data is compressed using the \textit{compress/flate} package to reduce message size \reqref{NF-S1}.\\
   \midrule
   VALIDATE\_REQ;$[message]$
-  & The user is requesting for this message to be signed using the receiver's Ethereum private key. This is used to verify the receiver's identity and owned collection of games.\\
+  & The user is requesting for this message to be signed using the receiver's Ethereum private key. This is used to verify the receiver's identity and thus their owned collection of games \reqref{F-S1}.\\
   VALIDATE\_RES;$[signed message]$
-  & The user responds to a VALIDATE\_REQ message with a signed version of the given message. From this signature, the receiver can determine the address and public key of the user.\\
+  & The user responds to a VALIDATE\_REQ message with a signed version of the given message. From this signature, the receiver can determine the address and public key of the user \reqref{F-S1}.\\
   \midrule
   REQ\_RECEIPT
-  & A user will request a RECEIPT message from a peer detailing the data that has been sent by the user.\\
+  & A user will request a RECEIPT message from a peer detailing the data that has been sent by the user \reqref{F-S3}.\\
   RECEIPT;$[signature]$;$[message]$
-  & A user will respond to a REQ\_RECEIPT message with a signed message detailing all of the blocks that the requester has sent to the user. This will allow for users to prove their contributions to the game developer who could then reward them.\\
+  & A user will respond to a REQ\_RECEIPT message with a signed message detailing all of the blocks that the requester has sent to the user. This will allow for users to prove their contributions to the game developer who could then reward them \reqref{F-S3}.\\
   \midrule
   ERROR;$[message]$
   & An error message that can be used to prompt a peer to resend a message.\\

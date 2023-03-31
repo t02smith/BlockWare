@@ -106,7 +106,9 @@ func (s *TCPServer) listen(
 
 // close a TCP server and all client connections
 func (s *TCPServer) Close() {
-	s.listener.Close()
+	if s.listener != nil {
+		s.listener.Close()
+	}
 	for _, c := range s.clients {
 		c.Close()
 	}
@@ -188,4 +190,14 @@ func (c *TCPServerClient) Info() string {
 // close a connection with a TCP client
 func (c *TCPServerClient) Close() error {
 	return c.con.Close()
+}
+
+func (s *TCPServer) IsClient(con TCPConnection) bool {
+	for _, con2 := range s.clients {
+		if con == con2 {
+			return true
+		}
+	}
+
+	return false
 }

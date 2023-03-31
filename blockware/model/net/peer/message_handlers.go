@@ -6,6 +6,8 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
+	"strconv"
+	"strings"
 
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/t02smith/part-iii-project/toolkit/model/manager/games"
@@ -53,6 +55,10 @@ func getHandlerByCommand(cmd string) func([]string, tcp.TCPConnection) error {
 		return handleREQ_RECEIPT
 	case "RECEIPT":
 		return handleRECEIPT
+	case "REQ_PEERS":
+		return handleREQ_PEERS
+	case "PEERS":
+		return handlePEERS
 	}
 
 	return func(s []string, t tcp.TCPConnection) error {
@@ -318,7 +324,9 @@ func handleVALIDATE_RES(cmd []string, client tcp.TCPConnection) error {
 	if !valid {
 		client.SendStringf(generateERROR("invalid signature sent"))
 	} else {
+		// request their libraries and a list of peers on connection
 		client.SendString(generateLIBRARY())
+		client.SendString(generateREQ_PEERS())
 	}
 
 	return nil
@@ -412,5 +420,105 @@ func handleRECEIPT(cmd []string, client tcp.TCPConnection) error {
 	util.Logger.Infof("Received receipt for %d blocks", len(data)/32)
 	// TODO do something ??
 
+	return nil
+}
+
+// REQ_PEERS cmd
+
+func generateREQ_PEERS() string {
+	return "REQ_PEERS\n"
+}
+
+func handleREQ_PEERS(cmd []string, client tcp.TCPConnection) error {
+	var ps []struct {
+		hostname string
+		port     uint
+	}
+
+	p := Peer()
+	p.peersMU.Lock()
+	clientPD, ok := p.peers[client]
+	if !ok {
+		return nil
+	}
+
+	for _, pd := range p.peers {
+		if pd.Hostname == clientPD.Hostname && pd.Port == clientPD.Port {
+			continue
+		}
+
+		if p.server.IsClient(client) {
+			continue
+		}
+
+		ps = append(ps, struct {
+			hostname string
+			port     uint
+		}{pd.Hostname, pd.Port})
+	}
+	p.peersMU.Unlock()
+
+	client.SendString(generatePEERS(ps))
+	return nil
+}
+
+// PEERS cmd
+
+func generatePEERS(peers []struct {
+	hostname string
+	port     uint
+}) string {
+	if len(peers) == 0 {
+		return "PEERS\n"
+	}
+
+	var sb strings.Builder
+	sb.WriteString("PEERS")
+	for i := 0; i < len(peers); i++ {
+		sb.WriteString(fmt.Sprintf(";%s:%d", peers[i].hostname, peers[i].port))
+	}
+	sb.WriteString("\n")
+
+	return sb.String()
+
+}
+
+func handlePEERS(cmd []string, client tcp.TCPConnection) error {
+	p := Peer()
+	counter := 0
+
+	var pds []*peerData
+	p.peersMU.Lock()
+	for _, pd := range p.GetPeers() {
+		pds = append(pds, pd)
+	}
+	p.peersMU.Unlock()
+
+	myHostname, myPort := p.GetServerInfo()
+
+	for i := 1; i < len(cmd); i++ {
+		parts := strings.Split(cmd[i], ":")
+		port, err := strconv.ParseUint(parts[1], 10, 32)
+		if err != nil {
+			continue
+		}
+
+		if parts[0] == myHostname && uint(port) == myPort {
+			continue
+		}
+
+		for _, pd := range pds {
+			if !(pd.Hostname == parts[0] && pd.Port == uint(port)) {
+				if err := p.ConnectToPeer(parts[0], uint(port)); err != nil {
+					util.Logger.Warnf("err connecting to peer %s:%d: %s", parts[0], port, err)
+				} else {
+					counter++
+				}
+				break
+			}
+		}
+	}
+
+	util.Logger.Infof("Attempting to connect to %d new peers", counter)
 	return nil
 }

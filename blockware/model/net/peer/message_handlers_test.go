@@ -777,3 +777,56 @@ func TestGenerateRECEIPT(t *testing.T) {
 		})
 	})
 }
+
+/*
+
+function: generateREQ_PEERS
+purpose: generate a request to discover peers
+
+? Test cases
+success
+	#1 => base case
+
+*/
+
+func TestGenerateREQ_PEERS(t *testing.T) {
+	t.Run("success", func(t *testing.T) {
+		assert.Equal(t, "REQ_PEERS\n", generateREQ_PEERS())
+	})
+}
+
+/*
+
+function: generatePEERS
+purpose: generate a peer cmd given a list of peers
+
+? Test cases
+success
+	#1 => no peers
+	#2 => many peers
+
+*/
+
+func TestGeneratePEERS(t *testing.T) {
+	t.Run("success", func(t *testing.T) {
+		t.Run("no peers", func(t *testing.T) {
+			assert.Equal(t, "PEERS\n", generatePEERS([]struct {
+				hostname string
+				port     uint
+			}{}))
+		})
+	})
+
+	t.Run("many peers", func(t *testing.T) {
+		ps := []struct {
+			hostname string
+			port     uint
+		}{
+			{"localhost", 7558},
+			{"8.8.8.8", 9645},
+			{"10.15.7.4", 1280},
+		}
+
+		assert.Equal(t, fmt.Sprintf("PEERS;%s:%d;%s:%d;%s:%d\n", ps[0].hostname, ps[0].port, ps[1].hostname, ps[1].port, ps[2].hostname, ps[2].port), generatePEERS(ps))
+	})
+}

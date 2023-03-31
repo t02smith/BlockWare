@@ -126,6 +126,7 @@ func (c *Controller) Disconnect(hostname string, port uint) {
 	for con, data := range p.GetPeers() {
 		if data.Hostname == hostname && data.Port == port {
 			p.OnConnectionClose(con)
+			return
 		}
 	}
 
@@ -141,6 +142,20 @@ func (c *Controller) ResendValidation(hostname string, port uint) {
 	for _, data := range p.GetPeers() {
 		if data.Hostname == hostname && data.Port == port {
 			data.ValidatePeer()
+			return
 		}
+	}
+}
+
+func (c *Controller) RequestContributions(game string) {
+	gh, err := hashStringToByte32(game)
+	if err != nil {
+		c.controllerError("Error parsing game hash")
+		return
+	}
+
+	p := peer.Peer()
+	for _, data := range p.GetPeers() {
+		data.RequestContributionsReceipt(gh)
 	}
 }

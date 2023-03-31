@@ -3,8 +3,6 @@
 \newpage
 \section{Benchmarking}\label{sec:benchmark}
 
-Benchmarking is being used to determine the overall performance and scalability of the application
-
 Benchmarking is being used in this project to determine the overall performance and scalability of the application, whilst also being useful in identifying any bottlenecks or how the end user can optimise their inputs. The key benchmark being assessed is related to how the application scales downloading games by varying the following factors:
 
 \begin{enumerate}
@@ -14,13 +12,13 @@ Benchmarking is being used in this project to determine the overall performance 
 \end{enumerate}
 
 \vspace{2mm}\noindent
-To ensure the consistency and correctness of results, all benchmarks will be ran on the same machine, running the same OS, and be completed multiple times. The test data is a collection of pseudo-randomly generated files that meet the criteria specified in each benchmark.
+To ensure the consistency and correctness of results, all benchmarks will be ran on the same machine, running the same OS, and be completed multiple times. The test data is a collection of pseudo-randomly generated files that meet the criteria specified in each benchmark. Moreover, the project size used for all benchmarks will be 40GB to match the average game size given in Section~\ref{subsec:design-data}.
 
 \subsection*{Number of Peers}
 
 This benchmark allows us to observe how the application scales when dealing with many peers at the same time and how if affects the overall performance of the application.
 \x
-For each run, we will create a project with 500 files, each of size 80MB~\footnote{These numbers were chosen to match our average game size from Section~\ref{subsec:design-data}, where $500\times 80MB = 40GB$} and a shard size of $2^{22}$ = 4MiB. We will then run $N$ peers locally to simulate a perfect network connection.
+For each run, we will create a project with 500 files, each of size 80MB and a shard size of $2^{22}$ = 4MiB. We will then run $N$ peers locally to simulate a perfect network connection.
 
 \begin{longtable}{l|llll|}
   \cline{2-5}
@@ -72,7 +70,7 @@ For each run, we will create a project with $F$ files of size $S$MB, such that $
   & \multicolumn{4}{c|}{\hdr{Runtime (s)}}
   \\\hline
   \multicolumn{1}{|l|}{\hdr{Count}} 
-  & \hdr{Size}
+  & \hdr{Size (MB)}
   & \multicolumn{1}{l|}{\hdr{1}} 
   & \multicolumn{1}{l|}{\hdr{2}} 
   & \multicolumn{1}{l|}{\hdr{3}} 
@@ -80,17 +78,17 @@ For each run, we will create a project with $F$ files of size $S$MB, such that $
   \\ \hline
   \multicolumn{1}{|r|}{200} 
   & 200
-  & \multicolumn{1}{l|}{} 
-  & \multicolumn{1}{l|}{} 
-  & \multicolumn{1}{l|}{} 
-  &  
+  & \multicolumn{1}{l|}{57} 
+  & \multicolumn{1}{l|}{55} 
+  & \multicolumn{1}{l|}{58} 
+  &  57
   \\\hline
   \multicolumn{1}{|r|}{100} 
   & 400
-  & \multicolumn{1}{l|}{} 
-  & \multicolumn{1}{l|}{} 
-  & \multicolumn{1}{l|}{} 
-  &  
+  & \multicolumn{1}{l|}{56} 
+  & \multicolumn{1}{l|}{52} 
+  & \multicolumn{1}{l|}{58} 
+  & 55
   \\\hline
   \multicolumn{1}{|r|}{50} 
   & 800

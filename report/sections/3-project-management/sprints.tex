@@ -1,144 +1,158 @@
 \section{Sprint Plans}
 
 \newcommand{\yes}{\cellcolor{green!30}YES}
+\newcommand{\started}{\cellcolor{yellow!50}STARTED}
 \newcommand{\no}{\cellcolor{red!30}NO}
 
-Use of sprints will allow me to incrementally build my project up by considering the most essential requirements first. 
+The use of sprints was essential in managing my time and ensuring that I was working on the most important aspects of my project first. The use of MoSCoW priortisation and by then dividing my requirements into logical groups I was able to effectively target key aspects of my application in bulk. The use of test-driven development~\cite{beck_test-driven_2003} meant that at the end of each sprint, each piece of code I wrote was tested and I could move on.
 \x
 For each sprint we will detail the planned requirements, whether they were completed or not, as well as any general comments about that sprint.
 
 \subsection{Sprint 1}
 
-The P2P distribution network was expected to be one of the most complex parts of the application so Sprint 1 was focused on getting the basics of it working.
+I anticipated that the P2P game distribution network would be the most complex and time consuming set of requirements in this project so I decided to focus on it for this first sprint. Table~\ref{tab:sprint-1} shows the requirements included for Sprint 1 and whether they were completed or not.
+\x
+This sprint was largely problem-free as I didn't have much to learn to be able to complete this and could rely heavily on my design to structure my implementation.
 
-% TODO This sucks just make a list
-\begin{longtable}{ | p{.08\textwidth} | p{.34\textwidth} | p{.13\textwidth} | p{.34\textwidth} | }
-  \hline
-  \hdr{Req.} & \hdr{Description} & \hdr{Complete} & \hdr{Evidence}
-  \\\hline
-  \reqref{F-M2}
-  & Downloading blocks from peers
-  & \yes
-  & Acceptence \& benchmark tests
-  \\\hline
-  \reqref{F-M5}
-  & Upload blocks to peers
-  & \yes
-  & Acceptence tests
-  \\\hline
-  \reqref{F-M6}
-  & Download the entire game
-  & \yes
-  & Acceptence tests
-  \\\hline
+\begin{longtable}{p{0.12\textwidth} p{.13\textwidth} p{.6\textwidth}}
+  \toprule
+  \textbf{Req.} & \textbf{Complete} & \textbf{Evidence/Reasoning}
+  \\\midrule\midrule
   \reqref{F-M7}
-  & Verify downloaded data
   & \yes
-  & Acceptence \& unit tests
-  \\\hline
+  & Unit tests for the model/net/tcp package and the peer count benchmark tests.
+  \\
+  \reqref{F-M8}
+  & \yes
+  & Unit tests for the model/net/peer/message\_handlers file test the handling of structured messages and the structured responses sent back. 
+  \\
+  \reqref{F-M9}
+  & \yes
+  & All benchmark tests show the downloading of data to a large scale.
+  \\
+  \reqref{F-M10}
+  & \yes
+  & Unit tests to show incorrect messages being rejected.
+  \\
   \reqref{F-M11}
-  & Maintain TCP connections
   & \yes
-  & Unit tests
-  \\\hline
-  \reqref{F-M12}
-  & Generate Hash Trees
+  & User walkthrough shows the download of a game in its entirety. 
+  \\\midrule\midrule
+  \reqref{NF-M2}
   & \yes
-  & Unit tests
-  \\\hline
+  & User walkthrough ... shows that any user can establish a connection with any other user.
+  \\
+  \reqref{NF-S1}
+  & \started
+  & Users will form many connections concurrently and optimisations were made using the producer/consumer pattern to complete actions like inserting data, or reqeusting data.
+  \\\bottomrule\bottomrule
+  \caption{Requirements included for Sprint 1}
+  \label{tab:sprint-1}
 \end{longtable}
 
 \subsection{Sprint 2}
 
-Sprint 2 was largely spent on two main aspects: creating the Smart Contract to store game metadata and start working on a user interface to show to the user. This sprint had a slower start due to me not being familiar with writing Smart Contracts and having difficulty in finding and learning a suitable GUI framework.
+Sprint 2 was about increasing the scope of the application by focusing on two main aspects:
 
-\begin{longtable}{ | p{.08\textwidth} | p{.34\textwidth} | p{.13\textwidth} | p{.34\textwidth} | }
-  \hline
-  \hdr{Req.} & \hdr{Description} & \hdr{Complete} & \hdr{Evidence}
-  \\\hline
+\begin{enumerate}
+  \item The integration with Ethereum using a Smart Contract, and
+  \item Allowing users to interface with the application via a GUI.
+\end{enumerate}
+
+\vspace{2mm}\noindent
+This sprint had a much slower start compared to the first one as I was largely unfamiliar with smart contract development and the related packages needed to interface with them. On top of this, I considered several UI framework's before settling on my final choice which increased the length of this sprint.
+\x
+Table~\ref{tab:sprint-2} shows the requirements pitched for Sprint 2 and whether or not they were completed.
+
+\begin{longtable}{p{0.12\textwidth} p{.13\textwidth} p{.6\textwidth}}
+  \toprule
+  \textbf{Req.} & \textbf{Complete} & \textbf{Evidence/Reasoning}
+  \\\midrule\midrule
   \reqref{F-M1}
-  & Store data on Ethereum
   & \yes
-  & Smart Contract unit tests
-  \\\hline
-  \reqref{F-M8}
-  & Connect to the Ethereum network
+  & Unit tests for the Library smart contract and user walkthrough ... show the ability to upload game metadata to Ethereum.
+  \\
+  \reqref{F-M2}
   & \yes
-  & Smart Contract unit tests
-  \\\hline
-  \reqref{F-M9}
-  & Purchasing games
+  & Unit tests for the Library smart contract and user walkthrough ... show the ability to upload an update to an existing game to Ethereum.
+  \\
+  \reqref{F-M3}
   & \yes
-  & Smart Contract unit tests
-  \\\hline
-  \reqref{F-M10}
-  & Proving a game purchase
+  & Unit tests for the Library smart contract show users of an existing game being given ownership of an updated version.
+  \\
+  \reqref{F-M4}
   & \yes
-  & Smart Contract unit tests
-  \\\hline
-  \reqref{F-C2}
-  & Provide a simple GUI
+  & The smart contract was successfully deployed the Sepolia test-net~\cite{etherscanio_deployed_nodate}. All user walkthroughs will form connections to this smart contract.\\
+  \reqref{F-M5}
   & \yes
-  & See Appendix~\ref{app:screenshots} for screenshots
-  \\\hline
+  & Unit tests for the Library smart contract and user walkthrough ... show the successful purchase of a game.
+  \\
+  \reqref{F-M6}
+  & \yes
+  & Unit tests for the Library smart contract show a user being added to a mapping containing all users who have purchased the game.
+  \\
+  \reqref{F-S2}
+  & \started
+  & Basic pages were added according to Section~\ref{}. These pages had little styling or reactivity but could perform the required basic functions. See Appendix~\ref{app:screenshots} for screenshots of the final versions.
+  \\\midrule\midrule
+  \reqref{NF-M1}
+  & \yes
+  & The use of the Ethereum blockchain means that no single user can control what is uploaded to the network.
+  \\
   \reqref{NF-M3}
-  & Uploaders are publically identifiable
   & \yes
-  & Smart Contract unit tests
-  \\\hline
+  & Developers can be uniquely identified using their Ethereum address. This should be made publically verifiable by the developers.
+  \\
   \reqref{NF-M4}
-  & Game data cannot be changed
   & \yes
-  & Data on Ethereum is effectively immutable
-  \\\hline
-  \reqref{NF-S2}
-  & Only the original uploader can release an update
+  & Data stored on Ethereum is inherently immutable.
+  \\
+  \reqref{NF-M5}
   & \yes
-  & Smart Contract unit tests
-  \\\hline
-  \reqref{NF-C1}
-  & Intuitive GUI
-  & \yes
-  & See Appendix~\ref{app:screenshots} for screenshots
-  \\\hline
+  & Unit tests for the smart contract show the restriction that only the original uploader can release an update.
+  \\\bottomrule\bottomrule
+  \caption{Requirements included for Sprint 2}
+  \label{tab:sprint-2}
 \end{longtable}
 
 \subsection{Sprint 3}
 
-\begin{longtable}{ | p{.08\textwidth} | p{.34\textwidth} | p{.13\textwidth} | p{.34\textwidth} | }
-  \hline
-  \hdr{Req.} & \hdr{Description} & \hdr{Complete} & \hdr{Evidence}
-  \\\hline
+\begin{longtable}{p{0.12\textwidth} p{.13\textwidth} p{.6\textwidth}}
+  \toprule
+  \textbf{Req.} & \textbf{Complete} & \textbf{Evidence/Reasoning}
+  \\\midrule\midrule
   \reqref{F-S1}
-  & Proving the amount of data seeded
   & \yes
-  & 
-  \\\hline
+  & Users will validate each other's Ethereum address after forming a connection and unit tests for the model/net/peer/message\_handlers file show this being performed.
+  \\
   \reqref{F-S2}
-  & Validate a user's ownership of a game before sending data 
   & \yes
-  &
-  \\\hline
-\end{longtable}
-
-\subsection{Incomplete Requirements}
-
-There were several requirements, which were left incomplete due to a variety of reasons.
-
-\begin{longtable}{ | p{.11\textwidth} | p{.29\textwidth} | p{.5\textwidth} | }
-  \hline
-  \hdr{Req.} & \hdr{Description} & \hdr{Reasoning}
-  \\\hline
-  \reqref{F-C3}
-  & Discover peers based upon what games they own
-  & This requirement was left incomplete intentionally due to the complexity it would have brought to the project. A solution could include using trackers, similar to BitTorrent, or a neighbour discovery algorithm.
-  \\\hline
+  & The UI was overall improved to improve the user experience.
+  \\
   \reqref{F-S3}
-  & Allow for the distribution of DLC 
-  & \multirow{2}{.5\textwidth}{DLC was left out of scope due to a combination of time constraints and an inefficienies within the update system that I felt should be resolved before implementing the DLC system. }
-  \\\cline{1-2}
-  \reqref{NF-S3}
-  & Only the original uploader can release DLC for their game
-  & 
-  \\\hline  
+  & \no
+  & Users will track the blocks sent to them by each of their peers but this application has no mechanism for redeeming these. Due to time constraints, I was unable to implement a sufficient solution. Moreover, I felt that a micro-payment system, like present in Swam~\cite{hartman_swarm_1999}, would be a much better implementation.
+  \\
+  \reqref{F-C1}
+  & \no
+  & Due to time constraints I was unable to implement this at all.
+  \\\midrule\midrule
+  \reqref{NF-S1}
+  & \yes
+  & Benchmark tests show the scalability of my application by varying certain parameters and that the target file size can be downloaded within an acceptable best-case.
+  \\
+  \reqref{NF-S2}
+  & \yes
+  & Changes to the UI made it more interactive and easier to navigate. Designs were inspired by pages from existing platforms to make the UI feel familiar. See Appendix~\ref{app:screenshots} for screenshots of the final versions.
+  \\
+  \reqref{NF-C1}
+  & \no
+  & Completing this requirement would be incredibly complex and was decided against being completed. Preventing the distribution of illegal content is an important consideration moving forward to help keep the platform safe.
+  \\
+  \reqref{NF-C2}
+  & \yes
+  & A help page was included answering some questions that new users may have about the application.
+  \\\bottomrule\bottomrule
+  \caption{Requirements included for Sprint 3}
+  \label{tab:sprint-3}
 \end{longtable}

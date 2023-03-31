@@ -13,7 +13,7 @@ func Run(privateKey string) error {
 		return fmt.Errorf("error starting eth client %s", err)
 	}
 
-	_, _, err = library.DeployLibraryContract("a368fddde78a49b3e415b280ebd36003b0aa93ab07bc97b5aabeaf70835fe778")
+	_, _, err = library.DeployLibraryContract("b3868cc6652c9279c088be8dbfe6f4ef2ab39ecc80b3c69602217fac64ed6ad4")
 	if err != nil {
 		return fmt.Errorf("error connecting to lib instance %s", err)
 	}

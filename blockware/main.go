@@ -82,7 +82,7 @@ func startPeer() error {
 			ContinueDownloads: viper.GetBool("net.peer.continuedownloads"),
 			LoadPeersFromFile: false,
 			ServeAssets:       viper.GetBool("net.peer.serveassets"),
-			SkipValidation:    viper.GetBool("net.peer.dovalidation"),
+			SkipValidation:    viper.GetBool("net.peer.skipvalidation"),
 		},
 		"localhost",
 		viper.GetUint("net.port"),

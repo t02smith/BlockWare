@@ -82,6 +82,10 @@ export function PurchaseGame(arg1) {
   return window['go']['controller']['Controller']['PurchaseGame'](arg1);
 }
 
+export function RequestContributions(arg1) {
+  return window['go']['controller']['Controller']['RequestContributions'](arg1);
+}
+
 export function ResendValidation(arg1, arg2) {
   return window['go']['controller']['Controller']['ResendValidation'](arg1, arg2);
 }

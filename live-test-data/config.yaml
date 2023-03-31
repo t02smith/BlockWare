@@ -1,0 +1,25 @@
+contract:
+    address: 0x2899Dab55A4A20D698062bBF4d4ce9f1073Ce052
+eth:
+    address: https://eth-sepolia.g.alchemy.com/v2/v51CbZclQLLclPgsqRwBINAYtA76FHAs
+games:
+    installfolder: ./downloads
+meta:
+    directory: .toolkit
+    hashes:
+        shardsize: 16384
+        workercount: 5
+    log: stdout
+    threadpoolsize: 10
+net:
+    peer:
+        continuedownloads: true
+        serveassets: true
+        skipvalidation: false
+        useknownpeers: false
+    port: 6051
+    useknownpeers: false
+user:
+    info:
+        domain: t02smith.com
+        name: tom

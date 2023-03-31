@@ -658,9 +658,11 @@ success
 */
 
 func TestGenerateREQ_RECEIPT(t *testing.T) {
+	game := sha256.Sum256([]byte("hello"))
+
 	t.Run("success", func(t *testing.T) {
-		res := generateREQ_RECEIPT()
-		assert.Equal(t, "REQ_RECEIPT\n", res)
+		res := generateREQ_RECEIPT(game)
+		assert.Equal(t, fmt.Sprintf("REQ_RECEIPT;%x\n", game), res)
 	})
 }
 

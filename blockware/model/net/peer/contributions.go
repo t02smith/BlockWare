@@ -20,7 +20,7 @@ each peer so that their contribution across the network
 can be tracked.
 */
 
-var contributionThresholdBeforeWrite uint = 5
+var contributionThresholdBeforeWrite uint = 50
 
 type contributions struct {
 	// what blocks have they sent us from which games
@@ -149,4 +149,9 @@ func GetContributionsFromPeer(addr common.Address, game [32]byte) ([][32]byte, e
 	}
 
 	return blocks, nil
+}
+
+// request a peer's contribution for a given game
+func (pd *peerData) RequestContributionsReceipt(game [32]byte) {
+	pd.Peer.SendString(generateREQ_RECEIPT(game))
 }

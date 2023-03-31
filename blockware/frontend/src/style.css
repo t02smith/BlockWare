@@ -57,3 +57,20 @@ marquee {
   font-weight: bold;
   font-size: 2rem;
 }
+
+.markdown li {
+  margin-left: 2rem;
+}
+
+.markdown p, .markdown li {
+  color: rgb(207, 207, 207);
+}
+
+.markdown h1 {
+  color: rgb(0, 131, 253);
+}
+
+.markdown h2 {
+  color: rgb(0, 106, 206);
+
+}

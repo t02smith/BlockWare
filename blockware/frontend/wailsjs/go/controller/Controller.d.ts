@@ -43,6 +43,8 @@ export function LoadDeferredRequests():Promise<void>;
 
 export function PurchaseGame(arg1:string):Promise<void>;
 
+export function RequestContributions(arg1:string):Promise<void>;
+
 export function ResendValidation(arg1:string,arg2:number):Promise<void>;
 
 export function SelectFolder():Promise<string>;

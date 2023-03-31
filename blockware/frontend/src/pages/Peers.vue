@@ -82,7 +82,7 @@ localhost:6751
           </h3>
 
           <div class="right">
-            <form action="">
+            <form @submit.prevent="requestReceipt">
               <select
                 name=""
                 id=""
@@ -91,7 +91,7 @@ localhost:6751
               >
                 <option value="" disabled>Choose game:</option>
 
-                <option :value="g" v-for="g in games.ownedGames">
+                <option :value="g.rootHash" v-for="g in games.ownedGames">
                   {{ g.title }}
                 </option>
               </select>
@@ -141,7 +141,10 @@ localhost:6751
 import { ref } from "vue";
 import { usePeerStore } from "../stores/peers";
 import { useGamesStore } from "../stores/games";
-import { SelectTxtFile } from "../../wailsjs/go/controller/Controller.js";
+import {
+  SelectTxtFile,
+  RequestContributions,
+} from "../../wailsjs/go/controller/Controller.js";
 import Error from "../components/Error.vue";
 
 /*
@@ -191,6 +194,11 @@ disconnect to an existing peer
 */
 function disconnect(hostname, port) {
   peers.disconnect(hostname, port);
+}
+
+function requestReceipt() {
+  if (!receiptGame) return;
+  RequestContributions(receiptGame.value);
 }
 </script>
 <style scoped lang="scss">

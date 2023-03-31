@@ -326,8 +326,8 @@ func handleVALIDATE_RES(cmd []string, client tcp.TCPConnection) error {
 
 // REQ_RECEIPT
 
-func generateREQ_RECEIPT() string {
-	return "REQ_RECEIPT\n"
+func generateREQ_RECEIPT(game [32]byte) string {
+	return fmt.Sprintf("REQ_RECEIPT;%x\n", game)
 }
 
 func handleREQ_RECEIPT(cmd []string, client tcp.TCPConnection) error {
@@ -361,18 +361,16 @@ func handleREQ_RECEIPT(cmd []string, client tcp.TCPConnection) error {
 //
 
 func generateRECEIPT(game [32]byte, blocks [][32]byte) string {
-	var buffer bytes.Buffer
-	w, _ := flate.NewWriter(&buffer, 6)
+	data := make([]byte, 32*len(blocks))
 
-	for _, b := range blocks {
-		w.Write(b[:])
+	for i, b := range blocks {
+		for j := 0; j < 32; j++ {
+			data[(i*32)+j] = b[j]
+		}
 	}
 
-	w.Flush()
-	w.Close()
-
-	sig, _ := ethereum.SignMessage(buffer.Bytes())
-	return fmt.Sprintf("RECEIPT;%x;%x;%x\n", game, sig, buffer.Bytes())
+	sig, _ := ethereum.SignMessage(data)
+	return fmt.Sprintf("RECEIPT;%x;%x;%x\n", game, sig, data)
 }
 
 func handleRECEIPT(cmd []string, client tcp.TCPConnection) error {
@@ -382,16 +380,11 @@ func handleRECEIPT(cmd []string, client tcp.TCPConnection) error {
 	}
 	_ = game
 
+	fmt.Printf("'%s'", cmd[3])
 	data, err := hex.DecodeString(cmd[3])
 	if err != nil {
 		return err
 	}
-
-	var b bytes.Buffer
-	r := flate.NewReader(bytes.NewReader(data))
-
-	b.ReadFrom(r)
-	r.Close()
 
 	// check signature of data matches expected user
 	pd := Peer().peers[client]
@@ -405,7 +398,7 @@ func handleRECEIPT(cmd []string, client tcp.TCPConnection) error {
 	}
 
 	pubKeyBytes := crypto.FromECDSAPub(pd.Validator.PublicKey)
-	hash := crypto.Keccak256Hash(b.Bytes())
+	hash := crypto.Keccak256Hash(data)
 
 	sigPublicKey, err := crypto.Ecrecover(hash.Bytes(), sig)
 	if err != nil {
@@ -416,6 +409,7 @@ func handleRECEIPT(cmd []string, client tcp.TCPConnection) error {
 		return fmt.Errorf("public keys do not match => throwing receipt")
 	}
 
+	util.Logger.Infof("Received receipt for %d blocks", len(data)/32)
 	// TODO do something ??
 
 	return nil

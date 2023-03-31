@@ -51,5 +51,5 @@ func defaultConfig() {
 	viper.SetDefault("net.peer.continuedownloads", true)
 	viper.SetDefault("net.peer.useKnownPeers", false)
 	viper.SetDefault("net.peer.serveassets", true)
-	viper.SetDefault("net.peer.dovalidation", true)
+	viper.SetDefault("net.peer.skipvalidation", false)
 }

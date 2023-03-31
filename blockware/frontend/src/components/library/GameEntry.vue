@@ -27,7 +27,7 @@
       </div>
     </div>
 
-    <div v-html="content"></div>
+    <div v-html="content" class="markdown"></div>
   </div>
 </template>
 <script setup>

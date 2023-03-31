@@ -2,7 +2,7 @@
   <router-link
     :to="`/${props.linkTo}?game=${props.hash}`"
     class="game"
-    :style="`background: url('http://localhost:3003/test/data/.toolkit/assets/${props.hash}/cover.png') no-repeat center;`"
+    :style="`background: url('http://localhost:3003/${directory}/assets/${props.hash}/cover.png') no-repeat center;`"
   >
     <div class="gradient"></div>
     <h5 class="version">v{{ props.version }}</h5>
@@ -14,6 +14,14 @@
   </router-link>
 </template>
 <script setup>
+import { onMounted, ref } from "vue";
+import { GetDirectory } from "../../../wailsjs/go/controller/Controller";
+
+const directory = ref("");
+onMounted(async () => {
+  directory.value = await GetDirectory();
+});
+
 const props = defineProps({
   title: {
     type: String,

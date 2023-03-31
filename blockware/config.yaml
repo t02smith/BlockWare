@@ -1,5 +1,5 @@
 contract:
-    address: 0x750cf6392175f94ff5014803a0bb6b79de543337
+    address: 0x4f5c19f9fdd23609d750f9723dc37bcd3bcfb9ac
 eth:
     address: http://localhost:8545
 games:
@@ -13,8 +13,8 @@ meta:
 net:
     peer:
         continuedownloads: true
-        dovalidation: true
         serveassets: true
+        skipvalidation: false
         useknownpeers: false
     port: 6749
 user:

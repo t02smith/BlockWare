@@ -2,7 +2,7 @@
 
 \subsubsection{Frontend}\label{subsubsec:frontend}
 
-This application will have a GUI \reqref{F-S2} \reqref{NF-S2} where users can interact with the platform and will need to include the following pages:
+This application will have a GUI \reqref{F-S2} \reqref{NF-S2} where users can interact with the platform. Having a GUI is essential to making the platform as easy to use as possible so that it is accessible to new users. At minimum it will need to include the following pages:
 
 \begin{itemize}
   \item \textbf{Library} The user's collection of owned games, where they can view details of each game owned as well as manage their download status.
@@ -16,10 +16,4 @@ This application will have a GUI \reqref{F-S2} \reqref{NF-S2} where users can in
 
 \subsubsection{Controller}
 
-The Controller will be the interface functions used for communication between the frontend and backend. Each function should be used to trigger an action/process or fetch some data. Some example Controller functions will include:
-
-\begin{itemize}
-  \item \textbf{PurchaseGame} Purchase a game off of Ethereum and add the metadata to the user's library.
-  \item \textbf{StartDownload} Create a download for one of the user's owned games and start looking for blocks of data for it.
-  \item \textbf{UploadGame} Upload a game to Ethereum given a set of input parameters.
-\end{itemize}
+The Controller will be represented as a set of interface functions that allow the backend and frontend code to communicate. This can be done to trigger actions such as starting a game download or to fetch data like the list of a user's owned games.

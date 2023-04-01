@@ -1,0 +1,22 @@
+\section{Future Work}
+
+\subsection*{Content Discovery}
+Creating a fully functioning store page, where users can search for and discover new games, would be a vital next step for this application. Some of the techniques used to achieve this could be:
+
+\begin{itemize}
+  \item \textbf{Indexing} Periodically generate an index of all games uploaded that allows users to easily search the store without having to make large amounts of requests to the blockchain. Use of ranking algorithms could allow for users to be shown the most relevant and useful results.
+  \item \textbf{More Metadata} Adding more metadata to games would allow for them to be more easily searchable and indexable. For example, each game might be given a set of tags that can be searched for.
+\end{itemize}
+
+\vspace{2mm}\noindent
+This would help flesh out our store page to make the user experience even better as user's will be able to search for games through this application.
+
+\subsection*{Optimisations}
+
+There are several optimisations we could add to improve the overall performance and scalability of the application:
+
+\begin{itemize}
+  \item \textbf{New Commands} By extending the commands from Section~\ref{subsubsec:commands} we could reduce the amount of network overhead required to communicate between peers.\newline This could include batch block requests, or only forming connections with peers who we share some games with.
+  \item \textbf{Block Selection} Currently blocks are not ranked in any way but by considering ideas from Section~\ref{subsec:bittorrent-download} we could improve the efficiency, availability and throughput of our network.
+  \item \textbf{UDP Connections} Using UDP would vastly reduce the network overhead for communicating with a large number of peers at the expense of greater complexity.
+\end{itemize}

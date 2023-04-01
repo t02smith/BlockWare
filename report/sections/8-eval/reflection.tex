@@ -2,18 +2,23 @@
 
 \subsection{Risk Assessment}
 
+Below I'll detail some the risks mentioned in Section~\ref{sec:risk-assessment} that came up during development and how my mitigation strategy helped me cope with the issues as they came up.
+
 \paragraph*{Difficulty with blockchain development}
-As expected there were several difficuluties with blockchain development:
+As expected there were several difficulties with blockchain development:
 
 \begin{itemize}
   \item A decent amount of the documentation is minimal or outdated. As blockchain development is a smaller field there are little in the ways of forum postings.
   \item Some of the libraries used had bugs in them that hindered development. For example, I could deploy the smart contract to the Sepolia testnet from Remix easily but not through Geth. 
 \end{itemize}
 
+\vspace{2mm}\noindent
+Despite the problems mentioned above, I was able to complete the blockchain aspect of the project successfully. Effective use of sprint planning meant that I had considered this to be a potential issue and had allocated time to being able to deal with it.
+
 \paragraph*{The application is not finished}
-Section~\ref{} details the requirements that were not finished and Section~\ref{} discusses the limitations with my current implementation. It was expected that this project would not be entirely finished but a lot of the major requirements were met.
+Section~\ref{sec:sprints} shows that not all of the requirements were finished and Section~\ref{sec:design-lim} discusses the limitations with my current implementation. It was expected that this project would not be entirely finished but a lot of the major requirements were met.
 \x
-The application ended up being incredibly large and took a lot more time to implement and test than expected. Table~\ref{tab:cloc} shows a breakdown of the source code.
+The application ended up being incredibly large and took a lot more time to implement and test than expected. Table~\ref{tab:cloc} shows a breakdown of the source code. Agile development could only help me so much so by having a hard cut-off point for the implementation I was still left with plenty of time to complete the report.
 
 \begin{longtable}{ | r | r | r | r | }
   \hline
@@ -47,6 +52,18 @@ The application ended up being incredibly large and took a lot more time to impl
   \caption{The lines of code written for this project calculated using CLOC \url{https://github.com/AlDanial/cloc}}
   \label{tab:cloc}
 \end{longtable}
+
+\subsection{Agile Development}
+
+The use of an agile methodology alongside test-driven development meant I could incrementally expand the scope of my application and ensure that existing code was tested sufficiently. Separating my implementation into three sprints benefitted me by:
+
+\begin{itemize}
+  \item having a smaller set of requirements to focus on at once helped me to feel less overwhelmed,
+  \item working on the most important aspects first to ensure I was able to produce a minimum viable product, and
+  \item taking time in-between sprints to take a break from the project and prepare for the next sprint.
+\end{itemize}
+
+
 
 \subsection{What Went Well}
 

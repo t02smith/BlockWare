@@ -79,10 +79,12 @@ func startPeer() error {
 	util.Logger.Info("Attempting to start peer")
 	_, err := peer.StartPeer(
 		peer.Config{
-			ContinueDownloads: viper.GetBool("net.peer.continuedownloads"),
-			LoadPeersFromFile: false,
-			ServeAssets:       viper.GetBool("net.peer.serveassets"),
-			SkipValidation:    viper.GetBool("net.peer.skipvalidation"),
+			ContinueDownloads:  viper.GetBool("net.peer.continuedownloads"),
+			LoadPeersFromFile:  false,
+			ServeAssets:        viper.GetBool("net.peer.serve_assets"),
+			SkipValidation:     viper.GetBool("net.peer.skip_validation"),
+			TrackContributions: true,
+			MaxConnections:     viper.GetUint("net.peer.max_connections"),
 		},
 		"localhost",
 		viper.GetUint("net.port"),

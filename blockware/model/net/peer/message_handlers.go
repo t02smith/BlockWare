@@ -447,7 +447,7 @@ func handleREQ_PEERS(cmd []string, client tcp.TCPConnection) error {
 			continue
 		}
 
-		if p.server.IsClient(client) {
+		if pd.Port == 0 {
 			continue
 		}
 
@@ -478,8 +478,8 @@ func generatePEERS(peers []struct {
 		sb.WriteString(fmt.Sprintf(";%s:%d", peers[i].hostname, peers[i].port))
 	}
 	sb.WriteString("\n")
-
-	return sb.String()
+	res := sb.String()
+	return res
 
 }
 

@@ -81,10 +81,12 @@ func RunProfile(profileNumber Profile, contractAddr string) error {
 	switch profileNumber {
 	case _listenOnly:
 		err := SetupProfile("./test/profiles/listenOnly", listenOnly.PrivateKey, addr, peer.Config{
-			ContinueDownloads: false,
-			LoadPeersFromFile: false,
-			ServeAssets:       false,
-			SkipValidation:    false,
+			ContinueDownloads:  false,
+			LoadPeersFromFile:  false,
+			ServeAssets:        false,
+			SkipValidation:     false,
+			MaxConnections:     50,
+			TrackContributions: false,
 		})
 		if err != nil {
 			return err
@@ -93,10 +95,12 @@ func RunProfile(profileNumber Profile, contractAddr string) error {
 
 	case _listenOnlyWithUpload:
 		err := SetupProfile("./test/profiles/listenOnlyWithUpload", listenOnlyUpload.PrivateKey, addr, peer.Config{
-			ContinueDownloads: false,
-			LoadPeersFromFile: false,
-			ServeAssets:       false,
-			SkipValidation:    false,
+			ContinueDownloads:  false,
+			LoadPeersFromFile:  false,
+			ServeAssets:        false,
+			SkipValidation:     false,
+			MaxConnections:     50,
+			TrackContributions: false,
 		})
 		if err != nil {
 			return err

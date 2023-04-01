@@ -13,9 +13,12 @@ meta:
 net:
     peer:
         continuedownloads: true
+        max_connections: 100
+        serve_assets: true
         serveassets: true
+        skip_validation: false
         skipvalidation: false
-        useknownpeers: false
+        use_known_peers: false
     port: 6749
 user:
     info:

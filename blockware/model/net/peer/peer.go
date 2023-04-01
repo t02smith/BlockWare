@@ -77,6 +77,9 @@ type Config struct {
 
 	// track contributions sent by peers
 	TrackContributions bool
+
+	// upper limit on connections
+	MaxConnections uint
 }
 
 // * functions
@@ -168,6 +171,18 @@ func (p *peer) ConnectToPeer(hostname string, portNo uint) error {
 
 // run this function every time we connect to a new peer
 func (p *peer) onConnection(hostname string, port uint, peer tcp.TCPConnection) {
+	p.peersMU.Lock()
+	numOfPeers := len(p.peers)
+	p.peersMU.Unlock()
+
+	if numOfPeers == int(p.config.MaxConnections) {
+		util.Logger.Debug("max connections reached => rejecting connection")
+		if err := peer.Close(); err != nil {
+			util.Logger.Warn(err)
+		}
+		return
+	}
+
 	pd := &peerData{
 		Hostname:     hostname,
 		Port:         port,

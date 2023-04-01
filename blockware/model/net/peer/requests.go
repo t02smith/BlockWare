@@ -6,14 +6,6 @@ import (
 	"github.com/t02smith/part-iii-project/toolkit/util"
 )
 
-/*
-
- */
-
-const (
-	maxRequestsPerPeer uint = 10
-)
-
 // listen for incoming download requests
 func (p *peer) listenToDownloadRequests() {
 	util.Logger.Info("Listening for incoming download requests")

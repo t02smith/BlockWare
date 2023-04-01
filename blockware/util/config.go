@@ -49,7 +49,8 @@ func defaultConfig() {
 	// net
 	viper.SetDefault("net.port", 6749)
 	viper.SetDefault("net.peer.continuedownloads", true)
-	viper.SetDefault("net.peer.useKnownPeers", false)
-	viper.SetDefault("net.peer.serveassets", true)
-	viper.SetDefault("net.peer.skipvalidation", false)
+	viper.SetDefault("net.peer.use_known_peers", false)
+	viper.SetDefault("net.peer.serve_assets", true)
+	viper.SetDefault("net.peer.skip_validation", false)
+	viper.SetDefault("net.peer.max_connections", 100)
 }

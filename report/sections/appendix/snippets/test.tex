@@ -1,0 +1,47 @@
+\newpage\section{Example Test}\label{app:ex-test}
+
+The following shows the example test structure for the tests about a function that handles an incoming SEND\_BLOCK message received from another peer. For each test we include a long comment above it detailing each test case included within the function below such that the structure of the test cases matches the structure of the nested tests.
+
+\begin{lstlisting}[language=go, caption={An example test case used for the handleSEND\_BLOCK function}]
+/*
+function: handleSEND_BLOCK
+purpose: receive a block of data from a peer and insert it into storage
+
+Test cases:
+success
+  #1 => single message received
+  #2 => all messages to download a file received
+
+failure
+  illegal arguments
+    #1 => invalid game hash
+    #2 => invalid shard hash
+    invalid data
+      #1 => wrong length
+      #1 => wrong content
+      
+  unexpected data
+    #1 => download for game not started
+    #2 => block not needed for download
+*/
+func TestHandleSEND_BLOCK(t *testing.T) {
+  // all tests setup
+  ...
+  // end all tests setup
+  t.Run("success", func(t *testing.T) {
+    t.Run("single message received", func(t *testing.T) {
+      ...
+    })
+
+    t.Run("all messages to download a file received", func(t *testing.T) {
+      ...
+    })
+  })
+
+  // failure tests
+  ...
+  // end failure tests
+
+  // all tests teardown
+}
+\end{lstlisting}

@@ -4,13 +4,14 @@
 \subsection{Data}
 \label{subsec:design-data}
 
-The first consideration is what kind of data we are going to be storing and where is it going to be stored.
+Table~\ref{tab:data} discusses the different types of data we are going to need to store and where they should be stored based upon their properties.
+
 
 \begin{longtable}{ p{.12\textwidth} p{.1\textwidth} p{.1\textwidth} p{.63\textwidth} }
   \toprule
   \textbf{Data} & \textbf{Size} & \textbf{Location} & \textbf{Explanation}\\
   \midrule\midrule
-  Game Metadata
+  Game Metadata\newline\reqref{F-M1}
   & 100 -- \newline200B
   & Ethereum
   & This data is the minimal set of information required for the unique identification of each game. See Section~\ref{subsubsec:eth-data}.
@@ -18,18 +19,18 @@ The first consideration is what kind of data we are going to be storing and wher
   \vspace{1mm}
   This data is appropriate to store on Ethereum as it is public, small in size, and essential to the correct functioning of the application as all users will need to be able to discover all games. 
   \x
-  Game Hash Tree
+  Game Hash Tree\newline\reqref{F-M12}
   & \~15KB
   & IPFS
-  & This will be the compressed Hash Tree that will allow the users to identify and verify the shards of data they need to download for their game.
+  & This will be the compressed Hash Tree that will allow the users to identify and verify the shards of data they need to download for their game. The user will download this immediately after purchasing the game.
 
   \vspace{1mm}
   This data would be costly to store on Ethereum for a large number of games and will only need to be accessed by a subset of users. As it is also public data, IPFS is appropriate to store it on, and we can reference the CID within the data stored on Ethereum.
   \x
-  Game Assets
+  Game\newline Assets\newline\reqref{F-C2}
   & Unkown~\footnote{Some games may include many promotional materials, whilst some could include none. Therefore, it is hard to estimate the expected size.} 
   & IPFS
-  & This will represent any promotional material provided for the game that can be viewed on the game's store page. This will typically include cover art and a markdown file for the description.
+  & This will represent any promotional material provided for the game that can be viewed on the game's store page. This will typically include cover art and a markdown file for the description. The user will download this when they first view it in the store.
 
   \vspace{1mm}
   Similar to the Hash Tree, this will typically be too large to store on Ethereum so, given that it is public and non-essential data, IPFS will be used to store and distribute it. 
@@ -43,6 +44,7 @@ The first consideration is what kind of data we are going to be storing and wher
   This data is way too large to store on Ethereum but also isn't public, which means using IPFS would not be appropriate~\footnote{IPFS and similar platforms provide no access control for the data stored there and any encryption based technique would be unviable.}. Therefore, this project will use a custom P2P network for sharing data, which is described in Section~\ref{subsec:design-p2p} 
   \\\bottomrule\bottomrule
   \caption{The different types of data required for each game.}
+  \label{tab:data}
 \end{longtable}
 
 \noindent 

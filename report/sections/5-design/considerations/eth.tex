@@ -22,8 +22,8 @@ To satisfy \reqref{F-M1} and \reqref{F-M2}, the data stored on the blockchain wi
   \toprule
   \textbf{Name} & \textbf{Description}
   \\\midrule\midrule
-  \multicolumn{2}{c}{\cellcolor{red!70}\textit{For each game}} 
-  \\\midrule
+  \multicolumn{2}{c}{\textit{For each game}} 
+  \\\midrule\midrule
   title & The name of the game.\\
   version & The version number of the game.\\
   \textit{release date} & The timestamp for when the game was uploaded.\\
@@ -32,16 +32,17 @@ To satisfy \reqref{F-M1} and \reqref{F-M2}, the data stored on the blockchain wi
   \textit{root hash} & The root hash of the game that uniquely identifies the game and is based upon its contents.\\
   previous version & The root hash of the most previous version of the game if it exists.\\
   price & The price of the game in Wei\\
-  \textit{hash tree CID} & Required for downloading the hash tree folder from IPFS.\\
-  \textit{assets CID} & Required for downloading the assets folder from IPFS.\\\midrule
-  \multicolumn{2}{c}{\cellcolor{green}\textit{Managing the Collection of Games}} 
-  \\\midrule
+  \textit{hash tree CID} & Required for downloading the hash tree folder from IPFS. Without this, user's won't be able to download the game as they will not have knowledge of the necessary blocks.\\
+  \textit{assets CID} & Required for downloading the assets folder from IPFS. Without this, the user won't have access to any promotional material and will be less likely to purchase the game.\\\midrule\midrule
+  \multicolumn{2}{c}{\textit{Managing the Collection of Games}} 
+  \\\midrule\midrule
   \textit{library} & A mapping for storing all games uploaded to the network, where a game's root hash is the key used to find its information.\\
   \textit{game hashes} & Solidity doesn't allow us to enumerate maps so we will also store a list of hashes for all games uploaded.\\
   \textit{purchased} & A mapping which allows us to easily check if a user has purchased a game \reqref{F-M6}.
   \\\bottomrule\bottomrule
   \caption{All the data to be stored on the Ethereum blockchain}
 \end{longtable}
+
 
 \subsubsection*{Purchasing Content}
 

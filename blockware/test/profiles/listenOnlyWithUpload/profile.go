@@ -44,11 +44,11 @@ Data:
 var PrivateKey string = testutil.Accounts[1][1]
 
 func Run() {
-	// if _, err := os.Stat("../../data/tmp/games/profile-2"); err != nil {
-	// 	if err = testutil.GenerateLargeFolder("profile-2", "../../data/tmp/games/", 80_000_000, 500); err != nil {
-	// 		util.Logger.Fatal(err)
-	// 	}
-	// }
+	if _, err := os.Stat("../../data/tmp/games/profile-2"); err != nil {
+		if err = testutil.GenerateLargeFolder("profile-2", "../../data/tmp/games/", 800_000_000, 50); err != nil {
+			util.Logger.Fatal(err)
+		}
+	}
 
 	p := peer.Peer()
 

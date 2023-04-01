@@ -65,6 +65,9 @@ func (l *Library) CreateDownload(g *Game) error {
 
 // GetOwnedGame get a game and its download if they exist
 func (l *Library) GetOwnedGame(rootHash [32]byte) *Game {
+	l.lock.Lock()
+	defer l.lock.Unlock()
+
 	if _, ok := l.ownedGames[rootHash]; !ok {
 		return nil
 	}

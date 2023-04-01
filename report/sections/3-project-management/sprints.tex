@@ -37,6 +37,10 @@ This sprint was largely problem-free as I didn't have much to learn to be able t
   \reqref{F-M11}
   & \yes
   & User walkthrough shows the download of a game in its entirety. 
+  \\
+  \reqref{F-M12}
+  & \started
+  & The algorithm to generate a hash tree and the using of it to download data was implemented but no way to upload it anywhere.
   \\\midrule\midrule
   \reqref{NF-M2}
   & \yes
@@ -91,9 +95,13 @@ Table~\ref{tab:sprint-2} shows the requirements pitched for Sprint 2 and whether
   & \yes
   & Unit tests for the Library smart contract show a user being added to a mapping containing all users who have purchased the game.
   \\
+  \reqref{F-M12}
+  & \yes
+  & Hash trees are now uploaded to IPFS and the CID is stored on Ethereum. 
+  \\
   \reqref{F-S2}
   & \started
-  & Basic pages were added according to Section~\ref{}. These pages had little styling or reactivity but could perform the required basic functions. See Appendix~\ref{app:screenshots} for screenshots of the final versions.
+  & Basic pages were added according to Section~\ref{subsubsec:frontend}. These pages had little styling or reactivity but could perform the required basic functions. See Appendix~\ref{app:screenshots} for screenshots of the final versions.
   \\\midrule\midrule
   \reqref{NF-M1}
   & \yes
@@ -133,9 +141,18 @@ Table~\ref{tab:sprint-2} shows the requirements pitched for Sprint 2 and whether
   & \no
   & Users will track the blocks sent to them by each of their peers but this application has no mechanism for redeeming these. Due to time constraints, I was unable to implement a sufficient solution. Moreover, I felt that a micro-payment system, like present in Swam~\cite{hartman_swarm_1999}, would be a much better implementation.
   \\
+  \reqref{F-S4}
+  & \yes
+  & Users will exchange the REQ\_PEERS/PEER commands to discover neighbouring peers.\newline
+  However a better implementation might have the developer of the game be able to provide a list of peers who have the game. This would allow a user to easily find peers who are interested in the same content.
+  \\
   \reqref{F-C1}
   & \no
   & Due to time constraints I was unable to implement this at all.
+  \\
+  \reqref{F-C2}
+  & \yes
+  & Game assets are uploaded to IPFS and the CID is stored with the game metadata on Ethereum.
   \\\midrule\midrule
   \reqref{NF-S1}
   & \yes

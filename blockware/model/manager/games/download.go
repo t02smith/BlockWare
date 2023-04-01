@@ -208,7 +208,7 @@ func (g *Game) insertData(fileHash, blockHash [32]byte, data []byte) error {
 
 	d.progressLock.Lock()
 	file, ok := d.Progress[fileHash]
-	d.progressLock.Unlock()
+	defer d.progressLock.Unlock()
 
 	if !ok {
 		return fmt.Errorf("file %x not in download queue", fileHash)

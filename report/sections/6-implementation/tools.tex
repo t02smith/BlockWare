@@ -24,7 +24,7 @@ The backend code for this application was written based upon the design from Sec
 
 \section{Smart Contract}
 
-To write and deploy a smart contract that met the criteria specified in Section~\ref{subsec:design-con-eth}, I used the following tools:
+To develop and deploy a smart contract that met the criteria specified in Section~\ref{subsec:design-con-eth}, I used the following tools:
 
 \begin{longtable}{p{0.15\textwidth} p{0.7\textwidth}}
   \toprule
@@ -37,9 +37,12 @@ To write and deploy a smart contract that met the criteria specified in Section~
   Alchemy~\cite{noauthor_alchemy_nodate}
   & Alchemy provides useful tools for interacting with Ethereum and specifically Sepolia, such as an ETH faucet and an RPC URL.\\
   MetaMask~\cite{noauthor_crypto_nodate}
-  & A browser-based wallet that can easily be conencted to other tools such as Alchemy or Remix.\\
+  & A browser-based wallet that can easily be connected to other tools such as Alchemy or Remix.\\
   Remix~\cite{noauthor_remix_nodate}
-  & A browser-based IDE for writing smart contracts that allows for easy deployment.
+  & A browser-based IDE for writing smart contracts that allows for easy deployment. I did have an implementation that would deploy using go-ethereum but due to a bug in package it was unable to work for the Sepolia test-net.
+  \\
+  Ganache CLI~\cite{noauthor_trufflesuiteganache_2023}
+  & Ganache CLI was used to create a local Ethereum test-net that I could develop my application with.
   \\\bottomrule\bottomrule
   \caption{The tools used for deployment of my smart contract}
 \end{longtable}
@@ -48,6 +51,8 @@ To write and deploy a smart contract that met the criteria specified in Section~
 The contract was successfully deployed~\cite{etherscanio_deployed_nodate} to the Sepolia test-net and can be interacted with by any user.
 
 \section{Frontend}
+
+The frontend code was developed from Section~\ref{subsubsec:frontend} to provide a user a GUI to interact with. Table~\ref{tab:tools-frontend} details the list of tools used.
 
 \begin{longtable}{p{0.15\textwidth} p{0.7\textwidth}}
   \toprule
@@ -70,11 +75,13 @@ The contract was successfully deployed~\cite{etherscanio_deployed_nodate} to the
   & An extension of CSS that is used to style DOM elements. This was essential in making the UI look nice and be accessible.
   \\
   \bottomrule\bottomrule
+  \caption{The tools used to develop the application's GUI }
+  \label{tab:tools-frontend}
 \end{longtable}
 
 \section{Other Tools}
 
-The following tools were also used throughout development:
+Table~\ref{tab:tools-other} shows the other tools used for the development of this application.
 
 \begin{longtable}{p{0.15\textwidth} p{0.7\textwidth}}
   \toprule
@@ -91,4 +98,5 @@ The following tools were also used throughout development:
   & Lucidchart was used to create all of the diagrams for this project.
   \\\bottomrule\bottomrule
   \caption{General purpose tools used for this project}
+  \label{tab:tools-other}
 \end{longtable}

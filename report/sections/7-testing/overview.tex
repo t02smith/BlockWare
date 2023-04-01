@@ -4,23 +4,24 @@ My approach to testing will consist of the following principles:
 
 \begin{enumerate}
   \item \textbf{Test Driven Development} Tests should be written alongside the code to reduce the risk of bugs and improve robustness.
-  \item \textbf{Fail Fast (Smoke testing)} Automated tests should be ran in a pipeline where the fastest tests are always ran first to reduce the time spent ranning tests.
-  \item \textbf{Documentation} Test cases should be well documented and group contextually.   
+  \item \textbf{Fail Fast (Smoke testing)} Automated tests should be ran in a pipeline where the fastest tests are always ran first to reduce the time spent running tests.
+  \item \textbf{Documentation} Test cases should be well documented and grouped contextually such that they are easy to maintain and add to. See Appendix~\ref{app:ex-test} for an example of the documentation and structure expected for each function test.  
 \end{enumerate}
 
 \subsection*{Tools}
 
-Below are the different tools I used to test my application and a justification as to why they were included.
+Table~\ref{tab:tools-testing} shows the different tools I used to test my application and a justification as to why they were included.
 
-\begin{longtable}{ | p{.2\textwidth} | p{.7\textwidth} | }
-  \hline
-  \hdr{Tool/Package} & \hdr{Justification}
-  \\\hline
-  Go testing
-  & The testing package is part of Go's standard library and will be sufficient to produce most test cases and also includes support for benchmarking and fuzzing tests.
-  \\\hline
+\begin{longtable}{p{0.15\textwidth} p{0.7\textwidth}}
+  \toprule
+  \textbf{Tool} & \textbf{Description \& Reasoning}
+  \\\midrule\midrule
+  Go Testing
+  & The testing package included with Go's standard library was sufficient to produce most of the test cases required for this project.
+  \\
   testify~\cite{noauthor_testify_2023}
   & This package is included as it provides several useful testing features that aren't present in the standard library testing package. This includes assert functions to boost code readability, mocking tools for better unit testing, setup/teardown functionality, and more.
-  \\\hline 
+  \\\bottomrule\bottomrule
   \caption{The tools used for testing my project}
+  \label{tab:tools-testing}
 \end{longtable}

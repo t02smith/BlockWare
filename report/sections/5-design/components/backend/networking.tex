@@ -39,6 +39,11 @@ Structured messages \reqref{F-M8} will typically come as part of a request/respo
   RECEIPT;$[signature]$;$[message]$
   & A user will respond to a REQ\_RECEIPT message with a signed message detailing all of the blocks that the requester has sent to the user. This will allow for users to prove their contributions to the game developer who could then reward them \reqref{F-S3}.\\
   \midrule
+  REQ\_PEERS
+  & A user requests a list of peers off one of their own peers. This will usually be sent immediately after a peer's identity is validated and will help increase the connectivity in the network \reqref{F-S4}.\\
+  PEERS;$[p_1 hostname]:[p_1 port]$;\ldots
+  & A user will send a list of their active peers. This will be limited to those peers which we have connected to and know the hostname and port of their server and will exclude the user's information \reqref{F-S4}.\\
+  \midrule
   ERROR;$[message]$
   & An error message that can be used to prompt a peer to resend a message.\\
   \bottomrule\bottomrule

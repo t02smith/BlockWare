@@ -1,12 +1,15 @@
 
 \subsection{Persistence}
 
-The Persistence layer shows how the data for the application is divided across several mediums; namely the \textbf{Ethereum Smart Contract}, \textbf{IPFS}, and a \textbf{P2P Network}. Each component stores a different, which is outlined in Section~\ref{subsec:design-data}.
+The Persistence layer shows how the data for the application is divided across several mediums; namely the \textbf{Ethereum Smart Contract}, \textbf{IPFS}, and a \textbf{P2P Network}. Each component stores a different type of data, which is outlined in Section~\ref{subsec:design-data}.
 \x
-There are several things to note about using Ethereum as platform for selling games:
+There are several things to note about using Ethereum as a platform for selling games:
 
 \begin{itemize}
-  \item Ethereum is a less stable currency than most traditional currencies like GBP or USD so games may fluctuate largely in price.
-  \item All write functions on the smart contract will incur a gas fee so uploading or updating data will not be free.
-  \item Users will have to source Ether from elsewhere before being able to purchase games, which may be intimidating to users not already familiar with the ecosystem.
+  \item Ethereum is a less stable currency than most traditional currencies like GBP or USD so games may fluctuate largely in price. This design describes no solution to this issue but an example solution might attempt to map a real-world currency to Ether.
+  \item All write functions to the smart contract will incur a gas fee so uploading or updating data will not be free.
+  \item Users will have to source Ether from elsewhere before being able to purchase games, which may be intimidating to users who are not already familiar with the Ethereum ecosystem. Moreover, many people are sceptical of blockchain technology so may be hesitant to adopt the application.
 \end{itemize}
+
+\vspace{2mm}\noindent
+This layer will also provide interface functions that will allow our backend code to interface with our smart contract. Interactions with IPFS will be very simple uploads or downloads of compressed data.

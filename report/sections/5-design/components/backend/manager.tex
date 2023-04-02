@@ -1,12 +1,12 @@
 \subsubsection{Data Manager}
 
-The data manager has several responsibilities:
+The Data Manager has several responsibilities:
 
 \begin{enumerate}
-  \item Track the user's owned games and know which are installed and which aren't.
-  \item Interact with the Library contract deployed to the Ethereum blockchain to discover, upload and purchase games.
-  \item Fetch shards of game data to send to other peers.
-  \item Interact with IPFS to upload/fetch a game hash tree and store assets.
+  \item Track the user's owned games and know which are installed locally and which aren't.
+  \item Interact with the Library contract deployed to the Ethereum blockchain to discover, upload and purchase games \reqref{F-M1} \reqref{F-M2} \reqref{F-M5}.
+  \item Fetch shards of game data from the disk to send to other peers.
+  \item Interact with IPFS to upload/fetch a game hash tree and assets \reqref{F-M12} \reqref{F-C2}.
   \item Sending requests to the networking layer to find and retrieve blocks of data from peers in the network.
-  \item Generate hash trees of games and use it for verification of data.
+  \item Generate hash trees for games.
 \end{enumerate}

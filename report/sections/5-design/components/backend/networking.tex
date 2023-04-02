@@ -1,51 +1,54 @@
 \subsubsection{Networking}
 
-Users running this application will be a part of a distributed network of peers by creating and maintaining a set of TCP connections with other users in the network and will communicate by sending structured messages to each other. Section~\ref{subsubsec:commands} describes these commands in detail.
+Users running this application will be a part of a distributed network of peers by creating and maintaining a set of TCP connections with other users \reqref{F-M7} in the network and will communicate by sending structured messages to each other \reqref{F-M8}. Section~\ref{subsubsec:commands} describes these commands in detail.
 \x
-The use of TCP will add a computational overhead to maintain proportional to the number of peers, which is not ideal for inactive channels. A UDP approach would be more scalable but would add greater complexity to the project.
+The use of TCP will add a computational overhead to maintain proportional to the number of peers, which is not ideal for inactive channels. A UDP approach would be more scalable but would add greater complexity to the project, but should be considered when extending this application.
 
 \paragraph*{Address Verification}
 When two peers connect they will perform a handshake to exchange their Ethereum addresses and public keys by sending signed messages to each other. This will allow a peer to identify what games another peer is allowed access to.
 
 \paragraph*{Message Handling}
 
-The main responsibility of this section is to respond to requests sent by the Data Manager by sending and tracking messages to other peers to fetch the requested data. Each message should be tracked by the peer for a given time period and resent if an appropriate response has not been received. Any duplicate requests sent by the data manager will be ignored if a pending request is active. 
+One of the responsibilities of this component is to respond to requests sent by the Data Manager by sending and tracking messages to other peers to fetch requested data. Each message should be tracked by the peer for a given time period and resent if an appropriate response has not been received. Any duplicate requests sent by the data manager will be ignored if a pending request is active. 
 
 \paragraph*{Commands}\label{subsubsec:commands}
 
-Structured messages \reqref{F-M8} will typically come as part of a request/response pair involving the sharing of information between peers.
+Structured messages \reqref{F-M8} will typically come as part of a request/response pair involving the sharing of information between peers. Command responses are not awaited to remove unnecessary blocking of the connection channel as a user may be responding to many different requests at once by the same peer. Table~\ref{tab:network-cmds} shows the list of commands used bu the application.
 
-\begin{longtable}{p{.4\textwidth} p{.57\textwidth}}
+\small
+\begin{longtable}{p{.38\textwidth} p{.57\textwidth}}
   \toprule
   \textbf{Message Format} & \textbf{Description}\\
   \midrule\midrule
   LIBRARY
-  & Request that a peer sends their library of games in the form of a BLOCK message.\\
+  & Request that a peer sends their library of game.\\
   GAMES;$[hash_1]$;$[hash_2]$;\ldots;
   & The user sends a list of their games as a series of unique root hashes. These root hashes will map to games on the blockchain.\\
   \midrule
   BLOCK;$[gameHash]$;$[blockHash]$;
-  & The user will request a block of data off of a user by sending the root hash of the game and the hash of the block being requested. The response will be a SEND\_BLOCK message \reqref{F-M9}.\\
+  & The user will request a block of data off of a peer by sending the root hash of the game and the hash of the block being requested. The response will be a SEND\_BLOCK message \reqref{F-M9}.\\
   SEND\_BLOCK;$[gameHash]$;\newline $[blockHash]$;$[compressedData]$;
   & The user sends a block of data in response to a BLOCK message \reqref{F-M9}. The data is compressed using the \textit{compress/flate} package to reduce message size \reqref{NF-S1}.\\
   \midrule
   VALIDATE\_REQ;$[message]$
-  & The user is requesting for this message to be signed using the receiver's Ethereum private key. This is used to verify the receiver's identity and thus their owned collection of games \reqref{F-S1}.\\
+  & The user is requesting for a message to be signed using the receiver's Ethereum private key. This is used to verify the receiver's identity and thus their owned collection of games \reqref{F-S1}.\\
   VALIDATE\_RES;$[signed message]$
-  & The user responds to a VALIDATE\_REQ message with a signed version of the given message. From this signature, the receiver can determine the address and public key of the user \reqref{F-S1}.\\
+  & The user responds to a VALIDATE\_REQ message with a signed version of the received message. From this signature, the receiver can determine the address and public key of the user \reqref{F-S1}.\\
   \midrule
-  REQ\_RECEIPT
-  & A user will request a RECEIPT message from a peer detailing the data that has been sent by the user \reqref{F-S3}.\\
-  RECEIPT;$[signature]$;$[message]$
-  & A user will respond to a REQ\_RECEIPT message with a signed message detailing all of the blocks that the requester has sent to the user. This will allow for users to prove their contributions to the game developer who could then reward them \reqref{F-S3}.\\
+  REQ\_RECEIPT;$[gameHash]$
+  & A user will request a RECEIPT message from a peer detailing the data that has been sent by the user for a specific game \reqref{F-S3}.\\
+  RECEIPT;$[gameHash]$;$[signature]$\newline ;$[message]$
+  & A user will respond to a REQ\_RECEIPT message with a signed message detailing all of the blocks that the requester has sent to the user from a given game. This will allow for users to prove their contributions to the game developer who could then reward them \reqref{F-S3}.\\
   \midrule
   REQ\_PEERS
-  & A user requests a list of peers off one of their own peers. This will usually be sent immediately after a peer's identity is validated and will help increase the connectivity in the network \reqref{F-S4}.\\
+  & A user requests the list of peers which the receiver peer is connected to. This will be sent immediately after a peer's identity is validated and will help increase the connectivity in the network \reqref{F-S4}.\\
   PEERS;$[p_1 hostname]:[p_1 port]$;\ldots
-  & A user will send a list of their active peers. This will be limited to those peers which we have connected to and know the hostname and port of their server and will exclude the user's information \reqref{F-S4}.\\
+  & A user will send a list of their active peers. This will be limited to those peers which they have connected to and thus know the hostname and port of their server \reqref{F-S4}.\\
   \midrule
   ERROR;$[message]$
   & An error message that can be used to prompt a peer to resend a message.\\
   \bottomrule\bottomrule
-  \caption{The structured messages sent between peers.}
+  \caption{The set of structured messages sent between peers}
+  \label{tab:network-cmds}
 \end{longtable}
+\normalsize

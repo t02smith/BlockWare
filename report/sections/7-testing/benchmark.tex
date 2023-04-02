@@ -127,11 +127,12 @@ This benchmark will be useful in determining an optimal shard size to use that m
 \x
 For each run we will create a new project with 500 files, each of size 80MB, and a shard size of $B$MiB. We will then run 1 peer locally to simulate a perfect network connection.
 
-\begin{longtable}{r|llll|}
-  \cline{2-5}
-  & \multicolumn{4}{l|}{\hdr{Runtime (s)}}
+\begin{longtable}{rr|llll|}
+  \cline{3-6}
+  && \multicolumn{4}{l|}{\hdr{Runtime (s)}}
   \\ \hline
   \multicolumn{1}{|l|}{\hdr{Shard Size (bytes)}} 
+  & \multicolumn{1}{|l|}{\hdr{Total Blocks}} 
   & \multicolumn{1}{l|}{\hdr{1}} 
   & \multicolumn{1}{l|}{\hdr{2}} 
   & \multicolumn{1}{l|}{\hdr{3}} 
@@ -141,9 +142,11 @@ For each run we will create a new project with 500 files, each of size 80MB, and
   & \multicolumn{1}{l|}{} 
   & \multicolumn{1}{l|}{} 
   & \multicolumn{1}{l|}{} 
+  & \multicolumn{1}{l|}{} 
   & 
   \\\hline
   \multicolumn{1}{|r|}{2,097,152} 
+  & \multicolumn{1}{l|}{} 
   & \multicolumn{1}{l|}{} 
   & \multicolumn{1}{l|}{} 
   & \multicolumn{1}{l|}{} 
@@ -153,15 +156,18 @@ For each run we will create a new project with 500 files, each of size 80MB, and
   & \multicolumn{1}{l|}{} 
   & \multicolumn{1}{l|}{} 
   & \multicolumn{1}{l|}{} 
+  & \multicolumn{1}{l|}{} 
   & 
   \\\hline
   \multicolumn{1}{|r|}{8,388,608} 
   & \multicolumn{1}{l|}{} 
   & \multicolumn{1}{l|}{} 
   & \multicolumn{1}{l|}{} 
+  & \multicolumn{1}{l|}{} 
   & 
   \\\hline
   \multicolumn{1}{|r|}{16,777,216} 
+  & \multicolumn{1}{l|}{} 
   & \multicolumn{1}{l|}{} 
   & \multicolumn{1}{l|}{} 
   & \multicolumn{1}{l|}{} 

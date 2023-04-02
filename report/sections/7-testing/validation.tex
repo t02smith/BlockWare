@@ -2,34 +2,56 @@
 
 \section{Acceptence Testing}
 
-To ensure that this application meets the requirements as described in Section~\ref{subsec:requirements}, each requirement will be given a set of tests that aim prove its completeness. The type of tests will vary based upon the requirement and be ran using various devices connect to each other over the internet \reqref{NF-M1} \reqref{NF-M2} and interacting with a Smart Contract deployed to an ethereum test-net \reqref{F-M8}.
-\x
-The following acceptence tests will be included:
+To ensure this application meets the requirements as described in Section~\ref{subsec:requirements}, each requirement will be part of at least one user walkthrough. In Table~\ref{tab:walkthroughs} we give a high level description of each user walkthrough and any comments or results found from it. Appendix~\ref{} will give a more in-detail example of user walkthrough 2. 
 
-\begin{longtable}{ | p{.05\textwidth} | p{.3\textwidth} | p{.6\textwidth} |  }
-  \hline
-  \hdr{Id} & \hdr{Requirements} & \hdr{Description}\\\hline
+\newcommand{\p}[1]{$P_{#1}$}
+\newcommand{\g}[1]{$G_{#1}$}
+
+\small
+\begin{longtable}{ p{.02\textwidth} p{.2\textwidth} p{.56\textwidth} p{0.1\textwidth} }
+  \toprule
+  \textbf{Id} & \textbf{Requirements} & \textbf{Description} & \textbf{Success}\\\midrule\midrule
   1
-  & \reqref{F-M1} \reqref{F-M9} \reqref{F-M10} \reqref{F-C2} \reqref{NF-M4} \reqref{NF-S2} \reqref{NF-C1}
-  & A user walkthrough that shows a user uploading a game and that game being visible on the store to a separate user. A separate user will then purchase that game.
-  \newline Unit tests are also provided to show the correct functionality of the Smart Contract.
-  \\\hline
+  & \reqref{F-M1} \reqref{F-M5} \reqref{F-M12} \reqref{F-S2} \reqref{F-C2}
+  & \vspace{-5mm}\begin{enumerate}[wide, labelwidth=!, labelindent=0pt]
+    \item \p{1} uploads a game \g{1}.
+    \item \p{2} finds \g{1} on the store.
+    \item \p{2} purchases \g{1}.
+    \item \p{2} shows \g{1} added to their library.
+  \end{enumerate}
+  & \yes
+  \\
   2 
-  & \reqref{F-M2} \reqref{F-M5} \reqref{F-M6} \reqref{F-M7} \reqref{F-M10} \reqref{F-S2} \reqref{F-C2} \reqref{NF-C1} 
-  & A user walkthrough that shows a user connecting to a peer and downloading a game off of them and those files being successfully downloaded. This assumes that the user has successfully purchased the game.
-  \newline Integration tests show the processing for verifying a user and data sent over the network.
-  \\\hline
+  & \reqref{F-M6} \reqref{F-M8} \reqref{F-M9} \reqref{F-M10} \reqref{F-M11} \reqref{F-S1} \reqref{F-S2}
+  & \vspace{-5mm}\begin{enumerate}[wide, labelwidth=!, labelindent=0pt]
+    \item \p{1} and \p{2} own game \g{1}.
+    \item \p{1} connects to \p{2}.
+    \item \p{1} and \p{2} exchange Ethereum addresses.
+    \item \p{1} starts a download for \g{1}.
+    \item \p{1} sends requests for blocks to \p{2}.
+    \item \p{2} queries the smart contract to verify that \p{1} owns \g{1}.
+    \item \p{2} will respond to \p{1} with the requested data.
+    \item \p{1} will verify each block of data received using its hash.
+    \item \p{1} will have full downloaded \g{1}
+  \end{enumerate}
+  & \yes
+  \\
   3
-  & \reqref{F-M6} \reqref{F-M7} \reqref{NF-S1} 
-  & Benchmark tests to show the scalability of downloading a game by varying given conditions. See Section~\ref{sec:benchmark}.
-  \\\hline
+  & \reqref{F-M7} \reqref{F-M8} \reqref{NF-S1}
+  & Refer to the benchmark tests described in Section~\ref{sec:benchmark}.
+  & \yes
+  \\
   4
-  & \reqref{F-S2}
-  & A user walkthrough in which a user does not validate their Ethereum address when connecting to peers. The user attempts to download blocks off of their peers but is rejected due to not being verified.
-  \\\hline
-  5
-  & \reqref{F-M4} \reqref{NF-S2} \reqref{NF-M3} \reqref{NF-M4}
-  & User walkthroughs showing two attempted uploads for a given game that already exists on the network. The first by the owner showing the process of selecting their previous game and uploading an update and another by a non-owner attempting the same thing.
-  \newline Unit tests for the Smart Contract can also show functionality.
-  \\\hline
+  & \reqref{F-M2} \reqref{F-M3} \reqref{F-M6} \reqref{NF-M5}
+  & \vspace{-5mm}\begin{enumerate}[wide, labelwidth=!, labelindent=0pt]
+    \item \p{1} is the original uploader of \g{1}.
+    \item \p{1} uploads an update to \g{1}, \g{2}.
+    \item \p{2} owns \g{1} and thus \g{2}.
+    \item \p{2} will successfully download \g{2}.
+  \end{enumerate}
+  & \no
+  \\\bottomrule\bottomrule
+  \caption{The set of user walkthroughs used to prove the completeness of this project's requirements.}
+  \label{tab:walkthroughs}
 \end{longtable}
+\normalsize

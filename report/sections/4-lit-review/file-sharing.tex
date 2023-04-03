@@ -11,6 +11,7 @@ The main issues involving these networks are:
   \item \textbf{Payment} These platform don't allow users to pay for content and are generally large sources of piracy. 
 \end{enumerate}
 
+\small
 \begin{longtable}{ p{0.15\textwidth} p{0.8\textwidth} }
   \toprule
   \textbf{System} & \textbf{Description of Solution}
@@ -37,7 +38,8 @@ The main issues involving these networks are:
   \x
   Gnutella~\cite{saroiu_measurement_2001}
   & Gnutella nodes form an overlay network by sending \textit{ping-pong} messages. When a node sends a \textit{ping} message to their peers, each of them replies with a \textit{pong} message and the \textit{ping} is forwarded to their peers. To download a file, a node will flood a message to its neighbors, who will check if they have and return a message saying so; regardless, the node will continue to flood their request till they find a suitable node to download off of.
-  \\\bottomrule
+  \\\bottomrule\bottomrule
   \caption{Various global distributed file systems.}
   \label{tab:lit-review-p2p}
 \end{longtable}
+\normalsize

@@ -19,11 +19,12 @@ The goal of this project is to implement a large-scale distribution platform tha
 
 \section{Scope}
 
-This project will be broken down into two distinct components:
+This project will consist of the following components:
 
 \begin{enumerate}
-  \item \textbf{On-Chain} This component will consist of a set of Solidity Smart Contracts written for the Ethereum blockchain that will allow users to view metadata about and purchase games. It will be tested using a local test-net like Ganache using TypeScript. It will later be deployed to the Ethereum test-net to showcase the application in a live network.
-  \item \textbf{Off-Chain} This component will be what users will actually run. Each user will join a peer-to-peer network in which they can upload and download games off of other users. This will interface with the blockchain to allow users access to game metadata. See Section~\ref{} for details about how this will be tested.
+  \item An Ethereum smart contract that will allow us to maintain a library of games that can be queried and added to by any user.
+  \item A local application to be run by users to interact with the smart contract and allow users to join a peer-to-peer network where they can download and upload games to.
 \end{enumerate}
 
-For both of these, a series of acceptance tests, that directly correlate to individual requirements, will be run and include a series of integration tests to show that my application can meet the requirements and goals I set out. A more detailed description is given in Section~\ref{}.
+\vspace{2mm}\noindent
+Both sections will need to pass a series of acceptance tests to ensure that they meet the requirements I set out in Section~\ref{subsec:requirements}. Further tests will consider how the application fares in a live environment as well as a local development one. 

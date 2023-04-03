@@ -3,27 +3,35 @@
 \newpage
 \section{Benchmarking}\label{sec:benchmark}
 
-Benchmarking is being used in this project to determine the overall performance and scalability of the application, whilst also being useful in identifying any bottlenecks or how the end user can optimise their inputs. The key benchmark being assessed is related to how the application scales downloading games by varying the following factors:
+This project uses benchmarking to determine the overall performance and scalability of the application, whilst also being useful in discovering any bottlenecks or bugs.
+Specifically, this section will test how varying the following conditions will effect the download speed of a game:
 
 \begin{enumerate}
-  \item how many of the peers we are connected to have the data we need,
-  \item how large is the game (in terms of average file size and number of files), and
-  \item the shard size used to create the hash tree.
+  \item how many peers we are connected to,
+  \item how the data for the game is distributed in terms of file size and the number of files, and
+  \item the block size that each file is broken up into.
 \end{enumerate}
 
 \vspace{2mm}\noindent
-To ensure the consistency and correctness of results, all benchmarks will be ran on the same machine, running the same OS, and be completed multiple times. The test data is a collection of pseudo-randomly generated files that meet the criteria specified in each benchmark. Moreover, the project size used for all benchmarks will be 40GB to match the average game size given in Section~\ref{subsec:design-data}.
+To ensure consistency in these results, we include the following constraints:
+
+\begin{itemize}
+  \item All benchmarks should be ran on the same hardware using the same OS,
+  \item All tests should be ran three times,
+  \item Test data should be pseudo-random, and
+  \item All projects should aim for the target size of 40GB to match the average game size given in Section~\ref{subsec:design-data}.
+\end{itemize}
 
 \subsection*{Number of Peers}
 
 This benchmark allows us to observe how the application scales when dealing with many peers at the same time and how if affects the overall performance of the application.
 \x
-For each run, we will create a project with 500 files, each of size 80MB and a shard size of $2^{22}$ = 4MiB. We will then run $N$ peers locally to simulate a perfect network connection.
+For each run, we will create a project with 500 files, each of size 80MB and a shard size of 4MiB. We will then run $N$ peers locally to simulate a perfect network connection.
 
 \begin{longtable}{l|llll|}
-  \cline{2-5}
-  & \multicolumn{4}{c|}{\hdr{Runtime (s)}}                                                    \\ \hline
-  \multicolumn{1}{|l|}{\hdr{Peer Count}} 
+  \cline{2-5}\cline{2-5}\cline{2-5}\cline{2-5}\cline{2-5}
+  & \multicolumn{4}{c|}{\hdr{Runtime (s)}}\\ \hline
+  \multicolumn{1}{|l|}{\hdr{Peers}} 
   & \multicolumn{1}{l|}{\hdr{1}} 
   & \multicolumn{1}{l|}{\hdr{2}} 
   & \multicolumn{1}{l|}{\hdr{3}} & \hdr{avg.}  \\ \hline
@@ -51,12 +59,17 @@ For each run, we will create a project with 500 files, each of size 80MB and a s
   \multicolumn{1}{l|}{60} &  
   62.7
   \\ \hline
-  \caption{How varying peer count affects download speed}
+  \caption{How varying the peer count affects download speed}
 \end{longtable}
 
-\noindent Taking into account a degree of error, it is clear that increasing the number of peers does not reduce the download time. This indicates that a bottleneck may exist elsewhere in the application such as inserting received data. This is supported by the observation that downloads got much slower towards the end and would often take \~15 seconds for the last 10\%; however, this could also be caused by the file verification that is ran once an entire file is downloaded.
-\x
-However, this result also shows that many peers can be supported without an impact on performance. However, maintaining TCP connections will be expensive for a very large number of peers so a UDP implementation should be a consideration moving forward. 
+\noindent
+These results show us that increasing the number of peers does not increase or decrease the download speed. However, some important notes about these results are:
+
+\begin{itemize}
+  \item Having more peers distributes the workload across the network. This reduces the load on individual peers, who can then share data with other users.
+  \item In reality, peers may have variable or weak network connections so having more peers may be a much larger contributing factor to download speed. 
+  \item There may be a bottleneck elsewhere in the application. For example, we may see better performance using UDP instead of TCP.
+\end{itemize}
 
 \subsection*{Game Size}
 
@@ -92,28 +105,28 @@ For each run, we will create a project with $F$ files of size $S$MB, such that $
   \\\hline
   \multicolumn{1}{|r|}{50} 
   & 800
-  & \multicolumn{1}{l|}{} 
-  & \multicolumn{1}{l|}{} 
-  & \multicolumn{1}{l|}{} 
-  &  
+  & \multicolumn{1}{l|}{110} 
+  & \multicolumn{1}{l|}{109} 
+  & \multicolumn{1}{l|}{110} 
+  & 110
   \\\hline
   \multicolumn{1}{|r|}{25} 
   & 1,600
-  & \multicolumn{1}{l|}{} 
-  & \multicolumn{1}{l|}{} 
-  & \multicolumn{1}{l|}{} 
-  &  
+  & \multicolumn{1}{l|}{110} 
+  & \multicolumn{1}{l|}{108} 
+  & \multicolumn{1}{l|}{114} 
+  & 111
   \\\hline
   \multicolumn{1}{|r|}{5} 
   & 8,000
-  & \multicolumn{1}{l|}{} 
-  & \multicolumn{1}{l|}{} 
-  & \multicolumn{1}{l|}{} 
-  &  
+  & \multicolumn{1}{l|}{311} 
+  & \multicolumn{1}{l|}{318} 
+  & \multicolumn{1}{l|}{311} 
+  & 313
   \\\hline
   \multicolumn{1}{|r|}{1} 
   & 40,000
-  & \multicolumn{1}{l|}{} 
+  & \multicolumn{1}{l|}{1,548} 
   & \multicolumn{1}{l|}{} 
   & \multicolumn{1}{l|}{} 
   &  
@@ -121,52 +134,68 @@ For each run, we will create a project with $F$ files of size $S$MB, such that $
   \caption{How varying file count and size affects download speed}
 \end{longtable}
 
-\subsection*{Shard Size}
+\noindent From these results, we can see that distributing data across a larger pool of files results in a greater download speed.
+This occurred for several reasons:
 
-This benchmark will be useful in determining an optimal shard size to use that maximises download speed.
+\begin{enumerate}
+  \item A file can only be written to by one process at one time so having less files will reduce the potential for parallelisation.
+  \item For each block downloaded: we open a writer to a file, write a single block, and close the writer. This adds a lot of overhead for files that have many blocks.
+\end{enumerate}
+
+\vspace{2mm}\noindent
+There are several optimisations we could make to improve this result:
+
+\begin{enumerate}
+  \item Using batch requests would increase the amount of data we would have to write to a file at once.
+  \item Using a memory buffer before writing to disk to increase the chance that we are writing many blocks to the same file at once.
+\end{enumerate}
+
+\subsection*{Block Size}
+
+This benchmark will be useful in determining an optimal block size to use that maximises download speed.
 \x
 For each run we will create a new project with 500 files, each of size 80MB, and a shard size of $B$MiB. We will then run 1 peer locally to simulate a perfect network connection.
 
 \begin{longtable}{rr|llll|}
-  \cline{3-6}
+  \cline{3-6}\cline{3-6}\cline{3-6}\cline{3-6}\cline{3-6}
   && \multicolumn{4}{l|}{\hdr{Runtime (s)}}
   \\ \hline
-  \multicolumn{1}{|l|}{\hdr{Shard Size (bytes)}} 
+  \multicolumn{1}{|l|}{\hdr{Block Size (MiB)}} 
   & \multicolumn{1}{|l|}{\hdr{Total Blocks}} 
   & \multicolumn{1}{l|}{\hdr{1}} 
   & \multicolumn{1}{l|}{\hdr{2}} 
   & \multicolumn{1}{l|}{\hdr{3}} 
   & \hdr{avg.}
   \\\hline
-  \multicolumn{1}{|r|}{1,048,576} 
+  \multicolumn{1}{|r|}{1} 
   & \multicolumn{1}{l|}{} 
   & \multicolumn{1}{l|}{} 
   & \multicolumn{1}{l|}{} 
   & \multicolumn{1}{l|}{} 
   & 
   \\\hline
-  \multicolumn{1}{|r|}{2,097,152} 
+  \multicolumn{1}{|r|}{2} 
   & \multicolumn{1}{l|}{} 
   & \multicolumn{1}{l|}{} 
   & \multicolumn{1}{l|}{} 
   & \multicolumn{1}{l|}{} 
   & 
   \\\hline
-  \multicolumn{1}{|r|}{4,194,304} 
+  \multicolumn{1}{|r|}{4} 
   & \multicolumn{1}{l|}{} 
   & \multicolumn{1}{l|}{} 
   & \multicolumn{1}{l|}{} 
   & \multicolumn{1}{l|}{} 
   & 
   \\\hline
-  \multicolumn{1}{|r|}{8,388,608} 
+  \multicolumn{1}{|r|}{8} 
   & \multicolumn{1}{l|}{} 
   & \multicolumn{1}{l|}{} 
   & \multicolumn{1}{l|}{} 
   & \multicolumn{1}{l|}{} 
   & 
   \\\hline
-  \multicolumn{1}{|r|}{16,777,216} 
+  \multicolumn{1}{|r|}{16} 
   & \multicolumn{1}{l|}{} 
   & \multicolumn{1}{l|}{} 
   & \multicolumn{1}{l|}{} 

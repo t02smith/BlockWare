@@ -80,6 +80,9 @@ func LoadDeferredRequests() {
 			manager.RequestDownload <- <-cached
 		}
 		util.Logger.Infof("deferred requests loaded")
+
 	}()
+
+	// Peer().Library().ContinueDownloads()
 
 }

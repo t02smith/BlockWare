@@ -135,6 +135,7 @@ func (c *Controller) Disconnect(hostname string, port uint) {
 
 func (c *Controller) LoadDeferredRequests() {
 	peer.LoadDeferredRequests()
+
 }
 
 func (c *Controller) ResendValidation(hostname string, port uint) {

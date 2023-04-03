@@ -38,11 +38,19 @@ func GenerateLargeFolder(name, root string, fileSize, fileCount uint) error {
 		return err
 	}
 
-	rand.Seed(17072847)
-	data := make([]byte, fileSize)
-	for j := 0; j < int(fileSize); j++ {
-		data[j] = byte(rand.Intn(256))
+	size := 4194304
+	if size > int(fileSize) {
+		size = int(fileSize)
 	}
+
+	randomData := func(buf []byte) {
+		for j := 0; j < len(buf); j++ {
+			buf[j] = byte(rand.Intn(256))
+		}
+	}
+
+	rand.Seed(17072847)
+	data := make([]byte, size)
 
 	for i := 0; i < int(fileCount); i++ {
 		f, err := os.Create(filepath.Join(root, name, fmt.Sprintf("%d.txt", i)))
@@ -51,16 +59,16 @@ func GenerateLargeFolder(name, root string, fileSize, fileCount uint) error {
 		}
 
 		writer := bufio.NewWriter(f)
-		_, err = writer.Write(data)
-		if err != nil {
-			return err
+
+		for j := 0; j < int(fileSize)/size; j++ {
+			randomData(data)
+			writer.Write(data)
+			writer.Flush()
 		}
 
-		err = writer.Flush()
-		if err != nil {
-			return err
-		}
-
+		randomData(data)
+		writer.Write(data[:(int(fileSize) % size)])
+		writer.Flush()
 		f.Close()
 	}
 

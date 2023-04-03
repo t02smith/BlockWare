@@ -106,7 +106,9 @@ func downloadToAppDownload(d *games.Download, name string) *ControllerDownload {
 	lock := d.GetProgressLock()
 	lock.Lock()
 	for _, f := range d.Progress {
-		x.BlocksLeft += len(f.BlocksRemaining)
+		for _, br := range f.BlocksRemaining {
+			x.BlocksLeft += len(br)
+		}
 	}
 	lock.Unlock()
 

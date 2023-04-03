@@ -164,7 +164,7 @@ func (l *Library) ContinueDownloads() {
 
 	count := 0
 	for _, g := range l.ownedGames {
-		if g.Download.Finished() {
+		if g.Download == nil || g.Download.Finished() {
 			continue
 		}
 

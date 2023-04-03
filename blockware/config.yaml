@@ -1,5 +1,5 @@
 contract:
-    address: 0x4f5c19f9fdd23609d750f9723dc37bcd3bcfb9ac
+    address: 0x091abe2d20c21334645403edb044453b272c0987
 eth:
     address: http://localhost:8545
 games:

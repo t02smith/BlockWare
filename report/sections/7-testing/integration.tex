@@ -2,27 +2,34 @@
 
 \subsection*{Profiles}
 
-Profiles are minimal versions of the application that can be run on external devices for the purposes of testing how my application fares in a simulated environment. The following profiles are included:
+A profile is designed to mimic a specific type of peer to allow me to test my application under more realistic conditions that didn't exclusively involve ideal peers. Table~\ref{tab:profiles} describes each profile, their purpose and the outcomes from using them.
 
-\begin{itemize}
-  \item \textbf{Listen Only} A client which will fetch a repository from Git and upload it as a game to the network. Once uploaded it will listen for incoming messages and reply accordingly. This is supposed to simulate an ideal peer.
-  \item \textbf{Send Only} This client will never respond to messages but will send them periodically to the peer. This represents a selfish client.
-  \item \textbf{Spam} This client will spam the peer with expensive messages, such as requesting a block, and should trigger the client to disconnect the spammer.
-  \item \textbf{Unreliable} This client will represent an unreliable peer who will take a long time to respond to messasges and may reply with the wrong contents at random. 
-\end{itemize}
+\small
+\begin{longtable}{p{.12\textwidth} p{.39\textwidth} p{.39\textwidth} }
+  \toprule
+  \textbf{Name} & \textbf{Purpose} & \textbf{Outcome}
+  \\\midrule\midrule
+  \textbf{Listen Only}
+  & A peer who will listen and respond to all requests perfectly but will never request anything.
+  & This implementation was used for benchmarking and development as a perfect peer.
+  \\
+  \textbf{Send Only}
+  & This peer will never respond to requests but will periodically send them and is supposed to represent a selfish client.
+  & This indicated the need for a \textit{reputation} score for each peer to determine whether their requests should be replied to.
+  \\
+  \textbf{Spammer}
+  & This peer will flood its peers with the same message over and over again. This represents a potentially malicious client.
+  & This indicated the need for ...
+  \\
+  \textbf{Unreliable}
+  & This peer will pseudo-randomly not respond to messages or send incorrect data in response.
+  & This also indicated the need for a \textit{reputation} score where users who are unreliable should be given lower priority.
+  \\\bottomrule\bottomrule
+  \caption{The different profiles used to simulate real-world peers.}
+  \label{tab:profiles}
+\end{longtable}
+\normalsize
 
-\subsection*{Deployed Implementation}
+\noindent
+The use of various profiles showed that this application needed some metric by which to rank peers to allow us to prioritise requests and choose who to send requests to. However, due to time constraints this was not completed but should be considered moving forward.
 
-\subsubsection*{Distributing Instances}
-
-To prove that the application could work in a live environment, we will need to deploy a set of instances of the application to different devices that communicate over the internet. An example deployment might consist of instances deployed to:
-
-\begin{itemize}
-  \item a local machine to initiate tests,
-  \item a VPS running on a cloud service provider,
-  \item 
-\end{itemize}
-
-\subsubsection*{Ethereum Test-Net}
-
-The Library Smart Contract, from Section~\ref{subsubsec:impl-eth}, will need to be deployed to an Ethereum test-net to allow instances of the application, that are distributed over the 

@@ -1,4 +1,46 @@
 \section{Unit Testing}
 
-Unit tests are to ensure the correct functionality of individual blocks of code within the application. This is to ensure that each function responds appropriately to both well-formed and illegal arguments and considers 
+Unit tests were written alongside the code they were testing to ensure my code was robust and responded appropriately to all inputs. Generic functions like getters or setters were ignored and I aimed for a 70\% test coverage to ensure a significant amount of the application was tested. Table~\ref{tab:coverage} shows a breakdown of test coverage by package.
 
+\begin{longtable}{p{.4\textwidth} p{0.15\textwidth} p{.2\textwidth}}
+  \toprule
+  \textbf{Package} & \textbf{Coverage} & \textbf{Tests Written}
+  \\\midrule\midrule
+  model/manager/hashtree
+  & 75.1\%
+  & 69
+  \\
+  model/manager/games
+  & 61.4\%
+  & 107
+  \\
+  model/manager/ignore
+  & 90.6\%
+  & 13
+  \\
+  model/net/tcp
+  & 71.6\%
+  & 27
+  \\
+  model/net/peer
+  & 50.4\%
+  & 111
+  \\
+  model/persistence/ethereum
+  & 81.7\%
+  & 20
+  \\
+  model/util
+  & 61.2\%
+  & 24
+  \\\midrule\midrule
+  \textbf{Total}
+  & 70.3\%
+  & 371
+  \\\bottomrule\bottomrule
+  \caption{Code coverage by package. Missing entries do not have code in them for example model/manager is only a wrapper for its child packages.}
+  \label{tab:coverage}
+\end{longtable}
+
+\noindent
+Automated tests were not written for the Controller functions as these were usually very simple and would only call a backend function and translate the output. Equally, UI components were not tested either due to the complexity of writing such tests.

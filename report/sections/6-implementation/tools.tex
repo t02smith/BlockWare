@@ -1,50 +1,52 @@
 
 \section{Backend}
 
-The backend code for this application was written based upon the design from Section~\ref{subsec:backend} and was done using the following tools:
+Table~\ref{tab:backend-tools} shows the tools to create the backend of my application as it was described in Section~\ref{subsec:backend}.
 
-\begin{longtable}{p{0.15\textwidth} p{0.7\textwidth}}
+\begin{longtable}{p{0.15\textwidth} p{0.75\textwidth}}
   \toprule
   \textbf{Tool} & \textbf{Description \& Reasoning}
   \\\midrule\midrule
   Go~\cite{noauthor_go_nodate}
-  & Go was chosen because of its simple syntax, high performance, strong standard library and third party packages for interacting with Ethereum.
+  & \small Go was chosen because of its simple syntax, high performance, strong standard library and third party packages for interacting with Ethereum.
   \\
   go-ipfs-api~\cite{noauthor_go-ipfs-api_2023}
-  & A Go package used for interacting with the Kubo implementation of IPFS that gave an easy interface for downloading and uploading data to Kubo.\\
+  & \small A Go package used for interacting with the Kubo implementation of IPFS that gave an easy interface for downloading and uploading data to Kubo.\\
   go-ethereum~\cite{noauthor_go-ethereum_nodate}
-  & A collection of tools used for interacting with Ethereum including an Ethereum CLI client Geth, and a tool for converting Ethereum contracts into Go packages.\\
+  & \small A collection of tools used for interacting with Ethereum including an Ethereum CLI client (Geth), and a tool for converting Ethereum contracts into Go packages (abigen). This was essential for interfacing with the smart contract.\\
   Zap~\cite{noauthor_zap_2023}
-  & A logging library that is much faster than the standard library implementation and has better customisation. \\
+  & \small A logging library that performs much better and provides easier customisation when compared to Go's standard library implementation. \\
   Viper~\cite{noauthor_viper_nodate}
-  & A configuration file management library that helps read, write, and access configuration options written to file.
+  & \small A configuration file management library that helps read, write, and access configuration options written to file. This makes it simple to access global configuration settings and made it easy to configure test profiles.
   \\\bottomrule\bottomrule
   \caption{The tools used to develop the backend}
+  \label{tab:backend-tools}
 \end{longtable}
 
-\section{Smart Contract}
+\section{Smart Contract}\label{sec:impl-deploy}
 
-To develop and deploy a smart contract that met the criteria specified in Section~\ref{subsec:design-con-eth}, I used the following tools:
+Table~\ref{tab:sc-tools} shows the tools used to create and deploy the Library smart contract as it was described in Section~\ref{subsec:design-con-eth}.
 
-\begin{longtable}{p{0.15\textwidth} p{0.7\textwidth}}
+\begin{longtable}{p{0.15\textwidth} p{0.75\textwidth}}
   \toprule
   \textbf{Tool} & \textbf{Description \& Reasoning}
   \\\midrule\midrule
   Solidity~\cite{noauthor_solidity_nodate}
-  & The language used to write smart contracts for the Ethereum blockchain.\\
+  & \small The first language used to write smart contracts for the Ethereum blockchain. Most tutorials are focused around Solidity so it made the most sense to learn it for this project.\\
   Sepolia~\cite{noauthor_sepolia_nodate}
-  & An Ethereum test-net that used to deploy my smart contract to. One of the main benefits was that it provides a fast transaction time for quick feedback.\\
+  & \small An Ethereum test-net that used to deploy my smart contract to. One of the main benefits was that it provides a fast transaction time for quick feedback. It was chosen of Goerli~\cite{noauthor_goerli_nodate} as the faucet gave out 5 times as much Ether.\\
   Alchemy~\cite{noauthor_alchemy_nodate}
-  & Alchemy provides useful tools for interacting with Ethereum and specifically Sepolia, such as an ETH faucet and an RPC URL.\\
+  & \small Alchemy provides useful tools for interacting with Ethereum and specifically Sepolia, such as an ETH faucet and an RPC URL.\\
   MetaMask~\cite{noauthor_crypto_nodate}
-  & A browser-based wallet that can easily be connected to other tools such as Alchemy or Remix.\\
+  & \small A browser-based wallet that can easily be connected to other tools such as Alchemy or Remix. This tool can generate new accounts and show you the transaction history of each using an intuitive UI.\\
   Remix~\cite{noauthor_remix_nodate}
-  & A browser-based IDE for writing smart contracts that allows for easy deployment. I did have an implementation that would deploy using go-ethereum but due to a bug in package it was unable to work for the Sepolia test-net.
+  & \small A browser-based IDE for writing smart contracts that allows for easy deployment. I did have an implementation that would deploy using go-ethereum but due to a bug in package it was unable to work for the Sepolia test-net.
   \\
   Ganache CLI~\cite{noauthor_trufflesuiteganache_2023}
-  & Ganache CLI was used to create a local Ethereum test-net that I could develop my application with.
+  & Ganache CLI was used to create a local Ethereum test-net that I could develop my application with. With one command I could quickly boot a lightweight blockchain with a predetermined set of keys. When compared to Geth, from go-ethereum, Ganache CLI was much more beginner friendly. 
   \\\bottomrule\bottomrule
   \caption{The tools used for deployment of my smart contract}
+  \label{tab:sc-tools}
 \end{longtable}
 
 \vspace{2mm}\noindent
@@ -54,25 +56,29 @@ The contract was successfully deployed~\cite{etherscanio_deployed_nodate} to the
 
 The frontend code was developed from Section~\ref{subsubsec:frontend} to provide a user a GUI to interact with. Table~\ref{tab:tools-frontend} details the list of tools used.
 
-\begin{longtable}{p{0.15\textwidth} p{0.7\textwidth}}
+\begin{longtable}{p{0.15\textwidth} p{0.75\textwidth}}
   \toprule
   \textbf{Tool} & \textbf{Description \& Reasoning}
   \\\midrule\midrule
   Wails~\cite{noauthor_wails_nodate}
-  & Allows you to add a webkit frontend to a Go application, so that you can use a modern web framework. This allowed me to easily create a reactive UI using tools I was previously familiar with.
+  & \small Allows you to add a webkit frontend to a Go application, so that you can use a modern web framework. This allowed me to easily create a reactive UI using tools I was previously familiar with.
 
   Wails allows you to implement a controller using functions written in that can be called from the frontend and can emit events that trigger actions in the frontend.
   \\
   Vue.js v3~\cite{noauthor_vuejs_nodate}
-  & A reactive, component based web-framework that allows me to create reusable components that react to changes in state and can trigger events at different points in a components lifecycle.
+  & \small A reactive, component based web-framework that allows me to create reusable components that react to changes in state and can trigger events at different points in a components lifecycle.
   
   The Vue Router~\cite{noauthor_vue_nodate} package was used to add multiple pages to the application and markdown-it~\cite{noauthor_markdown-it_2023} was used to render markdown files.
+
+  Vue was chosen over other frameworks (like React or Angular) because it is my personal favourite and the one that I have had the most experience working with.
   \\
   Pinia~\cite{noauthor_pinia_nodate}
-  & A state management tool for Vue.js that boosts the reusabiltiy of components and reduces the overall complexity of the frontend. 
+  & \small A state management tool for Vue.js that boosts the reusability of components and reduces the overall complexity of the frontend by allowing state to be accessed globally through stores.
+  
+  Pinia integrates directly with Vue's composition API and is very beginner friendly and well documented, especially when considered to similar tools from other frameworks.
   \\
   SASS~\cite{noauthor_sass_nodate}
-  & An extension of CSS that is used to style DOM elements. This was essential in making the UI look nice and be accessible.
+  & \small An extension of CSS that is used to style DOM elements. This was essential in making the UI look nice and be accessible without having styling that was hard to maintain and search through.
   \\
   \bottomrule\bottomrule
   \caption{The tools used to develop the application's GUI }
@@ -81,21 +87,21 @@ The frontend code was developed from Section~\ref{subsubsec:frontend} to provide
 
 \section{Other Tools}
 
-Table~\ref{tab:tools-other} shows the other tools used for the development of this application.
+Table~\ref{tab:tools-other} shows the other tools used for the design, development and write-up of this application.
 
-\begin{longtable}{p{0.15\textwidth} p{0.7\textwidth}}
+\begin{longtable}{p{0.15\textwidth} p{0.75\textwidth}}
   \toprule
   \textbf{Tool} & \textbf{Description \& Reasoning}
   \\\midrule\midrule
   Git~\cite{noauthor_git_nodate}\newline GitHub~\cite{noauthor_github_nodate}
-  & A version control system used in conjunction with GitHub. Creating periodic commits meant I always had a recent backup available and could easily backtrack to help find issues.
+  & \small A version control system used in conjunction with GitHub. Creating periodic commits meant I always had a recent backup available and could easily backtrack to help find issues.
   Use of a GitHub Actions helped remind me that not all of my tests passed at all times :(.\\
   LaTeX~\cite{noauthor_latex_nodate}
-  & Used for the write-up of this document. LaTeX was useful in creating a large document and has many packages that help with referencing and design.\\
+  & \small Used for the write-up of this document. LaTeX was useful in creating a large document and has many packages that help with referencing and design.\\
   VSCode~\cite{noauthor_visual_nodate}
-  & My code editor of choice for this project as it allowed me to seamlessly work on both my frontend and backend code at once.\\
+  & \small My code editor of choice for this project as it allowed me to seamlessly work on both my frontend and backend code at once. \\
   Lucidchart~\cite{noauthor_lucidchart_nodate}
-  & Lucidchart was used to create all of the diagrams for this project.
+  & \small Lucidchart was used to create all of the diagrams for this project. Lucidchart offers a better user experience when compared to alternatives like Draw.io but locks several features behind a paywall.
   \\\bottomrule\bottomrule
   \caption{General purpose tools used for this project}
   \label{tab:tools-other}

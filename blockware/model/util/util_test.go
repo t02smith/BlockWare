@@ -141,7 +141,7 @@ func TestSetupToolkitEnvironment(t *testing.T) {
 			}
 			defer f.Close()
 
-			gamesFound, hashesFound := false, false
+			gamesFound, hashesFound, assets, peers, receipts := false, false, false, false, false
 			dirs, err := f.Readdirnames(0)
 			if err != nil {
 				return false
@@ -153,10 +153,16 @@ func TestSetupToolkitEnvironment(t *testing.T) {
 					gamesFound = true
 				case "hashes":
 					hashesFound = true
+				case "assets":
+					assets = true
+				case "peers":
+					peers = true
+				case "receipts":
+					receipts = true
 				}
 			}
 
-			return gamesFound && hashesFound
+			return gamesFound && hashesFound && assets && peers && receipts
 		}
 
 		passed := t.Run("basic case", func(t *testing.T) {

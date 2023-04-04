@@ -13,8 +13,6 @@ import (
 	"github.com/t02smith/part-iii-project/toolkit/util"
 )
 
-type Void struct{}
-
 // creates the required directories for toolkit
 func SetupToolkitEnvironment() error {
 

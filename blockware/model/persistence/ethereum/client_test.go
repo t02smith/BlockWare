@@ -1,13 +1,12 @@
 package ethereum
 
 import (
-	"bytes"
-	"io"
-	"os"
+	"math/big"
 	"testing"
 
-	"github.com/ethereum/go-ethereum/accounts/keystore"
-	model "github.com/t02smith/part-iii-project/toolkit/model/util"
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/stretchr/testify/assert"
+	"github.com/t02smith/part-iii-project/toolkit/test/testutil"
 )
 
 func TestStartClient(t *testing.T) {
@@ -31,44 +30,43 @@ func TestStartClient(t *testing.T) {
 
 }
 
-func TestCreateKeyStore(t *testing.T) {
-	t.Skip()
-	keyStorePath := "../../test/data/tmp/wallets"
-	err := model.CreateDirectoryIfNotExist(keyStorePath)
-	if err != nil {
-		t.Fatalf("Error creating tmp folder")
-	}
+/*
 
+ */
+
+func TestGenerateAuthInstance(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
-		t.Skip() // TODO BROKEN
-
-		password := "secret"
-		acc, err := CreateKeyStore(keyStorePath, password)
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		f, err := os.Open(acc.URL.Path)
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		data, err := io.ReadAll(f)
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		ks := keystore.NewKeyStore(keyStorePath, keystore.StandardScryptN, keystore.StandardScryptP)
-
-		accFromFile, err := ks.Import(data, password, password)
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		if !bytes.Equal(acc.Address.Hash().Bytes(), accFromFile.Address.Hash().Bytes()) {
-			t.Errorf("accounts do not match")
-		}
-
+		auth, err := GenerateAuthInstance(testutil.Accounts[4][1])
+		assert.Nil(t, err)
+		assert.Zero(t, auth.Value.Cmp(big.NewInt(0)))
+		assert.True(t, auth.GasLimit == uint64(3000000))
 	})
 
+	t.Run("failure", func(t *testing.T) {
+		t.Run("invalid private key", func(t *testing.T) {
+			tops, err := GenerateAuthInstance("010")
+			assert.Nil(t, tops)
+			assert.NotNil(t, err)
+		})
+	})
+}
+
+/*
+
+ */
+
+func TestAddress(t *testing.T) {
+	t.Run("private key found", func(t *testing.T) {
+		addr := Address()
+		assert.NotEqual(t, common.Address{}, addr)
+	})
+
+	t.Run("private key not found", func(t *testing.T) {
+		old := _privateKey
+		_privateKey = nil
+		t.Cleanup(func() { _privateKey = old })
+
+		addr := Address()
+		assert.Equal(t, common.Address{}, addr)
+	})
 }

@@ -1,6 +1,8 @@
 package ignore
 
 import (
+	"bufio"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -59,6 +61,45 @@ func TestAllowed(t *testing.T) {
 					assert.False(t, test.i.Allowed(test.rootDir, test.input))
 				})
 			}
+		})
+	})
+}
+
+/*
+
+ */
+
+func TestReadIgnoreFromFile(t *testing.T) {
+	t.Run("success", func(t *testing.T) {
+		f, err := os.Create("../../../test/data/tmp/ignore-test")
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		writer := bufio.NewWriter(f)
+		writer.WriteString("test\n")
+		writer.WriteString("data\r\n")
+		writer.WriteString("missing")
+		writer.Flush()
+
+		f.Close()
+		t.Cleanup(func() { os.Remove("../../../test/data/tmp/ignore-test") })
+
+		i, err := ReadIgnoreFromFile("../../../test/data/tmp/ignore-test")
+		assert.Nil(t, err)
+		assert.NotNil(t, i)
+		assert.Equal(t, 2, len(i))
+		assert.Equal(t, "test", i[0])
+		assert.Equal(t, "data", i[1])
+
+	})
+
+	t.Run("failure", func(t *testing.T) {
+		t.Run("file not found", func(t *testing.T) {
+			i, err := ReadIgnoreFromFile("./fake/ignore/file")
+			assert.NotNil(t, err)
+			assert.ErrorIs(t, err, os.ErrNotExist)
+			assert.Nil(t, i)
 		})
 	})
 }

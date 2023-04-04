@@ -20,7 +20,6 @@ func setupTestLibrary(t *testing.T) (*Library, *Game) {
 	lib.AddOrUpdateOwnedGame(testGame)
 	t.Cleanup(func() {
 		lib.ClearOwnedGames()
-		lib.Close()
 	})
 
 	return lib, testGame
@@ -119,7 +118,7 @@ func TestCreateDownload(t *testing.T) {
 
 		t.Run("unexpected err", func(t *testing.T) {
 			t.Run("files with same name already exist", func(t *testing.T) {
-				dir := filepath.Join(viper.GetString("games.installFolder"), testGame.Title)
+				dir := filepath.Join(viper.GetString("games.installFolder"), fmt.Sprintf("%s-%s", testGame.Title, testGame.Version))
 				f, err := os.Create(dir)
 				if err != nil {
 					t.Fatal(err)
@@ -249,10 +248,6 @@ success
 func TestAddOrUpdateOwnedGame(t *testing.T) {
 	lib := NewLibrary()
 	testGame := fetchTestGame(t)
-
-	t.Cleanup(func() {
-		lib.Close()
-	})
 
 	t.Run("success", func(t *testing.T) {
 		t.Run("new game", func(t *testing.T) {
@@ -423,5 +418,42 @@ func TestUninstallGame(t *testing.T) {
 				assert.ErrorIs(t, err, os.ErrNotExist)
 			})
 		})
+	})
+}
+
+/*
+
+ */
+
+func TestLibraryLocks(t *testing.T) {
+	l := &Library{}
+
+	t.Run("lock", func(t *testing.T) {
+		l.Lock()
+		assert.False(t, l.lock.TryLock())
+	})
+
+	t.Run("unlock", func(t *testing.T) {
+		l.Unlock()
+		assert.True(t, l.lock.TryLock())
+	})
+}
+
+/*
+
+ */
+
+func TestClearOwnedGames(t *testing.T) {
+	l := &Library{
+		ownedGames: make(map[[32]byte]*Game),
+	}
+
+	hash := sha256.Sum256([]byte("hello"))
+	l.ownedGames[hash] = &Game{}
+
+	t.Run("success", func(t *testing.T) {
+		assert.Equal(t, 1, len(l.ownedGames))
+		l.ClearOwnedGames()
+		assert.Empty(t, l.ownedGames)
 	})
 }

@@ -3,12 +3,12 @@ package ethereum
 import (
 	"context"
 	"crypto/ecdsa"
+	"errors"
 	"math/big"
 	"sync"
 
 	"github.com/ethereum/go-ethereum/accounts"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
-	"github.com/ethereum/go-ethereum/accounts/keystore"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
@@ -66,13 +66,13 @@ func GenerateAuthInstance(privateKey string) (*bind.TransactOpts, error) {
 	util.Logger.Info("Generating auth instance")
 	privKeyECDSA, err := crypto.HexToECDSA(privateKey)
 	if err != nil {
-		util.Logger.Info(err)
+		return nil, err
 	}
 	_privateKey = privKeyECDSA
 
 	pubKeyECDSA, ok := privKeyECDSA.Public().(*ecdsa.PublicKey)
 	if !ok {
-		util.Logger.Info("public key of incorrect type")
+		return nil, errors.New("invalid priv key")
 	}
 
 	fromAddress := crypto.PubkeyToAddress(*pubKeyECDSA)
@@ -113,17 +113,4 @@ func Address() common.Address {
 	}
 
 	return crypto.PubkeyToAddress(_privateKey.PublicKey)
-}
-
-// key store
-
-// CreateKeyStore create a new keystore
-func CreateKeyStore(keyStorePath string, password string) (*accounts.Account, error) {
-	ks := keystore.NewKeyStore(keyStorePath, keystore.StandardScryptN, keystore.StandardScryptP)
-	account, err := ks.NewAccount(password)
-	if err != nil {
-		return nil, err
-	}
-
-	return &account, nil
 }

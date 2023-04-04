@@ -84,27 +84,6 @@ func (c *TCPClient) listen(onMessage func([]string, TCPConnection) error, onClos
 	}
 }
 
-// Send a message in bytes to the server
-func (c *TCPClient) Send(command []byte) error {
-	if c.closed {
-		return nil
-	}
-
-	_, err := c.writer.Write(command)
-	if err != nil {
-		util.Logger.Errorf("Error sending message %s", err)
-		return err
-	}
-
-	err = c.writer.Flush()
-	if err != nil {
-		util.Logger.Errorf("Error sending message %s", err)
-		return err
-	}
-
-	return nil
-}
-
 // Send a string message to the server
 func (c *TCPClient) SendString(command string) error {
 	if c.closed {

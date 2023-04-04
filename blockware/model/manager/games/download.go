@@ -372,15 +372,6 @@ func CleanFile(path string, size int) error {
 	return nil
 }
 
-// GetProgress get the total download progress as a percent
-func (d *Download) GetProgress() float32 {
-	d.progressLock.Lock()
-	length := len(d.Progress)
-	d.progressLock.Unlock()
-
-	return 1 - float32(length)/float32(d.TotalBlocks)
-}
-
 // Finished whether any more blocks are still needed
 func (d *Download) Finished() bool {
 	d.progressLock.Lock()
@@ -401,10 +392,4 @@ func (d *Download) GetProgressLock() *sync.Mutex {
 
 func (d *Download) InserterPool() chan InsertShardRequest {
 	return d.inserterPool
-}
-
-func (fp *FileProgress) removeFile(hash [32]byte) {
-	fp.lock.Lock()
-	defer fp.lock.Unlock()
-	delete(fp.BlocksRemaining, hash)
 }

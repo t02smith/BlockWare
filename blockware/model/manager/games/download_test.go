@@ -54,7 +54,7 @@ func TestSetupDownload(t *testing.T) {
 		assert.NotNil(t, g.Download)
 
 		d := g.Download
-		assert.Equal(t, filepath.Join("../../../test/data/tmp", "toolkit"), d.AbsolutePath)
+		assert.Equal(t, filepath.Join("../../../test/data/tmp", "toolkit-1.0.4"), d.AbsolutePath)
 		assert.Equal(t, 3, len(d.Progress))
 
 		queuedBlocks := 0
@@ -201,7 +201,7 @@ func TestInsertData(t *testing.T) {
 		assert.Nil(t, err)
 
 		// read inserted data
-		f, err := os.Open("../../../test/data/tmp/toolkit/subdir/chip8.c")
+		f, err := os.Open("../../../test/data/tmp/toolkit-1.0.4/subdir/chip8.c")
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -360,7 +360,6 @@ func TestContinueDownload(t *testing.T) {
 
 	})
 
-	close(channel)
 }
 
 /*
@@ -440,6 +439,37 @@ func TestCompleteFile(t *testing.T) {
 
 			assert.NotZero(t, file.BlocksRemaining)
 			assert.Equal(t, len(oldBR), len(file.BlocksRemaining))
+		})
+	})
+}
+
+/*
+
+ */
+
+func TestFinished(t *testing.T) {
+	t.Run("success", func(t *testing.T) {
+		t.Run("finished", func(t *testing.T) {
+			d := &Download{
+				Progress: make(map[[32]byte]*FileProgress),
+			}
+
+			assert.True(t, d.Finished())
+		})
+
+		t.Run("not finished", func(t *testing.T) {
+			d := &Download{
+				Progress: make(map[[32]byte]*FileProgress),
+			}
+
+			fileHash := sha256.Sum256([]byte("hello"))
+			file := &FileProgress{
+				BlocksRemaining: make(map[[32]byte][]uint),
+			}
+			file.BlocksRemaining[fileHash] = []uint{0, 1, 2}
+			d.Progress[fileHash] = file
+
+			assert.False(t, d.Finished())
 		})
 	})
 }

@@ -270,7 +270,6 @@ func TestCheckGameDownload(t *testing.T) {
 			g.checkGameDownload()
 
 			assert.NotNil(t, g.Download.inserterPool)
-			close(g.Download.inserterPool)
 		})
 
 	})

@@ -4,6 +4,17 @@
 
 \begin{document}
 
+% BODY ONLY?
+
+\newif\ifbodyonly
+\bodyonlytrue
+% \bodyonlyfalse
+
+% 
+
+\ifbodyonly
+\else
+
 \input{sections/title-page}\newpage
 
 %% FOREWORDS
@@ -15,6 +26,8 @@
 
 %% CONTENTS
 \tableofcontents
+
+\fi
 
 \clearpage\pagenumbering{arabic}
 
@@ -32,6 +45,8 @@
 
 %% END OF SECTIONS 
 
+\ifbodyonly
+\else
 
 \newpage
 \chapter{References}
@@ -44,5 +59,6 @@
 \printbibliography[heading=subbibintoc, title={Other}, notkeyword=report-blockchain, notkeyword=p2p, notkeyword=tool,notkeyword=project-management]
 
 \input{sections/appendix/appendix.tex}
+\fi
 
 \end{document}

@@ -12,11 +12,18 @@
           /> -->
 
           <div class="header-text">
-            <h2>{{ props.game.title }}</h2>
-            <div>
-              <h3>{{ props.game.dev }}</h3>
-              <h3>•</h3>
+            <div class="title">
+              <h2>{{ props.game.title }}</h2>
               <h3>{{ props.game.version }}</h3>
+            </div>
+
+            <div class="dev">
+              <p>From</p>
+              <h3>
+                {{ props.game.dev }}
+              </h3>
+              <h4>/</h4>
+              <p>{{ props.game.uploader }}</p>
             </div>
           </div>
 
@@ -102,22 +109,37 @@ onMounted(async () => {
           display: flex;
           flex-direction: column;
 
-          > h2 {
-            font-size: 4rem;
-            margin-bottom: -0.9rem;
+          > .title {
+            display: flex;
+            align-items: flex-end;
+            gap: 0.25rem;
+
+            > h2 {
+              font-size: 4.25rem;
+              margin-bottom: -0.9rem;
+            }
+
+            > h3 {
+              color: rgb(0, 183, 255);
+            }
           }
 
-          > div {
+          > .dev {
             display: flex;
             align-items: center;
             gap: 0.5rem;
+            overflow-x: hidden;
 
-            > h3:nth-child(3) {
-              color: darken(white, 25%);
+            > h3 {
+              color: rgb(0, 183, 255);
             }
 
-            > h3:nth-child(1) {
-              color: rgb(0, 183, 255);
+            > p {
+              color: darken(white, 25%);
+
+              &:last-child {
+                font-weight: bold;
+              }
             }
           }
         }

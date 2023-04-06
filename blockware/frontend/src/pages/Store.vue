@@ -39,7 +39,7 @@
 
         <div class="fields">
           <p><strong>Enter some info about the game:</strong></p>
-          <marquee behavior="" direction=""> ⚠️ TODO ⚠️</marquee>
+          <h2>⚠️ Coming Soon</h2>
         </div>
       </form>
     </div>
@@ -136,6 +136,13 @@ async function searchForGame() {
     }
 
     > .fields {
+      h2 {
+        background-color: lighten(#131313, 7%);
+        padding: 0.5rem 1rem;
+        border-radius: 3px;
+        margin-top: 5px;
+      }
+
       > .input {
         p {
           margin-bottom: 3px;

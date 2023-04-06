@@ -50,6 +50,8 @@ Games are content addressable using their root hash field, which will allow user
 
 \vspace{2mm}\noindent
 Users will be able to connect to many peers at once \reqref{F-M7} and will send download requests to the subset of their peers who also own the game. Requests will be sent in a round-robin fashion to evenly distribute the requests and prevent overloading a single peer \reqref{NF-S1}. Requests that cannot be completed will be retried when connecting to a new peer or when a peer has a change in library.
+\x
+See Figure~\ref{fig:p2p-interactions} for a diagram showing these interactions fully.
 
 \subsubsection*{Updating Content}\label{subsubsec:updating}
 

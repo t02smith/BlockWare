@@ -1,5 +1,3 @@
-
-
 \usepackage[a4paper, top=25mm, bottom=25mm, left=25mm, right=25mm]{geometry}
 \usepackage[inline]{enumitem}
 \usepackage[linesnumbered,lined,ruled]{algorithm2e}
@@ -24,13 +22,16 @@
   fancyhdr,
   caption,
   multirow,
-  array
+  array,
+  etoolbox
 }
 \usepackage[
   backend=biber,
   sorting=none
 ]{biblatex}
 \addbibresource{ref.bib}
+
+\patchcmd{\abstract}{\null\vfil}{}{}{}
 
 \pagestyle{fancy}
 \fancyhf{}

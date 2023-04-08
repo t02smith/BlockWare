@@ -1,30 +1,35 @@
 
 \section{BitTorrent}\label{sec:bittorrent}
 
-It is an unrealistic to expect that every game uploaded to the network will be downloaded by every user so only a subset of users will have the game installed and available to share.
-In this section and Section~\ref{sec:lit-p2p}, I will look at how various peer-to-peer file-sharing networks allow users to discover and download content that is fragmented across the network.
-\x
-BitTorrent~\cite{kaune_unraveling_2010,pouwelse_bittorrent_2005} was chosen as part of my background research as it is one of the most popular P2P file-sharing platforms. In 2013 it was estimated that tens of millions of users used BitTorrent every day~\cite{wang_measuring_2013}.
-In BitTorrent, users barter for chunks of data by downloading and uploading them in a tit-for-tat fashion, such that peers with a high upload rate will typically also have a high download rate.
+\paragraph*{Motivation}
+Due to the typically large size of video games, it is impractical to expect that every user should have a copy of every game, or even have all of their own games installed. Therefore, I will need to understand how peer-to-peer systems manage distributing data between nodes in their networks in order to implement a similar functionality.
 
+\newparagraph
+BitTorrent~\cite{kaune_unraveling_2010, pouwelse_bittorrent_2005} is a protocol for sharing data across a distributed network\footnote{Popular implementations include BitTorrent Web~\cite{inc_bittorrent_nodate}, qBittorrent~\cite{noauthor_qbittorrent_nodate}, and µTorrent~\cite{inc_torrent_nodate}}. 
+It was chosen here as it is one of the most commonly used protocols, being responsible for 3.35\% of global bandwidth~\cite{noauthor_application_nodate}. 
+In BitTorrent, users will barter for blocks of data from a network of peers in a tit-for-tat fashion, such that users with a high upload rate will also typically have a high download rate.
 
-\subsection*{Download Protocol}\label{subsec:bittorrent-download}
+\subsection*{Key Ideas}
 
-For a user to download data from BitTorrent they would:
+\paragraph*{Trackers}
+A tracker server is used for peer discovery by keeping track of which peers have which copies of data, which of those peers are available at the time of request, and will provide network statistics to help the user decide which peers to prioritise.
 
+\paragraph*{Block Priority}
+Users will download blocks from other peers using the following priority:
 \begin{enumerate}
-  \item Find the corresponding~.torrent file that contains metadata about the torrent.
-  \item The user will find peers, using a tracker identified in the~.torrent, that are also interested in that content and will establish connections with them.
-  \item The user will download blocks\footnote{nodes may reject downloads without the user providing data themselves in a tit-for-tat fashion}, from peers, based upon the following priority:
-        \begin{enumerate}
-          \item \textbf{Strict Priority} Data is split into pieces and sub-pieces with the aim that once a given sub-piece is requested then all of the other sub-pieces in the same piece are requested.
-          \item \textbf{Rarest First} Aims to download the piece that the fewest peers have to increase supply.
-          \item \textbf{Random First Piece} When a peer has no pieces, it will try to get one as soon as possible to be able to contribute.
-        \end{enumerate}
-  \item The node will continuously upload blocks it has while active.
+  \item \textbf{Strict Priority} Data is split into pieces and sub-pieces where pieces are ideally downloaded together.
+  \item \textbf{Rarest First} Download the pieces that have the fewest copies on the network to boost availability.
+  \item \textbf{As Soon As Possible} A user with no peers will try get a random piece quickly so that they can contribute to the network. 
 \end{enumerate}
+
+\paragraph*{Hashing}
+Hashing is used to provide a unique fingerprint of a piece of data to ensure that a user is downloading the correct piece of data. This only proves data integrity and not that the data isn't anything malicious, which means that a user will have to trust the uploader of the torrent.
+
+\paragraph*{Optimistic Unchoking}
+A peer will allocate a portion of their bandwidth for communicating with unknown peers. This will allow new users to join the network and be able to contribute without being ignored by most peers and it gives a way for existing peers to seek better peers.
 
 \subsection*{Availability}\label{subsec:availability}
 
 One of the most significant issues facing BitTorrent is the availability of torrents, where \textit{`38\% of torrents become unavailable in the first month'}~\cite{kaune_unraveling_2010} and that \textit{`the majority of users disconnect from the network within a few hours after the download has finished'}~\cite{pouwelse_bittorrent_2005}.
-This paper~\cite{neglia_availability_2007} looks at how the use of multiple trackers for the same content and DHTs can be used to boost availability.
+This paper~\cite{neglia_availability_2007} looks at how the use of multiple trackers for the same content and DHTs can be used to boost availability. 
+However, good availability requires users to \textit{choose} to contribute and often the built-in incentives aren't enough to encourage users to contribute for a long period of time.

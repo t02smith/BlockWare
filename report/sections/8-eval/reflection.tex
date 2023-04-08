@@ -10,7 +10,7 @@ As expected there were several difficulties with blockchain development:
   \item Some of the libraries used had bugs in them that hindered development. For example, I could deploy the smart contract to the Sepolia testnet from Remix easily but not through Geth. 
 \end{itemize}
 
-\vspace{2mm}\noindent
+\newparagraph
 Despite the problems mentioned above, I was able to complete the blockchain aspect of the project successfully. Effective use of sprint planning meant that I had considered this to be a potential issue and had allocated time to being able to deal with it.
 
 \paragraph*{The application is not finished}
@@ -18,35 +18,35 @@ Section~\ref{sec:sprints} shows that not all of the requirements were finished a
 \x
 The application ended up being incredibly large and took a lot more time to implement and test than expected. Table~\ref{tab:cloc} shows a breakdown of the source code. Agile development could only help me so much so by having a hard cut-off point for the implementation I was still left with plenty of time to complete the report.
 
-\begin{longtable}{ | r | r | r | r | }
-  \hline
+\begin{longtable}{ r r r r }
+  \toprule
   \textbf{Language} & \textbf{Files} & \textbf{Comments} & \textbf{Code}
-  \\\hline
+  \\\midrule\midrule
   Go
   & 45
   & 829
   & 5006
-  \\\hline
+  \\
   Go Tests
   & 26
   & 665
   & 2836
-  \\\hline
+  \\
   Vue.js Components
   & 17
   & 141
   & 2414
-  \\\hline
+  \\
   JavaScript
   & 19
   & 88
   & 377
-  \\\hline
+  \\
   Solidity
   & 1
   & 33
   & 46
-  \\\hline
+  \\\bottomrule\bottomrule
   \caption{The lines of code written for this project calculated using CLOC~\cite{noauthor_aldanialcloc_nodate}}
   \label{tab:cloc}
 \end{longtable}
@@ -64,5 +64,5 @@ The use of an agile methodology alongside test-driven development meant I could 
   \item taking time in-between sprints to take a break from the project and prepare for the next sprint.
 \end{itemize}
 
-\vspace{2mm}\noindent
+\newparagraph
 On top of this, using a Gantt chart (Section~\ref{fig:gantt-chart-1}) allowed me to have a clear overview of my project timeline so I could realistically gage just how much time I would need for each section.

@@ -1,0 +1,24 @@
+
+\chapter{User Walkthrough 1}\label{app:user-walkthrough}
+
+This section will give an example of how a user walkthrough, from Section~\ref{sec:acc-tests} is carried out. User Walkthrough 1 shows a user \p{1} uploading a new game \g{1} and another user \p{2} purchasing it. Transaction logs for smart contract actions can be viewed at \url{https://sepolia.etherscan.io/address/0x2899dab55a4a20d698062bbf4d4ce9f1073ce052}.
+
+\begin{enumerate}
+  \item \textbf{\p{1} uploads a game \g{1}.}
+  \newline \p{1} will run the application and connect to the Library smart contract instance uploaded to the Sepolia test-net. \p{1} will then enter the following details for their game \g{1} = [title="User WT \#1", version="1.0.2", developer="tcs1g20", previousVersion=None, price=0].
+  \newline This transaction can then be seen on logs for the Sepolia test-net.
+  % TODO insert screenshot
+
+  \item \textbf{\p{2} finds \g{1} on the store.}
+  \newline \p{2} will connect to the same Library smart contract and head to the store page on the application. \p{2} will find \g{1} on the store and open its store page, where they see some the information entered above.
+  
+  \item \textbf{\p{2} purchases \g{1}.}
+  \newline \p{2} will hit the purchase button and the transaction will successfully carry out. This transaction can then be seen on logs for the Sepolia test-net.
+  % TODO insert screenshot
+  
+  \item \textbf{\p{2} shows \g{1} added to their library.}
+  \newline \p{2} heads to their library page and opens the game up. All the information should be identical to the store page for \g{1}.
+\end{enumerate}
+
+\newparagraph
+If all these steps are completed successfully then we can say that all the requirements specified for this user walkthrough must be complete. Evidence is shown through Ethereum transaction records that the actions are carried out and screenshots of the application show these being reflected in the user interface.

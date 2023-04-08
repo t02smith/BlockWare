@@ -9,3 +9,5 @@
 *.out
 *.fls
 **/blockware.exe
+*.run.xml
+*.bcf

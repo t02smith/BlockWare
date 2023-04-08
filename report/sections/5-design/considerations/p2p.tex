@@ -27,7 +27,7 @@ For a developer to upload their game \reqref{F-M1}, they must provide the follow
   \item an assets folder containing a piece of cover art \textit{(cover.png)} and a description file \textit{(description.md)}.
 \end{itemize}
 
-\vspace{2mm}\noindent
+\newparagraph
 The developer should be able to enter the required fields into an upload page of the GUI and have the data generated and uploaded for them \reqref{F-S2}.
 
 \subsubsection*{Downloading Content}
@@ -48,7 +48,7 @@ Games are content addressable using their root hash field, which will allow user
   \item \seeder may request a signed receipt that details the blocks they uploaded \reqref{F-S3} to \downloader.
 \end{enumerate}
 
-\vspace{2mm}\noindent
+\newparagraph
 Users will be able to connect to many peers at once \reqref{F-M7} and will send download requests to the subset of their peers who also own the game. Requests will be sent in a round-robin fashion to evenly distribute the requests and prevent overloading a single peer \reqref{NF-S1}. Requests that cannot be completed will be retried when connecting to a new peer or when a peer has a change in library.
 \x
 See Figure~\ref{fig:p2p-interactions} for a diagram showing these interactions fully.
@@ -68,7 +68,7 @@ Downloadable Content (DLC) \reqref{F-C1} represent optional additions for games 
   \item \textbf{Previous Version} (Optional) The root hash of the previous version of the DLC.
 \end{enumerate}
 
-\vspace{2mm}\noindent
+\newparagraph
 Users must own the original game to buy any of its DLC. 
 
 \subsubsection*{Proving Contribution}

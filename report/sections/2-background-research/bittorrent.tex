@@ -2,28 +2,28 @@
 \section{BitTorrent}\label{sec:bittorrent}
 
 \paragraph*{Motivation}
-Due to the typically large size of video games, it is impractical to expect that every user should have a copy of every game, or even have all of their own games installed. Therefore, I will need to understand how peer-to-peer systems manage distributing data between nodes in their networks in order to implement a similar functionality.
+Due to the typical size of video games, it is impractical for every user to have a copy of every game. Therefore, it is important that I understand how a popular example of a peer-to-peer P2P file sharing system works when data is fragmented across the network.
 
 \newparagraph
-BitTorrent~\cite{kaune_unraveling_2010, pouwelse_bittorrent_2005} is a protocol for sharing data across a distributed network\footnote{Popular implementations include BitTorrent Web~\cite{inc_bittorrent_nodate}, qBittorrent~\cite{noauthor_qbittorrent_nodate}, and µTorrent~\cite{inc_torrent_nodate}}. 
-It was chosen here as it is one of the most commonly used protocols, being responsible for 3.35\% of global bandwidth~\cite{noauthor_application_nodate}. 
-In BitTorrent, users will barter for blocks of data from a network of peers in a tit-for-tat fashion, such that users with a high upload rate will also typically have a high download rate.
+BitTorrent~\cite{kaune_unraveling_2010, pouwelse_bittorrent_2005} is a protocol for sharing data across a distributed network\footnote{Popular implementations include BitTorrent Web~\cite{inc_bittorrent_nodate}, qBittorrent~\cite{noauthor_qbittorrent_nodate}, and µTorrent~\cite{inc_torrent_nodate}} and 
+it was chosen here because of its popularity, being responsible for 3.35\% of global bandwidth~\cite{noauthor_application_nodate}. 
+In BitTorrent, users barter for blocks of data from a network of peers in a tit-for-tat fashion, such that users with a high upload rate will also typically have a high download rate.
 
 \subsection*{Key Ideas}
 
 \paragraph*{Trackers}
-A tracker server is used for peer discovery by keeping track of which peers have which copies of data, which of those peers are available at the time of request, and will provide network statistics to help the user decide which peers to prioritise.
+A tracker server keeps track of which peers have what data, which of those peers are available at, and will provide network statistics to \textit{recommend} which peers to connect to first.
 
 \paragraph*{Block Priority}
 Users will download blocks from other peers using the following priority:
 \begin{enumerate}
   \item \textbf{Strict Priority} Data is split into pieces and sub-pieces where pieces are ideally downloaded together.
   \item \textbf{Rarest First} Download the pieces that have the fewest copies on the network to boost availability.
-  \item \textbf{As Soon As Possible} A user with no peers will try get a random piece quickly so that they can contribute to the network. 
+  \item \textbf{As Soon As Possible} A user with no peers will try get a random piece quickly so they can contribute to the network. 
 \end{enumerate}
 
 \paragraph*{Hashing}
-Hashing is used to provide a unique fingerprint of a piece of data to ensure that a user is downloading the correct piece of data. This only proves data integrity and not that the data isn't anything malicious, which means that a user will have to trust the uploader of the torrent.
+Hashing privdes a unique fingerprint of some data, which can be used to verify the integrity of it. As data is broken into pieces, invalid pieces can easily be fetched again without interfering with any other pieces.
 
 \paragraph*{Optimistic Unchoking}
 A peer will allocate a portion of their bandwidth for communicating with unknown peers. This will allow new users to join the network and be able to contribute without being ignored by most peers and it gives a way for existing peers to seek better peers.

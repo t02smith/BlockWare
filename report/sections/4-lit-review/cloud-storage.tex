@@ -9,15 +9,15 @@ Blockchain technology can be leveraged for distributed cloud storage to provide 
   \textbf{Paper} & \textbf{Description of Solution}
   \\\midrule\midrule
   Blockchain Based Data Integrity Verification in P2P Cloud Storage~\cite{yue_blockchain_2018}
-  & This paper uses Merkle trees to help verify the integrity of data within a P2P blockchain cloud storage network. It also looks at how different structures of Merkle trees effect the performance of the system.
+  & This paper looks at how varying structures of Merkle Trees can be used to verify the integrity of data within a P2P blockchain cloud storage system.
   %
   \x
   Deduplication with Blockchain for Secure Cloud Storage~\cite{li_deduplication_2018}
-  & This paper describes a deduplication scheme that uses the blockchain to record storage information and distribute files to multiple servers. This is implemented as a set of smart contracts.
+  & A deduplication scheme that uses the Ethereum blockchain to record storage information and distribute files across multiple servers
   %
   \x
   Block-secure: Blockchain based scheme for secure P2P cloud storage~\cite{li_block-secure_2018}
-  & A distributed cloud system in which users divide their own data into encrypted chunks and upload those chunks randomly into the blockchain, P2P network. 
+  & Users divide their own data into encrypted blocks and upload them randomly into a blockchain, P2P network. It uses a custom genetic algorithm to solve the file block replica placement problem and ensure data availability.
   %
   \x
   Blockchain-Based Medical Records Secure Storage and Medical Service Framework~\cite{chen_blockchain-based_2018}
@@ -25,7 +25,7 @@ Blockchain technology can be leveraged for distributed cloud storage to provide 
   %
   \x
   A Blockchain-Based Framework for Data Sharing With Fine-Grained Access Control in Decentralized Storage Systems~\cite{wang_blockchain-based_2018}
-  & This solution uses IPFS, Ethereum and ABE technology to provide distributed cloud storage with an access rights management system using secret keys distributed by the data owner.
+  & This solution proposes an attribute-based encryption scheme that allows the distribution of access keys to users based upon their allocated groups. Data is uploaded to IPFS and uses an Ethereum smart contract to implement a keyword search of the data stored.
   %
   \x
   Blockchain based Proxy Re-Encryption Scheme for Secure IoT Data Sharing~\cite{manzoor_blockchain_2019}
@@ -37,4 +37,11 @@ Blockchain technology can be leveraged for distributed cloud storage to provide 
 \normalsize
 
 \paragraph*{Gaps}
-One gap found when researching these solutions was that few offered file versioning that would allow a user to view previous versions of uploaded data. File versioning is a particularly important to this project as users will likely all have varying versions of the same software.
+Some of the gaps found include:
+\begin{itemize}
+  \item \textbf{Access Control} Many of these include no dynamic access-control system, and~\cite{wang_blockchain-based_2018} requires the owner of the data to manually manage access rights. 
+  \item \textbf{Versioning} Many of these systems rely on platforms like IPFS, which do not natively allow for versioning without uploading a new set of data entirely.
+\end{itemize}
+
+\newparagraph
+This project will allow for dynamic access control through a payment system based on Ethereum and will allow for pieces of data to be versioned to match a more realistic lifecycle for a piece of software.

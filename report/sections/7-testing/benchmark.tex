@@ -18,46 +18,58 @@ To ensure consistency in these results, I've included the following constraints:
 
 For each run, we will create a project with 500 files, each of size 80MB and a shard size of 4MiB. We will then run $N$ peers locally to simulate a perfect network connection.
 
-\begin{longtable}{l|llll|}
-  \cline{2-5}\cline{2-5}\cline{2-5}\cline{2-5}\cline{2-5}
-  & \multicolumn{4}{c|}{\hdr{Runtime (s)}}\\ \hline
-  \multicolumn{1}{|l|}{\hdr{Peers}} 
-  & \multicolumn{1}{l|}{\hdr{1}} 
-  & \multicolumn{1}{l|}{\hdr{2}} 
-  & \multicolumn{1}{l|}{\hdr{3}} & \hdr{avg.}  \\ \hline
-  \multicolumn{1}{|l|}{1} & 
-  \multicolumn{1}{l|}{56} & 
-  \multicolumn{1}{l|}{65} & 
-  \multicolumn{1}{l|}{63} &  
-  61.3
-  \\ \hline
-  \multicolumn{1}{|l|}{2} & 
-  \multicolumn{1}{l|}{65} & 
-  \multicolumn{1}{l|}{64} & 
-  \multicolumn{1}{l|}{60} &  
-  63
-  \\ \hline
-  \multicolumn{1}{|l|}{4} & 
-  \multicolumn{1}{l|}{66} & 
-  \multicolumn{1}{l|}{65} & 
-  \multicolumn{1}{l|}{65} &  
-  65.7
-  \\ \hline
-  \multicolumn{1}{|l|}{8} & 
-  \multicolumn{1}{l|}{66} & 
-  \multicolumn{1}{l|}{62} & 
-  \multicolumn{1}{l|}{60} &  
-  62.7
-  \\ \hline
-  \caption{How varying the peer count affects download speed}
-\end{longtable}
 
-\noindent
-These results shows us that having more peers won't typically increase the download speed. This indicates that there may be a bottleneck elsewhere such as writing the data to disk. However, it is still useful to connect to many peers as connections to peers are not guaranteed to be fast or perfect.
+\begin{table}[ht]
+  \vspace{-5mm}
+  \begin{minipage}[t]{.5\textwidth }
+    \vspace{-36mm}
+    \begin{longtable}{l|llll|}
+      \cline{2-5}\cline{2-5}\cline{2-5}\cline{2-5}\cline{2-5}
+      & \multicolumn{4}{c|}{\hdr{Runtime (s)}}\\ \hline
+      \multicolumn{1}{|l|}{\hdr{Peers}} 
+      & \multicolumn{1}{l|}{\hdr{1}} 
+      & \multicolumn{1}{l|}{\hdr{2}} 
+      & \multicolumn{1}{l|}{\hdr{3}} & \hdr{avg.}  \\ \hline
+      \multicolumn{1}{|l|}{1} & 
+      \multicolumn{1}{l|}{1,513} & 
+      \multicolumn{1}{l|}{1,511} & 
+      \multicolumn{1}{l|}{1,511} &  
+      1,512
+      \\ \hline
+      \multicolumn{1}{|l|}{2} & 
+      \multicolumn{1}{l|}{777} & 
+      \multicolumn{1}{l|}{775} & 
+      \multicolumn{1}{l|}{777} &  
+      776
+      \\ \hline
+      \multicolumn{1}{|l|}{4} & 
+      \multicolumn{1}{l|}{397} & 
+      \multicolumn{1}{l|}{397} & 
+      \multicolumn{1}{l|}{396} &  
+      397
+      \\ \hline
+      \multicolumn{1}{|l|}{8} & 
+      \multicolumn{1}{l|}{227} & 
+      \multicolumn{1}{l|}{223} & 
+      \multicolumn{1}{l|}{224} &  
+      225
+      \\ \hline
+      \caption{Raw data from peer count benchmark}
+      \label{tab:bench-peer-count}
+    \end{longtable}
+  \end{minipage}%
+  \begin{minipage}[t]{.5\textwidth}
+      \includegraphics[width=\textwidth]{assets/images/charts/peer-count.png}
+      \caption{Graphical version of Table~\ref{tab:bench-peer-count}}
+  \end{minipage}
+\end{table}
+
+\vspace{-4mm}\noindent
+This result shows us that we can massively increase the download speed by increasing the number of peers we are connected to. This shows that my application can correctly handle many concurrent peers \reqref{F-M7} and uses the increased connections to boost performance \reqref{NF-S1}.
 
 \subsection*{Game Size}
 
-For each run, we will create a project with $F$ files of size $S$MB, such that $F\times S = 40GB$, and a shard size of 4MiB. We will then run 1 peer locally to simulate a perfect network connection.
+For each run, we will create a project of $F$ files of size $S$MB, such that $F\times S = 40GB$. We will download the game off of 4 peers that are running locally on the same machine.
 
 \begin{longtable}{rr|llll|}
   \hline
@@ -73,42 +85,42 @@ For each run, we will create a project with $F$ files of size $S$MB, such that $
   \\ \hline
   \multicolumn{1}{|r|}{200} 
   & 200
-  & \multicolumn{1}{l|}{57} 
-  & \multicolumn{1}{l|}{55} 
-  & \multicolumn{1}{l|}{58} 
-  &  57
+  & \multicolumn{1}{l|}{} 
+  & \multicolumn{1}{l|}{} 
+  & \multicolumn{1}{l|}{} 
+  &  
   \\\hline
   \multicolumn{1}{|r|}{100} 
   & 400
-  & \multicolumn{1}{l|}{56} 
-  & \multicolumn{1}{l|}{52} 
-  & \multicolumn{1}{l|}{58} 
-  & 55
+  & \multicolumn{1}{l|}{} 
+  & \multicolumn{1}{l|}{} 
+  & \multicolumn{1}{l|}{} 
+  & 
   \\\hline
   \multicolumn{1}{|r|}{50} 
   & 800
-  & \multicolumn{1}{l|}{110} 
-  & \multicolumn{1}{l|}{109} 
-  & \multicolumn{1}{l|}{110} 
-  & 110
+  & \multicolumn{1}{l|}{} 
+  & \multicolumn{1}{l|}{} 
+  & \multicolumn{1}{l|}{} 
+  & 
   \\\hline
   \multicolumn{1}{|r|}{25} 
   & 1,600
-  & \multicolumn{1}{l|}{110} 
-  & \multicolumn{1}{l|}{108} 
-  & \multicolumn{1}{l|}{114} 
-  & 111
+  & \multicolumn{1}{l|}{} 
+  & \multicolumn{1}{l|}{} 
+  & \multicolumn{1}{l|}{} 
+  & 
   \\\hline
   \multicolumn{1}{|r|}{5} 
   & 8,000
-  & \multicolumn{1}{l|}{311} 
-  & \multicolumn{1}{l|}{318} 
-  & \multicolumn{1}{l|}{311} 
-  & 313
+  & \multicolumn{1}{l|}{} 
+  & \multicolumn{1}{l|}{} 
+  & \multicolumn{1}{l|}{} 
+  & 
   \\\hline
   \multicolumn{1}{|r|}{1} 
   & 40,000
-  & \multicolumn{1}{l|}{1,548} 
+  & \multicolumn{1}{l|}{} 
   & \multicolumn{1}{l|}{} 
   & \multicolumn{1}{l|}{} 
   &  
@@ -123,56 +135,3 @@ This occurred for several reasons:
   \item A file can only be written to by one process at one time so having less files will reduce the potential for parallelisation.
   \item For each block downloaded: we open a writer to a file, write a single block, and close the writer. This adds a lot of overhead for files that have many blocks.
 \end{enumerate}
-
-\subsection*{Block Size}
-
-For each run we will create a new project with 500 files, each of size 80MB, and a shard size of $B$MiB. We will then run 1 peer locally to simulate a perfect network connection.
-
-\begin{longtable}{rr|llll|}
-  \cline{3-6}\cline{3-6}\cline{3-6}\cline{3-6}\cline{3-6}
-  && \multicolumn{4}{l|}{\hdr{Runtime (s)}}
-  \\ \hline
-  \multicolumn{1}{|l|}{\hdr{Block Size (MiB)}} 
-  & \multicolumn{1}{|l|}{\hdr{Total Blocks}} 
-  & \multicolumn{1}{l|}{\hdr{1}} 
-  & \multicolumn{1}{l|}{\hdr{2}} 
-  & \multicolumn{1}{l|}{\hdr{3}} 
-  & \hdr{avg.}
-  \\\hline
-  \multicolumn{1}{|r|}{1} 
-  & \multicolumn{1}{l|}{} 
-  & \multicolumn{1}{l|}{} 
-  & \multicolumn{1}{l|}{} 
-  & \multicolumn{1}{l|}{} 
-  & 
-  \\\hline
-  \multicolumn{1}{|r|}{2} 
-  & \multicolumn{1}{l|}{} 
-  & \multicolumn{1}{l|}{} 
-  & \multicolumn{1}{l|}{} 
-  & \multicolumn{1}{l|}{} 
-  & 
-  \\\hline
-  \multicolumn{1}{|r|}{4} 
-  & \multicolumn{1}{l|}{} 
-  & \multicolumn{1}{l|}{} 
-  & \multicolumn{1}{l|}{} 
-  & \multicolumn{1}{l|}{} 
-  & 
-  \\\hline
-  \multicolumn{1}{|r|}{8} 
-  & \multicolumn{1}{l|}{} 
-  & \multicolumn{1}{l|}{} 
-  & \multicolumn{1}{l|}{} 
-  & \multicolumn{1}{l|}{} 
-  & 
-  \\\hline
-  \multicolumn{1}{|r|}{16} 
-  & \multicolumn{1}{l|}{} 
-  & \multicolumn{1}{l|}{} 
-  & \multicolumn{1}{l|}{} 
-  & \multicolumn{1}{l|}{} 
-  & 
-  \\\hline
-  \caption{How varying the shard size of the hash tree affects download speed}
-\end{longtable}

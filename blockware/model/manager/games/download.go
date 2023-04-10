@@ -208,7 +208,7 @@ func (g *Game) insertData(fileHash, blockHash [32]byte, data []byte) error {
 
 	d.progressLock.Lock()
 	file, ok := d.Progress[fileHash]
-	defer d.progressLock.Unlock()
+	d.progressLock.Unlock()
 
 	if !ok {
 		return fmt.Errorf("file %x not in download queue", fileHash)
@@ -216,26 +216,29 @@ func (g *Game) insertData(fileHash, blockHash [32]byte, data []byte) error {
 
 	// is block needed
 	file.lock.Lock()
-	defer file.lock.Unlock()
 
 	offsets, ok := file.BlocksRemaining[blockHash]
 	if !ok {
+		file.lock.Unlock()
 		return fmt.Errorf("block %x not in download queue", blockHash)
 	}
 
 	// verify the contents of the data
 	tree, err := g.GetData()
 	if err != nil {
+		file.lock.Unlock()
 		return err
 	}
 
 	shardSize := tree.ShardSize
 	if len(data) != int(shardSize) {
+		file.lock.Unlock()
 		return fmt.Errorf("data is not correct length. Got %d, expected %d", len(data), shardSize)
 	}
 
 	dataHash := sha256.Sum256(data)
 	if !bytes.Equal(blockHash[:], dataHash[:]) {
+		file.lock.Unlock()
 		return fmt.Errorf("block %x data does not match expected content", blockHash)
 	}
 
@@ -243,6 +246,7 @@ func (g *Game) insertData(fileHash, blockHash [32]byte, data []byte) error {
 	for _, offset := range offsets {
 		err := hash.InsertData(file.AbsolutePath, shardSize, uint(offset), data)
 		if err != nil {
+			file.lock.Unlock()
 			return err
 		}
 	}
@@ -253,6 +257,7 @@ func (g *Game) insertData(fileHash, blockHash [32]byte, data []byte) error {
 
 	// check if file is completely downloaded
 	if len(file.BlocksRemaining) == 0 {
+		file.lock.Unlock()
 		if err = g.completeFile(fileHash, file); err != nil {
 			return err
 		}
@@ -261,8 +266,10 @@ func (g *Game) insertData(fileHash, blockHash [32]byte, data []byte) error {
 			g.Download.Stage = DS_FinishedDownloading
 		}
 
+		return nil
 	}
 
+	file.lock.Unlock()
 	return nil
 }
 
@@ -295,6 +302,7 @@ func (g *Game) completeFile(fileHash [32]byte, file *FileProgress) error {
 	}
 
 	if correct {
+		util.Logger.Debugf("file %s correct", file.AbsolutePath)
 		return nil
 	}
 

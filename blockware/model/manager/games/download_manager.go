@@ -55,7 +55,7 @@ func (d *DownloadManager) Close() {
 
 func shardInserterPool(capacity int, game *Game) chan InsertShardRequest {
 	util.Logger.Infof("Creating shard inserter pool")
-	input := make(chan InsertShardRequest, shardInserterCount)
+	input := make(chan InsertShardRequest, 10)
 
 	for w := 1; w <= capacity; w++ {
 		go shardInserterWorker(w, game, input)

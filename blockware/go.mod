@@ -1,6 +1,6 @@
 module github.com/t02smith/part-iii-project/toolkit
 
-go 1.18
+go 1.19
 
 require (
 	github.com/ethereum/go-ethereum v1.10.26

@@ -160,7 +160,7 @@ func (l *Library) StopDownloads() {
 // ContinueDownloads continue a libraries downloads
 func (l *Library) ContinueDownloads() {
 	util.Logger.Info("Continuing downloads")
-	l.DownloadManager.RequestDownload = make(chan DownloadRequest)
+	l.DownloadManager.RequestDownload = make(chan DownloadRequest, 25)
 
 	count := 0
 	for _, g := range l.ownedGames {

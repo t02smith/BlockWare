@@ -197,6 +197,7 @@ func generateSEND_BLOCK(gameHash, shardHash [32]byte, data []byte) string {
 
 func handleSEND_BLOCK(cmd []string, client tcp.TCPConnection) error {
 	util.Logger.Debugf("SEND_BLOCK => Block received")
+
 	// * parse input
 	gh, err := stringTo32ByteArr(cmd[1])
 	if err != nil {
@@ -268,8 +269,6 @@ func handleSEND_BLOCK(cmd []string, client tcp.TCPConnection) error {
 		Peer().contributions.addContribution(crypto.PubkeyToAddress(*pd.Validator.PublicKey), gh, sh)
 	}
 
-	game.OutputToFile()
-
 	util.Logger.Debugf("Successfully inserted shard %x", sh)
 	return nil
 }
@@ -329,7 +328,7 @@ func handleVALIDATE_RES(cmd []string, client tcp.TCPConnection) error {
 	} else {
 		// request their libraries and a list of peers on connection
 		client.SendString(generateLIBRARY())
-		client.SendString(generateREQ_PEERS())
+		// client.SendString(generateREQ_PEERS())
 	}
 
 	return nil

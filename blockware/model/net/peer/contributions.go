@@ -20,7 +20,7 @@ each peer so that their contribution across the network
 can be tracked.
 */
 
-var contributionThresholdBeforeWrite uint = 50
+var contributionThresholdBeforeWrite uint = 250
 
 type contributions struct {
 	// what blocks have they sent us from which games

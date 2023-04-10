@@ -181,6 +181,7 @@ func (ht *HashTree) Hash() error {
 	if err != nil {
 		return err
 	}
+	util.Logger.Debugf("found %d files", fileCount)
 
 	if ht.progress != nil {
 		ht.progress <- fileCount
@@ -516,7 +517,7 @@ func VerifyFile(htf *HashTreeFile, filename string, shardSize uint) (bool, map[[
 	util.Logger.Debugf("Verifying file '%s'", filename)
 	for {
 		_, err := reader.Read(buffer)
-		if err == io.EOF {
+		if errors.Is(err, io.EOF) {
 			break
 		}
 
@@ -543,6 +544,7 @@ func VerifyFile(htf *HashTreeFile, filename string, shardSize uint) (bool, map[[
 	// }
 	// fmt.Println()
 
+	util.Logger.Debugf("Finished verifying file %s", filename)
 	return len(incorrect) == 0, incorrect, nil
 }
 

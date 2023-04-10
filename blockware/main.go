@@ -73,6 +73,13 @@ func main() {
 		util.Logger.Error("Error:", err.Error())
 	}
 
+	lib := peer.Peer().Library()
+	lib.Lock()
+	for _, g := range lib.GetOwnedGames() {
+		g.OutputToFile()
+	}
+	lib.Unlock()
+
 }
 
 func startPeer() error {

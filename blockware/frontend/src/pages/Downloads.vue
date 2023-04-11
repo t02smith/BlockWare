@@ -35,7 +35,9 @@
         <p>{{ download.Name }}</p>
         <p>{{ download.Stage }}</p>
 
-        <p>{{ download.ElapsedTime }}</p>
+        <p>{{ download.Stage === "Setting up download"
+          ? "00:00:00"
+          : download.ElapsedTime }}</p>
 
         <p>
           {{ download.BlocksLeft }}

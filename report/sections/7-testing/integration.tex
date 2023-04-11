@@ -2,28 +2,26 @@
 
 \subsection*{Profiles}
 
-A profile is designed to mimic a specific type of peer to allow me to test my application under more realistic conditions that didn't exclusively involve ideal peers. Table~\ref{tab:profiles} describes each profile, their purpose and the outcomes from using them.
+A profile is used to mimic a specific type of peer that a user may find through this application. This is to allow me to test my application under different conditions and see how it reacts. Table~\ref{tab:profiles} details the used profiles.
 
 \small
-\begin{longtable}{p{.12\textwidth} p{.39\textwidth} p{.39\textwidth} }
+\begin{longtable}{p{.15\textwidth} p{.7\textwidth}}
   \toprule
-  \textbf{Name} & \textbf{Purpose} & \textbf{Outcome}
+  \textbf{Name} & \textbf{Purpose}
   \\\midrule\midrule
   \textbf{Listen Only}
-  & A peer who will listen and respond to all requests perfectly but will never request anything.
-  & This implementation was used for benchmarking and development as a perfect peer.
+  & A peer who will listen and respond to all requests perfectly but will never request anything. This is useful for testing when we want a lightweight client to just download data off of. 
+  
+  This will also be able to upload a game to the locally running smart contract.
   \\
-  \textbf{Send Only}
-  & This peer will never respond to requests but will periodically send them and is supposed to represent a selfish client.
-  & This indicated the need for a \textit{reputation} score for each peer to determine whether their requests should be replied to.
-  \\
-  \textbf{Spammer}
-  & This peer will flood its peers with the same message over and over again. This represents a potentially malicious client.
-  & This indicated the need for ...
+  \textbf{Sender}
+  & This peer will respond to requests but will also periodically send requests. This can be used to show how my application reacts to more realistic peers. 
   \\
   \textbf{Unreliable}
-  & This peer will pseudo-randomly not respond to messages or send incorrect data in response.
-  & This also indicated the need for a \textit{reputation} score where users who are unreliable should be given lower priority.
+  & This peer will pseudo-randomly not respond to messages or send incorrect data in response. This is used to show how my application recovers from faults sent by other users.
+  \\
+  \textbf{Selfish}
+  & This peer will send requests but will never respond to any. This is used to show how my application handles expired requests.
   \\\bottomrule\bottomrule
   \caption{The different profiles used to simulate real-world peers.}
   \label{tab:profiles}
@@ -31,5 +29,4 @@ A profile is designed to mimic a specific type of peer to allow me to test my ap
 \normalsize
 
 \noindent
-The use of various profiles showed that this application needed some metric by which to rank peers to allow us to prioritise requests and choose who to send requests to. However, due to time constraints this was not completed but should be considered moving forward.
-
+The main outcome from these different profiles shows the need for a reputation system where a user can distinguish between peers that reliably respond to requests and peers that don't. This would help mitigate some of the overhead of timed-out requests or receiving incorrect data.

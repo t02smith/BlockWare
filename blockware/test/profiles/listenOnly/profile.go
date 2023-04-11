@@ -60,7 +60,7 @@ func Run() {
 		Developer:   "tcs1g20",
 		RootDir:     "../../data/tmp/games/profile-2",
 		Price:       big.NewInt(150),
-		ShardSize:   67108864,
+		ShardSize:   4194304,
 		AssetsDir:   "../../data/assets"},
 		nil,
 	)

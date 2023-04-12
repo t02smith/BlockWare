@@ -5,7 +5,7 @@ My approach to testing will consist of the following principles:
 \begin{enumerate}
   \item \textbf{Test Driven Development~\cite{beck_test-driven_2003}} Tests should be written alongside the code to reduce the risk of bugs and improve robustness.
   \item \textbf{Fail Fast (Smoke testing)} Automated tests should be ran in a pipeline where the fastest tests are always ran first to reduce the time spent running tests.
-  \item \textbf{Documentation} Test cases should be well documented and grouped contextually such that they are easy to maintain and add to. See Appendix~\ref{app:ex-test} for an example of the documentation and structure expected for each function test.  
+  \item \textbf{Documentation} Test cases should be well documented and grouped contextually such that they are easy to maintain and add to.
 \end{enumerate}
 
 \subsection*{Tools}
@@ -16,7 +16,7 @@ In Table~\ref{tab:tools-testing} I detail the different tools I used to write au
   \toprule
   \textbf{Tool} & \textbf{Description \& Reasoning}
   \\\midrule\midrule
-  Go Testing
+  Go\newline Testing~\cite{noauthor_testing_nodate}
   & The testing package included with Go's standard library was sufficient to produce most of the test cases required for this project.
   \\
   testify~\cite{noauthor_testify_2023}

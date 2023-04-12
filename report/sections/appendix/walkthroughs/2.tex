@@ -1,0 +1,38 @@
+
+\section*{User Walkthrough 2}
+
+User walkthrough 2 shows a user \p{1} downloading a game \g{1}, where \g{1} = [title="User WT \#1", version="1.0.2", developer="tcs1g20", previousVersion=None, price=0, rootHash=`'], off of another user \g{2}. Both \p{1} and \p{2} already own \g{1}.
+
+\begin{enumerate}
+  \item \textbf{\p{1} connects to \p{2}.}
+  % TODO log for forming connection
+
+  \item \textbf{\p{1} and \p{2} exchange Ethereum addresses.}
+  % TODO show VALIDATE_REQ logs
+
+  \item \textbf{\p{1} starts a download for \g{1}}
+  % TODO no evidence to be provided
+
+  \item \textbf{\p{1} sends requests for blocks to \p{2}}
+  % TODO show BLOCK requests with the g1 hash included
+
+  \item\textbf{\p{2} queries the smart contract to verify that \p{1} owns \g{1}}
+  % TODO show logs for contract query
+  % Potentially alchemy logs??
+
+  \item \textbf{\p{2} will respond to \p{1} with the requested data.}
+  % TODO show a corresponding SEND_BLOCK message from example above
+
+  \item \textbf{\p{1} will verify each block of data received using its hash.}
+  % TODO show logs with comparison
+
+  \item \textbf{\p{1} will have a full downloaded copy of \g{1}}
+  % TODO show screenshots of expected files??
+  % TODO show download complete screenshot??
+
+  \item \textbf{\p{2} will request a contributions receipt for \g{1}.}
+  % TODO logs showing message
+
+  \item \textbf{\p{1} will send the receipt to \p{2}.}
+  % TODO show network logs
+\end{enumerate}

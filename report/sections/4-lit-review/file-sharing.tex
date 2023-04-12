@@ -26,12 +26,12 @@ Table~\ref{tab:lit-review-p2p} looks at various implementations of P2P file-shar
   %
   \x
   Napster~\cite{saroiu_measurement_2001}
-  & Napster uses a central cluster of servers that maintain an index of every file on the network and which users have a copy of it. Clients will query the cluster for this information and will choose peers based upon their bandwidth.  
+  & Napster uses a central cluster of servers that maintain an index of every file on the network and which users have a copy of it. Clients will query the cluster for this information and will choose peers based upon their bandwidth. This protocol is dependant on a central cluster existing and will not function properly without it.  
   %
   \x
   Gnutella~\cite{saroiu_measurement_2001}
   & In Gnutella, nodes form an overlay network and will discover other peers through \textit{ping-pong} messages, where any node that receives a \textit{ping} message will forward it to their neighbours and send a \textit{pong} message to the originator. 
-  A user will flood a download request to their peers until they find a suitable peer to download off of.
+  A user will flood a download request to their peers until they find a suitable peer to download off of. A network flood in a large network will result in a significant amount of congestion and and a large amount of \textit{pong} messages going to a single node results in a DDoS attack.
   \\\bottomrule\bottomrule
   \caption{Various global distributed file systems.}
   \label{tab:lit-review-p2p}

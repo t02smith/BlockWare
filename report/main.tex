@@ -7,7 +7,7 @@
 % BODY ONLY
 
 \newif\ifbodyonly
-\bodyonlytrue
+\bodyonlyfalse
 
 % 
 
@@ -47,15 +47,7 @@
 \ifbodyonly 
 \else
 
-\newpage
-\chapter{References}
-
-\printbibliography[heading=subbibintoc, title={Peer-to-Peer File Sharing}, keyword=p2p]
-\printbibliography[heading=subbibintoc, title={Blockchain}, keyword=report-blockchain]
-\printbibliography[heading=subbibintoc, title={Tools Used}, keyword=tool]
-\printbibliography[heading=subbibintoc, title={Project Management}, keyword=project-management]
-
-\printbibliography[heading=subbibintoc, title={Other}, notkeyword=report-blockchain, notkeyword=p2p, notkeyword=tool,notkeyword=project-management]
+\input{sections/references.tex}
 
 \input{sections/appendix/appendix.tex}
 \fi

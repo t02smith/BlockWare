@@ -1,7 +1,9 @@
 
 \section{Blockchain-Based Cloud Storage}
 
-This project will need to maintain an immutable and public record across a P2P network such that it searchable and can be trusted. Blockchain technology has been used to provide a solution to this and Table~\ref{tab:blockhain cloud storage} details some examples of how it has been used to facilitate the large-scale storage of data.
+This project will need to maintain an immutable and public record across a P2P network such that it searchable and can be trusted. Blockchain technology has been used to provide a solution to this.
+\x
+Table~\ref{tab:blockhain cloud storage} details some examples of how it has been used to facilitate the large-scale storage of data.
 
 \small
 \begin{longtable}{ p{0.35\textwidth} p{0.6\textwidth} }
@@ -9,11 +11,11 @@ This project will need to maintain an immutable and public record across a P2P n
   \textbf{Paper} & \textbf{Description of Solution}
   \\\midrule\midrule
   Blockchain Based Data Integrity Verification in P2P Cloud Storage~\cite{yue_blockchain_2018}
-  & This paper looks at how varying structures of Merkle Trees can be used to verify the integrity of data within a P2P blockchain cloud storage system.
+  & This paper uses the Ethereum blockchain to add trust to a data verificaiton system for a P2P network. It analyses how varying structures affect the performance of verificaiton of data stored in the network. 
   %
   \x
   Deduplication with Blockchain for Secure Cloud Storage~\cite{li_deduplication_2018}
-  & A deduplication scheme\footnote{Data deduplication is about reducing the amount of copies kept of a single block of data. This paper~\cite{storer_secure_2008} looks at doing this across encrypted data.} that uses the Ethereum blockchain to record storage information and distribute files across multiple servers
+  & This paper implements a deduplication scheme by uploading storage information to Ethereum and uses smart contract based protocols to provide secure deduplication.
   %
   \x
   Block-secure: Blockchain based scheme for secure P2P cloud storage~\cite{li_block-secure_2018}
@@ -21,7 +23,7 @@ This project will need to maintain an immutable and public record across a P2P n
   %
   \x
   Blockchain-Based Medical Records Secure Storage and Medical Service Framework~\cite{chen_blockchain-based_2018}
-  & Describes a secure and immutable storage scheme to manage personal medical records as well as a service framework to allow for the sharing of these records.
+  & Describes a blockchain-based platform that would allow for the secure and immutable storage of user medical records, such that they are free from any individual medical institution and users have greater control over who can access their personal data.
   %
   \x
   A Blockchain-Based Framework for Data Sharing With Fine-Grained Access Control in Decentralized Storage Systems~\cite{wang_blockchain-based_2018}
@@ -36,12 +38,14 @@ This project will need to maintain an immutable and public record across a P2P n
 \end{longtable}
 \normalsize
 
-\paragraph*{Gaps}
-Some of the gaps found include:
+\noindent
+Some common themes found include:
+
 \begin{itemize}
-  \item \textbf{Access Control} Many of these include no dynamic access-control system, and~\cite{wang_blockchain-based_2018} requires the owner of the data to manually manage access rights. 
-  \item \textbf{Versioning} Many of these systems rely on platforms like IPFS, which do not natively allow for versioning without uploading a new set of data entirely.
+  \item \textbf{Access Control} If these platforms offer access control it is typically up for the owner of the data to distribute access rights. 
+  \item \textbf{Data Integrity} The blockchain is primarily used to add trust across a distributed network in the form of immutability or providing data integrity services.
+  \item \textbf{Versioning} 
 \end{itemize}
 
 \newparagraph
-This project will allow for dynamic access control through a payment system based on Ethereum and will allow for pieces of data to be versioned to match a more realistic lifecycle for a piece of software.
+One of the main issues is that the blockchain itself is not suitable for data storage due to the large storage requirement so it is important for us to consider how we might distirbute data that is fragmented across a large network.

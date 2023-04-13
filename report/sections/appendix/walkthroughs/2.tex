@@ -1,34 +1,77 @@
 
 \section*{User Walkthrough 2}
 
-User walkthrough 2 shows a user \p{1} downloading a game \g{1}, where \g{1} = [title="User WT \#1", version="1.0.2", developer="tcs1g20", previousVersion=None, price=0, rootHash=`'], off of another user \g{2}. Both \p{1} and \p{2} already own \g{1}.
+User walkthrough 2 shows a user \p{1} downloading a game \g{1} off of another user \g{2}. Both \p{1} and \p{2} already own \g{1}.
 
-\begin{enumerate}
-  \item \textbf{\p{1} connects to \p{2}.}
-  % TODO log for forming connection
+\begin{enumerate}[itemsep=2.5pt]
+  \item \textbf{\p{2} connects to \p{1}.}
+  
+  Logs showing \p{2} forming a TCP connection with \p{1}: 
+\begin{lstlisting}[breaklines=true, postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space}]
+2023-04-13T13:03:45.069+0100	[INFO]	tcp/client.go:42	Attempting to open connection to localhost:6051
+...
+2023-04-13T13:03:45.376+0100	[INFO]	controller/peers.go:52	Connected to peer localhost:6051
+\end{lstlisting}
 
   \item \textbf{\p{1} and \p{2} exchange Ethereum addresses.}
-  % TODO show VALIDATE_REQ logs
+  
+  Logs showing \p{2} sending \p{1} a VALIDATE\_REQ message and receiving a VALIDATE\_RES to verify its address: 
+\begin{lstlisting}[breaklines=true, postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space}]
+2023-04-13T13:03:45.376+0100	[INFO]	ethereum/identity.go:54	Generating address validation
+2023-04-13T13:03:45.376+0100	[DEBUG]	tcp/client.go:93	Sending VALIDATE_REQ;323032332d30342d31332031333a30333a34352e33373636363231202b3031303020425354206d3d2 b32392e393936343634313031
+...
+2023-04-13T13:03:45.379+0100	[DEBUG]	tcp/client.go:79	message received VALIDATE_RES;4b711e654d929c6a9b7b6db2a0fa53877a3d78f6bf64134cc6b1e35f2ff029682fbb484d74 a5645fb3d6b9806b1888abce1b29 eaa02730ace98151ad55aff3c100
+2023-04-13T13:03:45.379+0100	[INFO]	ethereum/identity.go:80	Checking signature
+2023-04-13T13:03:45.379+0100	[INFO]	ethereum/identity.go:97	Signature valid: true
+\end{lstlisting}
 
-  \item \textbf{\p{1} starts a download for \g{1}}
-  % TODO no evidence to be provided
+  \item \textbf{\p{2} starts a download for \g{1}}
+  
+  \p{2} Hits the download button in the libraray entry.
 
-  \item \textbf{\p{1} sends requests for blocks to \p{2}}
-  % TODO show BLOCK requests with the g1 hash included
+  \item \textbf{\p{2} sends requests for blocks to \p{2}}
+  
+  Logs showing \p{2} choose a block and send a request for it \p{1}:
 
-  \item\textbf{\p{2} queries the smart contract to verify that \p{1} owns \g{1}}
+\begin{lstlisting}[breaklines=true, postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space}]
+2023-04-13T13:32:48.197+0100	[DEBUG]	games/download.go:339	Requesting file downloads\User WT-1.0\test.txt for game 795417059cee199df9874f951ac1b5a0df51e7a4610764aac8dd76aa3ff27664
+2023-04-13T13:32:48.197+0100	[DEBUG]	games/download.go:343	Requesting shard 8ad06d76f6ac8729ab24e81b5e8d273c33bd6914f40c6709f2e6c02534428923 for file downloads\User WT-1.0\test.txt in game 795417059cee199df9874f951ac1b5a0df51e7a4610764aac8dd76aa3ff27664
+...
+2023-04-13T13:32:48.197+0100	[DEBUG]	peer/requests.go:14	Processing request for block 8ad06d76f6ac8729ab24e81b5e8d273c33bd6914f40c6709f2e6c02534428923
+...
+2023-04-13T13:32:48.197+0100	[DEBUG]	tcp/client.go:93	Sending BLOCK;795417059cee199df9874f951ac1b5a0df51e7a4610764aac8dd76aa3ff27664; 8ad06d76f6ac8729ab24e81b5e8d273c33bd6914f40c6709f2e6c02534428923
+\end{lstlisting}
+
+  \item\textbf{\p{1} queries the smart contract to verify that \p{2} owns \g{1}}
   % TODO show logs for contract query
   % Potentially alchemy logs??
 
-  \item \textbf{\p{2} will respond to \p{1} with the requested data.}
-  % TODO show a corresponding SEND_BLOCK message from example above
+  \item \textbf{\p{1} will respond to \p{2} with the requested data.}
+  
+  Logs showing \p{2} receive a SEND\_BLOCK message with the specified data:
+
+\begin{lstlisting}[breaklines=true, postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space}]
+2023-04-13T13:32:48.576+0100	[DEBUG]	tcp/client.go:79	message received SEND_BLOCK;795417059cee199df9874f951ac1b5a0df51e7a4610764aac8dd76aa3ff27664;< DATA OMITTED >
+\end{lstlisting}
 
   \item \textbf{\p{1} will verify each block of data received using its hash.}
-  % TODO show logs with comparison
+  
+  The data matches the expected contents, no error is thrown and the shard is inserted:
+  
+\begin{lstlisting}[breaklines=true, postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space}]
+2023-04-13T13:32:48.582+0100	[DEBUG]	peer/message_handlers.go:272	Successfully inserted shard 8ad06d76f6ac8729ab24e81b5e8d273c33bd6914f40c6709f2e6c02534428923
+\end{lstlisting}
+
 
   \item \textbf{\p{1} will have a full downloaded copy of \g{1}}
-  % TODO show screenshots of expected files??
-  % TODO show download complete screenshot??
+  
+  The output of a diff command comparing the original directory with the downloaded one. An empty output here indicates they are identical.
+
+\begin{lstlisting}[breaklines=true, postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space}]
+thoma@TOM-LAPTOP MINGW64 ~/coursework/part-iii-project (main)
+$ diff -rq ./blockware/test/data/testdir/ ./live-test-data-p2/downloads/User\ WT-1.0/
+
+\end{lstlisting}
 
   \item \textbf{\p{2} will request a contributions receipt for \g{1}.}
   % TODO logs showing message
@@ -36,3 +79,7 @@ User walkthrough 2 shows a user \p{1} downloading a game \g{1}, where \g{1} = [t
   \item \textbf{\p{1} will send the receipt to \p{2}.}
   % TODO show network logs
 \end{enumerate}
+
+\begin{lstlisting}[breaklines=true, postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space}]
+  
+\end{lstlisting}

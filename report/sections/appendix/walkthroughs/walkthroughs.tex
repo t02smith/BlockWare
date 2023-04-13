@@ -4,10 +4,20 @@
 This section will go through each of the acceptance tests outlined in Section~\ref{sec:acc-tests} and provide the evidence that they pass. This evidence will be given in the form of:
 
 \begin{itemize}
-  \item Smart contract transaction logs from the Sepolia test-net. These are public at \url{https://sepolia.etherscan.io/address/0x2899dab55a4a20d698062bbf4d4ce9f1073ce052}.
+  \item Smart contract transaction logs from the Sepolia test-net. These are public at \small\url{https://sepolia.etherscan.io/address/0x2899dab55a4a20d698062bbf4d4ce9f1073ce052}\normalsize.
   \item Copies of particular log entries that correspond to specific actions.
   \item Screenshots to show changes being reflected in the user interface.
 \end{itemize}
+
+\newparagraph
+For this the game will be a simple folder of text files that we can easily compare to show correctness. Any comparisons will be done using the \textit{diff} command. The games used will be:
+
+\small
+\begin{itemize}
+  \item \g{1} = [title="User WT", version="1.0", developer="tcs1g20",\newline uploader=0xfBC8D99Bb9ab8F781fF04F9b45Fe5c97AACE1916, previousVersion=None, price=0, rootHash=`']
+  \item \g{2} = [title="User WT", version="2.0", developer="tcs1g20", previousVersion=\g{1}, price=0,\newline uploader=0xfBC8D99Bb9ab8F781fF04F9b45Fe5c97AACE1916, rootHash=`']
+\end{itemize}
+\normalsize
 
 \input{sections/appendix/walkthroughs/1.tex}
 \input{sections/appendix/walkthroughs/2.tex}

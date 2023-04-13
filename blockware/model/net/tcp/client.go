@@ -76,7 +76,7 @@ func (c *TCPClient) listen(onMessage func([]string, TCPConnection) error, onClos
 			break
 		}
 
-		// util.Logger.Debugf("message received %s", msg)
+		util.Logger.Debugf("message received %s", msg)
 		err = onMessage(strings.Split(msg[:len(msg)-1], ";"), c)
 		if err != nil {
 			util.Logger.Warn(err)

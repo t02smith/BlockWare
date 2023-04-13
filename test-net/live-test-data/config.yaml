@@ -1,0 +1,26 @@
+contract:
+    address: 0x2899Dab55A4A20D698062bBF4d4ce9f1073Ce052
+eth:
+    address: https://eth-sepolia.g.alchemy.com/v2/v51CbZclQLLclPgsqRwBINAYtA76FHAs
+games:
+    installfolder: ./test/data/tmp
+meta:
+    directory: .toolkit
+    hashes:
+        shardsize: 16384
+        workercount: 5
+    log: stdout
+net:
+    peer:
+        continuedownloads: true
+        max_connections: 100
+        serve_assets: true
+        serveassets: true
+        skip_validation: false
+        skipvalidation: false
+        use_known_peers: false
+        useknownpeers: false
+    port: 6051
+user:
+    info:
+        name: ""

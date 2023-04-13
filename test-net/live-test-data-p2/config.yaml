@@ -10,16 +10,16 @@ meta:
         shardsize: 16384
         workercount: 5
     log: stdout
-    threadpoolsize: 10
 net:
     peer:
         continuedownloads: true
+        max_connections: 100
+        serve_assets: true
         serveassets: true
+        skip_validation: false
         skipvalidation: false
-        useknownpeers: false
-    port: 6051
-    useknownpeers: false
+        use_known_peers: false
+    port: 6052
 user:
     info:
-        domain: t02smith.com
-        name: tom
+        name: ""

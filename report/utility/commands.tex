@@ -16,7 +16,8 @@
   multirow,
   array,
   pdflscape,
-  pdfpages
+  pdfpages,
+  listings
 }
 \usepackage[
   backend=biber,
@@ -53,3 +54,24 @@
 \definecolor{code_bg}{rgb}{0.95,0.95,0.92}
 
 \setlist{nosep}
+
+\lstset{
+  backgroundcolor=\color{white},
+  commentstyle=\color{code_comment},
+  keywordstyle=\color{magenta},
+  numberstyle=\tiny,
+  stringstyle=\color{blue},
+  basicstyle=\ttfamily\scriptsize,
+  breakatwhitespace=false,
+  breaklines=true,
+  captionpos=b,
+  keepspaces=true,
+  numbers=left,
+  numbersep=5pt,
+  showspaces=false,
+  showstringspaces=false,
+  showtabs=false,
+  tabsize=2,
+  emphstyle={\color{orange}},
+}
+

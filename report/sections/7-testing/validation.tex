@@ -24,16 +24,15 @@ A series of user walkthroughs are provided to show that this application meets t
   2 
   & \reqref{F-M6} \reqref{F-M8} \reqref{F-M9} \reqref{F-M10} \reqref{F-M11} \reqref{F-S1} \reqref{F-S2} \reqref{F-S3} \reqref{NF-M2} 
   & \vspace{-5mm}\begin{enumerate}[wide, labelwidth=!, labelindent=0pt]
-    \item \p{1} connects to \p{2}.
+    \item \p{2} connects to \p{1}.
     \item \p{1} and \p{2} exchange Ethereum addresses.
-    \item \p{1} starts a download for \g{1}.
-    \item \p{1} sends requests for blocks to \p{2}.
-    \item \p{2} queries the smart contract to verify that \p{1} owns \g{1}.
-    \item \p{2} will respond to \p{1} with the requested data.
-    \item \p{1} will verify each block of data received using its hash.
-    \item \p{1} will have full downloaded \g{1}.
-    \item \p{2} will request a contributions receipt for \g{1}.
-    \item \p{1} will send the receipt to \p{2}.
+    \item \p{2} starts a download for \g{1}.
+    \item \p{2} sends requests for blocks to \p{1}.
+    \item \p{1} queries the smart contract to verify that \p{2} owns \g{1}.
+    \item \p{1} will respond to \p{2} with the requested data.
+    \item \p{2} will verify each block of data received using its hash.
+    \item \p{2} will have full downloaded \g{1}.
+    \item \p{1} will request and receive a contributions receipt for \g{1} from \p{2}.
   \end{enumerate}
   & \yes
   \\\midrule

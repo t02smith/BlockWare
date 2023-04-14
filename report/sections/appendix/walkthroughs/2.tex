@@ -27,7 +27,7 @@ User walkthrough 2 shows a user \p{1} downloading a game \g{1} off of another us
 
   \item \textbf{\p{2} starts a download for \g{1}}
   
-  \p{2} Hits the download button in the libraray entry.
+  \p{2} Hits the download button in the libraray entry page.
 
   \item \textbf{\p{2} sends requests for blocks to \p{2}}
   
@@ -73,11 +73,16 @@ $ diff -rq ./blockware/test/data/testdir/ ./live-test-data-p2/downloads/User\ WT
 
 \end{lstlisting}
 
-  \item \textbf{\p{2} will request a contributions receipt for \g{1}.}
-  % TODO logs showing message
+  \item \textbf{\p{1} will request and be sent a contributions receipt for \g{1} from \p{2}.}
+  
+  Logs showing \p{1} send a REQ\_RECEIPT message to \p{2} and receive a signed RECEIPT back:
 
-  \item \textbf{\p{1} will send the receipt to \p{2}.}
-  % TODO show network logs
+\begin{lstlisting}[breaklines=true, postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space}]
+2023-04-13T18:44:18.882+0100	[DEBUG]	tcp/server.go:147	Sending REQ_RECEIPT;795417059cee199df9874f951ac1b5a0df51e7a4610764aac8dd76aa3ff27664
+2023-04-13T18:44:18.890+0100	[DEBUG]	tcp/server.go:135	message received RECEIPT;795417059cee199df9874f951ac1b5a0df51e7a4610764aac8dd76aa3ff27664; e53da088782e02e933b62c20e9e5897db2dfd56f7011357d55c5cbb2844374b40a77186ca2 498727a311156f181d89ff356b9a485c0b952209d1d61b11a6e69d00;< BLOCKS OMITTED >
+2023-04-13T18:44:18.890+0100	[INFO]	peer/message_handlers.go:422	Received receipt for 6 blocks
+\end{lstlisting}
+
 \end{enumerate}
 
 \begin{lstlisting}[breaklines=true, postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space}]

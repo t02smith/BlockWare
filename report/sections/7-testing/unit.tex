@@ -42,5 +42,5 @@ Unit tests were written alongside the code they were testing to ensure my code w
   \label{tab:coverage}
 \end{longtable}
 
-\noindent
-Automated tests were not written for the Controller functions as these were usually very simple and would only call a backend function and translate the output. Equally, UI components were not tested either due to the complexity of writing such tests.
+\newparagraph
+Automated tests were also written for the smart contract functions and tested locally using Ganache CLI~\cite{noauthor_trufflesuiteganache_2023}. However, tests were not written for the controller functions as those functions were generally wrappers around model functions that cast between data types. Equally, automated UI tests were omitted due to time constraints and that UI components were partially tested by the user walkthroughs.

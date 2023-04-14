@@ -1,9 +1,8 @@
 
 \section{Blockchain-Based Cloud Storage}
 
-This project will need to maintain an immutable and public record across a P2P network such that it searchable and can be trusted. Blockchain technology has been used to provide a solution to this.
-\x
-Table~\ref{tab:blockhain cloud storage} details some examples of how it has been used to facilitate the large-scale storage of data.
+This project will need to maintain an immutable and public record across a P2P network such that it searchable and can be trusted. Table~\ref{tab:blockhain cloud storage} shows how blockchain technology has been used to provide a solution distributed cloud storage systems.
+
 
 \small
 \begin{longtable}{ p{0.35\textwidth} p{0.6\textwidth} }
@@ -11,11 +10,11 @@ Table~\ref{tab:blockhain cloud storage} details some examples of how it has been
   \textbf{Paper} & \textbf{Description of Solution}
   \\\midrule\midrule
   Blockchain Based Data Integrity Verification in P2P Cloud Storage~\cite{yue_blockchain_2018}
-  & This paper uses the Ethereum blockchain to add trust to a data verificaiton system for a P2P network. It analyses how varying structures affect the performance of verificaiton of data stored in the network. 
+  & The Ethereum blockchain is used to add trust to a data verification system for a P2P network. It analyses how varying structures of Merkle Trees affect the performance of verification of data stored in the network. 
   %
   \x
   Deduplication with Blockchain for Secure Cloud Storage~\cite{li_deduplication_2018}
-  & This paper implements a deduplication scheme by uploading storage information to Ethereum and uses smart contract based protocols to provide secure deduplication.
+  & This paper implements a deduplication scheme by uploading storage information to Ethereum and uses smart contract based protocols to provide secure deduplication over encrypted data.
   %
   \x
   Block-secure: Blockchain based scheme for secure P2P cloud storage~\cite{li_block-secure_2018}
@@ -23,15 +22,15 @@ Table~\ref{tab:blockhain cloud storage} details some examples of how it has been
   %
   \x
   Blockchain-Based Medical Records Secure Storage and Medical Service Framework~\cite{chen_blockchain-based_2018}
-  & Describes a blockchain-based platform that would allow for the secure and immutable storage of user medical records, such that they are free from any individual medical institution and users have greater control over who can access their personal data.
+  & Describes a blockchain-based platform that would allow for the secure and immutable storage of user medical records, such that they are independant from any individual medical institution and users have greater control over who can access their personal data.
   %
   \x
   A Blockchain-Based Framework for Data Sharing With Fine-Grained Access Control in Decentralized Storage Systems~\cite{wang_blockchain-based_2018}
-  & This solution proposes an attribute-based encryption scheme that allows the distribution of access keys to users based upon their allocated groups. Data is uploaded to IPFS and uses an Ethereum smart contract to implement a keyword search of the data stored.
+  & An attribute-based encryption scheme that allows the distribution of access keys to users based upon their allocated groups. Data is uploaded to IPFS and an Ethereum smart contract is used to implement a keyword search of the data stored.
   %
   \x
   Blockchain based Proxy Re-Encryption Scheme for Secure IoT Data Sharing~\cite{manzoor_blockchain_2019}
-  & An IoT distributed cloud system for encrypted IoT data that uses a proxy re-encryption scheme that allows the data to only be visible to the owner and any persons present in the smart contract.
+  & A distributed cloud system for encrypted IoT data that uses a proxy re-encryption scheme that allows the data to only be visible to the owner and any persons present in the smart contract.
   \\\bottomrule\bottomrule
   \caption{Examples of blockchain cloud storage systems~\cite{sharma_blockchain_2021} }
   \label{tab:blockhain cloud storage}
@@ -44,8 +43,5 @@ Some common themes found include:
 \begin{itemize}
   \item \textbf{Access Control} If these platforms offer access control it is typically up for the owner of the data to distribute access rights. 
   \item \textbf{Data Integrity} The blockchain is primarily used to add trust across a distributed network in the form of immutability or providing data integrity services.
-  \item \textbf{Versioning} 
+  \item \textbf{Data Location} Data stored on the blockchain is commonly metadata that refers to some data stored elsewhere, typically on a form of distributed storage network. 
 \end{itemize}
-
-\newparagraph
-One of the main issues is that the blockchain itself is not suitable for data storage due to the large storage requirement so it is important for us to consider how we might distirbute data that is fragmented across a large network.

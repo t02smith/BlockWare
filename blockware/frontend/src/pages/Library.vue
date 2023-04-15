@@ -2,13 +2,6 @@
   <div class="library">
     <!-- sidebar -->
     <ul>
-      <div class="header">
-        <p>🎮 Your games:</p>
-        <button @click="() => (importPanelOpen = !importPanelOpen)">
-          {{ importPanelOpen ? "❌ close" : "🌍 import" }}
-        </button>
-      </div>
-
       <li
         v-if="games.ownedGames"
         v-for="g in games.ownedGames"
@@ -35,6 +28,16 @@
 
     <!-- game details -->
     <div class="details-wrapper">
+      <div class="nav">
+        <p>🎮 Your games:</p>
+        <button @click="() => (importPanelOpen = !importPanelOpen)">
+          {{ importPanelOpen ? "❌ close" : "🌍 import" }}
+        </button>
+        <button @click="checkForUpdates" :disabled="checkingForUpdates">
+          ♻️ Check for updates
+        </button>
+      </div>
+
       <form
         @submit.prevent="
           () => {
@@ -137,6 +140,14 @@ const importGameHash = ref("");
 
 const directory = ref("");
 
+//
+const checkingForUpdates = ref(false);
+async function checkForUpdates() {
+  checkForUpdates.value = true;
+  await games.checkForUpdates();
+  checkForUpdates.value = false;
+}
+
 watch(selected, async () => {
   if (!selected.value) return;
 
@@ -193,11 +204,49 @@ async function uninstall() {
 
   .details-wrapper {
     padding: 1.5rem;
+    padding-top: 0.5rem;
     max-width: 1500px;
     justify-self: center;
     overflow-y: auto;
     position: relative;
     width: 100%;
+
+    > .nav {
+      margin: 0.5rem 1.5rem;
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+
+      > p {
+        font-weight: bold;
+        font-size: 1.25rem;
+      }
+
+      > button:nth-child(2) {
+        margin-left: auto;
+      }
+
+      > button {
+        background-color: lighten(#131313, 20%);
+        border: none;
+        padding: 5px 8px;
+        font-weight: bold;
+        border-radius: 6px;
+
+        cursor: pointer;
+        transition: 150ms;
+        color: rgb(0, 174, 255);
+        font-size: 0.7rem;
+
+        &:hover {
+          background-color: lighten(#131313, 25%);
+        }
+
+        &.active {
+          background-color: lighten(#131313, 20%);
+        }
+      }
+    }
   }
 
   .import-game {
@@ -270,38 +319,6 @@ async function uninstall() {
     > .empty {
       color: darken(white, 20%);
       text-align: left;
-    }
-
-    > .header {
-      display: flex;
-      padding: 12px 15px;
-      align-items: center;
-
-      > p {
-        font-weight: bold;
-      }
-
-      > button {
-        margin-left: auto;
-        background-color: lighten(#131313, 20%);
-        border: none;
-        padding: 5px 8px;
-        font-weight: bold;
-        border-radius: 6px;
-        margin-top: 4px;
-        cursor: pointer;
-        transition: 150ms;
-        color: rgb(0, 174, 255);
-        font-size: 0.7rem;
-
-        &:hover {
-          background-color: lighten(#131313, 25%);
-        }
-
-        &.active {
-          background-color: lighten(#131313, 20%);
-        }
-      }
     }
 
     > li {

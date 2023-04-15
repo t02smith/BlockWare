@@ -29,7 +29,7 @@ cloc:
 	cloc --exclude-dir=node_modules,.git,wailsjs --include-ext=go,vue,sol,js .
 
 cloc-non-test:
-	cloc --exclude-dir=node_modules,.git --include-ext=go --not-match-f='_test.go' .
+	cloc --exclude-dir=node_modules,.git,build --include-ext=go --not-match-f='_test.go' .
 
 cloc-test:
-	cloc --exclude_dir=node_modeules,.git --match-f='_test.go' .
+	cloc --exclude_dir=node_modules,.git,build --match-f='_test.go' .

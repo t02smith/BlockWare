@@ -9,6 +9,7 @@ import {
   ContinueAllDownloads,
   FetchOwnedGame,
   LoadDeferredRequests,
+  CheckForUpdates,
 } from "../../wailsjs/go/controller/Controller";
 import { EventsOn } from "../../wailsjs/runtime/runtime";
 
@@ -86,6 +87,14 @@ export const useGamesStore = defineStore("games", () => {
     LoadDeferredRequests();
   }
 
+  /**
+   * Check for any updates to existing games
+   */
+  async function checkForUpdates() {
+    await CheckForUpdates();
+    await refreshOwnedGames();
+  }
+
   return {
     ownedGames,
     downloads,
@@ -97,5 +106,6 @@ export const useGamesStore = defineStore("games", () => {
     purchase,
     importGame,
     loadDeferredRequests,
+    checkForUpdates,
   };
 });

@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"fmt"
 	"math/big"
+	"sort"
+	"strings"
 	"time"
 
 	"github.com/spf13/viper"
@@ -22,10 +24,18 @@ func (a *Controller) GetOwnedGames() []*ControllerGame {
 	out := []*ControllerGame{}
 
 	for _, g := range gs {
+		var rd string
+		_rd, err := time.Parse("2006-01-02 15:04:05.999999999 -0700 MST", strings.Split(g.ReleaseDate, " m=")[0])
+		if err != nil {
+			rd = g.ReleaseDate
+		} else {
+			rd = fmt.Sprintf("%d %s %d", _rd.Day(), _rd.Month(), _rd.Year())
+		}
+
 		out = append(out, &ControllerGame{
 			Title:           g.Title,
 			Version:         g.Version,
-			ReleaseDate:     g.ReleaseDate,
+			ReleaseDate:     rd,
 			Developer:       g.Developer,
 			RootHash:        fmt.Sprintf("%x", g.RootHash),
 			PreviousVersion: fmt.Sprintf("%x", g.PreviousVersion),
@@ -37,6 +47,14 @@ func (a *Controller) GetOwnedGames() []*ControllerGame {
 			IsOwner:         bytes.Equal(addr.Bytes(), g.Uploader.Bytes()),
 		})
 	}
+
+	sort.Slice(out, func(i, j int) bool {
+		return gs[i].ReleaseDate >= gs[j].ReleaseDate
+	})
+
+	sort.Slice(out, func(i, j int) bool {
+		return out[i].Title < out[j].Title
+	})
 
 	return out
 }
@@ -198,4 +216,13 @@ func (c *Controller) UninstallGame(rh string) {
 	}
 
 	runtime.EventsEmit(c.ctx, "update-downloads")
+}
+
+// checks for updates to owned games
+func (c *Controller) CheckForUpdates() {
+	lib := peer.Peer().Library()
+	if err := library.CheckForGameUpdates(lib); err != nil {
+		c.controllerError("Error checking for updates")
+		util.Logger.Error(err)
+	}
 }

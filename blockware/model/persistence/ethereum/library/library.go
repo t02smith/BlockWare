@@ -1,6 +1,7 @@
 package library
 
 import (
+	"bytes"
 	"context"
 	"errors"
 	"fmt"
@@ -130,20 +131,7 @@ func fetchGamesFromEthereum() ([]*games.Game, error) {
 			continue
 		}
 
-		gs = append(gs, &games.Game{
-			Title:               game.Title,
-			Version:             game.Version,
-			ReleaseDate:         game.ReleaseDate,
-			Developer:           game.Developer,
-			RootHash:            game.RootHash,
-			HashTreeIPFSAddress: game.HashTreeIPFSAddress,
-			Uploader:            game.Uploader,
-			Price:               game.Price,
-			PreviousVersion:     game.PreviousVersion,
-			Assets: &games.GameAssets{
-				Cid: game.AssetsIPFSAddress,
-			},
-		})
+		gs = append(gs, gameStructToGame(game))
 	}
 
 	util.Logger.Infof("Fetched %d games from ethereum", len(gs))
@@ -202,24 +190,6 @@ func Upload(g *games.Game) error {
 	return uploadToEthereum(g)
 }
 
-// translates from the ethereum version to the locally used struct
-func gameEntryToGame(game *library.LibraryGameEntry) *games.Game {
-	return &games.Game{
-		Title:               game.Title,
-		Version:             game.Version,
-		ReleaseDate:         game.ReleaseDate,
-		Developer:           game.Developer,
-		RootHash:            game.RootHash,
-		HashTreeIPFSAddress: game.HashTreeIPFSAddress,
-		Assets: &games.GameAssets{
-			Cid: game.AssetsIPFSAddress,
-		},
-		Uploader:        game.Uploader,
-		Price:           game.Price,
-		PreviousVersion: game.PreviousVersion,
-	}
-}
-
 // Purchase purchase a new game off the blockchain
 func Purchase(l *games.Library, rootHash [32]byte) error {
 	var g *games.Game
@@ -241,19 +211,7 @@ func Purchase(l *games.Library, rootHash [32]byte) error {
 			return err
 		}
 
-		g = gameEntryToGame(&library.LibraryGameEntry{
-			Title:               gx.Title,
-			Version:             gx.Version,
-			ReleaseDate:         gx.ReleaseDate,
-			Developer:           gx.Developer,
-			RootHash:            gx.RootHash,
-			PreviousVersion:     gx.PreviousVersion,
-			Price:               gx.Price,
-			Uploader:            gx.Uploader,
-			HashTreeIPFSAddress: gx.HashTreeIPFSAddress,
-			AssetsIPFSAddress:   gx.AssetsIPFSAddress,
-		})
-
+		g = gameStructToGame(gx)
 		l.SetBlockchainGame(g.RootHash, g)
 	}
 
@@ -313,7 +271,76 @@ func FetchOwnedGame(l *games.Library, gameHash [32]byte) error {
 		return err
 	}
 
-	localGame := &games.Game{
+	localGame := gameStructToGame(game)
+
+	err = localGame.DownloadAllData()
+	if err != nil {
+		util.Logger.Warnf("error downloading game data %s", err)
+	}
+
+	l.AddOrUpdateOwnedGame(localGame)
+	util.Logger.Infof("Fetched game data for %x", gameHash)
+	return nil
+}
+
+// check for updates for all games in a library
+func CheckForGameUpdates(lib *games.Library) error {
+	var updates []*games.Game
+
+	util.Logger.Debug("Checking for game updates")
+	for _, game := range lib.GetOwnedGames() {
+		g, err := GetMostRecentVersion(game.RootHash)
+		if err != nil {
+			return err
+		}
+
+		if g != nil {
+			updates = append(updates, g)
+		}
+	}
+
+	util.Logger.Infof("Found %d updates", len(updates))
+	for _, update := range updates {
+		lib.AddOrUpdateOwnedGame(update)
+	}
+	util.Logger.Debugf("%d game updates added successfully", len(updates))
+	return nil
+}
+
+// Get the most recent version of a given game or nil otherwise
+func GetMostRecentVersion(gameHash [32]byte) (*games.Game, error) {
+	mostRecentVersion, err := libInstance.GetMostRecentVersion(nil, gameHash)
+	if err != nil {
+		return nil, err
+	}
+
+	empty := [32]byte{}
+	if bytes.Equal(mostRecentVersion[:], empty[:]) {
+		return nil, nil
+	}
+
+	game, err := libInstance.Games(nil, mostRecentVersion)
+	if err != nil {
+		return nil, err
+	}
+
+	return gameStructToGame(game), nil
+}
+
+func gameStructToGame(game struct {
+	Title               string
+	Version             string
+	ReleaseDate         string
+	Developer           string
+	RootHash            [32]byte
+	PreviousVersion     [32]byte
+	NextVersion         [32]byte
+	Price               *big.Int
+	Uploader            common.Address
+	HashTreeIPFSAddress string
+	AssetsIPFSAddress   string
+}) *games.Game {
+	return &games.Game{
 		Title:               game.Title,
 		Version:             game.Version,
 		ReleaseDate:         game.ReleaseDate,
@@ -326,14 +353,6 @@ func FetchOwnedGame(l *games.Library, gameHash [32]byte) error {
 		Uploader:        game.Uploader,
 		Price:           game.Price,
 		PreviousVersion: game.PreviousVersion,
+		NextVersion:     game.NextVersion,
 	}
-
-	err = localGame.DownloadAllData()
-	if err != nil {
-		util.Logger.Warnf("error downloading game data %s", err)
-	}
-
-	l.AddOrUpdateOwnedGame(localGame)
-	util.Logger.Infof("Fetched game data for %x", gameHash)
-	return nil
 }

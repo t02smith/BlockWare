@@ -31,6 +31,7 @@ type Game struct {
 	Developer       string
 	RootHash        [32]byte
 	PreviousVersion [32]byte
+	NextVersion     [32]byte
 
 	// IPFS
 	HashTreeIPFSAddress string
@@ -138,6 +139,7 @@ func CreateGame(newGame NewGame, progress chan int) (*Game, error) {
 		HashTreeIPFSAddress: "",
 		Price:               newGame.Price,
 		PreviousVersion:     [32]byte{},
+		NextVersion:         [32]byte{},
 		Uploader:            ethereum.Address(),
 		Assets: &GameAssets{
 			AbsolutePath: newGame.AssetsDir,

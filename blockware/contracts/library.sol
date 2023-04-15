@@ -1,24 +1,34 @@
 // SPDX-License-Identifier: SEE LICENSE IN LICENSE
 pragma solidity ^0.8.18;
 
+/**
+ * @title Library
+ * @author tcs1g20 @ University of Southampton
+ * @notice Manage a distributed marketplace for video games
+ */
 contract Library {
-    // triggered every time a game is uploaded
+
+    /// @notice called when a game is uploaded
+    /// @param hash the game's unique SHA-256 hash
+    /// @param game the corresponding entry of the new game
     event NewGame(bytes32 hash, GameEntry game);
 
-    // when a user purchases a game
-    event Purchase(bytes32, address, bytes);
+    /// @notice called when a game is purchased by a new user
+    /// @param hash the game's unique SHA-256 hash
+    /// @param buyer the address of the user buying the game
+    /// @param data the data returned from the ether transfer 
+    event Purchase(bytes32 hash, address buyer, bytes data);
 
-    // game root hash => entry
+    /// @notice maps game hashes to their metadata
     mapping(bytes32 => GameEntry) public games;
 
-    // game root hash => address => purchased
-    // addresses are only included when a user has purchased
+    /// @notice for each game maps what addresses have purchased it or not
     mapping(bytes32 => mapping(address => uint8)) purchases;
 
-    // a list of all hashes
+    /// @notice the list of all root hashes uploaded
     bytes32[] public gameHashes;
 
-    // metadata about each game
+    /// @notice the metadata provided for each game
     struct GameEntry {
 
         // game meta data
@@ -27,7 +37,10 @@ contract Library {
         string releaseDate;
         string developer;
         bytes32 rootHash;
+
+        // versioning data
         bytes32 previousVersion;
+        bytes32 nextVersion;
 
         // purchasing
         uint price;
@@ -38,15 +51,12 @@ contract Library {
         string assetsIPFSAddress;
     }
 
-    constructor() {}
-
     /**
-     * Upload a new game to the network
+     * @notice upload a new game to the network
      * @param _game the details about the game
      */
     function uploadGame(GameEntry memory _game) external {
         // check input data
-        require(_game.rootHash.length > 0, "no root hash given");
         require(bytes(_game.hashTreeIPFSAddress).length > 0, "no IPFS address given for hash treee");
         require(bytes(_game.assetsIPFSAddress).length > 0, "no IPFS address given for the assets ");
 
@@ -56,6 +66,7 @@ contract Library {
 
           GameEntry memory g = games[_game.previousVersion];
           require(g.uploader == msg.sender, "only the original uploader can update their game");
+          g.nextVersion = _game.rootHash;
           purchases[_game.rootHash][msg.sender] = 1;
         }
 
@@ -67,7 +78,7 @@ contract Library {
     }
 
     /**
-     * Purchase a new game
+     * @notice purchase a new game
      * @param _game the root hash of the game
      */
 
@@ -84,18 +95,36 @@ contract Library {
     }
 
     /**
-     * How many games exist in the current library
+     * @notice How many games exist in the current library
+     * @return uint number of games present in the library
      */
     function libSize() external view returns (uint) {
         return gameHashes.length;
     }
 
     /**
-     * Has a given user purchased a game
+     * @notice Has a given user purchased a game
      * @param _game The root hash of the chosen game
      * @param _addr The address of the person to check
+     * @return bool Whether the address has purchased the game
      */
     function hasPurchased(bytes32 _game, address _addr) external view returns (bool) {
       return purchases[_game][_addr] == 1;
+    }
+
+    /// @notice get the data for the most recent version of a game
+    /// @param _game the root hash of the requested game
+    /// @return bytes32 the root hash of the most recent version
+    function getMostRecentVersion(bytes32 _game) external view returns (bytes32) {
+      require(bytes(games[_game].title).length > 0, "game not found");
+      GameEntry memory game = games[_game];
+
+      bytes32 empty = bytes32(0x0);
+      while (game.nextVersion != empty) {
+        game = games[game.nextVersion];
+      }
+
+      if (game.rootHash == _game) return empty;
+      return game.nextVersion;
     }
 }

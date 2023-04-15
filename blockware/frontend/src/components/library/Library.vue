@@ -30,8 +30,11 @@
 import Game from "./Game.vue";
 import AddGames from "./AddGames.vue";
 import { useGamesStore } from "../../stores/games";
+import { onMounted } from "vue";
 
 const games = useGamesStore();
+
+onMounted(() => games.refreshOwnedGames());
 </script>
 <style scoped lang="scss">
 .library {

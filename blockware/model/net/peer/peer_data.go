@@ -62,7 +62,6 @@ func (pd *peerData) checkOwnership(gameHash [32]byte) (bool, error) {
 		return false, nil
 	}
 
-	util.Logger.Debugf("Verifying ownership of game %x for user %s", gameHash, pd.Peer.Info())
 	checked, ok := pd.Library[gameHash]
 	if !ok {
 		return false, nil
@@ -74,6 +73,7 @@ func (pd *peerData) checkOwnership(gameHash [32]byte) (bool, error) {
 	case notOwned:
 		return false, nil
 	case unknown:
+		util.Logger.Debugf("Verifying ownership of game %x for user %s", gameHash, pd.Peer.Info())
 		addr := crypto.PubkeyToAddress(*pd.Validator.PublicKey)
 		verified, err := library.HasPurchased(gameHash, addr)
 		if err != nil {
@@ -81,8 +81,10 @@ func (pd *peerData) checkOwnership(gameHash [32]byte) (bool, error) {
 		}
 
 		if verified {
+			util.Logger.Debugf("User %s owns game %x", pd.Peer.Info(), gameHash)
 			pd.Library[gameHash] = owned
 		} else {
+			util.Logger.Debugf("User %s does not own game %x", pd.Peer.Info(), gameHash)
 			pd.Library[gameHash] = notOwned
 		}
 

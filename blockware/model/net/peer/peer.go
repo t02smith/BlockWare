@@ -329,6 +329,7 @@ func (p *peer) Close() {
 	p.savePeersToFile()
 	p.library.Close()
 	p.server.Close()
+	p.contributions.writeContributions()
 	for _, c := range p.clients {
 		c.Close()
 	}

@@ -365,6 +365,7 @@ async function submit() {
     assets.value = "";
   } else {
     success.value = true;
+    games.refreshOwnedGames();
   }
 
   submitted.value = false;

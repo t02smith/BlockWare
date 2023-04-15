@@ -25,6 +25,12 @@
               <h4>/</h4>
               <p>{{ props.game.uploader }}</p>
             </div>
+
+            <div class="release-date">
+              <p>
+                Released on <strong> {{ props.game.release }}</strong>
+              </p>
+            </div>
           </div>
 
           <div class="slot">
@@ -124,11 +130,18 @@ onMounted(async () => {
             }
           }
 
+          > .release-date {
+            margin-left: 5px;
+            color: darken(white, 25%);
+          }
+
           > .dev {
             display: flex;
             align-items: center;
             gap: 0.5rem;
             overflow-x: hidden;
+            margin-top: 15px;
+            margin-left: 5px;
 
             > h3 {
               color: rgb(0, 183, 255);

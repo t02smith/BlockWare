@@ -32,6 +32,7 @@ func assertGamesEqual(t *testing.T, g1 library.LibraryGameEntry, g2 struct {
 	Developer           string
 	RootHash            [32]byte
 	PreviousVersion     [32]byte
+	NextVersion         [32]byte
 	Price               *big.Int
 	Uploader            common.Address
 	HashTreeIPFSAddress string
@@ -39,6 +40,7 @@ func assertGamesEqual(t *testing.T, g1 library.LibraryGameEntry, g2 struct {
 }) {
 	assert.True(t, bytes.Equal(g1.RootHash[:], g2.RootHash[:]))
 	assert.True(t, bytes.Equal(g1.PreviousVersion[:], g2.PreviousVersion[:]))
+	assert.True(t, bytes.Equal(g1.NextVersion[:], g2.NextVersion[:]))
 	assert.Equal(t, g1.Title, g2.Title)
 	assert.Equal(t, g1.Version, g2.Version)
 	assert.Equal(t, g1.ReleaseDate, g2.ReleaseDate)

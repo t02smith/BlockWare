@@ -3,6 +3,8 @@
 import {map[string]controller} from '../models';
 import {controller} from '../models';
 
+export function CheckForUpdates():Promise<void>;
+
 export function ConnectFromFile(arg1:string):Promise<void>;
 
 export function ConnectToManyPeers(arg1:string):Promise<void>;

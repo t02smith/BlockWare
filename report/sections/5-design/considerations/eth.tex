@@ -16,8 +16,6 @@ To satisfy \reqref{NF-M1} and \reqref{NF-M2}, we will need to use a public block
 \subsubsection*{Uploading Games}
 \label{subsubsec:eth-data}
 
-
-
 To satisfy \reqref{F-M1} and \reqref{F-M2}, the data stored on the blockchain will be used for the identification of games. Table~\ref{tab:eth-data} shows the fields that will stored as part of the smart contract for each game and to manage the whole collection of games. Fields in \textit{italics} are generated for the user and non-italic fields are entered manually.
 
 \begin{longtable}{ p{.2\textwidth} p{.75\textwidth} }
@@ -33,6 +31,7 @@ To satisfy \reqref{F-M1} and \reqref{F-M2}, the data stored on the blockchain wi
   \textit{uploader} & The Ethereum address of the developer \reqref{NF-M3}.\\
   \textit{root hash} & The root hash of the game that uniquely identifies the game and is based upon its contents.\\
   previous version & The root hash of the most previous version of the game if it exists.\\
+  \textit{next version} & The root hash of next update to this game. \\
   price & The price of the game in Wei.\\
   \textit{hash tree CID} & Required for downloading the hash tree from IPFS.\\
   \textit{assets CID} & Required for downloading the assets folder from IPFS.

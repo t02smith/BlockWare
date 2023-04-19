@@ -14,7 +14,7 @@
           <div class="header-text">
             <div class="title">
               <h2>{{ props.game.title }}</h2>
-              <h3>{{ props.game.version }}</h3>
+              <h3>v{{ props.game.version }}</h3>
             </div>
 
             <div class="dev">

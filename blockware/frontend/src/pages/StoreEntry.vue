@@ -61,13 +61,18 @@ onMounted(async () => {
   game.value = games.storeGames.find((g) => gameHash === g.rootHash);
 });
 
+const submitted = ref(false);
+
 /*
 purchase the currently on display game if there is oen
 */
 async function purchase() {
   if (!game.value) return;
 
+  submitted.value = true;
   await games.purchase(game.value.rootHash);
+  await games.refreshOwnedGames();
+  submitted.value = false;
 }
 </script>
 <style scoped lang="scss">

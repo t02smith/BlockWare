@@ -207,6 +207,22 @@
           </div>
         </div>
         <hr />
+        <div class="question">
+          <h4>Why are some games smaller in my library?</h4>
+          <div class="answer">
+            <p>
+              The smaller games represent old versions of games and the larger
+              version represents the most recent versions. This is to help you
+              see the latest changes without losing access to old updates.
+            </p>
+            <p>
+              You can toggle this on and off by ticking the
+              <strong>show old versions</strong> box in the top right hand
+              corner of your library page.
+            </p>
+          </div>
+        </div>
+        <hr />
       </div>
     </div>
   </div>

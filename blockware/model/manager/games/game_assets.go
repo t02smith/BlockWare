@@ -92,7 +92,7 @@ func (g *Game) CopyAssetsFolder() error {
 		return err
 	}
 
-	expectedFiles := []string{ASSET_COVER, ASSET_BACKGROUND, ASSET_DESCRIPTION}
+	expectedFiles := []string{ASSET_COVER, ASSET_DESCRIPTION}
 
 	_, err = os.Stat(g.Assets.AbsolutePath)
 	if err != nil {

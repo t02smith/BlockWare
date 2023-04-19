@@ -3,15 +3,17 @@
     <!-- sidebar -->
     <ul>
       <li
-        v-if="games.ownedGames"
-        v-for="g in games.ownedGames"
+        v-if="listGames"
+        v-for="g in listGames"
         @click="
           () => {
             selected = g;
             importPanelOpen = false;
           }
         "
-        :class="`${selected === g && 'active'}`"
+        :class="`${selected === g && 'active'} ${
+          g.mostRecentVersion ? 'most-recent' : 'old-version'
+        }`"
       >
         <img
           :src="`http://localhost:3003/${directory}/assets/${g.rootHash}/cover.png`"
@@ -20,7 +22,7 @@
         <p>
           {{ g.title }}
         </p>
-        <strong>{{ g.version }}</strong>
+        <strong>v{{ g.version }}</strong>
       </li>
 
       <p class="empty" v-else>Nothing to show here 🥲</p>
@@ -36,6 +38,10 @@
         <button @click="checkForUpdates" :disabled="checkingForUpdates">
           ♻️ Check for updates
         </button>
+        <div class="checkbox">
+          <input type="checkbox" name="" id="" v-model="showOldVersions" />
+          <p>Show old versions</p>
+        </div>
       </div>
 
       <form
@@ -101,7 +107,7 @@
   </div>
 </template>
 <script setup>
-import { ref, watch, onMounted } from "vue";
+import { ref, watch, onMounted, computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import GameEntry from "../components/library/GameEntry.vue";
 import {
@@ -140,13 +146,16 @@ const importGameHash = ref("");
 
 const directory = ref("");
 
-//
+// check for updates to your library
 const checkingForUpdates = ref(false);
 async function checkForUpdates() {
   checkForUpdates.value = true;
   await games.checkForUpdates();
   checkForUpdates.value = false;
 }
+
+// show old versions of game in list or not
+const showOldVersions = ref(false);
 
 watch(selected, async () => {
   if (!selected.value) return;
@@ -163,6 +172,7 @@ watch(selected, async () => {
 
 // load game mentioned in query parameter if it exists
 onMounted(async () => {
+  await games.refreshOwnedGames();
   directory.value = await GetDirectory();
 
   const gameHash = route.query.game;
@@ -174,6 +184,22 @@ onMounted(async () => {
   }
 
   selected.value = games.ownedGames.find((g) => gameHash === g.rootHash);
+});
+
+const listGames = computed(() => {
+  let gs = [];
+  games.ownedGames
+    .sort((a, b) => a.release > b.release)
+    .forEach((g) => {
+      if (gs.find((_g) => _g.title === g.title && _g.uploader === g.uploader)) {
+        g.mostRecentVersion = false;
+        if (showOldVersions.value) gs.push(g);
+      } else {
+        g.mostRecentVersion = true;
+        gs.push(g);
+      }
+    });
+  return gs;
 });
 
 /*
@@ -214,7 +240,7 @@ async function uninstall() {
     > .nav {
       margin: 0.5rem 1.5rem;
       display: flex;
-      gap: 1rem;
+      gap: 0.5rem;
       align-items: center;
 
       > p {
@@ -227,12 +253,11 @@ async function uninstall() {
       }
 
       > button {
-        background-color: lighten(#131313, 20%);
+        background-color: lighten(#131313, 10%);
         border: none;
         padding: 5px 8px;
         font-weight: bold;
-        border-radius: 6px;
-
+        border-radius: 3px;
         cursor: pointer;
         transition: 150ms;
         color: rgb(0, 174, 255);
@@ -244,6 +269,23 @@ async function uninstall() {
 
         &.active {
           background-color: lighten(#131313, 20%);
+        }
+      }
+
+      > .checkbox {
+        background-color: lighten(#131313, 10%);
+        display: flex;
+        gap: 5px;
+        align-items: center;
+        justify-content: center;
+        padding: 5px 8px;
+        font-weight: bold;
+        border-radius: 3px;
+        color: rgb(0, 174, 255);
+        font-size: 0.7rem;
+
+        > input {
+          margin-top: 2px;
         }
       }
     }
@@ -326,25 +368,54 @@ async function uninstall() {
       transition: 100ms;
       height: fit-content;
       font-weight: bold;
-      font-size: 1.15rem;
       transition: 150ms;
       display: flex;
       align-items: center;
 
+      &.most-recent {
+        font-size: 1.15rem;
+
+        > p {
+          padding: 10px 5px;
+        }
+
+        > img {
+          width: 50px;
+          height: 50px;
+        }
+
+        > strong {
+          font-size: 0.95rem;
+          padding: 10px 5px;
+        }
+      }
+
+      &.old-version {
+        font-size: 0.75rem;
+
+        > p {
+          padding: 0px 5px;
+        }
+
+        > img {
+          width: 25px;
+          height: 25px;
+        }
+
+        > strong {
+          padding: 0px 5px;
+          font-size: 0.75rem;
+
+          color: rgb(209, 17, 17);
+        }
+      }
+
       > img {
-        width: 50px;
-        height: 50px;
         object-fit: cover;
       }
 
-      > p {
-        padding: 10px 5px;
-      }
-
       > strong {
-        padding: 10px 5px;
         margin-left: auto;
-        font-size: 0.95rem;
       }
 
       &:last-child {

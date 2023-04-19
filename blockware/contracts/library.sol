@@ -43,7 +43,7 @@ contract Library {
         bytes32 nextVersion;
 
         // purchasing
-        uint price;
+        uint256 price;
         address uploader;
 
         // address to download hash data from IPFS
@@ -66,6 +66,9 @@ contract Library {
 
           GameEntry memory g = games[_game.previousVersion];
           require(g.uploader == msg.sender, "only the original uploader can update their game");
+
+          bytes32 empty = bytes32(0x0);
+          require(g.nextVersion == empty, "an update has already been released for this game");
           g.nextVersion = _game.rootHash;
           purchases[_game.rootHash][msg.sender] = 1;
         }
@@ -81,7 +84,6 @@ contract Library {
      * @notice purchase a new game
      * @param _game the root hash of the game
      */
-
     function purchaseGame(bytes32 _game) external payable {
       require(bytes(games[_game].title).length > 0, "game not found");
       require(purchases[_game][msg.sender] == 0, "user already owns game");

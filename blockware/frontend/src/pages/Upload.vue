@@ -63,7 +63,7 @@
                 <option value="" disabled>Choose game:</option>
 
                 <option :value="g" v-for="g in ownedGames">
-                  {{ g.title }}
+                  <div>{{ g.title }} v{{ g.version }}</div>
                 </option>
               </select>
 
@@ -219,7 +219,9 @@
           </div>
 
           <div class="submit">
-            <button type="submit">Upload your game!</button>
+            <button type="submit" :disabled="submitted">
+              Upload your game!
+            </button>
 
             <div class="file-counter">
               <div class="progress-bar">
@@ -246,6 +248,7 @@ import {
 import { EventsOn } from "../../wailsjs/runtime/runtime";
 import Error from "../components/Error.vue";
 import { useGamesStore } from "../stores/games";
+import { useErrStore } from "../stores/err";
 
 /*
 
@@ -266,16 +269,14 @@ const submitted = ref(false);
 // whether the upload was a success
 const success = ref(false);
 
-// an err from the upload
-const err = ref("");
-
 // input fields
 
 // 1 => new game OR update
 const type = ref(null);
 
-// for tracking the user's owned games
-const ownedGames = computed(() => games.ownedGames.filter((g) => g.IsOwner));
+// for tracking the user's owned games that are updateable
+const ownedGames = ref([]);
+
 const selectedOwnGame = ref("");
 
 // 2 => Game details
@@ -300,6 +301,8 @@ const progressWidth = computed(() =>
   fileProgress.value === 0 ? 0 : (fileProgress.value / fileCount.value) * 300
 );
 
+const err = useErrStore();
+
 onMounted(async () => {
   // listen to progress bar events
   EventsOn("file-count", (count) => {
@@ -310,7 +313,16 @@ onMounted(async () => {
     fileProgress.value = count;
   });
 
-  games.refreshOwnedGames();
+  await games.refreshOwnedGames();
+
+  let gameLS = [];
+  games.ownedGames
+    .filter((g) => g.IsOwner)
+    .sort((a, b) => a.release > b.release)
+    .forEach(
+      (g) => !gameLS.find((_g) => _g.title === g.title) && gameLS.push(g)
+    );
+  ownedGames.value = gameLS;
 });
 
 //
@@ -342,7 +354,7 @@ async function submit() {
 
   // submit
   submitted.value = true;
-  err.value = await UploadGame(
+  await UploadGame(
     title.value,
     version.value,
     dev.value,
@@ -354,7 +366,7 @@ async function submit() {
   );
 
   // reset fields
-  if (err.value.length > 0) {
+  if (err.err.length === 0) {
     title.value = "";
     version.value = "";
     dev.value = "";
@@ -363,9 +375,10 @@ async function submit() {
     price.value = 0;
     workers.value = 5;
     assets.value = "";
-  } else {
     success.value = true;
     games.refreshOwnedGames();
+  } else {
+    success.value = false;
   }
 
   submitted.value = false;
@@ -460,7 +473,8 @@ async function submit() {
 
           > select {
             padding: 4px 10px;
-            border-radius: 5px;
+            border-radius: 2px;
+            font-size: 1.1rem;
             font-weight: bold;
             background-color: rgb(0, 131, 253);
             border: none;

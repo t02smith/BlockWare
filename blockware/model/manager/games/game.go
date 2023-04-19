@@ -129,13 +129,22 @@ func CreateGame(newGame NewGame, progress chan int) (*Game, error) {
 	copy(h[:], gameRootHash)
 
 	// return value
+	now := time.Now()
 	game := &Game{
-		Title:               newGame.Title,
-		Version:             newGame.Version,
-		ReleaseDate:         newGame.ReleaseDate,
-		Developer:           newGame.Developer,
-		data:                tree,
-		RootHash:            h,
+		Title:       newGame.Title,
+		Version:     newGame.Version,
+		ReleaseDate: newGame.ReleaseDate,
+		Developer:   newGame.Developer,
+		data:        tree,
+		RootHash:    h,
+		Download: &Download{
+			Progress:     make(map[[32]byte]*FileProgress),
+			TotalBlocks:  0,
+			Stage:        DS_FinishedDownloading,
+			StartTime:    now,
+			EndTime:      &now,
+			AbsolutePath: newGame.RootDir,
+		},
 		HashTreeIPFSAddress: "",
 		Price:               newGame.Price,
 		PreviousVersion:     [32]byte{},

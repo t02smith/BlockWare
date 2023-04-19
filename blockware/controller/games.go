@@ -120,7 +120,6 @@ func (c *Controller) UploadGame(title, version, dev, rootDir string, shardSize, 
 		c.controllerErrorf("Error creating game %s", err)
 		return
 	}
-	close(progress)
 
 	err = library.Upload(g)
 	if err != nil {
@@ -134,6 +133,8 @@ func (c *Controller) UploadGame(title, version, dev, rootDir string, shardSize, 
 		c.controllerErrorf("Error saving game to file %s", err)
 		return
 	}
+
+	close(progress)
 }
 
 // find an uploaded game given its root hash

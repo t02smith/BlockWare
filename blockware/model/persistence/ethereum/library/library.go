@@ -104,7 +104,8 @@ func FillLibraryBlockchainGames(lib *games.Library) error {
 // fetch a list of games from ethereum
 func fetchGamesFromEthereum() ([]*games.Game, error) {
 	util.Logger.Info("Fetching games from ethereum")
-	var gs []*games.Game
+
+	gameSet := make(map[[32]byte]*games.Game)
 
 	gameSize, err := libInstance.LibSize(nil)
 	if err != nil {
@@ -118,6 +119,7 @@ func fetchGamesFromEthereum() ([]*games.Game, error) {
 	}
 
 	one := big.NewInt(1)
+	var empty [32]byte
 	for i := big.NewInt(0); i.Cmp(limit) < 0; i.Add(i, one) {
 		gameHash, err := libInstance.GameHashes(nil, i)
 		if err != nil {
@@ -131,10 +133,33 @@ func fetchGamesFromEthereum() ([]*games.Game, error) {
 			continue
 		}
 
-		gs = append(gs, gameStructToGame(game))
+		if !bytes.Equal(game.NextVersion[:], empty[:]) {
+			mostRecentVersion, err := libInstance.GetMostRecentVersion(nil, game.RootHash)
+			if err != nil {
+				util.Logger.Warnf("Error getting game %s", err)
+				continue
+			}
+
+			if _, ok := gameSet[mostRecentVersion]; ok {
+				continue
+			}
+
+			game, err = libInstance.Games(nil, mostRecentVersion)
+			if err != nil {
+				util.Logger.Warnf("Error getting game %s", err)
+				continue
+			}
+		}
+
+		gameSet[game.RootHash] = gameStructToGame(game)
 	}
 
-	util.Logger.Infof("Fetched %d games from ethereum", len(gs))
+	util.Logger.Infof("Fetched %d games from ethereum", len(gameSet))
+	var gs []*games.Game
+	for _, g := range gameSet {
+		gs = append(gs, g)
+	}
+
 	return gs, nil
 }
 

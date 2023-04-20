@@ -1,0 +1,25 @@
+contract:
+    address: 0x091abe2d20c21334645403edb044453b272c0987
+eth:
+    address: http://localhost:8545
+games:
+    installfolder: ./downloads
+meta:
+    directory: .toolkit
+    hashes:
+        shardsize: 16384
+        workercount: 5
+    log: stdout
+net:
+    peer:
+        continuedownloads: true
+        max_connections: 100
+        serve_assets: true
+        skip_validation: false
+        skipvalidation: false
+        use_known_peers: false
+        useknownpeers: false
+    port: 6052
+user:
+    info:
+        name: ""

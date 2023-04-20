@@ -1,0 +1,47 @@
+
+\section*{User Walkthrough 4}
+
+User Walkthrough 4 shows a user discovering more peers through a request sent to a newly met peer through the use of the SERVER, REQ\_PEERS and PEERS commands.
+
+\begin{enumerate}[itemsep=2.5pt]
+
+  \item \textbf{\p{1} is connected to \p{2}.}
+  
+  Logs from \p{1} show us forming a connection with \p{2} and sending its server address:
+
+\begin{lstlisting}[breaklines=true, postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space}]
+2023-04-20T15:51:58.918+0100	[INFO]	tcp/server.go:70	Server listening on localhost:6051
+< other application setup >
+2023-04-20T15:52:46.812+0100	[INFO]	tcp/client.go:41	Attempting to open connection to localhost:6052
+2023-04-20T15:52:47.116+0100	[DEBUG]	tcp/client.go:89	Sending SERVER;localhost:6051
+< eth address validation  > 
+2023-04-20T15:52:47.116+0100	[INFO]	controller/peers.go:53	Connected to peer localhost:6052
+\end{lstlisting}
+
+  \item \textbf{\p{3} forms a connection with \p{1}}
+  Logs from \p{1} show \p{3} initiating a connection and sending their server address:
+
+\begin{lstlisting}[breaklines=true, postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space}]
+2023-04-20T15:52:54.514+0100	[INFO]	tcp/server.go:94	Client joined: 127.0.0.1:19335
+...
+2023-04-20T15:52:54.515+0100	[DEBUG]	tcp/server.go:131	message received from 127.0.0.1:19335: SERVER;localhost:6053
+\end{lstlisting}
+
+  \item \textbf{\p{3} requests a list of \p{1}'s peers and \p{1} will send the details for \p{2}.}
+  Logs from \p{1} show \p{3} requesting a list of peers and \p{1} replying with \p{2}'s information.
+
+\begin{lstlisting}[breaklines=true, postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space}]
+2023-04-20T15:52:54.515+0100	[DEBUG]	tcp/server.go:131	message received from 127.0.0.1:19335: REQ_PEERS
+2023-04-20T15:52:54.515+0100	[DEBUG]	tcp/server.go:143	Sending PEERS;localhost:6052
+\end{lstlisting}
+
+  \item \textbf{\p{3} forms a connection with \p{2}.}
+  Logs from \p{3} show the receing \p{2}'s information from \p{1} and forming a connection with \p{2}.
+
+\begin{lstlisting}[breaklines=true, postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space}]
+2023-04-20T15:52:54.515+0100	[DEBUG]	tcp/client.go:73	message received from localhost:6051 PEERS;localhost:6052
+2023-04-20T15:52:54.515+0100	[INFO]	tcp/client.go:41	Attempting to open connection to localhost:6052
+2023-04-20T15:52:54.820+0100	[DEBUG]	tcp/client.go:89	Sending SERVER;localhost:6053
+\end{lstlisting}
+
+\end{enumerate}

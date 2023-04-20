@@ -1,11 +1,9 @@
-\subsubsection*{Networking}
+\subsubsection{Networking}
 
 Users running this application will be a part of a distributed network of peers by creating and maintaining a set of TCP connections with other users \reqref{F-M7} in the network and will communicate by sending structured messages to each other \reqref{F-M8}. Section~\ref{subsubsec:commands} describes these commands in detail.
-% \x
-% The use of TCP will add a computational overhead to maintain proportional to the number of peers, which is not ideal for inactive channels. A UDP approach would be more scalable but would add greater complexity to the project, but should be considered when extending this application.
 
 \paragraph*{Address Verification}
-When two peers connect they will perform a handshake to exchange their Ethereum addresses and public keys by sending signed messages to each other. This will allow a peer to identify what games another peer is allowed access to.
+When two peers connect they will perform a handshake to exchange their Ethereum addresses and public keys by sending signed messages to each other. This will allow a peer to identify what games another peer is allowed access to. This also allows us to prevent any duplicate connections from the same user.
 
 \paragraph*{Message Handling}
 
@@ -44,6 +42,8 @@ Structured messages \reqref{F-M8} will typically come as part of a request/respo
   & A user requests the list of peers which the receiver peer is connected to. This will be sent immediately after a peer's identity is validated and will help increase the connectivity in the network \reqref{F-S4}.\\
   PEERS;$[p_1 hostname]:[p_1 port]$;\ldots
   & A user will send a list of their active peers. This will be limited to those peers which they have connected to and thus know the hostname and port of their server \reqref{F-S4}.\\
+  SERVER;$[hostname]:[port]$\\
+  & When we form a connection with a peer we send them the address of our server that peers use to connect to us. This allows that peer to share our address through the PEER command so we are more easily discoverable.\\
   \midrule
   ERROR;$[message]$
   & An error message that can be used to prompt a peer to resend a message.\\

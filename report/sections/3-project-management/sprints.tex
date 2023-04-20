@@ -13,11 +13,11 @@ I anticipated that the P2P game distribution network would be the most complex a
   \\\midrule\midrule
   \reqref{F-M7}
   & \yes
-  & Unit tests for the model/net/tcp package and the peer count benchmark tests.
+  & Unit tests for the \textit{model/net/tcp} package and the peer count benchmark tests.
   \\
   \reqref{F-M8}
   & \yes
-  & Unit tests for the model/net/peer/message\_handlers file test the handling of structured messages and the structured responses sent back. 
+  & Unit tests for the \textit{model/net/peer/message\_handlers} file test the handling of structured messages and the structured responses sent back. 
   \\
   \reqref{F-M9}
   & \yes
@@ -33,7 +33,7 @@ I anticipated that the P2P game distribution network would be the most complex a
   \\
   \reqref{F-M12}
   & \started
-  & The algorithm to generate a hash tree and the using of it to download data was implemented but no way to upload it anywhere.
+  & The algorithm to generate hash trees and the ability to use them to download data was implemented. Unit tests for the \textit{model/manager/hashtree} and \textit{model/manager/games} packages show this. Uploading this to distributed storage was planned for Sprint 2.
   \\\midrule\midrule
   \reqref{NF-M2}
   & \yes
@@ -41,7 +41,7 @@ I anticipated that the P2P game distribution network would be the most complex a
   \\
   \reqref{NF-S1}
   & \started
-  & Users will form many connections concurrently and optimisations were made using the producer/consumer pattern to complete actions like inserting data, or requesting data.
+  & Users can perform many concurrent connections and channels are used at component boundaries to allow for multiple producers/consumers of data. This requirement was a consideration throughout all sprints.
   \\\bottomrule\bottomrule
   \caption{Requirements included for Sprint 1}
   \label{tab:sprint-1}
@@ -81,7 +81,7 @@ Table~\ref{tab:sprint-2} shows the requirements pitched for Sprint 2 and whether
   \\
   \reqref{F-M4}
   & \yes
-  & The smart contract was successfully deployed the Sepolia test-net~\cite{etherscanio_deployed_nodate}. All user walkthroughs will form connections to this smart contract.\\
+  & The smart contract was successfully deployed the Sepolia test-net~\cite{etherscanio_library_nodate}. All user walkthroughs will form connections to this smart contract.\\
   \reqref{F-M5}
   & \yes
   & Unit tests for the Library smart contract and user walkthrough 1 show the successful purchase of a game.

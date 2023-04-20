@@ -75,13 +75,13 @@ func downloadToGameDownloads(ds map[[32]byte]*games.Download) map[string]*Contro
 	for hash, d := range ds {
 		g := peer.Peer().Library().GetOwnedGame(hash)
 
-		out[fmt.Sprintf("%x", hash)] = downloadToAppDownload(d, g.Title)
+		out[fmt.Sprintf("%x", hash)] = downloadToAppDownload(d, g.Title, g.Version)
 	}
 
 	return out
 }
 
-func downloadToAppDownload(d *games.Download, name string) *ControllerDownload {
+func downloadToAppDownload(d *games.Download, name, version string) *ControllerDownload {
 	if d == nil {
 		return nil
 	}
@@ -97,6 +97,7 @@ func downloadToAppDownload(d *games.Download, name string) *ControllerDownload {
 	x := &ControllerDownload{
 		TotalBlocks: d.TotalBlocks,
 		Name:        name,
+		Version:     version,
 		Stage:       string(d.Stage),
 		ElapsedTime: fmt.Sprintf("%02d:%02d:%02d", int(diff.Hours()), int(diff.Minutes())%60, int(diff.Seconds())%60),
 		Finished:    finished,

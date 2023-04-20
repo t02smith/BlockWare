@@ -29,6 +29,7 @@ type ControllerGame struct {
 
 type ControllerDownload struct {
 	Name        string
+	Version     string
 	TotalBlocks int
 	Stage       string
 	ElapsedTime string

@@ -32,12 +32,18 @@
         v-for="[hash, download] in downloadGamePairs"
       >
         <p class="indicator">{{ download.Finished ? "✅" : "⌛" }}</p>
-        <p>{{ download.Name }}</p>
+        <p>
+          {{ download.Name }} <strong>v{{ download.Version }}</strong>
+        </p>
         <p>{{ download.Stage }}</p>
 
-        <p>{{ download.Stage === "Setting up download"
-          ? "00:00:00"
-          : download.ElapsedTime }}</p>
+        <p>
+          {{
+            download.Stage === "Setting up download"
+              ? "00:00:00"
+              : download.ElapsedTime
+          }}
+        </p>
 
         <p>
           {{ download.BlocksLeft }}
@@ -48,6 +54,8 @@
             {{
               download.Stage === "Setting up download"
                 ? 0
+                : download.Stage === "Finished"
+                ? 100
                 : Math.round(
                     (1 - download.BlocksLeft / download.TotalBlocks) * 1000
                   ) / 10

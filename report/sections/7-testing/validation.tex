@@ -2,8 +2,8 @@
 
 \section{Acceptance Testing}\label{sec:acc-tests}
 
-A series of user walkthroughs are provided to show that this application meets the requirements set out in Section~\ref{subsec:requirements}. Table~\ref{tab:walkthroughs} describes each user walkthrough and Appendix~\ref{app:user-walkthrough} shows the evidence given for each (e.g. logs showing network messages \reqref{F-M8}). 
-All user walkthroughs use a contract deployed to the Sepolia test-net~\cite{etherscanio_deployed_nodate}, satisfying \reqref{F-M4}, \reqref{NF-M2} and \reqref{NF-M1}. I have also uploaded the smart contract source code to demonstrate that specific functions have actually been called. 
+A user walkthrough is a series of steps to take that, if completed, prove the completeness of a set of requirements. Table~\ref{tab:walkthroughs} describes all user walkthroughs and Appendix~\ref{app:user-walkthrough} shows the evidence for their completeness.
+All user walkthroughs use a contract deployed to the Sepolia test-net~\cite{etherscanio_library_nodate}, satisfying \reqref{F-M4}, \reqref{NF-M2} and \reqref{NF-M1}. I have also uploaded the smart contract source code to demonstrate that specific functions are called following specific events. 
 
 \newcommand{\p}[1]{$P_{#1}$}
 \newcommand{\g}[1]{$G_{#1}$}
@@ -37,23 +37,22 @@ All user walkthroughs use a contract deployed to the Sepolia test-net~\cite{ethe
   \end{enumerate}
   & \yes
   \\\midrule
-  4
+  3
   & \reqref{F-M2} \reqref{F-M3} \reqref{F-M6} \reqref{NF-M5}
   & \vspace{-5mm}\begin{enumerate}[wide, labelwidth=!, labelindent=0pt]
-    \item \p{1} is the original uploader of \g{1}.
+    \item \p{1} is the original uploader of \g{1} and \p{2} has already purchased \g{1}.
     \item \p{1} uploads an update to \g{1}, \g{2}.
-    \item \p{2} owns \g{1} and thus \g{2}.
-    \item \p{2} will successfully download \g{2}.
+    \item \p{2} will hit the ‘check for updates’ button and see \g{2} in their library.
   \end{enumerate}
   & \yes
   \\\midrule
-  5
+  4
   & \reqref{F-S4} \reqref{F-M7} \reqref{NF-M2} 
   & \vspace{-5mm}\begin{enumerate}[wide, labelwidth=!, labelindent=0pt]
-    \item \p{1} is connected to \p{2} and \p{3}.
-    \item \p{4} forms a connection with \p{1}.
-    \item \p{4} requests a list of \p{1}'s peers and \p{1} responds with the details of \p{2} and \p{3}.
-    \item \p{4} forms connections with \p{2} and \p{3}.
+    \item \p{1} is connected to \p{2}.
+    \item \p{3} forms a connection with \p{1}.
+    \item \p{3} requests a list of \p{1}'s peers and \p{1} responds with the details for \p{2}.
+    \item \p{4} forms connections with \p{2}.
   \end{enumerate}
   & \yes
   \\\bottomrule\bottomrule

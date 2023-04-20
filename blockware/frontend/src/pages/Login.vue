@@ -52,16 +52,10 @@ Connect to the BlockWare network
 */
 
 // user's private key
-const key = ref(
-  "af9668cd6ebc3ba4c0e5036c284e128ed66e18ba9e4ed87b2c0c6d9642f2b879"
-);
-// const key = ref(
-//   "a368fddde78a49b3e415b280ebd36003b0aa93ab07bc97b5aabeaf70835fe778"
-// );
+const key = ref("");
 
 // address of the deployed smart contract
 const addr = ref("");
-// const addr = ref("0x2899Dab55A4A20D698062bBF4d4ce9f1073Ce052");
 
 // join existing network OR deploy new one
 const isJoining = ref(true);

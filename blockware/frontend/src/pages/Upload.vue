@@ -362,7 +362,8 @@ async function submit() {
     shardSize.value,
     price.value,
     workers.value,
-    assets.value
+    assets.value,
+    selectedOwnGame.value ? selectedOwnGame.value.rootHash : ""
   );
 
   // reset fields

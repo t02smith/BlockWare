@@ -61,13 +61,13 @@ contract Library {
         require(bytes(_game.assetsIPFSAddress).length > 0, "no IPFS address given for the assets ");
 
         // look for previous version
-        if (_game.previousVersion != 0) {
+        bytes32 empty = bytes32(0x0);
+        if (_game.previousVersion != empty) {
           require(bytes(games[_game.previousVersion].title).length > 0, "previous version of game not found");
 
-          GameEntry memory g = games[_game.previousVersion];
+          GameEntry storage g = games[_game.previousVersion];
           require(g.uploader == msg.sender, "only the original uploader can update their game");
 
-          bytes32 empty = bytes32(0x0);
           require(g.nextVersion == empty, "an update has already been released for this game");
           g.nextVersion = _game.rootHash;
           purchases[_game.rootHash][msg.sender] = 1;
@@ -111,7 +111,20 @@ contract Library {
      * @return bool Whether the address has purchased the game
      */
     function hasPurchased(bytes32 _game, address _addr) external view returns (bool) {
-      return purchases[_game][_addr] == 1;
+      if (purchases[_game][_addr] == 1) {
+        return true;
+      }
+
+      bytes32 empty = bytes32(0x0);
+      GameEntry memory game = games[_game];
+      while (game.previousVersion != empty) {
+        game = games[game.previousVersion];
+        if (purchases[game.rootHash][_addr] == 1) {
+          return true;
+        }
+      }
+
+      return false;
     }
 
     /// @notice get the data for the most recent version of a game
@@ -127,6 +140,6 @@ contract Library {
       }
 
       if (game.rootHash == _game) return empty;
-      return game.nextVersion;
+      return game.rootHash;
     }
 }

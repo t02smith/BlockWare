@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
-	"io"
 	"net"
 	"strings"
 
@@ -38,6 +37,7 @@ type TCPServerClient struct {
 	con    net.Conn
 	reader *bufio.Reader
 	writer *bufio.Writer
+	closed bool
 }
 
 //
@@ -96,6 +96,7 @@ func (s *TCPServer) listen(
 			con:    con,
 			reader: bufio.NewReader(con),
 			writer: bufio.NewWriter(con),
+			closed: false,
 		}
 		s.clients = append(s.clients, client)
 
@@ -123,23 +124,18 @@ func (c *TCPServerClient) listen(onMessage func([]string, TCPConnection) error, 
 	for {
 		msg, err := c.reader.ReadString('\n')
 		if err != nil {
-			if err == io.EOF {
-				onClose(c)
-				return
-			}
-
 			util.Logger.Warnf("Malformed message from client: %s", err)
 			break
 		}
 
-		util.Logger.Debugf("message received %s", msg[:len(msg)-1])
+		util.Logger.Debugf("message received from %s: %s", c.Info(), msg[:len(msg)-1])
 		err = onMessage(strings.Split(msg[:len(msg)-1], ";"), c)
 		if err != nil {
 			util.Logger.Warn(err)
 		}
 	}
 
-	c.Close()
+	onClose(c)
 }
 
 // send a string message to a given client
@@ -172,6 +168,11 @@ func (c *TCPServerClient) Info() string {
 
 // close a connection with a TCP client
 func (c *TCPServerClient) Close() error {
+	if c.closed {
+		return nil
+	}
+
+	c.closed = true
 	return c.con.Close()
 }
 
@@ -183,4 +184,8 @@ func (s *TCPServer) IsClient(con TCPConnection) bool {
 	}
 
 	return false
+}
+
+func (s *TCPServer) GetServerInfo() (string, uint) {
+	return s.hostname, s.port
 }

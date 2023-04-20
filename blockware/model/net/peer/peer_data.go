@@ -29,6 +29,7 @@ type peerData struct {
 	// peer details for logging
 	Hostname string
 	Port     uint
+	Server   string
 
 	// socket interface to communicate with peer
 	Peer tcp.TCPConnection

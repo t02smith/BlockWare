@@ -59,6 +59,8 @@ func getHandlerByCommand(cmd string) func([]string, tcp.TCPConnection) error {
 		return handleREQ_PEERS
 	case "PEERS":
 		return handlePEERS
+	case "SERVER":
+		return handleSERVER
 	}
 
 	return func(s []string, t tcp.TCPConnection) error {
@@ -326,9 +328,35 @@ func handleVALIDATE_RES(cmd []string, client tcp.TCPConnection) error {
 	if !valid {
 		client.SendStringf(generateERROR("invalid signature sent"))
 	} else {
+
+		// use their eth address to check if we already have a connection to them
+		p := Peer()
+		p.peersMU.Lock()
+		duplicate := false
+		for pdClient, pd := range p.peers {
+			if pd.Validator == nil || pdClient.Info() == client.Info() {
+				continue
+			}
+
+			if pd.Validator.PublicKey.Equal(validator.PublicKey) {
+				util.Logger.Debugf("Duplicate connection to peer made => terminating connection")
+				duplicate = true
+				break
+			}
+		}
+
+		if duplicate {
+			p.peersMU.Unlock()
+			p.OnConnectionClose(client)
+
+			return nil
+		}
+
+		p.peersMU.Unlock()
+
 		// request their libraries and a list of peers on connection
 		client.SendString(generateLIBRARY())
-		// client.SendString(generateREQ_PEERS())
+		client.SendString(generateREQ_PEERS())
 	}
 
 	return nil
@@ -432,10 +460,7 @@ func generateREQ_PEERS() string {
 }
 
 func handleREQ_PEERS(cmd []string, client tcp.TCPConnection) error {
-	var ps []struct {
-		hostname string
-		port     uint
-	}
+	var ps []string
 
 	p := Peer()
 	p.peersMU.Lock()
@@ -449,14 +474,7 @@ func handleREQ_PEERS(cmd []string, client tcp.TCPConnection) error {
 			continue
 		}
 
-		if pd.Port == 0 {
-			continue
-		}
-
-		ps = append(ps, struct {
-			hostname string
-			port     uint
-		}{pd.Hostname, pd.Port})
+		ps = append(ps, pd.Server)
 	}
 	p.peersMU.Unlock()
 
@@ -466,10 +484,7 @@ func handleREQ_PEERS(cmd []string, client tcp.TCPConnection) error {
 
 // PEERS cmd
 
-func generatePEERS(peers []struct {
-	hostname string
-	port     uint
-}) string {
+func generatePEERS(peers []string) string {
 	if len(peers) == 0 {
 		return "PEERS\n"
 	}
@@ -477,7 +492,7 @@ func generatePEERS(peers []struct {
 	var sb strings.Builder
 	sb.WriteString("PEERS")
 	for i := 0; i < len(peers); i++ {
-		sb.WriteString(fmt.Sprintf(";%s:%d", peers[i].hostname, peers[i].port))
+		sb.WriteString(fmt.Sprintf(";%s", peers[i]))
 	}
 	sb.WriteString("\n")
 	res := sb.String()
@@ -509,18 +524,73 @@ func handlePEERS(cmd []string, client tcp.TCPConnection) error {
 			continue
 		}
 
+		duplicate := false
 		for _, pd := range pds {
-			if !(pd.Hostname == parts[0] && pd.Port == uint(port)) {
-				if err := p.ConnectToPeer(parts[0], uint(port)); err != nil {
-					util.Logger.Warnf("err connecting to peer %s:%d: %s", parts[0], port, err)
-				} else {
-					counter++
-				}
+			if (pd.Hostname == parts[0] && pd.Port == uint(port)) || pd.Server == cmd[i] {
+				duplicate = true
 				break
+			}
+		}
+
+		if !duplicate {
+			if err := p.ConnectToPeer(parts[0], uint(port)); err != nil {
+				util.Logger.Warnf("err connecting to peer %s:%d: %s", parts[0], port, err)
+			} else {
+				counter++
 			}
 		}
 	}
 
 	util.Logger.Infof("Attempting to connect to %d new peers", counter)
+	return nil
+}
+
+// SERVER
+
+func generateSERVER(hostname string, port uint) string {
+	return fmt.Sprintf("SERVER;%s:%d\n", hostname, port)
+}
+
+func handleSERVER(cmd []string, client tcp.TCPConnection) error {
+	if len(cmd) == 1 {
+		return nil
+	}
+
+	details := strings.Split(cmd[1], ":")
+	if len(details) != 2 {
+		return nil
+	}
+
+	_, err := strconv.ParseUint(details[1], 10, 32)
+	if err != nil {
+		return err
+	}
+
+	p := Peer()
+
+	p.peersMU.Lock()
+	duplicate := false
+	for _, pd := range p.peers {
+		if pd.Server == cmd[1] {
+			util.Logger.Debugf("Duplicate connection made to %s => terminating", cmd[1])
+			duplicate = true
+			break
+		}
+	}
+
+	if duplicate {
+		p.peersMU.Unlock()
+		p.OnConnectionClose(client)
+
+		return nil
+	}
+
+	p.peersMU.Unlock()
+
+	pd := p.GetPeer(client)
+	pd.lock.Lock()
+	pd.Server = cmd[1]
+	pd.lock.Unlock()
+
 	return nil
 }

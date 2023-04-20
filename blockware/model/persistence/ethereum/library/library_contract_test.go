@@ -3,6 +3,7 @@ package library
 import (
 	"bytes"
 	"crypto/sha256"
+	"fmt"
 	"math/big"
 	"testing"
 	"time"
@@ -51,6 +52,8 @@ func assertGamesEqual(t *testing.T, g1 library.LibraryGameEntry, g2 struct {
 	assert.Equal(t, g1.HashTreeIPFSAddress, g2.HashTreeIPFSAddress)
 }
 
+var empty [32]byte
+
 var gameI library.LibraryGameEntry = library.LibraryGameEntry{
 	Title:               "game I",
 	Version:             "1.7",
@@ -61,6 +64,8 @@ var gameI library.LibraryGameEntry = library.LibraryGameEntry{
 	RootHash:            sha256.Sum256([]byte("hello")),
 	AssetsIPFSAddress:   "hello world",
 	HashTreeIPFSAddress: "testing",
+	PreviousVersion:     empty,
+	NextVersion:         empty,
 }
 
 var gameII library.LibraryGameEntry = library.LibraryGameEntry{
@@ -70,10 +75,11 @@ var gameII library.LibraryGameEntry = library.LibraryGameEntry{
 	Developer:           "tcs1g20",
 	Price:               big.NewInt(1),
 	Uploader:            common.Address{},
-	RootHash:            sha256.Sum256([]byte("hello")),
+	RootHash:            sha256.Sum256([]byte("hello world")),
 	AssetsIPFSAddress:   "hello world",
 	HashTreeIPFSAddress: "testing",
 	PreviousVersion:     gameI.RootHash,
+	NextVersion:         empty,
 }
 
 // tests
@@ -133,10 +139,17 @@ func TestLibrarySmartContract(t *testing.T) {
 
 					hashArr, err := lib.GameHashes(nil, big.NewInt(in.hashIndex))
 					assert.Nil(t, err)
-					assert.True(t, bytes.Equal(gameI.RootHash[:], hashArr[:]))
+					assert.True(t, bytes.Equal(in.game.RootHash[:], hashArr[:]))
 				})
 			}
 
+		})
+
+		t.Run("update made changes", func(t *testing.T) {
+			g, err := lib.Games(nil, gameI.RootHash)
+			assert.Nil(t, err)
+
+			assert.True(t, bytes.Equal(g.NextVersion[:], gameII.RootHash[:]), gameI)
 		})
 	})
 
@@ -161,10 +174,17 @@ func TestLibrarySmartContract(t *testing.T) {
 	t.Run("Purchase Game", func(t *testing.T) {
 		t.Run("success", func(t *testing.T) {
 			t.Run("purchase successful", func(t *testing.T) {
+				authInstance.Value = gameI.Price
 				_, err := lib.PurchaseGame(ops, gameI.RootHash)
 				assert.Nil(t, err)
 
 				purchased, err := lib.HasPurchased(nil, gameI.RootHash, ethereum.Address())
+				assert.Nil(t, err)
+				assert.True(t, purchased)
+			})
+
+			t.Run("tangential ownership", func(t *testing.T) {
+				purchased, err := lib.HasPurchased(nil, gameII.RootHash, ethereum.Address())
 				assert.Nil(t, err)
 				assert.True(t, purchased)
 			})
@@ -188,6 +208,15 @@ func TestLibrarySmartContract(t *testing.T) {
 				assert.Nil(t, err)
 				assert.True(t, purchased)
 			})
+		})
+	})
+
+	t.Run("get most recent version", func(t *testing.T) {
+		t.Run("success", func(t *testing.T) {
+			gHash, err := lib.GetMostRecentVersion(nil, gameI.RootHash)
+			assert.Nil(t, err)
+			fmt.Println(gHash)
+			assert.True(t, bytes.Equal(gameII.RootHash[:], gHash[:]))
 		})
 	})
 }

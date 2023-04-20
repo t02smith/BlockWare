@@ -32,7 +32,8 @@ func TestMain(m *testing.M) {
 func setupTestGame(t *testing.T) {
 	t.Helper()
 	datetime := time.Date(2002, 1, 10, 0, 0, 0, 0, time.UTC).String()
-	game, err := CreateGame(NewGame{"toolkit", "1.0.4", datetime, "google.com", "../../../test/data/testdir", big.NewInt(0), 256, "../../../test/data/assets"}, nil)
+	var empty [32]byte
+	game, err := CreateGame(NewGame{"toolkit", "1.0.4", datetime, "google.com", "../../../test/data/testdir", big.NewInt(0), 256, "../../../test/data/assets", empty}, nil)
 
 	if err != nil {
 		t.Fatal(err)

@@ -2,6 +2,7 @@ package peer
 
 import (
 	"bufio"
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
@@ -189,7 +190,17 @@ func (p *peer) onConnection(hostname string, port uint, peer tcp.TCPConnection) 
 		Peer:         peer,
 		Library:      make(map[[32]byte]ownership),
 		sentRequests: make(map[games.DownloadRequest]time.Time, 100),
+		Server:       "",
 	}
+
+	if port != 0 {
+		// we have connected to them
+		pd.Server = fmt.Sprintf("%s:%d", hostname, port)
+
+		// send our server information to them
+		peer.SendString(generateSERVER(p.GetServerInfo()))
+	}
+
 	p.setPeerData(peer, pd)
 
 	// ? start address verification handshake
@@ -200,14 +211,20 @@ func (p *peer) onConnection(hostname string, port uint, peer tcp.TCPConnection) 
 
 // run this function after closing a connection to an existing peer
 func (p *peer) OnConnectionClose(peer tcp.TCPConnection) {
+	p.peersMU.Lock()
 	util.Logger.Infof("Closing connection to %s", peer.Info())
-	peer.Close()
+	if err := peer.Close(); err != nil {
+		util.Logger.Warnf("Err closing connection %s", err)
+	}
+
 	p.DeletePeer(peer)
+	util.Logger.Infof("Connection closed to %s", peer.Info())
+	p.peersMU.Unlock()
 }
 
 // GetServerInfo get information about the current peer
 func (p *peer) GetServerInfo() (string, uint) {
-	return "", 0
+	return p.server.GetServerInfo()
 }
 
 // * known peers

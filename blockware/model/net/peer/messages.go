@@ -28,7 +28,7 @@ func onMessage(cmd []string, client tcp.TCPConnection) error {
 	}
 
 	pd := Peer().GetPeer(client)
-	if !Peer().config.SkipValidation && !pd.Validator.Valid() && cmd[0] != "VALIDATE_REQ" && cmd[0] != "VALIDATE_RES" {
+	if !Peer().config.SkipValidation && !pd.Validator.Valid() && cmd[0] != "VALIDATE_REQ" && cmd[0] != "VALIDATE_RES" && cmd[0] != "SERVER" {
 		util.Logger.Warnf("Peer not validated => discarding message")
 	}
 

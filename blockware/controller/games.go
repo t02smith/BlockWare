@@ -91,9 +91,19 @@ func (c *Controller) GetStoreGames() []*ControllerGame {
 }
 
 // upload a new game
-func (c *Controller) UploadGame(title, version, dev, rootDir string, shardSize, price, workerCount uint, assetsDir string) {
+func (c *Controller) UploadGame(title, version, dev, rootDir string, shardSize, price, workerCount uint, assetsDir, previousVersion string) {
 	release := time.Now().String()
 	progress := make(chan int)
+
+	var prevVersion [32]byte
+
+	if previousVersion != "" {
+		prevVersionBytes, err := hashStringToByte32(previousVersion)
+		if err != nil {
+			c.controllerErrorf("Invalid previous version")
+		}
+		prevVersion = prevVersionBytes
+	}
 
 	go func() {
 		fileCount, current := <-progress, 0
@@ -108,14 +118,16 @@ func (c *Controller) UploadGame(title, version, dev, rootDir string, shardSize, 
 
 	viper.Set("meta.hashes.workerCount", workerCount)
 	g, err := games.CreateGame(games.NewGame{
-		Title:       title,
-		Version:     version,
-		ReleaseDate: release,
-		Developer:   dev,
-		RootDir:     rootDir,
-		Price:       big.NewInt(int64(price)),
-		ShardSize:   shardSize,
-		AssetsDir:   assetsDir}, progress)
+		Title:           title,
+		Version:         version,
+		ReleaseDate:     release,
+		Developer:       dev,
+		RootDir:         rootDir,
+		Price:           big.NewInt(int64(price)),
+		ShardSize:       shardSize,
+		AssetsDir:       assetsDir,
+		PreviousVersion: prevVersion,
+	}, progress)
 	if err != nil {
 		c.controllerErrorf("Error creating game %s", err)
 		return

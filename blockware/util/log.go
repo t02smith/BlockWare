@@ -20,9 +20,9 @@ func InitLogger(showDebug bool) *zap.SugaredLogger {
 		config.Level = zap.NewAtomicLevelAt(zapcore.DebugLevel)
 	}
 
-	// config.OutputPaths = []string{
-	// 	"./zap.log",
-	// }
+	config.OutputPaths = []string{
+		"./zap.log",
+	}
 
 	l, _ := config.Build()
 	Logger = l.Sugar()

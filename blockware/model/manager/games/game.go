@@ -51,14 +51,15 @@ type Game struct {
 // Creator
 
 type NewGame struct {
-	Title       string
-	Version     string
-	ReleaseDate string
-	Developer   string
-	RootDir     string
-	Price       *big.Int
-	ShardSize   uint
-	AssetsDir   string
+	Title           string
+	Version         string
+	ReleaseDate     string
+	Developer       string
+	RootDir         string
+	Price           *big.Int
+	ShardSize       uint
+	AssetsDir       string
+	PreviousVersion [32]byte
 }
 
 // CreateGame create a new instance of a game and generate a hash tree for it
@@ -147,7 +148,7 @@ func CreateGame(newGame NewGame, progress chan int) (*Game, error) {
 		},
 		HashTreeIPFSAddress: "",
 		Price:               newGame.Price,
-		PreviousVersion:     [32]byte{},
+		PreviousVersion:     newGame.PreviousVersion,
 		NextVersion:         [32]byte{},
 		Uploader:            ethereum.Address(),
 		Assets: &GameAssets{

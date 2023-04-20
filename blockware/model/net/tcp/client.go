@@ -3,7 +3,6 @@ package tcp
 import (
 	"bufio"
 	"fmt"
-	"io"
 	"net"
 	"strings"
 
@@ -67,21 +66,18 @@ func (c *TCPClient) listen(onMessage func([]string, TCPConnection) error, onClos
 	for {
 		msg, err := c.reader.ReadString('\n')
 		if err != nil {
-			if err == io.EOF {
-				onClose(c)
-				return
-			}
-
 			util.Logger.Warnf("Malformed message from client: %s", err)
 			break
 		}
 
-		util.Logger.Debugf("message received %s", msg[:len(msg)-1])
+		util.Logger.Debugf("message received from %s %s", c.Info(), msg[:len(msg)-1])
 		err = onMessage(strings.Split(msg[:len(msg)-1], ";"), c)
 		if err != nil {
 			util.Logger.Warn(err)
 		}
 	}
+
+	onClose(c)
 }
 
 // Send a string message to the server
@@ -119,6 +115,10 @@ func (c *TCPClient) Info() string {
 
 // close the tcp client
 func (c *TCPClient) Close() error {
+	if c.closed {
+		return nil
+	}
+
 	c.closed = true
 	return c.con.Close()
 }

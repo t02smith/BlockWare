@@ -123,7 +123,7 @@ localhost:6751
           </button>
 
           <p>
-            <strong>tcp://{{ p.Hostname }}:{{ p.Port }}</strong> -
+            <strong>tcp://{{ p.Server }}</strong> -
             {{ p.Library ? p.Library.length : 0 }} games in common
           </p>
         </div>

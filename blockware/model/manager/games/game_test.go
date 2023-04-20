@@ -35,16 +35,17 @@ func TestCreateGame(t *testing.T) {
 
 	t.Run("illegal arguments", func(t *testing.T) {
 		datetime := time.Date(2002, 1, 10, 0, 0, 0, 0, time.UTC).String()
+		var empty [32]byte
 
 		table := []struct {
 			name string
 			game NewGame
 		}{
-			{"root directory", NewGame{"test-game", "1.1.1", datetime, "tcs1g20", "./fake/root/dir", big.NewInt(16), 256, "../../../test/data/assets"}},
-			{"release date", NewGame{"test-game", "1.1.2", "not a real time", "tcs1g20", ".", big.NewInt(16), 256, "../../../test/data/assets"}},
-			{"shard size", NewGame{"test-game", "1.1.1", datetime, "google.com", ".", big.NewInt(16), 0, "../../../test/data/assets"}},
-			{"price", NewGame{"test-game", "1.1.1", datetime, "google.com", ".", big.NewInt(-1), 256, "../../../test/data/assets"}},
-			{"assets directory", NewGame{"test-game", "1.1.1", datetime, "google.com", ".", big.NewInt(16), 256, "./test/data/assets"}},
+			{"root directory", NewGame{"test-game", "1.1.1", datetime, "tcs1g20", "./fake/root/dir", big.NewInt(16), 256, "../../../test/data/assets", empty}},
+			{"release date", NewGame{"test-game", "1.1.2", "not a real time", "tcs1g20", ".", big.NewInt(16), 256, "../../../test/data/assets", empty}},
+			{"shard size", NewGame{"test-game", "1.1.1", datetime, "google.com", ".", big.NewInt(16), 0, "../../../test/data/assets", empty}},
+			{"price", NewGame{"test-game", "1.1.1", datetime, "google.com", ".", big.NewInt(-1), 256, "../../../test/data/assets", empty}},
+			{"assets directory", NewGame{"test-game", "1.1.1", datetime, "google.com", ".", big.NewInt(16), 256, "./test/data/assets", empty}},
 		}
 
 		for _, x := range table {
@@ -57,11 +58,12 @@ func TestCreateGame(t *testing.T) {
 
 	t.Run("success", func(t *testing.T) {
 		datetime := time.Date(2002, 1, 10, 0, 0, 0, 0, time.UTC).String()
+		var empty [32]byte
 
 		game, err := CreateGame(NewGame{
 			"test-game", "1.1.1", datetime, "Tom Smith",
 			"../../../test/data/testdir", big.NewInt(10), 64,
-			"../../../test/data/assets"}, nil)
+			"../../../test/data/assets", empty}, nil)
 		assert.Nil(t, err, err)
 
 		assert.Equal(t, "test-game", game.Title)

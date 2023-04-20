@@ -29,6 +29,7 @@ func (a *Controller) GetPeerInformation() []ControllerPeerData {
 		ps = append(ps, ControllerPeerData{
 			Hostname:  data.Hostname,
 			Port:      data.Port,
+			Server:    data.Server,
 			Library:   games,
 			Validated: data.Validator != nil && data.Validator.Valid(),
 		})

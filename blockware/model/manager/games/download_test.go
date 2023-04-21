@@ -50,7 +50,6 @@ func TestSetupDownload(t *testing.T) {
 		})
 
 		assert.Nil(t, err)
-
 		assert.NotNil(t, g.Download)
 
 		d := g.Download

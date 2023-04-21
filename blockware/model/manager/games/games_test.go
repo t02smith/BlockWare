@@ -83,6 +83,8 @@ func fetchTestGame(t *testing.T) *Game {
 		t.Fatal(err)
 	}
 
+	testGame.Download = nil
+
 	return testGame
 }
 

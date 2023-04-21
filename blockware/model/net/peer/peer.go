@@ -172,9 +172,7 @@ func (p *peer) ConnectToPeer(hostname string, portNo uint) error {
 
 // run this function every time we connect to a new peer
 func (p *peer) onConnection(hostname string, port uint, peer tcp.TCPConnection) {
-	p.peersMU.Lock()
 	numOfPeers := len(p.peers)
-	p.peersMU.Unlock()
 
 	if numOfPeers == int(p.config.MaxConnections) {
 		util.Logger.Debug("max connections reached => rejecting connection")
@@ -217,9 +215,9 @@ func (p *peer) OnConnectionClose(peer tcp.TCPConnection) {
 		util.Logger.Warnf("Err closing connection %s", err)
 	}
 
+	p.peersMU.Unlock()
 	p.DeletePeer(peer)
 	util.Logger.Infof("Connection closed to %s", peer.Info())
-	p.peersMU.Unlock()
 }
 
 // GetServerInfo get information about the current peer

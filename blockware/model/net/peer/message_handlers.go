@@ -504,6 +504,10 @@ func handlePEERS(cmd []string, client tcp.TCPConnection) error {
 	p := Peer()
 	counter := 0
 
+	if len(cmd) == 1 {
+		return nil
+	}
+
 	var pds []*peerData
 	p.peersMU.Lock()
 	for _, pd := range p.GetPeers() {

@@ -9,10 +9,12 @@ import (
 	"fmt"
 	"os"
 	"reflect"
+	"strconv"
 	"strings"
 	"testing"
 	"time"
 
+	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/t02smith/part-iii-project/toolkit/model/net/tcp"
 	"github.com/t02smith/part-iii-project/toolkit/model/persistence/ethereum"
 	model "github.com/t02smith/part-iii-project/toolkit/model/util"
@@ -274,6 +276,14 @@ func TestHandleGAMES(t *testing.T) {
 			assert.Zero(t, len(data.Library), "game should not have been added")
 		})
 
+	})
+
+	t.Run("error cases", func(t *testing.T) {
+		t.Run("client not found", func(t *testing.T) {
+			err := handleGAMES([]string{"GAMES"}, nil)
+			assert.NotNil(t, err)
+			assert.Equal(t, "unknown peer", err.Error())
+		})
 	})
 }
 
@@ -675,6 +685,31 @@ func _sendBlock(t *testing.T, filename string, mp *testutil.MockPeer, g *games.G
 
 /*
 
+function: generateERROR
+
+*/
+
+func TestGenerateERROR(t *testing.T) {
+	t.Run("success", func(t *testing.T) {
+		res := generateERROR("hello world")
+		assert.Equal(t, "ERROR;hello world\n", res)
+	})
+}
+
+/*
+
+function: handleERROR
+
+*/
+
+func TestHandleERROR(t *testing.T) {
+	t.Run("success", func(t *testing.T) {
+		assert.Nil(t, handleERROR([]string{"ERROR", "hello world"}, nil))
+	})
+}
+
+/*
+
 function: generateVALIDATE_REQ
 purpose: build a structured message from id verification
 
@@ -692,6 +727,63 @@ func TestGenerateVALIDATE_REQ(t *testing.T) {
 
 			assert.Equal(t, fmt.Sprintf("VALIDATE_REQ;%x\n", msg), res, "invalid message")
 		})
+	})
+}
+
+/*
+
+function: handleVALIDATE_REQ
+
+*/
+
+func TestHandleVALIDATE_REQ(t *testing.T) {
+	t.Run("error cases", func(t *testing.T) {
+		t.Run("message not hex", func(t *testing.T) {
+			err := handleVALIDATE_REQ([]string{"VALIDATE_REQ", "xzjcoixnczjbui123vb@"}, nil)
+			assert.NotNil(t, err)
+			assert.Equal(t, "encoding/hex: invalid byte: U+0078 'x'", err.Error())
+		})
+
+		t.Run("empty message", func(t *testing.T) {
+			err := handleVALIDATE_REQ([]string{"VALIDATE_REQ", ""}, nil)
+			assert.NotNil(t, err)
+			assert.Equal(t, "validation message should not be empty", err.Error())
+		})
+	})
+
+	t.Run("success", func(t *testing.T) {
+		if _, _, err := ethereum.StartClient("http://localhost:8545"); err != nil {
+			t.Fatal(err)
+		}
+
+		if _, err := ethereum.GenerateAuthInstance(testutil.Accounts[0][1]); err != nil {
+			t.Fatal(err)
+		}
+
+		mp, _ := createMockPeer(t)
+		mp.SendStringAndWait(50, generateVALIDATE_REQ([]byte("hello world")))
+
+		res := mp.GetLastMessage()
+		parts := strings.Split(res, ";")
+		assert.Equal(t, "VALIDATE_RES", parts[0])
+
+		sig, err := hex.DecodeString(parts[1][:len(parts[1])-1])
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		pubKey, err := crypto.SigToPub(crypto.Keccak256Hash([]byte("hello world")).Bytes(), sig)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		privKey, err := crypto.HexToECDSA(testutil.Accounts[0][1])
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		assert.True(t, privKey.PublicKey.Equal(pubKey))
+
 	})
 }
 
@@ -848,6 +940,59 @@ func TestGenerateREQ_PEERS(t *testing.T) {
 
 /*
 
+function: handlePEERS
+
+*/
+
+func TestHandlePEERS(t *testing.T) {
+	mp, _ := createMockPeer(t)
+	mp.SendStringAndWait(25, "SERVER;localhost:4056\n")
+
+	t.Run("success", func(t *testing.T) {
+		ms, err := testutil.StartMockServer(9046)
+		if err != nil {
+			t.Fatal(err)
+		}
+		t.Cleanup(func() {
+			ms.Close()
+		})
+
+		time.Sleep(25 * time.Millisecond)
+		pCount := len(Peer().peers)
+		mp.SendStringAndWait(25, "PEERS;localhost:9046\n")
+		assert.Equal(t, pCount, len(Peer().peers))
+	})
+
+	t.Run("error cases", func(t *testing.T) {
+		t.Run("no peers given", func(t *testing.T) {
+			err := handlePEERS([]string{"PEERS"}, nil)
+			assert.Nil(t, err)
+		})
+
+		t.Run("no new peers made", func(t *testing.T) {
+
+			table := []struct {
+				name     string
+				argument string
+			}{
+				{"duplicate peer", "localhost:4056"},
+				{"invalid address", "localhost:hello"},
+				{"given peer's own address", "localhost:7886"},
+			}
+
+			for _, x := range table {
+				t.Run(x.name, func(t *testing.T) {
+					pCount := len(Peer().peers)
+					mp.SendStringAndWait(25, fmt.Sprintf("PEERS;%s\n", x.argument))
+					assert.Equal(t, pCount, len(Peer().peers))
+				})
+			}
+		})
+	})
+}
+
+/*
+
 function: generatePEERS
 purpose: generate a peer cmd given a list of peers
 
@@ -903,7 +1048,20 @@ func TestHandleSERVER(t *testing.T) {
 
 	t.Run("failure", func(t *testing.T) {
 		t.Run("no arguments given", func(t *testing.T) {
+			err := handleSERVER([]string{"SERVER"}, nil)
+			assert.Nil(t, err)
+		})
 
+		t.Run("invalid server address", func(t *testing.T) {
+			t.Run("not enough details", func(t *testing.T) {
+				err := handleSERVER([]string{"SERVER", "localhost1011"}, nil)
+				assert.Nil(t, err)
+			})
+
+			t.Run("port not a num", func(t *testing.T) {
+				err := handleSERVER([]string{"SERVER", "localhost:hello"}, nil)
+				assert.ErrorIs(t, err, strconv.ErrSyntax)
+			})
 		})
 	})
 }

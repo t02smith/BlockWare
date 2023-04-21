@@ -68,5 +68,6 @@ func createMockPeer(t *testing.T) (*testutil.MockPeer, tcp.TCPConnection) {
 	})
 
 	clients := Peer().server.Clients()
+	util.Logger.Info("Mock peer started")
 	return mp, clients[len(clients)-1]
 }

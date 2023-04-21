@@ -112,8 +112,13 @@ func StartMockServer(port uint) (*MockServer, error) {
 // close the mock server
 func (ms *MockServer) Close() {
 	util.Logger.Info("Closing mock server")
-	ms.con.Close()
-	ms.listener.Close()
+	if ms.con != nil {
+		ms.con.Close()
+	}
+
+	if ms.listener != nil {
+		ms.listener.Close()
+	}
 }
 
 // add a response to a given input

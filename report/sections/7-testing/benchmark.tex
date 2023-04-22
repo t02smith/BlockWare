@@ -3,12 +3,12 @@
 
 To assert that my application is scalable \reqref{NF-S1}, I will be using a benchmark to show the download speed of a game varies depending on the number of peers a user is connected to.
 \x
-For each test case:
+Each test case will:
 
 \begin{itemize}
-  \item I will connect to $N$ simulated peers using the \textbf{Listen Only} profile \reqref{F-M7}.
-  \item I will download the entirety of a generated directory off of those peers \reqref{F-M9} \reqref{F-M11}. The generated data will will be 40GB in size, to match the average given in Section~\ref{subsec:design-data}, and be made up of 500 files, each of size 80MB.
-  \item I will run each test case three times to ensure the consistency of my results. All tests will be performed on the same machine.
+  \item connect to $N$ \textbf{Listen Only} peers.
+  \item dowload the entirety of the generated test data. This data will be of size 40GB to match the average game size mentioned in Section~\ref{tab:data}.
+  \item be run three times to ensure consistency.
 \end{itemize}
 
 \newparagraph
@@ -51,4 +51,4 @@ Table~\ref{tab:bench-peer-count} shows the results of the benchmark.
 
 \vspace{-4mm}
 \newparagraph
-This result shows us that we can massively increase the download speed by increasing the number of peers we are connected to. This shows that my application can correctly handle many concurrent peers \reqref{F-M7} and will distribute requests among many different connections to increase scalability \reqref{NF-S1}.
+These results show that the download speed we can massively be increasedbby connecting to more peers. This shows that my application can correctly handle many concurrent peers \reqref{F-M7} and will distribute requests among many different connections to increase scalability \reqref{NF-S1}.

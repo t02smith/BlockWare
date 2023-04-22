@@ -1,17 +1,17 @@
 \section{Unit Testing}
 
-Unit tests were written alongside the code they were testing to ensure my code was robust and responded appropriately to all inputs. Generic functions like getters or setters were ignored and I aimed for a 70\% test coverage to ensure a significant amount of the application was tested. Table~\ref{tab:coverage} shows a breakdown of test coverage by package.
+Unit tests were written alongside the code they were testing to ensure my code was robust and responded appropriately to all inputs. I aimed for a 70\% test coverage to ensure a significant amount of the application was tested. Table~\ref{tab:coverage} shows a breakdown of test coverage by package.
 
 \begin{longtable}{p{.4\textwidth} p{0.15\textwidth} p{.2\textwidth}}
   \toprule
   \textbf{Package} & \textbf{Coverage} & \textbf{Tests Written}
   \\\midrule\midrule
   model/manager/hashtree
-  & 75.1\%
+  & 75.2\%
   & 69
   \\
   model/manager/games
-  & 61.4\%
+  & 61.3\%
   & 107
   \\
   model/manager/ignore
@@ -19,11 +19,11 @@ Unit tests were written alongside the code they were testing to ensure my code w
   & 13
   \\
   model/net/tcp
-  & 71.6\%
+  & 71.9\%
   & 27
   \\
   model/net/peer
-  & 50.4\%
+  & 55.8\%
   & 111
   \\
   model/persistence/ethereum
@@ -35,7 +35,7 @@ Unit tests were written alongside the code they were testing to ensure my code w
   & 24
   \\\midrule\midrule
   \textbf{Total}
-  & 70.3\%
+  & 71.1\%
   & 371
   \\\bottomrule\bottomrule
   \caption{Code coverage by package. Missing entries do not have code in them for example model/manager is only a wrapper for its child packages.}
@@ -43,4 +43,5 @@ Unit tests were written alongside the code they were testing to ensure my code w
 \end{longtable}
 
 \newparagraph
-Automated tests were also written for the smart contract functions and tested locally using Ganache CLI~\cite{noauthor_trufflesuiteganache_2023}. However, tests were not written for the controller functions as those functions were generally wrappers around model functions that cast between data types. Equally, automated UI tests were omitted due to time constraints and that UI components were partially tested by the user walkthroughs.
+Automated tests were also written for the smart contract functions and tested locally using Ganache CLI~\cite{noauthor_trufflesuiteganache_2023}. 
+Tests were not written for generic functions like getters and setts; this includes the Controller functions that were typically wrappers around Model functions. Equally, automated UI tests were omitted due to time constraints and that UI components were partially tested by the user walkthroughs.

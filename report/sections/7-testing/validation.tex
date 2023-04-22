@@ -2,8 +2,10 @@
 
 \section{Acceptance Testing}\label{sec:acc-tests}
 
-A user walkthrough is a series of steps to take that, if completed, prove the completeness of a set of requirements. Table~\ref{tab:walkthroughs} describes all user walkthroughs and Appendix~\ref{app:user-walkthrough} shows the evidence for their completeness.
-All user walkthroughs use a contract deployed to the Sepolia test-net~\cite{etherscanio_library_nodate}, satisfying \reqref{F-M4}, \reqref{NF-M2} and \reqref{NF-M1}. I have also uploaded the smart contract source code to demonstrate that specific functions are called following specific events. 
+A user walkthrough is a series of steps to take that, if completed, prove the completeness of a set of requirements. 
+All user walkthroughs use a contract deployed to the Sepolia test-net~\cite{etherscanio_library_nodate}, satisfying \reqref{F-M4}, \reqref{NF-M2} and \reqref{NF-M1}, and all transactions completed can be seen publicly.
+\x
+Table~\ref{tab:walkthroughs} describes all user walkthroughs and Appendix~\ref{app:user-walkthrough} shows the evidence for their completeness.
 
 \newcommand{\p}[1]{$P_{#1}$}
 \newcommand{\g}[1]{$G_{#1}$}
@@ -52,7 +54,7 @@ All user walkthroughs use a contract deployed to the Sepolia test-net~\cite{ethe
     \item \p{1} is connected to \p{2}.
     \item \p{3} forms a connection with \p{1}.
     \item \p{3} requests a list of \p{1}'s peers and \p{1} responds with the details for \p{2}.
-    \item \p{4} forms connections with \p{2}.
+    \item \p{3} forms connections with \p{2}.
   \end{enumerate}
   & \yes
   \\\bottomrule\bottomrule

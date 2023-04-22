@@ -42,7 +42,7 @@ Structured messages \reqref{F-M8} will typically come as part of a request/respo
   & A user requests the list of peers which the receiver peer is connected to. This will be sent immediately after a peer's identity is validated and will help increase the connectivity in the network \reqref{F-S4}.\\
   PEERS;$[p_1 hostname]:[p_1 port]$;\ldots
   & A user will send a list of their active peers. This will be limited to those peers which they have connected to and thus know the hostname and port of their server \reqref{F-S4}.\\
-  SERVER;$[hostname]:[port]$\\
+  SERVER;$[hostname]:[port]$
   & When we form a connection with a peer we send them the address of our server that peers use to connect to us. This allows that peer to share our address through the PEER command so we are more easily discoverable.\\
   \midrule
   ERROR;$[message]$

@@ -1,13 +1,9 @@
-\subsubsection{Networking}
+\subsubsection{Networking}\label{subsubsec:networking}
 
-Users running this application will be a part of a distributed network of peers by creating and maintaining a set of TCP connections with other users \reqref{F-M7} in the network and will communicate by sending structured messages to each other \reqref{F-M8}. Section~\ref{subsubsec:commands} describes these commands in detail.
+This component will connect users to the distributed P2P file-sharing network, where it will create and maintain a set of TCP connections with other users \reqref{F-M7} in the network and will communicate by sending structured messages to each other \reqref{F-M8}. Section~\ref{subsubsec:commands} describes these commands in detail.
 
-\paragraph*{Address Verification}
-When two peers connect they will perform a handshake to exchange their Ethereum addresses and public keys by sending signed messages to each other. This will allow a peer to identify what games another peer is allowed access to. This also allows us to prevent any duplicate connections from the same user.
-
-\paragraph*{Message Handling}
-
-One of the responsibilities of this component is to respond to requests sent by the Data Manager by sending and tracking messages to other peers to fetch requested data. Each message should be tracked by the peer for a given time period and resent if an appropriate response has not been received. Any duplicate requests sent by the data manager will be ignored if a pending request is active. 
+\paragraph*{Peer Identification}
+Peers are identified by their Ethereum addresses, which will allow us to view which games they've purchased and are allowed access to. Upon forming a connection, each peer will request the other return a signature for a generated message, from which we can derive their address and public key.
 
 \paragraph*{Commands}\label{subsubsec:commands}
 
@@ -24,7 +20,7 @@ Structured messages \reqref{F-M8} will typically come as part of a request/respo
   & The user sends a list of their games as a series of unique root hashes. These root hashes will map to games on the blockchain.\\
   \midrule
   BLOCK;$[gameHash]$;$[blockHash]$;
-  & The user will request a block of data off of a peer by sending the root hash of the game and the hash of the block being requested. The response will be a SEND\_BLOCK message \reqref{F-M9}.\\
+  & The user will request a block of data off of a peer by sending the root hash of the game and the hash of the block being requested. The response will be a SEND\_BLOCK message \reqref{F-M9} and if it isn't received after a given amount of time then it is resent.\\
   SEND\_BLOCK;$[gameHash]$;\newline $[blockHash]$;$[compressedData]$;
   & The user sends a block of data in response to a BLOCK message \reqref{F-M9}. The data is compressed using the \textit{compress/flate} package to reduce message size \reqref{NF-S1}.\\
   \midrule

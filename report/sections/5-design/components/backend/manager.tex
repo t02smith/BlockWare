@@ -1,12 +1,10 @@
-\subsubsection{Data Manager}
+\subsubsection{Data Manager}\label{subsubsec:data-manager}
 
-The Data Manager has several responsibilities:
+This component is responsible for interacting with local storage and managing the user's collection of owned and installed games.
+\x
+It will interact directly with Ethereum to discover, purchase \reqref{F-M5}, and upload \reqref{F-M1} \reqref{F-M2} games and use IPFS to upload and distribute game assets \reqref{F-C2} and hash trees \reqref{F-M12}.
 
-\begin{enumerate}
-  \item Track the user's owned games and know which are installed locally and which aren't.
-  \item Interact with the Library contract deployed to the Ethereum blockchain to discover, upload and purchase games \reqref{F-M1} \reqref{F-M2} \reqref{F-M5}.
-  \item Fetch shards of game data from the disk to send to other peers.
-  \item Interact with IPFS to upload/fetch a game hash tree and assets \reqref{F-M12} \reqref{F-C2}.
-  \item Sending requests to the networking layer to find and retrieve blocks of data from peers in the network.
-  \item Generate hash trees for games.
-\end{enumerate}
+\paragraph*{Download Order} Each download will have a downloader thread that selects the order at which blocks are to be fetched. Using the hash tree, it will queue whole files at a time and to verify the whole file once all blocks have been fetched.
+
+
+

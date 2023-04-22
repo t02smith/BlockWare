@@ -6,10 +6,12 @@ The Persistence layer shows how the data for the application is divided across s
 There are several things to note about using Ethereum as a platform for selling games:
 
 \begin{itemize}
-  \item Ethereum is a less stable currency than most traditional currencies like GBP or USD so games may fluctuate largely in price. This design describes no solution to this issue but an example solution might attempt to map a real-world currency to Ether.
+  \item Ethereum is a less stable currency than most traditional currencies so games may fluctuate largely in price. This design describes no solution to this issue but an example solution might attempt to map a real-world currency to Ether.
   \item All write functions to the smart contract will incur a gas fee so uploading or updating data will not be free.
-  \item Users will have to source Ether from elsewhere before being able to purchase games, which may be intimidating to users who are not already familiar with the Ethereum ecosystem. Moreover, many people are sceptical of blockchain technology so may be hesitant to adopt the application.
+  \item Many people are sceptical of blockchain technology so may be hesitant to adopt the application.
 \end{itemize}
 
 \newparagraph
 This layer will also provide interface functions that will allow our backend code to interface with our smart contract. Interactions with IPFS will be very simple uploads or downloads of compressed data.
+\x
+A peer's behaviour is described by the Backend in Section~\ref{subsec:backend}, which will be part of the application run locally by the user.

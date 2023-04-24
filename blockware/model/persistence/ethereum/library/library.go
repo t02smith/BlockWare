@@ -164,7 +164,7 @@ func fetchGamesFromEthereum() ([]*games.Game, error) {
 }
 
 // upload a new game to ethereum as well as its data from IPFS
-func uploadToEthereum(g *games.Game) error {
+func UploadToEthereum(g *games.Game) error {
 
 	// upload data to IPFS
 	util.Logger.Infof("Uploading game data for %s to IPFS", g.Title)
@@ -204,16 +204,6 @@ func uploadToEthereum(g *games.Game) error {
 	util.Logger.Infof("Successfully uploaded game metadata for %s to Ethereum", g.Title)
 
 	return nil
-}
-
-// Upload upload a new game to ethereum as well as its data from IPFS with some checks
-func Upload(g *games.Game) error {
-	if libInstance == nil || authInstance == nil {
-		return errors.New("lib or auth instance are nil => run DeployLibraryContract first to initialise them")
-	}
-
-	// * upload
-	return uploadToEthereum(g)
 }
 
 // Purchase purchase a new game off the blockchain

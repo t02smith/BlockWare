@@ -6,7 +6,6 @@ import (
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/t02smith/part-iii-project/toolkit/build/contracts/library"
-	"github.com/t02smith/part-iii-project/toolkit/model/persistence/ethereum"
 	"github.com/t02smith/part-iii-project/toolkit/test/testutil"
 	"github.com/t02smith/part-iii-project/toolkit/util"
 )
@@ -26,10 +25,6 @@ func beforeAll() {
 	util.InitLogger(true)
 	testutil.SetupTestConfig()
 
-	_, _, err := ethereum.StartClient("ws://localhost:8545")
-	if err != nil {
-		util.Logger.Error(err)
-	}
 }
 
 func TestMain(m *testing.M) {

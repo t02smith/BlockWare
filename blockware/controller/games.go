@@ -133,7 +133,7 @@ func (c *Controller) UploadGame(title, version, dev, rootDir string, shardSize, 
 		return
 	}
 
-	err = library.Upload(g)
+	err = library.UploadToEthereum(g)
 	if err != nil {
 		c.controllerErrorf("Error uploading game %s", err)
 		return

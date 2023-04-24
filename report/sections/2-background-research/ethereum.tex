@@ -1,16 +1,20 @@
 
 \section{Ethereum}
 
+A large amount of the platforms discussed in Section~\ref{sec:lit-blockchain} use Ethereum smart contracts so this section will look at what it is and how it can be used to write distributed applications. 
+\x
 Ethereum~\cite{vujicic_blockchain_2018,dannen_introducing_2017} is a distributed transaction-based blockchain that comes with a built-in Turing-complete programming language that allows any user to design their own transactions. Each block will include a list of transactions, where each transaction includes bytecode that can be run by each node in the network to update their copy of the global state.
 
 \subsection*{Smart Contracts}
 
 A smart contract is an executable piece of code, usually written in Solidity~\cite{noauthor_solidity_nodate}, that will automatically execute on every node in the Ethereum network when certain conditions are met. Smart contracts are enforced by the network, remove the need for intermediaries and reduce the potential of contractual disputes, due to their transparency and immutability.
-\x
+
+\vspace{2mm}
+\noindent
 Gas is the computational effort of running a smart contract and must be paid, in Ether, before a transaction can be processed and added to the blockchain. This helps prevent DoS attacks and provides economic incentives for users to behave in a way that benefits the whole network.
 \x
 Miners receive Ether for mining transactions based upon their gas price, which results in gas price varying according to supply and demand. For example, in a period of congestion users will offer a higher gas price to have their transaction be processed more quickly.
 
 \subsection*{Test Networks}
 
-An Ethereum test network is an instance of Ethereum in which users can deploy their smart contracts and test them in a live environment. Ether for these networks can be gained for free from a faucet provided by a node from the network. Some notable examples include Sepolia~\cite{noauthor_sepolia_nodate}, Goerli~\cite{noauthor_goerli_nodate}, and Ropsten\footnote{The Ropsten test-net is declared as end of life as of December 2022~\cite{noauthor_ropsten_2023}}.
+An Ethereum test network is an instance of Ethereum in which users can deploy their smart contracts and test them in a live environment. Ether for these networks can be gained for free from a faucet provided by a node from the network. Some notable examples include Sepolia~\cite{noauthor_sepolia_nodate}, Goerli~\cite{noauthor_goerli_nodate}, and Ropsten~\cite{noauthor_ropsten_2023}.

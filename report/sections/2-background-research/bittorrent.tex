@@ -1,11 +1,9 @@
 
 \section{BitTorrent}\label{sec:bittorrent}
 
-The storage requirements for games make it impractical for every user to have a copy of every game. Therefore, it is important that I understand how a popular example of a peer-to-peer P2P file sharing system works when data is fragmented across the network.
 
-\newparagraph
-BitTorrent~\cite{kaune_unraveling_2010, pouwelse_bittorrent_2005} is a protocol for sharing data across a distributed network\footnote{Popular implementations include BitTorrent Web~\cite{inc_bittorrent_nodate}, qBittorrent~\cite{noauthor_qbittorrent_nodate}, and µTorrent~\cite{inc_torrent_nodate}} and 
-it was chosen because of its popularity, being responsible for 3.35\% of global bandwidth~\cite{noauthor_application_nodate}. 
+BitTorrent~\cite{kaune_unraveling_2010, pouwelse_bittorrent_2005} is a protocol for sharing data across a distributed network\footnote{Popular implementations include BitTorrent Web~\cite{inc_bittorrent_nodate}, qBittorrent~\cite{noauthor_qbittorrent_nodate}, and µTorrent~\cite{inc_torrent_nodate}} and is one of the most popular P2P file-sharing protocols active today, being responsible for 3.35\% of global bandwidth~\cite{noauthor_application_nodate}. 
+As such, it is important to understand what makes BitTorrent so successful and how I could include key ideas in my project.
 In BitTorrent, users barter for blocks of data from a network of peers in a tit-for-tat fashion, such that users with a high upload rate will also typically have a high download rate.
 
 \subsection*{Key Ideas}
@@ -20,9 +18,6 @@ Users will download blocks from other peers using the following priority:
   \item \textbf{Rarest First} Download pieces that have the fewest copies to boost availability.
   \item \textbf{As Soon As Possible} A user with no pieces will try to get a random piece quickly so they can contribute to the network. 
 \end{enumerate}
-
-\paragraph*{Hashing}
-Hashing generates a unique fingerprint of some data, which can be used to verify the integrity of it. When a user downloads a piece they generate its hash and compare it with the expected value; they can then decide to re-fetch it or not. 
 
 \paragraph*{Optimistic Unchoking}
 A peer allocates a portion of their bandwidth for communicating with unknown peers. This allows new users to join the network and be able to contribute without being ignored and gives a way for existing peers to seek better peers.

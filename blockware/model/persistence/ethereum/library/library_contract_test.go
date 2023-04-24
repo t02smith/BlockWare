@@ -85,6 +85,11 @@ var gameII library.LibraryGameEntry = library.LibraryGameEntry{
 // tests
 
 func TestLibrarySmartContract(t *testing.T) {
+	_, _, err := ethereum.StartClient("ws://localhost:8545")
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	ops, lib := deployContract(t)
 	/*
 

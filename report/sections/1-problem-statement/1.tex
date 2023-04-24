@@ -1,27 +1,30 @@
 
 \chapter{Introduction}\label{sec:problem}
 
-Video games are large, highly popular pieces of software that are typically obtained through centralised platforms, like Steam or Epic Games. These platforms offer high availability, social features and customer support at the expense of:
+Millions of worldwide users enjoy video games, which are large pieces of software that require complex platforms to distribute them, which results in them being generally provided by multinational corporations. However this approach often results in these platforms:
 
 \begin{itemize}
   \item taking a large cut of revenue from developers\footnote{Steam take a 30\% cut~\cite{marks_report_2019,brown_valve_2021}},
   \item being prone to censorship from entities like governments\footnote{See the Chinese version of Steam~\cite{noauthor_steam_nodate-1}},
-  \item relying on a single platform to stay active, distribute games and maintain a user's ownership\footnote{For example, the Nintendo eShop closing down~\cite{noauthor_nintendo_2022}}, and
-  \item collecting large amounts of data from their users.
+  \item relying on a single platform to stay active, distribute games and maintain a user's ownership\footnote{For example, the Nintendo eShop closing down~\cite{noauthor_nintendo_2022}}.
 \end{itemize}
 
-\section{Goals}
+\newparagraph
 
-This project aims to produce a proof-of-concept, decentralised video game marketplace, using blockchain technology, that will allow developers to continuously release and update their games on a public network where they directly interact with their users. This network should be built on top of a peer-to-peer file-sharing network to allow users to to distribute games in return for some reward.
+
+\section{Objectives}
+
+Modern web ideas revolve around taking power away from large corporations and having platforms that are built, run and maintained by those who use them.
+This project aims to produce a proof-of-concept, distributed video game marketplace that will allow developers to continuously release and update their games on a public network where they can interact directly with their users.
 
 \section{Scope}
 
-This project will consist of the following components:
+This project will strictly focus on creating a distributed platform in which users can upload, purchase and share games and will consist of the following components:
 
 \begin{enumerate}
   \item An Ethereum smart contract that will allow us to maintain a library of games that can be queried and added to by any user. This will then be deployed to an Ethereum test-net.
-  \item An application to be run by users to interact with the smart contract and allow them to join a peer-to-peer network where they can download and upload games.
+  \item A local application to be run by users to interact with the smart contract and allow them to join a peer-to-peer network where they can download and upload games.
 \end{enumerate}
 
 \newparagraph
-This paper will first look at ....
+This project will not present methods for preventing or stopping the distribution of illegal content or include tangentially related features such as achievements, or message boards.

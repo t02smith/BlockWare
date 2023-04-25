@@ -1,44 +1,24 @@
 \subsection*{Risk Evaluation}\label{subsec:risk-reflection}
 
-This section will look at whether any risks outlined in the previous section occurred and how effective my mitigation was.
+Table~\ref{tab:risks-happened} looks at which risks occurred during the this project and how effective my mitigation stratgeies were.
 
-\paragraph*{The application is not finished}
-Section~\ref{tab:sprint-3} shows the scoped requirements that were not met and Section~\ref{sec:design-lim} shows some of the limitations within my design when compared to similar platforms. However, use of MoSCoW prioritisation and sprint planning meant I was still able to produce a largely functional application that met the majority of the requirements and having a cut off point for implementation ensured I had sufficient time to complete this report.
-\x
-One reason for not finishing was the size of the project, which took a considerable amount of time to implement and test. Table~\ref{tab:cloc} shows a breakdown of the source code.
-
-\begin{longtable}{ r r r r }
+\begin{longtable}{p{.2\textwidth} p{.73\textwidth}}
   \toprule
-  \textbf{Language} & \textbf{Files} & \textbf{Comments} & \textbf{Code}
+  \textbf{Risk} & \textbf{Explanation}
   \\\midrule\midrule
-  Go
-  & 44
-  & 683
-  & 4621
-  \\
-  Go Tests
-  & 29
-  & 791
-  & 3205
-  \\
-  Vue.js Components
-  & 18
-  & 147
-  & 2855
-  \\
-  JavaScript
-  & 19
-  & 74
-  & 209
-  \\
-  Solidity
-  & 1
-  & 30
-  & 51
+  The application is not finished
+  & Several requirements were not met, as shown in Section~\ref{tab:sprint-3}, and this can be attributed to the project simply being too large for the time frame I had. 
+  
+
+  However, this risk was highly anticipated and by using sprints I was able to focus my attention to the most important requirements and ensure that the application I had was still successful in terms of the goals of this project.
+  \x
+  Lack of\newline large-scale testing\newline infrastructure
+  & The lack of devices available to me made this application difficult to test in a \textit{real} environment but the mitigations suggested allowed me to prove that my application worked correctly in a test-network and would can scale effectively.
+  \x
+  Difficulty with\newline blockchain\newline development
+  & Being new to this field meant I faced several setback when working with blockchain technology. However by dedicating time to learning and practicing before incorporating it into my project, I was able to successfully complete that section.
   \\\bottomrule\bottomrule
-  \caption{The lines of code written for this project calculated using CLOC~\cite{noauthor_aldanialcloc_nodate} excluding any auto-generated code.}
-  \label{tab:cloc}
+  \caption{The risks which occurred during this project.}
+  \label{tab:risks-happened}
 \end{longtable}
 
-\paragraph*{Lack of large-scale testing infrastructure}
-Testing distributed applications is challenging due to many factors, such as having to source homogenous devices, having access to networks that would allow me host a peer, and more. However, several useful results were produced from the benchmarks (Section~\ref{sec:benchmark}) and acceptance tests (Section~\ref{sec:acc-tests}) that can be used to improve the application. If this project were to move forward then testing it on a large-scale would be essential.

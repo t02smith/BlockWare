@@ -3,7 +3,7 @@
 \input{sections/appendix/walkthroughs/walkthroughs.tex}
 \input{sections/appendix/screenshots.tex}
 
-\chapter{Other Diagrams}
+\chapter{Other Figures}
 
 \section*{Requirement Analysis}\label{app:req-analysis}
 
@@ -16,6 +16,46 @@ Figure~\ref{fig:req-generator} shows a mind-map which shows the relationships be
   \label{fig:req-generator}
 \end{figure}
 
+\section*{Lines of Code}
 
-\chapter{Progress Report}
-\includepdf[pages=-, pagecommand={\thispagestyle{fancy}}]{assets/InterimBody.pdf}
+Table~\ref{tab:cloc} shows a breakdown of my project by lines of code calculated using CLOC \url{https://github.com/AlDanial/cloc}. 
+
+\begin{longtable}{ r r r r }
+  \toprule
+  \textbf{Language} & \textbf{Files} & \textbf{Comments} & \textbf{Code}
+  \\\midrule\midrule
+  Go
+  & 44
+  & 683
+  & 4621
+  \\
+  Go Tests
+  & 29
+  & 791
+  & 3205
+  \\
+  Vue.js Components
+  & 18
+  & 147
+  & 2855
+  \\
+  JavaScript
+  & 19
+  & 74
+  & 209
+  \\
+  Solidity
+  & 1
+  & 30
+  & 51
+  \\\bottomrule\bottomrule
+  \caption{The lines of code written for this project calculated excluding any auto-generated code.}
+  \label{tab:cloc}
+\end{longtable}
+
+
+\chapter{Progress Report}\label{app:interim}
+
+The rest of this report will show the body of submitted interim report.
+
+\includepdf[pages=-]{assets/InterimBody.pdf}

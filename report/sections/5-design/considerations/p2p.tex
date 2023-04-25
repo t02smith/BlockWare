@@ -26,7 +26,7 @@ Hash trees will be stored on IPFS with the CID being kept with the other game me
 \newcommand{\seeder}{$P_{seeder}$~}
 \newcommand{\downloader}{$P_{downloader}$~}
 
-Games are content addressable using their root hash field, which will allow users to request data from that game from other users. When a peer seeking data \downloader forms a connection with another peer \seeder they will:
+Using the hash tree, a user will select blocks of data and send requests for them to other users. When a peer seeking data \downloader forms a connection with another peer \seeder they will:
 
 \begin{enumerate}
   \item Perform a handshake to determine each other's Ethereum address and public key.
@@ -38,11 +38,11 @@ Games are content addressable using their root hash field, which will allow user
 \end{enumerate}
 
 \newparagraph
-Users will be able to connect and send requeststo many peers at once \reqref{F-M7}. Requests will be sent in a round-robin fashion to evenly distribute the requests and prevent overloading a single peer \reqref{NF-S1}. Requests that cannot be completed will be retried when connecting to a new peer or when a peer has a change in library.
+Users will be able to connect and send requests to many peers at once \reqref{F-M7}. Requests will be sent in a round-robin fashion to evenly distribute the requests and prevent overloading a single peer \reqref{NF-S1}. Incomplete requests will be retried periodically or when connecting to a new peer.
 
 \subsubsection*{Updating Content}\label{subsubsec:updating}
 
-To satisfy \reqref{F-M2}, developers will upload the game and also provide the root hash of the most previous version of the game, where only the original uploader will be allowed to publish an update to an existing game \reqref{NF-M5}. Any users who own a previous version of a game will be allowed access to all future versions \reqref{F-M3}.
+To satisfy \reqref{F-M2}, developers can upload updated versions of their games by providing the root hash of the most previous version of the game, where only the original uploader will be allowed to publish an update to an existing game \reqref{NF-M5}. Any users who own a previous version of a game will be allowed access to all future versions \reqref{F-M3}.
 \x
 Each version is considered its own game and will require users to download the updated version separately. Whilst this isn't reflective of how updates are typically managed, this will be acceptable for the scope of this project.
 

@@ -9,7 +9,7 @@
           :to="`/library?game=${game.rootHash}`"
           v-if="ownsGame"
           class="owned"
-          >View in Library</router-link
+          >📖 View in Library</router-link
         >
         <button @click="purchase" v-else>Purchase</button>
       </div>
@@ -44,8 +44,10 @@ const games = useGamesStore();
 
 // selected game
 const game = ref(null);
-const ownsGame = computed(() =>
-  games.ownedGames.find((g) => g.rootHash === game.rootHash)
+const ownsGame = computed(
+  () =>
+    game.value &&
+    games.ownedGames.find((g) => g.rootHash === game.value.rootHash)
 );
 
 //
@@ -129,7 +131,7 @@ async function purchase() {
     font-size: 2rem;
   }
 
-  > .owned {
+  .owned {
     color: white;
     text-decoration: none;
     background-color: green;

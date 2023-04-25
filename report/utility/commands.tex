@@ -17,7 +17,9 @@
   array,
   pdflscape,
   pdfpages,
-  listings
+  listings,
+  titlesec,
+  xhfill
 }
 \usepackage[
   backend=biber,
@@ -75,3 +77,8 @@
   emphstyle={\color{orange}},
 }
 
+% TITLES
+
+\colorlet{rulecolor}{black}
+\titleformat{\chapter}[display]
+{\filcenter}{\titlerule[1pt]\vspace{1mm}\titlerule[1pt]\vspace{2mm}\mbox{}\xrfill[0.4ex]{3pt}[rulecolor]\textsc{\LARGE\enspace\chaptername~\thechapter}\enspace\xrfill[0.4ex]{3pt}[rulecolor]\mbox{}\vspace{1mm}}{0.3ex} {{\color{rulecolor}\titlerule[1pt]\vspace{1mm}\titlerule[1pt]}\vskip3ex\huge\bfseries}[\medskip{\color{rulecolor}\titlerule[1pt]\vspace{1mm}\titlerule[1pt]}]

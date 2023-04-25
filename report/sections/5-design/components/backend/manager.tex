@@ -1,7 +1,6 @@
 \subsubsection{Data Manager}\label{subsubsec:data-manager}
 
 This component is responsible for interacting with local storage and managing the user's collection of owned and installed games.
-\x
 It will interact directly with Ethereum to discover, purchase \reqref{F-M5}, and upload \reqref{F-M1} \reqref{F-M2} games and use IPFS to upload and distribute game assets \reqref{F-C2} and hash trees \reqref{F-M12}.
 
 \paragraph*{Download Order} Each download will have a downloader thread that selects the order at which blocks are to be fetched. Using the hash tree, it will queue whole files at a time and to verify the whole file once all blocks have been fetched.

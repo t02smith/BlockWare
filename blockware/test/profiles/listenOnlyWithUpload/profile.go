@@ -2,7 +2,6 @@ package profileListenOnlyUpload
 
 import (
 	"math/big"
-	"os"
 	"time"
 
 	"github.com/t02smith/part-iii-project/toolkit/model/manager/games"
@@ -40,31 +39,31 @@ Data:
 var PrivateKey string = testutil.Accounts[1][1]
 
 func Run() {
-	if _, err := os.Stat("../../data/tmp/games/profile-2"); err != nil {
-		if err = testutil.GenerateLargeFolder("profile-2", "../../data/tmp/games/", 80_000_000, 500); err != nil {
-			util.Logger.Fatal(err)
-		}
-	}
+	// if _, err := os.Stat("../../data/tmp/games/profile-2"); err != nil {
+	// 	if err = testutil.GenerateLargeFolder("profile-2", "../../data/tmp/games/", 80_000_000, 500); err != nil {
+	// 		util.Logger.Fatal(err)
+	// 	}
+	// }
 
 	p := peer.Peer()
 
 	// * create & upload game
-	g, err := games.CreateGame(games.NewGame{
-		Title:       "benchmark",
-		Version:     "4.7.1",
-		ReleaseDate: time.Date(2002, time.January, 10, 0, 0, 0, 0, time.UTC).String(),
-		Developer:   "tcs1g20",
-		RootDir:     "../../data/tmp/games/profile-2",
-		Price:       big.NewInt(150),
-		ShardSize:   4194304,
-		AssetsDir:   "../../data/assets"},
-		nil,
-	)
-	_ = g
+	// g, err := games.CreateGame(games.NewGame{
+	// 	Title:       "benchmark",
+	// 	Version:     "4.7.1",
+	// 	ReleaseDate: time.Date(2002, time.January, 10, 0, 0, 0, 0, time.UTC).String(),
+	// 	Developer:   "tcs1g20",
+	// 	RootDir:     "../../data/tmp/games/profile-2",
+	// 	Price:       big.NewInt(150),
+	// 	ShardSize:   4194304,
+	// 	AssetsDir:   "../../data/assets"},
+	// 	nil,
+	// )
+	// _ = g
 
-	if err != nil {
-		util.Logger.Fatalf("Error creating game: %s", err)
-	}
+	// if err != nil {
+	// 	util.Logger.Fatalf("Error creating game: %s", err)
+	// }
 
 	g1, err := games.CreateGame(games.NewGame{
 		Title:       "website",
@@ -100,9 +99,9 @@ func Run() {
 		util.Logger.Errorf("Error creating game: %s", err)
 	}
 
-	for _, _g := range []*games.Game{g, g2} {
+	for _, _g := range []*games.Game{g1, g2} {
 		p.Library().AddOrUpdateOwnedGame(_g)
-		if err := library.Upload(_g); err != nil {
+		if err := library.UploadToEthereum(_g); err != nil {
 			util.Logger.Fatalf("Error uploading game to ETH %s", err)
 		}
 

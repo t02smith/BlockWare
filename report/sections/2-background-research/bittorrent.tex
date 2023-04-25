@@ -1,7 +1,8 @@
 
 \section{BitTorrent}\label{sec:bittorrent}
 
-
+Without centralised architecture, data will need to be distributed among users where a user will only have the data they are interested in. This section will discuss the popular P2P file-sharing protocol BitTorrent and Section~\ref{sec:lit-p2p} will look at other examples
+\x
 BitTorrent~\cite{kaune_unraveling_2010, pouwelse_bittorrent_2005} is a protocol for sharing data across a distributed network\footnote{Popular implementations include BitTorrent Web~\cite{inc_bittorrent_nodate}, qBittorrent~\cite{noauthor_qbittorrent_nodate}, and µTorrent~\cite{inc_torrent_nodate}} and is one of the most popular P2P file-sharing protocols active today, being responsible for 3.35\% of global bandwidth~\cite{noauthor_application_nodate}. 
 As such, it is important to understand what makes BitTorrent so successful and how I could include key ideas in my project.
 In BitTorrent, users barter for blocks of data from a network of peers in a tit-for-tat fashion, such that users with a high upload rate will also typically have a high download rate.

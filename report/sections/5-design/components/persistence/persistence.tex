@@ -1,17 +1,12 @@
 
 \subsection{Persistence}
 
-The Persistence layer shows how the data for the application is divided across several mediums; namely the \textbf{Ethereum Smart Contract}, \textbf{IPFS}, and a \textbf{P2P Network}. Each component stores a different type of data, which is outlined in Section~\ref{subsec:design-data}.
+The Persistence layer manages how data is stored across the platform using distributed storage. Table~\ref{tab:data} gives a breakdown of the data stored on each platform.
 \x
-There are several things to note about using Ethereum as a platform for selling games:
+The Backend will use interface functions to interact with these platforms, specifically:
 
 \begin{itemize}
-  \item Ethereum is a less stable currency than most traditional currencies so games may fluctuate largely in price. This design describes no solution to this issue but an example solution might attempt to map a real-world currency to Ether.
-  \item All write functions to the smart contract will incur a gas fee so uploading or updating data will not be free.
-  \item Many people are sceptical of blockchain technology so may be hesitant to adopt the application.
+  \item \textbf{Smart Contract} An ABI file specifies details about a smart contract and allows us to interact with it from code external to Ethereum.
+  \item \textbf{IPFS} Using the IPFS daemon and a client library, we can upload and download data to IPFS.
+  \item \textbf{Peers} Section~\ref{subsubsec:networking} describes how peers are interacted with.
 \end{itemize}
-
-\newparagraph
-This layer will also provide interface functions that will allow our backend code to interface with our smart contract. Interactions with IPFS will be very simple uploads or downloads of compressed data.
-\x
-A peer's behaviour is described by the Backend in Section~\ref{subsec:backend}, which will be part of the application run locally by the user.

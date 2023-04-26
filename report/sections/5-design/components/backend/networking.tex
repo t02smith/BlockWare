@@ -1,6 +1,6 @@
 \subsubsection{Networking}\label{subsubsec:networking}
 
-This component will connect users to the distributed P2P file-sharing network, where it will create and maintain a set of TCP connections with other users \reqref{F-M7} in the network and will communicate by sending structured messages to each other \reqref{F-M8}. Section~\ref{subsubsec:commands} describes these commands in detail.
+This component will connect users to the distributed P2P file-sharing network, where it will create and maintain a set of TCP connections with other users \reqref{F-M7} in the network and will communicate by sending structured messages to each other \reqref{F-M8}.
 
 \paragraph*{Peer Identification}
 Peers are identified by their Ethereum addresses, which will allow us to view which games they've purchased and are allowed access to. Upon forming a connection, each peer will request the other return a signature for a generated message, from which we can derive their address and public key.
@@ -41,7 +41,7 @@ Table~\ref{tab:network-cmds} shows the list of commands used by the application.
   PEERS;$[p_1 hostname]:[p_1 port]$;\ldots
   & A user will send a list of their active peers. This will be limited to those peers which they have connected to and thus know the hostname and port of their server \reqref{F-S4}.\\
   SERVER;$[hostname]:[port]$
-  & When we form a connection with a peer we send them the address of our server that peers use to connect to us. This allows that peer to share our address through the PEER command so we are more easily discoverable.\\
+  & When we connect to a peer, we send them the details of our server so they can share it using the PEERS command.\\
   \midrule
   ERROR;$[message]$
   & An error message that can be used to prompt a peer to resend a message.\\

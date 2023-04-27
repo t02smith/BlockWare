@@ -53,4 +53,5 @@ func defaultConfig() {
 	viper.SetDefault("net.peer.serve_assets", true)
 	viper.SetDefault("net.peer.skip_validation", false)
 	viper.SetDefault("net.peer.max_connections", 100)
+	viper.SetDefault("net.hostname", "")
 }

@@ -92,6 +92,7 @@ func startPeer() error {
 			SkipValidation:     viper.GetBool("net.peer.skip_validation"),
 			TrackContributions: true,
 			MaxConnections:     viper.GetUint("net.peer.max_connections"),
+			PublicHostname:     viper.GetString("net.hostname"),
 		},
 		"localhost",
 		viper.GetUint("net.port"),

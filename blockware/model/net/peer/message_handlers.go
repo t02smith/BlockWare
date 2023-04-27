@@ -474,6 +474,11 @@ func handleREQ_PEERS(cmd []string, client tcp.TCPConnection) error {
 			continue
 		}
 
+		parts := strings.Split(pd.Server, ":")
+		if len(parts) != 2 || len(parts[0]) == 0 {
+			continue
+		}
+
 		ps = append(ps, pd.Server)
 	}
 	p.peersMU.Unlock()

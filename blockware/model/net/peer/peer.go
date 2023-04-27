@@ -64,6 +64,9 @@ type peer struct {
 // Config Runtime configuration settings for the peer
 type Config struct {
 
+	// hostname or ip address of our server
+	PublicHostname string
+
 	// attempt to start downloads when starting the peer
 	ContinueDownloads bool
 
@@ -88,6 +91,11 @@ type Config struct {
 // Peer Get the singleton instance of the current peer if it exists
 func Peer() *peer {
 	return singleton
+}
+
+// reutrn the config settings for this peer
+func (p *peer) Config() Config {
+	return p.config
 }
 
 // StartPeer start a new instance of a peer and assign it to the singleton
@@ -196,7 +204,10 @@ func (p *peer) onConnection(hostname string, port uint, peer tcp.TCPConnection) 
 		pd.Server = fmt.Sprintf("%s:%d", hostname, port)
 
 		// send our server information to them
-		peer.SendString(generateSERVER(p.GetServerInfo()))
+		host, port := p.GetServerInfo()
+		if host != "" {
+			peer.SendString(generateSERVER(host, port))
+		}
 	}
 
 	p.setPeerData(peer, pd)
@@ -222,7 +233,9 @@ func (p *peer) OnConnectionClose(peer tcp.TCPConnection) {
 
 // GetServerInfo get information about the current peer
 func (p *peer) GetServerInfo() (string, uint) {
-	return p.server.GetServerInfo()
+	host := p.config.PublicHostname
+	_, port := p.server.GetServerInfo()
+	return host, port
 }
 
 // * known peers
@@ -377,6 +390,14 @@ func (p *peer) SetContinueDownloads(state bool) {
 		// pause downloads
 		p.library.StopDownloads()
 	}
+}
+
+func (p *peer) SetPublicHostname(hostname string) {
+	p.config.PublicHostname = hostname
+	viper.Set("net.hostname", hostname)
+
+	_, port := p.GetServerInfo()
+	p.Broadcast(generateSERVER(hostname, port))
 }
 
 func (p *peer) setPeerData(con tcp.TCPConnection, pd *peerData) {

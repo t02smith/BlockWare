@@ -35,6 +35,10 @@ export function GetOwnedGames():Promise<Array<controller.ControllerGame>>;
 
 export function GetPeerInformation():Promise<Array<controller.ControllerPeerData>>;
 
+export function GetPort():Promise<number>;
+
+export function GetPublicHostname():Promise<string>;
+
 export function GetStoreGames():Promise<Array<controller.ControllerGame>>;
 
 export function IsDownloading(arg1:string):Promise<number>;
@@ -52,6 +56,8 @@ export function ResendValidation(arg1:string,arg2:number):Promise<void>;
 export function SelectFolder():Promise<string>;
 
 export function SelectTxtFile():Promise<string>;
+
+export function SetPublicHostname(arg1:string):Promise<void>;
 
 export function UninstallGame(arg1:string):Promise<void>;
 

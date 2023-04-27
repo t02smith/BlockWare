@@ -223,6 +223,31 @@
           </div>
         </div>
         <hr />
+        <div class="question">
+          <h4>What is peer discovery?</h4>
+          <div class="answer">
+            <p>
+              When you connect to a new peer you will exchange your list of
+              connected peers to allow each other to discover new peers. Peers
+              will connect to you using your public hostname (or IP address) but
+              the peers that you connect to won't know what this is unless we
+              tell them.
+            </p>
+            <p>
+              By entering your public hostname in the peers menu, we allow other
+              users to share our server information to their peers.
+            </p>
+            <p>
+              If you don't know what your public IP address is you can use a
+              website like
+              <a href="https://www.whatismyip.com/"
+                >https://www.whatismyip.com/</a
+              >. It's likely that you may need to enable port forwarding for
+              your device at your home router.
+            </p>
+          </div>
+        </div>
+        <hr />
       </div>
     </div>
   </div>

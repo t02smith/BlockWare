@@ -66,6 +66,14 @@ export function GetPeerInformation() {
   return window['go']['controller']['Controller']['GetPeerInformation']();
 }
 
+export function GetPort() {
+  return window['go']['controller']['Controller']['GetPort']();
+}
+
+export function GetPublicHostname() {
+  return window['go']['controller']['Controller']['GetPublicHostname']();
+}
+
 export function GetStoreGames() {
   return window['go']['controller']['Controller']['GetStoreGames']();
 }
@@ -100,6 +108,10 @@ export function SelectFolder() {
 
 export function SelectTxtFile() {
   return window['go']['controller']['Controller']['SelectTxtFile']();
+}
+
+export function SetPublicHostname(arg1) {
+  return window['go']['controller']['Controller']['SetPublicHostname'](arg1);
 }
 
 export function UninstallGame(arg1) {

@@ -11,6 +11,7 @@ meta:
         workercount: 5
     log: stdout
 net:
+    hostname: localhost
     peer:
         continuedownloads: true
         max_connections: 100

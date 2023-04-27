@@ -1,6 +1,28 @@
 <template>
   <div class="peers">
     <div class="side-panel">
+      <form @submit.prevent="setPublicHostname" class="public-ip">
+        <h4>Enter your public IP address or hostname:</h4>
+        <p>This will allow other users to form connections with you.</p>
+        <p>
+          You are currently listening on
+          <strong
+            >tcp://{{ currentUserHostname ? currentUserHostname : "<UNKOWN>" }}:{{
+              userPort
+            }}</strong
+          >
+        </p>
+        <p style="color: red; margin-top: 5px;" v-if="!currentUserHostname">⚠️ Enter your hostname to enable peer discovery</p>
+        <input
+          type="text"
+          name=""
+          id=""
+          placeholder="IP address or hostname"
+          v-model="userHostname"
+        />
+        <button type="submit">Confirm</button>
+      </form>
+
       <h3>
         Connect to New Peers:
         <hr style="opacity: 0.5" />
@@ -123,7 +145,7 @@ localhost:6751
           </button>
 
           <p>
-            <strong>tcp://{{ p.Server }}</strong> -
+            <strong>tcp://{{ p.Server ? p.Server : "<SERVER NOT KNOWN>" }}</strong> -
             {{ p.Library ? p.Library.length : 0 }} games in common
           </p>
         </div>
@@ -138,12 +160,15 @@ localhost:6751
   </div>
 </template>
 <script setup>
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import { usePeerStore } from "../stores/peers";
 import { useGamesStore } from "../stores/games";
 import {
   SelectTxtFile,
   RequestContributions,
+  GetPublicHostname,
+  SetPublicHostname,
+  GetPort,
 } from "../../wailsjs/go/controller/Controller.js";
 import Error from "../components/Error.vue";
 
@@ -157,6 +182,22 @@ peers.
 // Peers pinia store
 const peers = usePeerStore();
 const games = useGamesStore();
+
+//
+const userHostname = ref("");
+const currentUserHostname = ref("");
+const userPort = ref(0);
+onMounted(async () => {
+  currentUserHostname.value = await GetPublicHostname();
+  userPort.value = await GetPort();
+});
+
+async function setPublicHostname() {
+  if (userHostname.value.length === 0) return;
+  await SetPublicHostname(userHostname.value);
+  userHostname.value = "";
+  currentUserHostname.value = await GetPublicHostname();
+}
 
 //
 const receiptGame = ref(null);
@@ -210,7 +251,7 @@ function requestReceipt() {
   > .side-panel {
     background-color: lighten(#131313, 5%);
     height: 100%;
-    max-width: fit-content;
+    max-width: 330px;
     padding: 1rem 1rem;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
     border-radius: 0 10px 0;
@@ -242,6 +283,28 @@ function requestReceipt() {
         &:hover {
           opacity: 0.75;
         }
+      }
+    }
+
+    > .public-ip {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+
+      > input {
+        margin-top: 15px;
+        padding: 5px 7px;
+        border-radius: 2px;
+        border: none;
+      }
+
+      > button {
+        margin-top: 10px;
+      }
+
+      > p {
+        font-size: 0.8rem;
+        color: darken(white, 20%);
       }
     }
 

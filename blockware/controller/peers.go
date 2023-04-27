@@ -10,6 +10,20 @@ import (
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
+// the public hostname of the peer
+func (c *Controller) GetPublicHostname() string {
+	return peer.Peer().Config().PublicHostname
+}
+
+func (c *Controller) SetPublicHostname(hostname string) {
+	peer.Peer().SetPublicHostname(hostname)
+}
+
+func (c *Controller) GetPort() uint {
+	_, port := peer.Peer().GetServerInfo()
+	return port
+}
+
 // get information about peers
 func (a *Controller) GetPeerInformation() []ControllerPeerData {
 	var ps []ControllerPeerData

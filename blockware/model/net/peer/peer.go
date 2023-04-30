@@ -191,12 +191,14 @@ func (p *peer) onConnection(hostname string, port uint, peer tcp.TCPConnection) 
 	}
 
 	pd := &peerData{
-		Hostname:     hostname,
-		Port:         port,
-		Peer:         peer,
-		Library:      make(map[[32]byte]ownership),
-		sentRequests: make(map[games.DownloadRequest]time.Time, 100),
-		Server:       "",
+		Hostname:             hostname,
+		Port:                 port,
+		Peer:                 peer,
+		Library:              make(map[[32]byte]ownership),
+		sentRequests:         make(map[games.DownloadRequest]time.Time, 100),
+		TotalRequestsSent:    0,
+		TotalRepliesReceived: 0,
+		Server:               "",
 	}
 
 	if port != 0 {

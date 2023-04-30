@@ -21,12 +21,15 @@ unreliable client:
 
 var unrelaiblePrivateKey string = testutil.Accounts[3][1]
 
-func unreliableRun(rate int) {
+const unreliableRate int = 50
+
+func unreliableRun() {
 	p := peer.Peer()
 	r := rand.New(rand.NewSource(time.Now().Unix()))
 
 	p.SetOnMessage(func(s []string, t tcp.TCPConnection) error {
-		if rate < r.Intn(100) {
+
+		if unreliableRate < r.Intn(100) || s[0] != "BLOCK" {
 			util.Logger.Debug("Responding to requests")
 			return peer.OnMessage(s, t)
 		} else {

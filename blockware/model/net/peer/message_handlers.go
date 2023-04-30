@@ -260,12 +260,10 @@ func handleSEND_BLOCK(cmd []string, client tcp.TCPConnection) error {
 	}
 
 	pd := Peer().GetPeer(client)
-	pd.Lock()
-	delete(pd.sentRequests, games.DownloadRequest{
+	pd.ConfirmRequest(games.DownloadRequest{
 		GameHash:  gh,
 		BlockHash: sh,
 	})
-	pd.Unlock()
 
 	if pd.Validator != nil {
 		Peer().contributions.addContribution(crypto.PubkeyToAddress(*pd.Validator.PublicKey), gh, sh)

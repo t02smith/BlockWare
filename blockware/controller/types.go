@@ -43,9 +43,10 @@ type ControllerFileProgress struct {
 }
 
 type ControllerPeerData struct {
-	Hostname  string
-	Port      uint
-	Server    string
-	Library   []string
-	Validated bool
+	Hostname   string
+	Port       uint
+	Server     string
+	Library    []string
+	Validated  bool
+	Reputation string
 }

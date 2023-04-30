@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/t02smith/part-iii-project/toolkit/model/manager/games"
 	"github.com/t02smith/part-iii-project/toolkit/model/persistence/ethereum"
 	"github.com/t02smith/part-iii-project/toolkit/test/testutil"
 )
@@ -127,6 +128,124 @@ func TestCheckOwnership(t *testing.T) {
 			res, err := pd.checkOwnership(game)
 			assert.Nil(t, err)
 			assert.False(t, res)
+		})
+	})
+}
+
+/*
+
+function: ConfirmRequest
+
+*/
+
+func TestConfirmRequest(t *testing.T) {
+	pd := &peerData{
+		sentRequests:         make(map[games.DownloadRequest]time.Time),
+		TotalRequestsSent:    0,
+		TotalRepliesReceived: 0,
+	}
+
+	req := games.DownloadRequest{
+		GameHash:  sha256.Sum256([]byte("hello")),
+		BlockHash: sha256.Sum256([]byte("hello")),
+	}
+
+	t.Run("success", func(t *testing.T) {
+		pd.sentRequests[req] = time.Now()
+		old := pd.TotalRepliesReceived
+
+		pd.ConfirmRequest(req)
+		assert.Equal(t, old+1, pd.TotalRepliesReceived)
+		_, ok := pd.sentRequests[req]
+		assert.False(t, ok)
+	})
+
+	t.Run("failure", func(t *testing.T) {
+		t.Run("request not queued", func(t *testing.T) {
+			old := pd.TotalRepliesReceived
+			pd.ConfirmRequest(req)
+			assert.Equal(t, old, pd.TotalRepliesReceived)
+		})
+	})
+}
+
+/*
+
+function FailedRequest
+
+*/
+
+func TestFailedRequest(t *testing.T) {
+	pd := &peerData{
+		sentRequests:         make(map[games.DownloadRequest]time.Time),
+		TotalRequestsSent:    0,
+		TotalRepliesReceived: 0,
+	}
+
+	req := games.DownloadRequest{
+		GameHash:  sha256.Sum256([]byte("hello")),
+		BlockHash: sha256.Sum256([]byte("hello")),
+	}
+
+	t.Run("success", func(t *testing.T) {
+		pd.sentRequests[req] = time.Now()
+		old := pd.TotalRepliesReceived
+
+		pd.FailedRequest(req)
+		assert.Equal(t, old, pd.TotalRepliesReceived)
+		_, ok := pd.sentRequests[req]
+		assert.False(t, ok)
+	})
+
+	t.Run("failure", func(t *testing.T) {
+		t.Run("request not queued", func(t *testing.T) {
+			old := pd.TotalRepliesReceived
+			pd.FailedRequest(req)
+			assert.Equal(t, old, pd.TotalRepliesReceived)
+		})
+	})
+}
+
+/*
+
+function PushRequest
+
+*/
+
+func TestPushRequest(t *testing.T) {
+	pd := &peerData{
+		sentRequests:         make(map[games.DownloadRequest]time.Time),
+		TotalRequestsSent:    0,
+		TotalRepliesReceived: 0,
+	}
+
+	req := games.DownloadRequest{
+		GameHash:  sha256.Sum256([]byte("hello")),
+		BlockHash: sha256.Sum256([]byte("hello")),
+	}
+
+	t.Run("success", func(t *testing.T) {
+		old := pd.TotalRequestsSent
+		pd.PushRequest(req)
+		t.Cleanup(func() {
+			delete(pd.sentRequests, req)
+		})
+
+		assert.Equal(t, old+1, pd.TotalRequestsSent)
+		_, ok := pd.sentRequests[req]
+		assert.True(t, ok)
+	})
+
+	t.Run("failure", func(t *testing.T) {
+		t.Run("duplicate request", func(t *testing.T) {
+			old := pd.TotalRequestsSent
+			pd.PushRequest(req)
+			t.Cleanup(func() {
+				delete(pd.sentRequests, req)
+			})
+			pd.PushRequest(req)
+
+			assert.Equal(t, old+1, pd.TotalRequestsSent)
 		})
 	})
 }

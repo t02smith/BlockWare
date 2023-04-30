@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"fmt"
 	"sort"
 	"strconv"
 	"strings"
@@ -40,12 +41,22 @@ func (a *Controller) GetPeerInformation() []ControllerPeerData {
 			games = append(games, game.Title)
 		}
 
+		var reputation string
+		if data.TotalRequestsSent == 0 {
+			reputation = "Unkown"
+		} else {
+			reputation = fmt.Sprintf("%0.2f",
+				float32(data.TotalRepliesReceived)/float32(data.TotalRequestsSent),
+			)
+		}
+
 		ps = append(ps, ControllerPeerData{
-			Hostname:  data.Hostname,
-			Port:      data.Port,
-			Server:    data.Server,
-			Library:   games,
-			Validated: data.Validator != nil && data.Validator.Valid(),
+			Hostname:   data.Hostname,
+			Port:       data.Port,
+			Server:     data.Server,
+			Library:    games,
+			Validated:  data.Validator != nil && data.Validator.Valid(),
+			Reputation: reputation,
 		})
 	}
 

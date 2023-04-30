@@ -1,6 +1,7 @@
 package peer
 
 import (
+	"math/rand"
 	"net/http"
 	"sort"
 	"sync"
@@ -23,6 +24,9 @@ const (
 	unknown
 )
 
+// rank a peer higher at this rate (%) to unchoke downloads
+const unchokeRate int8 = 25
+
 // Stores useful information about other peers
 type peerData struct {
 
@@ -41,7 +45,9 @@ type peerData struct {
 	Validator *ethereum.AddressValidator
 
 	//
-	sentRequests map[games.DownloadRequest]time.Time
+	sentRequests         map[games.DownloadRequest]time.Time
+	TotalRequestsSent    int64
+	TotalRepliesReceived int64
 
 	lock sync.Mutex
 }
@@ -107,9 +113,25 @@ func (p *peer) findPeersWhoHaveGame(gameHash [32]byte) []tcp.TCPConnection {
 		}
 	}
 
-	// prioritise connections who have been sent the least blocks
+	r := rand.New(rand.NewSource(time.Now().Unix()))
 	sort.Slice(peers, func(i, j int) bool {
-		return len(p.peers[peers[i]].sentRequests) < len(p.peers[peers[j]].sentRequests)
+		p1 := p.peers[peers[i]]
+		p2 := p.peers[peers[j]]
+
+		// always send to unkown peers first to help discovery
+		if p1.TotalRequestsSent == 0 && p2.TotalRequestsSent > 0 ||
+			p1.TotalRequestsSent == 0 && p2.TotalRequestsSent == 0 {
+			return true
+		} else if p1.TotalRequestsSent > 0 && p2.TotalRequestsSent == 0 {
+			return false
+		}
+
+		// otherwise send to peer with highest reputation
+		rep1 := float32(p1.TotalRepliesReceived) / float32(p1.TotalRequestsSent)
+		rep2 := float32(p2.TotalRepliesReceived) / float32(p2.TotalRequestsSent)
+		unchoke := r.Intn(100) >= int(unchokeRate)
+
+		return rep1 <= rep2 && !unchoke
 	})
 
 	return peers
@@ -129,6 +151,45 @@ func (p *peer) serveAssetsFolder() {
 	if err != nil {
 		util.Logger.Error(err)
 	}
+}
+
+// store details about a request sent to a user
+func (pd *peerData) PushRequest(req games.DownloadRequest) {
+	pd.lock.Lock()
+	defer pd.lock.Unlock()
+
+	if _, ok := pd.sentRequests[req]; ok {
+		util.Logger.Debug("req already sent to peer => ignoring")
+		return
+	}
+
+	pd.sentRequests[req] = time.Now()
+	pd.TotalRequestsSent++
+}
+
+// confirm that a request was replied to
+func (pd *peerData) ConfirmRequest(req games.DownloadRequest) {
+	pd.lock.Lock()
+	defer pd.lock.Unlock()
+
+	if _, ok := pd.sentRequests[req]; !ok {
+		return
+	}
+
+	delete(pd.sentRequests, req)
+	pd.TotalRepliesReceived++
+}
+
+// confirm a request was not replied to
+func (pd *peerData) FailedRequest(req games.DownloadRequest) {
+	pd.lock.Lock()
+	defer pd.lock.Unlock()
+
+	if _, ok := pd.sentRequests[req]; !ok {
+		return
+	}
+
+	delete(pd.sentRequests, req)
 }
 
 func (pd *peerData) Lock() {

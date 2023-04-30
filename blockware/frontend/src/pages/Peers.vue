@@ -6,11 +6,9 @@
         <p>This will allow other users to form connections with you.</p>
         <p>
           You are currently listening on
-          <strong
-            >tcp://{{ currentUserHostname ? currentUserHostname : "<UNKOWN>" }}:{{
+          <strong>tcp://{{ currentUserHostname ? currentUserHostname : "<UNKOWN>" }}:{{
               userPort
-            }}</strong
-          >
+            }}</strong>
         </p>
         <p style="color: red; margin-top: 5px;" v-if="!currentUserHostname">⚠️ Enter your hostname to enable peer discovery</p>
         <input
@@ -147,6 +145,10 @@ localhost:6751
           <p>
             <strong>tcp://{{ p.Server ? p.Server : "<SERVER NOT KNOWN>" }}</strong> -
             {{ p.Library ? p.Library.length : 0 }} games in common
+          </p>
+
+          <p style="margin-left: auto">
+            reputation: {{ p.Reputation }}
           </p>
         </div>
         <p

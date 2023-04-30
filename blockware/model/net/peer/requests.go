@@ -30,17 +30,19 @@ func (p *peer) listenToDownloadRequests() {
 				peerData := p.GetPeer(peerCon)
 
 				peerData.lock.Lock()
-				if sentAt, ok := peerData.sentRequests[request]; ok {
+				sentAt, ok := peerData.sentRequests[request]
+				peerData.lock.Unlock()
+
+				if ok {
 					// ? we've already sent them this request
 					if time.Since(sentAt).Seconds() >= 5 {
 						// ? request time out => send again
 						util.Logger.Info("Request timeout. Sending to new Peer.")
-						delete(peerData.sentRequests, request)
+						peerData.FailedRequest(request)
 
 					} else {
 						// ? request still to be timed out
 						resend = false
-						peerData.lock.Unlock()
 						break
 					}
 				} else {
@@ -50,7 +52,6 @@ func (p *peer) listenToDownloadRequests() {
 						chosenPD = peerData
 					}
 				}
-				peerData.lock.Unlock()
 			}
 
 			if !resend {
@@ -59,10 +60,7 @@ func (p *peer) listenToDownloadRequests() {
 
 			// * at least one peer has it
 			chosenPD.Peer.SendString(generateBLOCK(request.GameHash, request.BlockHash))
-
-			chosenPD.Lock()
-			chosenPD.sentRequests[request] = time.Now()
-			chosenPD.Unlock()
+			chosenPD.PushRequest(request)
 		}
 		util.Logger.Info("stopped listening to incoming download requests")
 	}()
@@ -78,20 +76,20 @@ func (p *peer) listenToDownloadRequests() {
 			var expiredPeerReqs []games.DownloadRequest
 
 			for _, pd := range Peer().peers {
-				pd.Lock()
 
+				pd.Lock()
 				for req, timeSent := range pd.sentRequests {
 					if time.Since(timeSent) > requestTimeout {
 						requests = append(requests, req)
 						expiredPeerReqs = append(expiredPeerReqs, req)
 					}
 				}
+				pd.Unlock()
 
 				for _, req := range expiredPeerReqs {
-					delete(pd.sentRequests, req)
+					pd.FailedRequest(req)
 				}
 
-				pd.Unlock()
 				expiredPeerReqs = []games.DownloadRequest{}
 			}
 

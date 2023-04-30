@@ -21,7 +21,9 @@ func senderRun() {
 		}
 
 		// reflect request back at peer
-		t.SendString(strings.Join(s, ";") + "\n")
+		if s[0] == "BLOCK" {
+			t.SendString(strings.Join(s, ";") + "\n")
+		}
 
 		return nil
 	})

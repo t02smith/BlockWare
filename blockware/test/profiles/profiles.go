@@ -151,7 +151,7 @@ func RunProfile(profileNumber Profile, contractAddr string) error {
 		}); err != nil {
 			return err
 		}
-		unreliableRun(50)
+		unreliableRun()
 	case None:
 	default:
 		return errors.New("unknown profile")
@@ -228,7 +228,7 @@ func SetupGame() error {
 	p := peer.Peer()
 
 	g1, err := games.CreateGame(games.NewGame{
-		Title:       "t02smith.github.io",
+		Title:       "website",
 		Version:     "4.7.1",
 		ReleaseDate: time.Date(2002, time.January, 10, 0, 0, 0, 0, time.UTC).String(),
 		Developer:   "tcs1g20",

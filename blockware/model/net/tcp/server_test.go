@@ -176,38 +176,3 @@ func TestTCPServerClientSendString(t *testing.T) {
 	})
 
 }
-
-/*
-
-function: IsClient
-purpose: Is the given connection someone who connected to us
-
-? Test cases
-success
-	#1 => yes
-	#2 => no
-
-*/
-
-func TestIsClient(t *testing.T) {
-	s := startTestTCPServer(t, 9045)
-
-	t.Run("success", func(t *testing.T) {
-		t.Run("yes", func(t *testing.T) {
-			mp, err := testutil.StartMockPeer(9045, true)
-			t.Cleanup(func() { mp.Close() })
-			assert.Nil(t, err)
-
-			time.Sleep(25 * time.Millisecond)
-			assert.True(t, s.IsClient(s.clients[0]))
-		})
-
-		t.Run("no", func(t *testing.T) {
-			client, err := InitTCPClient("localhost", 9045, func(s []string, t TCPConnection) error { return nil }, func(s string, u uint, t TCPConnection) {}, func(t TCPConnection) {})
-			assert.Nil(t, err)
-			t.Cleanup(func() { client.Close() })
-			time.Sleep(25 * time.Millisecond)
-			assert.False(t, s.IsClient(client))
-		})
-	})
-}

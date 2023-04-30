@@ -17,7 +17,7 @@ func InitLogger(showDebug bool) *zap.SugaredLogger {
 	if showDebug {
 		config.Level = zap.NewAtomicLevelAt(zapcore.DebugLevel)
 	} else {
-		config.Level = zap.NewAtomicLevelAt(zapcore.DebugLevel)
+		config.Level = zap.NewAtomicLevelAt(zapcore.InfoLevel)
 	}
 
 	// config.OutputPaths = []string{

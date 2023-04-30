@@ -163,13 +163,13 @@ func newPeer(config Config, serverHostname string, serverPort uint, installFolde
 		contributions:      newContributions(),
 	}
 
-	go peer.server.Start(onMessage, peer.onConnection, peer.OnConnectionClose)
+	go peer.server.Start(OnMessage, peer.onConnection, peer.OnConnectionClose)
 	return peer, nil
 }
 
 // ConnectToPeer form a connection to another peer
 func (p *peer) ConnectToPeer(hostname string, portNo uint) error {
-	client, err := tcp.InitTCPClient(hostname, portNo, onMessage, p.onConnection, p.OnConnectionClose)
+	client, err := tcp.InitTCPClient(hostname, portNo, OnMessage, p.onConnection, p.OnConnectionClose)
 	if err != nil {
 		return err
 	}
@@ -226,9 +226,28 @@ func (p *peer) OnConnectionClose(peer tcp.TCPConnection) {
 		util.Logger.Warnf("Err closing connection %s", err)
 	}
 
+	var incompleteReqs []games.DownloadRequest
+
+	pd, ok := p.peers[peer]
+	if ok {
+		pd.lock.Lock()
+		for req := range pd.sentRequests {
+			incompleteReqs = append(incompleteReqs, req)
+		}
+		pd.lock.Unlock()
+	}
+
 	p.peersMU.Unlock()
 	p.DeletePeer(peer)
 	util.Logger.Infof("Connection closed to %s", peer.Info())
+
+	go func() {
+		reqChan := p.library.DownloadManager.RequestDownload
+		util.Logger.Debugf("queueing incomplete requests")
+		for _, req := range incompleteReqs {
+			reqChan <- req
+		}
+	}()
 }
 
 // GetServerInfo get information about the current peer
@@ -405,4 +424,9 @@ func (p *peer) setPeerData(con tcp.TCPConnection, pd *peerData) {
 	defer p.peersMU.Unlock()
 
 	p.peers[con] = pd
+}
+
+// update handlers
+func (p *peer) SetOnMessage(onMessage func([]string, tcp.TCPConnection) error) {
+	p.server.SetOnMessage(onMessage)
 }

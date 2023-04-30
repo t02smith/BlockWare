@@ -1,4 +1,4 @@
-package profileListenOnlyUpload
+package profiles
 
 import (
 	"math/big"
@@ -19,26 +19,11 @@ Features:
 - listen-and-respond only peer
 - will upload a game to ETH and seed it
 - ideal connection
-
-Data:
-
-- small size project (latex-template from github)
-	a small scale project that will allow for the peer to download
-	from many different files.
-
-- fake large file
-	TODO ^^
-	A large amount of blocks that can be easily generated without
-	storing them => e.g. block 0 has a content of ...0000, block 1
-	is ...00001, etc.
-	Will only need to store the hash with the offset to be able to
-	generate it
-
 */
 
-var PrivateKey string = testutil.Accounts[1][1]
+var listenOnlyUploadPrivateKey string = testutil.Accounts[1][1]
 
-func Run() {
+func listenOnlyUploadRun() {
 	// if _, err := os.Stat("../../data/tmp/games/profile-2"); err != nil {
 	// 	if err = testutil.GenerateLargeFolder("profile-2", "../../data/tmp/games/", 80_000_000, 500); err != nil {
 	// 		util.Logger.Fatal(err)
@@ -70,10 +55,10 @@ func Run() {
 		Version:     "4.7.1",
 		ReleaseDate: time.Date(2002, time.January, 10, 0, 0, 0, 0, time.UTC).String(),
 		Developer:   "tcs1g20",
-		RootDir:     "./t02smith.github.io",
+		RootDir:     "./games/t02smith.github.io",
 		Price:       big.NewInt(150),
 		ShardSize:   4194304,
-		AssetsDir:   "../../data/assets"},
+		AssetsDir:   "../data/assets"},
 		nil,
 	)
 	_ = g1
@@ -87,10 +72,10 @@ func Run() {
 		Version:     "1.17.4",
 		ReleaseDate: time.Date(2002, time.January, 10, 0, 0, 0, 0, time.UTC).String(),
 		Developer:   "Tom Smith",
-		RootDir:     "../../../model",
+		RootDir:     "../../model",
 		Price:       big.NewInt(10),
 		ShardSize:   4194304,
-		AssetsDir:   "../../data/assets"},
+		AssetsDir:   "../data/assets"},
 		nil,
 	)
 	_ = g2

@@ -4,18 +4,17 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"math/big"
 	"os"
+	"time"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/spf13/viper"
+	"github.com/t02smith/part-iii-project/toolkit/model/manager/games"
 	"github.com/t02smith/part-iii-project/toolkit/model/net/peer"
 	"github.com/t02smith/part-iii-project/toolkit/model/persistence/ethereum"
 	"github.com/t02smith/part-iii-project/toolkit/model/persistence/ethereum/library"
 	model "github.com/t02smith/part-iii-project/toolkit/model/util"
-	deployEth "github.com/t02smith/part-iii-project/toolkit/test/profiles/deploy"
-	listenOnly "github.com/t02smith/part-iii-project/toolkit/test/profiles/listenOnly"
-	listenOnlyUpload "github.com/t02smith/part-iii-project/toolkit/test/profiles/listenOnlyWithUpload"
-	"github.com/t02smith/part-iii-project/toolkit/test/testutil"
 	"github.com/t02smith/part-iii-project/toolkit/util"
 )
 
@@ -37,7 +36,9 @@ const (
 	None                  Profile = 0
 	_listenOnlyWithUpload Profile = 1
 	_listenOnly           Profile = 2
-	_deploy               Profile = 3
+	_selfish              Profile = 3
+	_sender               Profile = 4
+	_unreliable           Profile = 5
 )
 
 func ProfileCLI() bool {
@@ -46,6 +47,7 @@ func ProfileCLI() bool {
 	contractAddr := flag.String("contract", "", "The address of the deployed contract")
 	showDebugLogs := flag.Bool("debug", false, "whether debug logs should be displayed")
 	port := flag.Uint("port", 6051, "what port should the profile run on")
+	deploy := flag.Bool("deploy", false, "deploy a new instance of the contract")
 
 	flag.Parse()
 	util.InitLogger(*showDebugLogs)
@@ -55,10 +57,18 @@ func ProfileCLI() bool {
 	viper.ReadInConfig()
 	util.Logger.Debugf("config loaded: %s", viper.AllSettings())
 
+	if *deploy {
+		if err := DeployContract(); err != nil {
+			util.Logger.Fatal("Failed to deploy contract")
+		}
+		util.Logger.Info("Contract deployed")
+	}
+
 	// ? run a profile
 	if *profile != 0 {
 		viper.Set("net.port", *port)
 		viper.Set("meta.directory", fmt.Sprintf(".toolkit-%d", *port))
+		viper.Set("games.installFolder", "./test/profiles/downloads")
 
 		util.Logger.Infof("profile %d selected", *profile)
 		err := RunProfile(Profile(*profile), *contractAddr)
@@ -80,7 +90,7 @@ func RunProfile(profileNumber Profile, contractAddr string) error {
 
 	switch profileNumber {
 	case _listenOnly:
-		err := SetupProfile("./test/profiles/listenOnly", listenOnly.PrivateKey, addr, peer.Config{
+		err := SetupProfile("./test/profiles/", listenOnlyPrivateKey, addr, peer.Config{
 			ContinueDownloads:  false,
 			LoadPeersFromFile:  false,
 			ServeAssets:        false,
@@ -91,10 +101,10 @@ func RunProfile(profileNumber Profile, contractAddr string) error {
 		if err != nil {
 			return err
 		}
-		listenOnly.Run()
+		listenOnlyRun()
 
 	case _listenOnlyWithUpload:
-		err := SetupProfile("./test/profiles/listenOnlyWithUpload", listenOnlyUpload.PrivateKey, addr, peer.Config{
+		err := SetupProfile("./test/profiles/", listenOnlyUploadPrivateKey, addr, peer.Config{
 			ContinueDownloads:  false,
 			LoadPeersFromFile:  false,
 			ServeAssets:        false,
@@ -105,9 +115,43 @@ func RunProfile(profileNumber Profile, contractAddr string) error {
 		if err != nil {
 			return err
 		}
-		listenOnlyUpload.Run()
-	case _deploy:
-		deployEth.Run(testutil.Accounts[3][1])
+		listenOnlyUploadRun()
+	case _selfish:
+		if err := SetupProfile("./test/profiles/", selfishPrivateKey, addr, peer.Config{
+			ContinueDownloads:  false,
+			LoadPeersFromFile:  false,
+			ServeAssets:        false,
+			SkipValidation:     false,
+			MaxConnections:     50,
+			TrackContributions: false,
+		}); err != nil {
+			return err
+		}
+		selfishRun()
+	case _sender:
+		if err := SetupProfile("./test/profiles/", senderPrivateKey, addr, peer.Config{
+			ContinueDownloads:  false,
+			LoadPeersFromFile:  false,
+			ServeAssets:        false,
+			SkipValidation:     false,
+			MaxConnections:     50,
+			TrackContributions: false,
+		}); err != nil {
+			return err
+		}
+		senderRun()
+	case _unreliable:
+		if err := SetupProfile("./test/profiles/", unrelaiblePrivateKey, addr, peer.Config{
+			ContinueDownloads:  false,
+			LoadPeersFromFile:  false,
+			ServeAssets:        false,
+			SkipValidation:     false,
+			MaxConnections:     50,
+			TrackContributions: false,
+		}); err != nil {
+			return err
+		}
+		unreliableRun(50)
 	case None:
 	default:
 		return errors.New("unknown profile")
@@ -162,4 +206,48 @@ func SetupProfile(path, privateKey string, contractAddr common.Address, config p
 func CloseProfile() {
 	peer.Peer().Close()
 	ethereum.CloseEthClient()
+}
+
+// deploy a new instance of the contract
+func DeployContract() error {
+	client, _, err := ethereum.StartClient("http://localhost:8545")
+	if err != nil {
+		return fmt.Errorf("error starting eth client %s", err)
+	}
+
+	_, _, err = library.DeployLibraryContract("af9668cd6ebc3ba4c0e5036c284e128ed66e18ba9e4ed87b2c0c6d9642f2b879")
+	if err != nil {
+		return fmt.Errorf("error connecting to lib instance %s", err)
+	}
+
+	client.Close()
+	return nil
+}
+
+func SetupGame() error {
+	p := peer.Peer()
+
+	g1, err := games.CreateGame(games.NewGame{
+		Title:       "t02smith.github.io",
+		Version:     "4.7.1",
+		ReleaseDate: time.Date(2002, time.January, 10, 0, 0, 0, 0, time.UTC).String(),
+		Developer:   "tcs1g20",
+		RootDir:     "./games/t02smith.github.io",
+		Price:       big.NewInt(150),
+		ShardSize:   4194304,
+		AssetsDir:   "../data/assets"},
+		nil,
+	)
+
+	if err != nil {
+		return err
+	}
+
+	p.Library().AddOrUpdateOwnedGame(g1)
+	err = games.OutputAllGameDataToFile(g1)
+	if err != nil {
+		return err
+	}
+
+	return err
 }

@@ -7,7 +7,7 @@ import (
 	"github.com/t02smith/part-iii-project/toolkit/util"
 )
 
-const requestTimeout time.Duration = 30 * time.Second
+const requestTimeout time.Duration = 5 * time.Second
 
 // listen for incoming download requests
 func (p *peer) listenToDownloadRequests() {
@@ -66,6 +66,42 @@ func (p *peer) listenToDownloadRequests() {
 		}
 		util.Logger.Info("stopped listening to incoming download requests")
 	}()
+
+	// load timed out requests that haven't been responded to
+	go func() {
+		util.Logger.Debugf("Checking for timed out requests")
+
+		for {
+			time.Sleep(requestTimeout)
+
+			var requests []games.DownloadRequest
+			var expiredPeerReqs []games.DownloadRequest
+
+			for _, pd := range Peer().peers {
+				pd.Lock()
+
+				for req, timeSent := range pd.sentRequests {
+					if time.Since(timeSent) > requestTimeout {
+						requests = append(requests, req)
+						expiredPeerReqs = append(expiredPeerReqs, req)
+					}
+				}
+
+				for _, req := range expiredPeerReqs {
+					delete(pd.sentRequests, req)
+				}
+
+				pd.Unlock()
+				expiredPeerReqs = []games.DownloadRequest{}
+			}
+
+			reqChannel := Peer().library.DownloadManager.RequestDownload
+			for _, req := range requests {
+				reqChannel <- req
+			}
+			util.Logger.Debugf("Finished loading expired requests => found %d", len(requests))
+		}
+	}()
 }
 
 /*
@@ -85,38 +121,6 @@ func LoadDeferredRequests() {
 		}
 		util.Logger.Infof("deferred requests loaded")
 
-	}()
-
-	// load timed out requests that haven't been responded to
-	go func() {
-		util.Logger.Debugf("Checking for timed out requests")
-
-		var requests []games.DownloadRequest
-		var expiredPeerReqs []games.DownloadRequest
-
-		for _, pd := range Peer().peers {
-			pd.Lock()
-
-			for req, timeSent := range pd.sentRequests {
-				if time.Since(timeSent) > requestTimeout {
-					requests = append(requests, req)
-					expiredPeerReqs = append(expiredPeerReqs, req)
-				}
-			}
-
-			for _, req := range expiredPeerReqs {
-				delete(pd.sentRequests, req)
-			}
-
-			pd.Unlock()
-			expiredPeerReqs = []games.DownloadRequest{}
-		}
-
-		reqChannel := Peer().library.DownloadManager.RequestDownload
-		for _, req := range requests {
-			reqChannel <- req
-		}
-		util.Logger.Debugf("Finished loading expired requests => found %d", len(requests))
 	}()
 
 }

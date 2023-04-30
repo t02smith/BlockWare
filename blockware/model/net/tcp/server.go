@@ -25,6 +25,11 @@ type TCPServer struct {
 	// incoming connection details
 	listener net.Listener
 	clients  []*TCPServerClient
+
+	// functions
+	onMessage    func([]string, TCPConnection) error
+	onConnection func(string, uint, TCPConnection)
+	onClose      func(TCPConnection)
 }
 
 /*
@@ -34,9 +39,14 @@ Messages from this will be listened for on their own process
 TCPServerClient implements the PeerIT interface
 */
 type TCPServerClient struct {
-	con    net.Conn
+	con net.Conn
+
+	// communication channels
 	reader *bufio.Reader
 	writer *bufio.Writer
+
+	// reference to server
+	server *TCPServer
 	closed bool
 }
 
@@ -67,19 +77,19 @@ func (s *TCPServer) Start(
 	}
 
 	s.listener = ln
+	s.onMessage = onMessage
+	s.onConnection = onConnection
+	s.onClose = onClose
+
 	util.Logger.Infof("Server listening on %s:%d", s.hostname, s.port)
-	s.listen(onMessage, onConnection, onClose)
+	s.listen()
 	util.Logger.Infof("server started")
 	return nil
 }
 
 // listen for incoming connections and setup processes to listen
 // for incoming messages from them
-func (s *TCPServer) listen(
-	onMessage func([]string, TCPConnection) error,
-	onConnection func(string, uint, TCPConnection),
-	onClose func(TCPConnection)) {
-
+func (s *TCPServer) listen() {
 	for {
 		con, err := s.listener.Accept()
 		if err != nil {
@@ -97,11 +107,12 @@ func (s *TCPServer) listen(
 			reader: bufio.NewReader(con),
 			writer: bufio.NewWriter(con),
 			closed: false,
+			server: s,
 		}
 		s.clients = append(s.clients, client)
 
-		onConnection(con.RemoteAddr().String(), 0000, client)
-		go client.listen(onMessage, onClose)
+		s.onConnection(con.RemoteAddr().String(), 0000, client)
+		go client.listen()
 	}
 }
 
@@ -120,7 +131,7 @@ func (s *TCPServer) Clients() []*TCPServerClient {
 }
 
 // listen for messages from a specific TCP connection
-func (c *TCPServerClient) listen(onMessage func([]string, TCPConnection) error, onClose func(TCPConnection)) {
+func (c *TCPServerClient) listen() {
 	for {
 		msg, err := c.reader.ReadString('\n')
 		if err != nil {
@@ -129,13 +140,13 @@ func (c *TCPServerClient) listen(onMessage func([]string, TCPConnection) error, 
 		}
 
 		util.Logger.Debugf("message received from %s: %s", c.Info(), msg[:len(msg)-1])
-		err = onMessage(strings.Split(msg[:len(msg)-1], ";"), c)
+		err = c.server.onMessage(strings.Split(msg[:len(msg)-1], ";"), c)
 		if err != nil {
 			util.Logger.Warn(err)
 		}
 	}
 
-	onClose(c)
+	c.server.onClose(c)
 }
 
 // send a string message to a given client
@@ -176,16 +187,12 @@ func (c *TCPServerClient) Close() error {
 	return c.con.Close()
 }
 
-func (s *TCPServer) IsClient(con TCPConnection) bool {
-	for _, con2 := range s.clients {
-		if con == con2 {
-			return true
-		}
-	}
-
-	return false
-}
-
+// get the hostname and port of the server
 func (s *TCPServer) GetServerInfo() (string, uint) {
 	return s.hostname, s.port
+}
+
+// update handlers
+func (s *TCPServer) SetOnMessage(onMessage func([]string, TCPConnection) error) {
+	s.onMessage = onMessage
 }

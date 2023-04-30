@@ -22,7 +22,7 @@ const (
 )
 
 // process a message received from a peer
-func onMessage(cmd []string, client tcp.TCPConnection) error {
+func OnMessage(cmd []string, client tcp.TCPConnection) error {
 	if cmd[0][len(cmd[0])-1] == '\r' {
 		cmd[0] = cmd[0][:len(cmd[0])-1]
 	}

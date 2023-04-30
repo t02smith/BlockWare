@@ -3,11 +3,12 @@ package peer
 import (
 	"crypto/sha256"
 	"fmt"
-	model "github.com/t02smith/part-iii-project/toolkit/model/util"
-	"github.com/t02smith/part-iii-project/toolkit/test/testutil"
 	"strings"
 	"testing"
 	"time"
+
+	model "github.com/t02smith/part-iii-project/toolkit/model/util"
+	"github.com/t02smith/part-iii-project/toolkit/test/testutil"
 
 	"github.com/stretchr/testify/assert"
 	testenv "github.com/t02smith/part-iii-project/toolkit/test/testutil/env"
@@ -102,7 +103,7 @@ func TestOnMessage(t *testing.T) {
 
 	t.Run("arguments", func(t *testing.T) {
 		t.Run("carriage return", func(t *testing.T) {
-			onMessage(strings.Split("LIBRARY\r", ";"), tcp)
+			OnMessage(strings.Split("LIBRARY\r", ";"), tcp)
 			time.Sleep(25 * time.Millisecond)
 
 			msg := mp.GetLastMessage()
@@ -110,14 +111,14 @@ func TestOnMessage(t *testing.T) {
 		})
 
 		t.Run("error message", func(t *testing.T) {
-			err := onMessage(strings.Split("ERROR;error message", ";"), tcp)
+			err := OnMessage(strings.Split("ERROR;error message", ";"), tcp)
 			assert.Nil(t, err)
 		})
 	})
 
 	t.Run("failure", func(t *testing.T) {
 		t.Run("unrecognised message", func(t *testing.T) {
-			err := onMessage(strings.Split("FAKE_MESSAGE;error message", ";"), tcp)
+			err := OnMessage(strings.Split("FAKE_MESSAGE;error message", ";"), tcp)
 			assert.NotNil(t, err, "error expected")
 			assert.Equal(t, fmt.Sprintf("unknown cmd '%s'", "FAKE_MESSAGE"), err.Error(), "incorrect err message")
 		})

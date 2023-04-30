@@ -29,6 +29,11 @@ type TCPClient struct {
 
 	//
 	closed bool
+
+	// handlers
+	onMessage    func([]string, TCPConnection) error
+	onConnection func(string, uint, TCPConnection)
+	onClose      func(TCPConnection)
 }
 
 // generate a new TCP client to conenct to a server
@@ -46,23 +51,26 @@ func InitTCPClient(
 	}
 
 	client := &TCPClient{
-		hostname: serverHostname,
-		port:     serverPort,
-		con:      con,
-		reader:   bufio.NewReader(con),
-		writer:   bufio.NewWriter(con),
-		closed:   false,
+		hostname:     serverHostname,
+		port:         serverPort,
+		con:          con,
+		reader:       bufio.NewReader(con),
+		writer:       bufio.NewWriter(con),
+		closed:       false,
+		onMessage:    onMessage,
+		onConnection: onConnection,
+		onClose:      onClose,
 	}
 
 	onConnection(serverHostname, serverPort, client)
 
-	go client.listen(onMessage, onClose)
+	go client.listen()
 	return client, nil
 }
 
 // listen for messages from the server
 // onMessage is a handler that is called when a message is received
-func (c *TCPClient) listen(onMessage func([]string, TCPConnection) error, onClose func(TCPConnection)) {
+func (c *TCPClient) listen() {
 	for {
 		msg, err := c.reader.ReadString('\n')
 		if err != nil {
@@ -71,13 +79,13 @@ func (c *TCPClient) listen(onMessage func([]string, TCPConnection) error, onClos
 		}
 
 		util.Logger.Debugf("message received from %s %s", c.Info(), msg[:len(msg)-1])
-		err = onMessage(strings.Split(msg[:len(msg)-1], ";"), c)
+		err = c.onMessage(strings.Split(msg[:len(msg)-1], ";"), c)
 		if err != nil {
 			util.Logger.Warn(err)
 		}
 	}
 
-	onClose(c)
+	c.onClose(c)
 }
 
 // Send a string message to the server
@@ -121,4 +129,9 @@ func (c *TCPClient) Close() error {
 
 	c.closed = true
 	return c.con.Close()
+}
+
+// update handlers
+func (c *TCPClient) SetOnMessage(onMessage func([]string, TCPConnection) error) {
+	c.onMessage = onMessage
 }

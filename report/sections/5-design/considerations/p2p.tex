@@ -42,13 +42,13 @@ Users will be able to connect and send requests to many peers at once \reqref{F-
 
 \subsubsection*{Updating Content}\label{subsubsec:updating}
 
-To satisfy \reqref{F-M2}, developers can upload updated versions of their games by providing the root hash of the most previous version of the game, where only the original uploader will be allowed to publish an update to an existing game \reqref{NF-M5}. Any users who own a previous version of a game will be allowed access to all future versions \reqref{F-M3}.
+To satisfy \reqref{F-M2}, developers can upload updated versions of their games by providing the root hash of the most recent version of the game, where only the original uploader will be allowed to publish an update to an existing game \reqref{NF-M5}. Any users who own a previous version of a game will be allowed access to all future versions \reqref{F-M3}.
 \x
 Each version is considered its own game and will require users to download the updated version separately. Whilst this isn't reflective of how updates are typically managed, this will be acceptable for the scope of this project.
 
 \subsubsection*{Downloadable Content}
 
-Downloadable Content (DLC) \reqref{F-C1} represent optional additions for games that users will buy separately. DLCs will act similarly to how updates are treated. Each DLC will need:
+Downloadable Content (DLC) \reqref{F-C1} represents optional additions for games that users will buy separately. DLCs will act similarly to how updates are treated. Each DLC will need:
 
 \begin{enumerate}
   \item \textbf{Dependency} The root hash of the oldest version of the game this DLC supports.

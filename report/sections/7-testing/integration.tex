@@ -13,13 +13,13 @@ The purpose of integration tests were to evaluate how the application fared when
   This will also be able to upload a game to the locally running smart contract.
   \\
   \textbf{Sender}
-  & This peer will respond to requests but will also periodically send requests. This can be used to show how my application reacts to more realistic peers. 
+  & This peer will respond to requests but will then also reflect the same request back. This shows a more realistic relationship between two peers where they both send and receive data.
   \\
   \textbf{Unreliable}
-  & This peer will pseudo-randomly not respond to messages or send incorrect data in response. This is used to show how my application recovers from faults sent by other users.
+  & This peer will pseudo-randomly not respond to messages. This is used to show how my application handles requests that sometimes aren't replied to from a peer.
   \\
   \textbf{Selfish}
-  & This peer will send requests but will never respond to any. This is used to show how my application handles expired requests.
+  & This peer will send requests but will never respond to any. This is used to show how my application handles requests that are never replied to from a peer.
   \\\bottomrule\bottomrule
   \caption{The different profiles used to simulate real-world peers.}
   \label{tab:profiles}

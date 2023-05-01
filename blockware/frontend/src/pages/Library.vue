@@ -95,13 +95,31 @@
           <h3>🗑️ Uninstall</h3>
         </div>
 
-        <router-link
-          :to="`/downloads`"
+        <div
           v-else-if="selectedIsDownloading === 2"
-          class="download downloading"
+          class="in-progress-wrapper"
         >
-          <h3>⏸️ Pause</h3>
-        </router-link>
+          <div class="download downloading" @click="pauseDownload">
+            <h3>⏸️ Pause</h3>
+          </div>
+
+          <div class="download downloading" @click="cancelDownload">
+            <h3>⛔ Cancel</h3>
+          </div>
+        </div>
+
+        <div
+          v-else-if="selectedIsDownloading === 3"
+          class="in-progress-wrapper"
+        >
+          <div class="download downloading" @click="continueDownload">
+            <h3>▶️ Continue</h3>
+          </div>
+
+          <div class="download downloading" @click="cancelDownload">
+            <h3>⛔ Cancel</h3>
+          </div>
+        </div>
       </GameEntry>
     </div>
   </div>
@@ -205,9 +223,24 @@ const listGames = computed(() => {
 /*
 start a download for an owned game
 */
-function createDownload() {
-  games.createDownload(selected.value.rootHash);
+async function createDownload() {
+  await games.createDownload(selected.value.rootHash);
   selectedIsDownloading.value = 2;
+}
+
+async function pauseDownload() {
+  await games.pauseDownload(selected.value.rootHash);
+  selectedIsDownloading.value = 3;
+}
+
+async function cancelDownload() {
+  await games.cancelDownload(selected.value.rootHash);
+  selectedIsDownloading.value = 0;
+}
+
+async function continueDownload() {
+  await games.continueDownload(selected.value.rootHash);
+  selectedIsDownloading.value = 1;
 }
 
 /*
@@ -431,6 +464,12 @@ async function uninstall() {
       }
     }
   }
+}
+
+.in-progress-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
 
 .download {

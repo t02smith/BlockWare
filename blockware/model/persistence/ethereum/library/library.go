@@ -184,7 +184,6 @@ func UploadToEthereum(g *games.Game) error {
 
 	// upload metadata to blockchain
 	util.Logger.Infof("Uploading game metadata for %s to Ethereum", g.Title)
-	util.Logger.Info("%x", g.PreviousVersion)
 	_, err = libInstance.UploadGame(authInstance, library.LibraryGameEntry{
 		Title:               g.Title,
 		Version:             g.Version,

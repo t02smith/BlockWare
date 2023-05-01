@@ -35,6 +35,7 @@ type ControllerDownload struct {
 	ElapsedTime string
 	Finished    bool
 	BlocksLeft  int
+	Paused      bool
 }
 
 type ControllerFileProgress struct {

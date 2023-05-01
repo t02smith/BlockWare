@@ -28,24 +28,27 @@ type DownloadManager struct {
 	RequestDownload chan DownloadRequest
 
 	/*
-
-	 */
+		This request has failed at least once and needs to be queued again
+	*/
 	DeferredRequests chan DownloadRequest
 }
 
+// request for the data manager to insert a piece of data
 type InsertShardRequest struct {
 	FileHash  [32]byte
 	BlockHash [32]byte
 	Data      []byte
 }
 
+// creatae a new download manager
 func NewDownloadManager() *DownloadManager {
 	return &DownloadManager{
-		RequestDownload:  make(chan DownloadRequest, 25),
-		DeferredRequests: make(chan DownloadRequest, 25),
+		RequestDownload:  make(chan DownloadRequest, 50),
+		DeferredRequests: make(chan DownloadRequest, 50),
 	}
 }
 
+// stop the download manager
 func (d *DownloadManager) Close() {
 	close(d.RequestDownload)
 	close(d.DeferredRequests)
@@ -53,6 +56,13 @@ func (d *DownloadManager) Close() {
 
 // workers
 
+/*
+Start a new shard inserter pool that will process requests sent by the
+networking component to insert a piece of data into storage.
+
+This will distribute insertion across N different nodes and is exclusive for
+a given game
+*/
 func shardInserterPool(capacity int, game *Game) chan InsertShardRequest {
 	util.Logger.Infof("Creating shard inserter pool")
 	input := make(chan InsertShardRequest, 10)

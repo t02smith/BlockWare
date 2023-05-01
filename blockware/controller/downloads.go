@@ -2,6 +2,7 @@ package controller
 
 import (
 	"encoding/hex"
+	"fmt"
 
 	"github.com/t02smith/part-iii-project/toolkit/model/net/peer"
 	"github.com/t02smith/part-iii-project/toolkit/util"
@@ -46,6 +47,10 @@ func (a *Controller) IsDownloading(gh string) int {
 		return 1
 	}
 
+	if g.GetDownload().Paused {
+		return 3
+	}
+
 	// ? download in progress
 	return 2
 }
@@ -86,6 +91,7 @@ func (c *Controller) CreateDownload(gh string) {
 	runtime.EventsEmit(c.ctx, "update-downloads")
 }
 
+// start all in progress downloads
 func (c *Controller) ContinueAllDownloads() {
 	util.Logger.Infof("continuing all downloads")
 
@@ -101,6 +107,7 @@ func (c *Controller) ContinueAllDownloads() {
 	runtime.EventsEmit(c.ctx, "update-downloads")
 }
 
+// start a download for a given game
 func (c *Controller) ContinueDownload(gh string) {
 	util.Logger.Infof("continuing download for %s", gh)
 
@@ -121,6 +128,7 @@ func (c *Controller) ContinueDownload(gh string) {
 		return
 	}
 
+	fmt.Println(g)
 	if g.Download == nil {
 		c.controllerErrorf("download not started for game %s", gh)
 		return
@@ -128,4 +136,59 @@ func (c *Controller) ContinueDownload(gh string) {
 
 	g.Download.ContinueDownload(gameHash, lib.DownloadManager.RequestDownload)
 	runtime.EventsEmit(c.ctx, "update-downloads")
+	runtime.EventsEmit(c.ctx, "update-owned-games")
+	fmt.Println(g)
+}
+
+// cancel an in progress download
+func (c *Controller) CancelDownload(gh string) {
+	gameHash, err := hashStringToByte32(gh)
+	if err != nil {
+		return
+	}
+
+	lib := peer.Peer().Library()
+	g := lib.GetOwnedGame(gameHash)
+	if g == nil {
+		c.controllerErrorf("game %s doesn't exist", gh)
+		return
+	}
+
+	if g.Download == nil {
+		c.controllerErrorf("download not started for game %s", gh)
+		return
+	}
+
+	err = lib.Uninstall(gameHash)
+	if err != nil {
+		c.controllerErrorf("Error uninstalling game %s", err)
+		return
+	}
+
+	runtime.EventsEmit(c.ctx, "update-downloads")
+	runtime.EventsEmit(c.ctx, "update-owned-games")
+}
+
+// pause an in progress download
+func (c *Controller) PauseDownload(gh string) {
+	gameHash, err := hashStringToByte32(gh)
+	if err != nil {
+		return
+	}
+
+	lib := peer.Peer().Library()
+	g := lib.GetOwnedGame(gameHash)
+	if g == nil {
+		c.controllerErrorf("game %s doesn't exist", gh)
+		return
+	}
+
+	if g.Download == nil {
+		c.controllerErrorf("download not started for game %s", gh)
+		return
+	}
+
+	g.Download.Paused = true
+	runtime.EventsEmit(c.ctx, "update-downloads")
+	runtime.EventsEmit(c.ctx, "update-owned-games")
 }

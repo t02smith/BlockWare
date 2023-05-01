@@ -34,13 +34,13 @@ Table~\ref{tab:sc-tools} shows the tools used to create and deploy the Library s
   Solidity~\cite{noauthor_solidity_nodate}
   & \small The first language used to write smart contracts for the Ethereum blockchain. Most tutorials are focused around Solidity so it made the most sense to learn it for this project.\\
   Sepolia~\cite{noauthor_sepolia_nodate}
-  & \small An Ethereum test-net that used to deploy my smart contract to. One of the main benefits was that it provides a fast transaction time for quick feedback. It was chosen of Goerli~\cite{noauthor_goerli_nodate} as the faucet gave out 5 times as much Ether.\\
+  & \small An Ethereum test-net that used to deploy my smart contract to. One of the main benefits was that it provides a fast transaction time for quick feedback. It was chosen over Goerli~\cite{noauthor_goerli_nodate} as the faucet gave out 5 times as much Ether.\\
   Alchemy~\cite{noauthor_alchemy_nodate}
-  & \small Alchemy provides useful tools for interacting with Ethereum and specifically Sepolia, such as an ETH faucet and an RPC URL so I don't have to run my own Ethereum node.\\
+  & \small Alchemy provides useful tools for interacting Sepolia, such as an Ether faucet and an RPC URL so I don't have to run my own Ethereum node.\\
   MetaMask~\cite{noauthor_crypto_nodate}
   & \small A browser-based wallet that can easily be connected to other tools such as Alchemy or Remix. This tool can generate new accounts and show you the transaction history of each using an intuitive UI.\\
   Remix~\cite{noauthor_remix_nodate}
-  & \small A browser-based IDE for writing smart contracts that allows for easy deployment. I did have an implementation that would deploy using go-ethereum but due to a bug in package it was unable to work for the Sepolia test-net.
+  & \small A browser-based IDE for writing smart contracts that allows for easy deployment.
   \\
   Ganache CLI~\cite{noauthor_trufflesuiteganache_2023}
   & Ganache CLI was used to create a local Ethereum test-net that I could develop my application with. With one command I could quickly boot a lightweight blockchain with a predetermined set of keys. When compared to Geth, from go-ethereum, Ganache CLI was much more beginner friendly. 
@@ -54,7 +54,7 @@ The contract was successfully deployed~\cite{etherscanio_library_nodate} to the 
 
 \section{Frontend}
 
-The frontend code was developed from Section~\ref{subsubsec:frontend} to provide a user a GUI to interact with. Table~\ref{tab:tools-frontend} details the list of tools used.
+The frontend code was developed from Section~\ref{subsubsec:frontend} to produce a GUI to interact with. Table~\ref{tab:tools-frontend} details the list of tools used.
 
 \begin{longtable}{p{0.15\textwidth} p{0.75\textwidth}}
   \toprule
@@ -96,8 +96,7 @@ Table~\ref{tab:tools-other} shows the other tools used for the design, developme
   \textbf{Tool} & \textbf{Description \& Reasoning}
   \\\midrule\midrule
   Git~\cite{noauthor_git_nodate}\newline GitHub~\cite{noauthor_github_nodate}
-  & \small A version control system used in conjunction with GitHub. Creating periodic commits meant I always had a recent backup available and could easily backtrack to help find issues.
-  Use of a GitHub Actions helped remind me that not all of my tests passed at all times.\\
+  & \small A version control system used in conjunction with GitHub. Creating periodic commits meant I always had a recent backup available and could easily backtrack to help find issues.\\
   LaTeX~\cite{noauthor_latex_nodate}
   & \small Used for the write-up of this document. LaTeX was useful in creating a large document and has many packages that help with referencing and design.\\
   VSCode~\cite{noauthor_visual_nodate}

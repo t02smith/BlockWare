@@ -10,6 +10,9 @@ import {
   FetchOwnedGame,
   LoadDeferredRequests,
   CheckForUpdates,
+  CancelDownload,
+  PauseDownload,
+  ContinueDownload,
 } from "../../wailsjs/go/controller/Controller";
 import { EventsOn } from "../../wailsjs/runtime/runtime";
 
@@ -49,9 +52,23 @@ export const useGamesStore = defineStore("games", () => {
 
   // create a new download for an existing game
   async function createDownload(gameHash) {
-    const success = await CreateDownload(gameHash);
-    if (!success) return;
+    await CreateDownload(gameHash);
+    await refreshDownloads();
+  }
 
+  // pause an in progress download
+  async function pauseDownload(gameHash) {
+    await PauseDownload(gameHash);
+    await refreshDownloads();
+  }
+
+  async function cancelDownload(gameHash) {
+    await CancelDownload(gameHash);
+    await refreshDownloads();
+  }
+
+  async function continueDownload(gameHash) {
+    await ContinueDownload(gameHash);
     await refreshDownloads();
   }
 
@@ -107,5 +124,8 @@ export const useGamesStore = defineStore("games", () => {
     importGame,
     loadDeferredRequests,
     checkForUpdates,
+    pauseDownload,
+    cancelDownload,
+    continueDownload,
   };
 });

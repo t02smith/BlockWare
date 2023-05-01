@@ -222,6 +222,30 @@ func handleSEND_BLOCK(cmd []string, client tcp.TCPConnection) error {
 		return fmt.Errorf("download not found for %x", game.RootHash)
 	}
 
+	if download.Paused {
+		// remove all queued requests for this from sent requests
+		p := Peer()
+		p.peersMU.Lock()
+
+		for _, pd := range p.peers {
+			var toRemove []games.DownloadRequest
+
+			for req := range pd.sentRequests {
+				if bytes.Equal(req.GameHash[:], gh[:]) {
+					toRemove = append(toRemove, req)
+				}
+			}
+
+			for _, req := range toRemove {
+				delete(pd.sentRequests, req)
+			}
+			pd.TotalRequestsSent -= int64(len(toRemove))
+		}
+
+		p.peersMU.Unlock()
+		return nil
+	}
+
 	gameTree, err := game.GetData()
 	if err != nil {
 		return fmt.Errorf("error loading game data %s", err)

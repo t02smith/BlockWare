@@ -3,6 +3,8 @@
 import {map[string]controller} from '../models';
 import {controller} from '../models';
 
+export function CancelDownload(arg1:string):Promise<void>;
+
 export function CheckForUpdates():Promise<void>;
 
 export function ConnectFromFile(arg1:string):Promise<void>;
@@ -46,6 +48,8 @@ export function IsDownloading(arg1:string):Promise<number>;
 export function JoinLibraryInstance(arg1:string,arg2:string):Promise<void>;
 
 export function LoadDeferredRequests():Promise<void>;
+
+export function PauseDownload(arg1:string):Promise<void>;
 
 export function PurchaseGame(arg1:string):Promise<void>;
 

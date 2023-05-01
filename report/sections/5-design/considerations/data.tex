@@ -24,7 +24,7 @@ Table~\ref{tab:data} discusses the different types of data we are going to need 
   & \small The hash tree that will allow users to identify and verify blocks of data they need to download for a game. The user will download this immediately after purchasing the game.
 
   \vspace{1mm}
-  \small This data is public but its size makes it costly to store on the blockchain at a large scale. IPFS will be used for fast, reliable access at a large scale and we can store the generated CID in the blockchain instead.
+  \small This data is public but its size makes it costly to store on the blockchain at a large scale. IPFS will be used for fast, reliable access at a large scale and we can store the generated content-identifier CID in the blockchain instead.
   \x
   Game\newline Assets\newline\reqref{F-C2}
   & \small Variable\footnote{Some games may include many promotional materials, whilst some could include none. Therefore, it is hard to estimate the expected size.} 
@@ -35,7 +35,7 @@ Table~\ref{tab:data} discusses the different types of data we are going to need 
   \small For similar reasons as the hash tree, this data will be also be stored on IPFS and have its CID stored on the blockchain instead.
   \x
   Game Data
-  & \textit{avg. 44GB~\footnote{Calculated based off of the top 30 games from SteamDB~\cite{noauthor_steam_nodate}.}}
+  & \textit{avg. 44GB\footnote{Calculated based off of the top 30 games from SteamDB~\cite{noauthor_steam_nodate}.}}
   & Peers
   & the data required to run the game that is fetched based upon the contents of the game's hash tree.
 

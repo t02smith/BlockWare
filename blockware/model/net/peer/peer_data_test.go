@@ -187,16 +187,6 @@ func TestFailedRequest(t *testing.T) {
 		BlockHash: sha256.Sum256([]byte("hello")),
 	}
 
-	t.Run("success", func(t *testing.T) {
-		pd.sentRequests[req] = time.Now()
-		old := pd.TotalRepliesReceived
-
-		pd.FailedRequest(req)
-		assert.Equal(t, old, pd.TotalRepliesReceived)
-		_, ok := pd.sentRequests[req]
-		assert.False(t, ok)
-	})
-
 	t.Run("failure", func(t *testing.T) {
 		t.Run("request not queued", func(t *testing.T) {
 			old := pd.TotalRepliesReceived
@@ -204,6 +194,43 @@ func TestFailedRequest(t *testing.T) {
 			assert.Equal(t, old, pd.TotalRepliesReceived)
 		})
 	})
+
+	t.Run("success", func(t *testing.T) {
+		t.Run("below min requests", func(t *testing.T) {
+			pd.sentRequests[req] = time.Now()
+			old := pd.TotalRepliesReceived
+
+			pd.FailedRequest(req)
+			assert.Equal(t, old, pd.TotalRepliesReceived)
+			_, ok := pd.sentRequests[req]
+			assert.False(t, ok)
+		})
+
+		t.Run("higher than required rate", func(t *testing.T) {
+			oldTotal := pd.TotalRequestsSent
+			oldReceived := pd.TotalRepliesReceived
+			pd.TotalRequestsSent = 100
+			pd.TotalRepliesReceived = 50
+			t.Cleanup(func() {
+				pd.TotalRequestsSent = oldTotal
+				pd.TotalRepliesReceived = oldReceived
+			})
+
+			pd.sentRequests[req] = time.Now()
+			old := pd.TotalRepliesReceived
+
+			pd.FailedRequest(req)
+			assert.Equal(t, old, pd.TotalRepliesReceived)
+			_, ok := pd.sentRequests[req]
+			assert.False(t, ok)
+		})
+
+		t.Run("lower than required rate", func(t *testing.T) {
+			//
+		})
+
+	})
+
 }
 
 /*

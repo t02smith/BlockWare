@@ -102,6 +102,7 @@ func downloadToAppDownload(d *games.Download, name, version string) *ControllerD
 		ElapsedTime: fmt.Sprintf("%02d:%02d:%02d", int(diff.Hours()), int(diff.Minutes())%60, int(diff.Seconds())%60),
 		Finished:    finished,
 		BlocksLeft:  0,
+		Paused:      d.Paused,
 	}
 
 	lock := d.GetProgressLock()

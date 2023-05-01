@@ -24,8 +24,16 @@ const (
 	unknown
 )
 
-// rank a peer higher at this rate (%) to unchoke downloads
-const unchokeRate int8 = 25
+const (
+	// rank a peer higher at this rate (%) to unchoke downloads
+	unchokeRate int8 = 25
+
+	// minimum reply rate from peers => if lower then disconnect
+	minimumRequestReplyRate float32 = 0.2
+
+	// apply rate after having sent N messages
+	requestsBeforeMinimumRateApplies int = 100
+)
 
 // Stores useful information about other peers
 type peerData struct {
@@ -183,13 +191,29 @@ func (pd *peerData) ConfirmRequest(req games.DownloadRequest) {
 // confirm a request was not replied to
 func (pd *peerData) FailedRequest(req games.DownloadRequest) {
 	pd.lock.Lock()
-	defer pd.lock.Unlock()
 
 	if _, ok := pd.sentRequests[req]; !ok {
+		pd.lock.Unlock()
 		return
 	}
 
 	delete(pd.sentRequests, req)
+
+	// check if threshold is met
+	if pd.TotalRequestsSent < int64(requestsBeforeMinimumRateApplies) {
+		pd.lock.Unlock()
+		return
+	}
+
+	rate := float32(pd.TotalRepliesReceived) / float32(pd.TotalRequestsSent)
+	if rate > minimumRequestReplyRate {
+		pd.lock.Unlock()
+		return
+	}
+
+	util.Logger.Debug("Peer reply rate too low => disconnecting")
+	pd.lock.Unlock()
+	pd.Peer.Close()
 }
 
 func (pd *peerData) Lock() {

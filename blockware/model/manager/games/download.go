@@ -58,6 +58,7 @@ type Download struct {
 
 	// progress of each file being downloaded
 	Progress     map[[32]byte]*FileProgress
+	Paused       bool
 	progressLock sync.Mutex
 
 	// total number of blocks to install
@@ -318,27 +319,32 @@ func (g *Game) completeFile(fileHash [32]byte, file *FileProgress) error {
 // this function will make requests down the libraries download request
 // channel
 func (d *Download) ContinueDownload(gameHash [32]byte, newRequest chan DownloadRequest) {
-
 	/*
-		TODO
 		Currently, this function will go through files sequentially and request
 		individual blocks at a time and will block until that block is received
 
-		Just for simplicity :)
 	*/
-
 	util.Logger.Infof("Continuing download for game %x", gameHash)
+	fmt.Println(d)
+
 	go func() {
 		if d.Finished() {
 			util.Logger.Info("Download finished")
 			return
 		}
 
+		d.Paused = false
+
 		d.progressLock.Lock()
 		for _, file := range d.Progress {
 			util.Logger.Debugf("Requesting file %s for game %x", file.AbsolutePath, gameHash)
 
 			for shard := range file.BlocksRemaining {
+				if d.Paused {
+					util.Logger.Infof("Pausing download for game %x", gameHash)
+					return
+				}
+
 				file.lock.Lock()
 				util.Logger.Debugf("Requesting shard %x for file %s in game %x", shard, file.AbsolutePath, gameHash)
 				newRequest <- DownloadRequest{
@@ -347,6 +353,7 @@ func (d *Download) ContinueDownload(gameHash [32]byte, newRequest chan DownloadR
 				}
 				file.lock.Unlock()
 			}
+
 		}
 		d.progressLock.Unlock()
 	}()
@@ -354,7 +361,7 @@ func (d *Download) ContinueDownload(gameHash [32]byte, newRequest chan DownloadR
 
 // ? misc functions
 
-// CleanFile /*
+// CleanFile
 func CleanFile(path string, size int) error {
 	util.Logger.Debugf("Cleaning file %s", path)
 

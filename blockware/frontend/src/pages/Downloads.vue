@@ -28,10 +28,14 @@
       <router-link
         :to="`/library?game=${hash}`"
         class="table-row"
-        :class="`${download.Finished && 'finished'}`"
+        :class="`${
+          download.Finished ? 'finished' : download.Paused ? 'paused' : ''
+        }`"
         v-for="[hash, download] in downloadGamePairs"
       >
-        <p class="indicator">{{ download.Finished ? "✅" : "⌛" }}</p>
+        <p class="indicator">
+          {{ download.Finished ? "✅" : download.Paused ? "⏸️" : "⌛" }}
+        </p>
         <p>
           {{ download.Name }} <strong>v{{ download.Version }}</strong>
         </p>
@@ -251,6 +255,14 @@ const pauseAll = ref(false);
 
       &:hover {
         background-color: lighten(rgba(0, 252, 0, 0.185), 10%);
+      }
+    }
+
+    &.paused {
+      background-color: rgba(255, 8, 0, 0.185);
+
+      &:hover {
+        background-color: lighten(rgba(255, 8, 0, 0.185), 10%);
       }
     }
 

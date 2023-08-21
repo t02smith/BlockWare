@@ -3,12 +3,12 @@
 
 This section will describe how blockchain technology will enable the storage of game metadata and the purchasing of content using a distributed immutable record that can be trusted by any user. 
 \x
-To satisfy \reqref{NF-M1} and \reqref{NF-M2}, we will need to use a public blockchain. This will benefit my project by:
+To satisfy \reqref{NF-M1} and \reqref{NF-M2}, we will need to use a public blockchain. This will benefit this project by:
 \vspace{2mm}
 \begin{itemize}
   \item being accessible to more users, which will boost both availability and scalability \reqref{NF-S1},
   \item reducing the risk of censorship \reqref{NF-M1}, and
-  \item providing greater data integrity \reqref{NF-M4}
+  \item providing greater data integrity \reqref{NF-M4}.
 \end{itemize}
 
 \newparagraph Ethereum is a public blockchain that allows developers to publish their own distributed applications to it. It comes with an extensive development toolchain so is an obvious choice for this project \reqref{F-M4}.
@@ -42,7 +42,7 @@ To satisfy \reqref{F-M1} and \reqref{F-M2}, the data stored on the blockchain wi
   \textit{game hashes} & Solidity doesn't allow us to enumerate maps so we will also store a list of hashes for all games uploaded.\\
   \textit{purchased} & A mapping which allows us to easily check if a user has purchased a game \reqref{F-M6}.
   \\\bottomrule\bottomrule
-  \caption{the data to be stored on Ethereum using a smart contract}
+  \caption{The data to be stored on Ethereum using a smart contract}
   \label{tab:eth-data}
 \end{longtable}
 

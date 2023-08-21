@@ -6,7 +6,7 @@
 
 Table~\ref{tab:data} discusses the different types of data we are going to need to store and where they should be stored based upon their properties.
 
-\begin{longtable}{ p{.12\textwidth} p{.1\textwidth} p{.1\textwidth} p{.63\textwidth} }
+\begin{longtable}{ p{.12\textwidth} p{.1\textwidth} p{.11\textwidth} p{.58\textwidth} }
   \toprule
   \textbf{Data} & \textbf{Size} & \textbf{Location} & \textbf{Explanation}\\
   \midrule\midrule
@@ -37,7 +37,7 @@ Table~\ref{tab:data} discusses the different types of data we are going to need 
   Game Data
   & \textit{avg. 44GB\footnote{Calculated based off of the top 30 games from SteamDB~\cite{noauthor_steam_nodate}.}}
   & Peers
-  & the data required to run the game that is fetched based upon the contents of the game's hash tree.
+  & The data required to run the game that is fetched based upon the contents of the game's hash tree.
 
   \vspace{1mm}
   \small This data is very large and has restricted access so wouldn't be appropriate to store on either the blockchain or IPFS. Therefore, this project will use a custom P2P network for sharing data, which is described in Section~\ref{subsec:design-p2p}.

@@ -3,7 +3,7 @@
 \section{Acceptance Testing}\label{sec:acc-tests}
 
 A user walkthrough is a series of steps to take that, if completed, prove the completeness of a set of requirements. 
-All user walkthroughs use a contract deployed to the Sepolia test-net~\cite{etherscanio_library_nodate}, satisfying \reqref{F-M4}, \reqref{NF-M2} and \reqref{NF-M1}, and all transactions completed can be seen publicly. See Appendix~\ref{app:test-deployment} for specific details about the test application architecture.
+All user walkthroughs use a contract deployed to the Sepolia test-net~\cite{etherscanio_library_nodate}, satisfying \reqref{F-M4}, \reqref{NF-M2}, and \reqref{NF-M1}, and all transactions completed can be seen publicly. See Appendix~\ref{app:test-deployment} for specific details about the test application architecture.
 \x
 Table~\ref{tab:walkthroughs} describes all user walkthroughs and Appendix~\ref{app:user-walkthrough} shows the evidence for their completeness.
 
@@ -20,7 +20,7 @@ Table~\ref{tab:walkthroughs} describes all user walkthroughs and Appendix~\ref{a
     \item \p{1} uploads a game \g{1}.
     \item \p{2} finds \g{1} on the store.
     \item \p{2} purchases \g{1}.
-    \item \p{2} shows \g{1} added to their library.
+    \item \g{1} is added to \p{2}'s library.
   \end{enumerate}
   & \yes
   \\\midrule
@@ -35,7 +35,7 @@ Table~\ref{tab:walkthroughs} describes all user walkthroughs and Appendix~\ref{a
     \item \p{1} will respond to \p{2} with the requested data.
     \item \p{2} will verify each block of data received using its hash.
     \item \p{2} will have full downloaded \g{1}.
-    \item \p{1} will request and receive a contributions receipt for \g{1} from \p{2}.
+    \item \p{1} will request and be sent a contributions receipt for \g{1} from \p{2}.
   \end{enumerate}
   & \yes
   \\\midrule
@@ -53,7 +53,7 @@ Table~\ref{tab:walkthroughs} describes all user walkthroughs and Appendix~\ref{a
   & \vspace{-5mm}\begin{enumerate}[wide, labelwidth=!, labelindent=0pt]
     \item \p{1} is connected to \p{2}.
     \item \p{3} forms a connection with \p{1}.
-    \item \p{3} requests a list of \p{1}'s peers and \p{1} responds with the details for \p{2}.
+    \item \p{3} requests a list of \p{1}'s peers and \p{1} will send the details for \p{2}.
     \item \p{3} forms connections with \p{2}.
   \end{enumerate}
   & \yes

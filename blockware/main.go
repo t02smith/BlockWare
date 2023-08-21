@@ -94,7 +94,7 @@ func startPeer() error {
 			MaxConnections:     viper.GetUint("net.peer.max_connections"),
 			PublicHostname:     viper.GetString("net.hostname"),
 		},
-		"localhost",
+		"0.0.0.0",
 		viper.GetUint("net.port"),
 		viper.GetString("games.installFolder"),
 		viper.GetString("meta.directory"),

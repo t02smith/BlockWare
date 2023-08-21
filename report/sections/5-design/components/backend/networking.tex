@@ -3,7 +3,7 @@
 This component will connect users to the distributed P2P file-sharing network, where it will create and maintain a set of TCP connections with other users \reqref{F-M7}. They will communicate by sending structured messages to each other \reqref{F-M8}.
 
 \paragraph*{Peer Identification}
-Peers are identified by their Ethereum addresses, which will allow us to view which games they've purchased and are allowed access to. Upon forming a connection, each peer will request the other return a signature for a generated message. From this we can derive their address and public key.
+Peers are identified by their Ethereum addresses, which will allow us to view which games they've purchased and are allowed access to. Upon forming a connection, each peer will request the other to return a signature for a generated message. From this we can derive their address and public key.
 
 \paragraph*{Peer Reputation}
 This application keeps track of how many of our data requests are sent and responded to by each peer. This allows us to favour reliable peers to get the greatest download speed. However, in the hopes to find more reliable peers we will prioritise sending requests to new peers and randomly to existing peers with a lower reputation.  

@@ -1,19 +1,39 @@
-# README
+# Blockware
 
-## About
+This is the source code for the Blockware application.
 
-This is the official Wails Vue template.
+## How to Install
 
-You can configure the project by editing `wails.json`. More information about the project settings can be found
-here: https://wails.io/docs/reference/project-config
+### Prerequisites
 
-## Live Development
+To install this application you will at minimum need the following:
 
-To run in live development mode, run `wails dev` in the project directory. This will run a Vite development
-server that will provide very fast hot reload of your frontend changes. If you want to develop in a browser
-and have access to your Go methods, there is also a dev server that runs on http://localhost:34115. Connect
-to this in your browser, and you can call your Go code from devtools.
+- Go v1.19 [https://go.dev/dl/](https://go.dev/dl/)
+- Node v16 [https://nodejs.org/en/blog/release/v16.16.0](https://nodejs.org/en/blog/release/v16.16.0)
+- Kubo IPFS [https://docs.ipfs.tech/install/](https://docs.ipfs.tech/install/)
+- Wails [https://wails.io/docs/gettingstarted/installation](https://wails.io/docs/gettingstarted/installation)
 
-## Building
+Make sure you have access to an Ethereum node. It is recommended that you use Alchemy [https://www.alchemy.com/](https://www.alchemy.com/) where you can get an RPC link.
 
-To build a redistributable, production mode package, use `wails build`.
+### Build
+
+You can build the application using the following command
+
+```bash
+wails build
+```
+
+This will create an executable in `/build/bin/blockware(.exe)?`. It is suggested you move the executable to a separate folder.
+
+### How to Run
+
+```bash
+# (if this is your first time using IPFS)
+ipfs init
+
+# start the IPFS daemon
+ipfs daemon
+
+# run the application
+./${path to application}/blockware.exe
+```

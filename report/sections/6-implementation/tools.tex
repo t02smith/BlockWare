@@ -8,7 +8,7 @@ Table~\ref{tab:backend-tools} shows the tools to create the backend of my applic
   \textbf{Tool} & \textbf{Description \& Reasoning}
   \\\midrule\midrule
   Go~\cite{noauthor_go_nodate}
-  & \small Go was chosen because of its simple syntax, high performance, strong standard library and third party packages for interacting with Ethereum.
+  & \small Go was chosen because of its simple syntax, high performance, strong standard library and third-party packages for interacting with Ethereum.
   \\
   go-ipfs-api~\cite{noauthor_go-ipfs-api_2023}
   & \small A Go package used for interacting with the Kubo implementation of IPFS~\cite{noauthor_ipfskubo_2023} that gave an easy interface for downloading and uploading data to Kubo.\\
@@ -34,7 +34,7 @@ Table~\ref{tab:sc-tools} shows the tools used to create and deploy the Library s
   Solidity~\cite{noauthor_solidity_nodate}
   & \small The first language used to write smart contracts for the Ethereum blockchain. Most tutorials are focused around Solidity so it made the most sense to learn it for this project.\\
   Sepolia~\cite{noauthor_sepolia_nodate}
-  & \small An Ethereum test-net that used to deploy my smart contract to. One of the main benefits was that it provides a fast transaction time for quick feedback. It was chosen over Goerli~\cite{noauthor_goerli_nodate} as the faucet gave out 5 times as much Ether.\\
+  & \small An Ethereum test-net that was used to deploy the smart contract to. One of the main benefits was that it provides a fast transaction time for quick feedback. It was chosen over Goerli~\cite{noauthor_goerli_nodate} as the faucet gave out 5 times as much Ether.\\
   Alchemy~\cite{noauthor_alchemy_nodate}
   & \small Alchemy provides useful tools for interacting Sepolia, such as an Ether faucet and an RPC URL so I don't have to run my own Ethereum node.\\
   MetaMask~\cite{noauthor_crypto_nodate}
@@ -43,7 +43,7 @@ Table~\ref{tab:sc-tools} shows the tools used to create and deploy the Library s
   & \small A browser-based IDE for writing smart contracts that allows for easy deployment.
   \\
   Ganache CLI~\cite{noauthor_trufflesuiteganache_2023}
-  & Ganache CLI was used to create a local Ethereum test-net that I could develop my application with. With one command I could quickly boot a lightweight blockchain with a predetermined set of keys. When compared to Geth, from go-ethereum, Ganache CLI was much more beginner friendly. 
+  & Ganache CLI was used to create a lightweight, local Ethereum test-net. The tool allowed for recreation of the same private keys for the network so that I could easily repeat automated tests. When compared to Geth, from go-ethereum, Ganache CLI was much more beginner friendly. 
   \\\bottomrule\bottomrule
   \caption{The tools used for deployment of my smart contract}
   \label{tab:sc-tools}
@@ -69,7 +69,7 @@ The frontend code was developed from Section~\ref{subsubsec:frontend} to produce
   Wails allows you to implement a controller using functions written in that can be called from the frontend and can emit events that trigger actions in the frontend.
   \\
   Vue.js v3~\cite{noauthor_vuejs_nodate}
-  & \small A reactive, component based web-framework that allows me to create reusable components that react to changes in state and can trigger events at different points in a components lifecycle.
+  & \small A reactive, component based web-framework that allows me to create reusable components that react to changes in state and can trigger events at different points in a component's lifecycle.
   
   The Vue Router~\cite{noauthor_vue_nodate} package was used to add multiple pages to the application and markdown-it~\cite{noauthor_markdown-it_2023} was used to render markdown files.
 

@@ -9,7 +9,7 @@ This section will look at how game data can be shared across a distributed set o
 \subsubsection*{Hash Tree}
 \label{subsubsec:hash-tree}
 
-The hash tree of a given directory is used to represent its structure as well as the contents of its files. Each file is represented by an ordered list of SHA-256 hashes that match a fixed-size block of data. This allows users to easily identify and verify game data \reqref{F-M10}. Users should be able to specify which folders/files to exclude when generating a hash tree.
+The hash tree of a given directory is used to represent its structure as well as the contents of its files. Each file is represented by an ordered list of SHA-256 hashes that match a fixed-size block of data. This allows users to easily identify and verify game data \reqref{F-M10}. Users should be able to use regular expressions to specify which files and folders to exclude when generating a hash tree.
 
 \begin{figure}[ht]
   \centering
@@ -60,4 +60,4 @@ Users must own the original game to buy any of its DLC.
 
 \subsubsection*{Proving Contribution}
 
-As a user downloads blocks of data, they will keep track of which users have sent them which blocks. A peer may then request their contributions in the form of a signed message that can be sent to the developer \reqref{F-S3} in return for some kind of reward. The contents of the reward isn't specified for this project but could include in-game items, digital assets or Ether. This solution assumes that developers have knowledge of which Ethereum address maps to which of their game's users.
+As a user downloads blocks of data, they will keep track of which users have sent them what blocks. A peer may then request their contributions in the form of a signed message that can be sent to the developer \reqref{F-S3} in return for some kind of reward. The contents of the reward isn't specified for this project but could include in-game items, digital assets or Ether. This solution assumes that developers have knowledge of which Ethereum address maps to which of their game's users.

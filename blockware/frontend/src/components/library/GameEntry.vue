@@ -44,7 +44,7 @@
   </div>
 </template>
 <script setup>
-import { onMounted, ref } from "vue";
+import { onMounted, ref, watch } from "vue";
 import md from "markdown-it";
 import { GetDirectory } from "../../../wailsjs/go/controller/Controller";
 
@@ -58,15 +58,17 @@ const props = defineProps({
 const directory = ref("");
 const content = ref(null);
 
-onMounted(async () => {
-  directory.value = await GetDirectory();
+onMounted(() => updateContent());
+watch(props.game, () => updateContent());
 
+async function updateContent() {
+  directory.value = await GetDirectory();
   const res = await fetch(
     `http://localhost:3003/${directory.value}/assets/${props.game.rootHash}/description.md`
   );
 
   content.value = md().render(await res.text());
-});
+}
 </script>
 <style scoped lang="scss">
 .details {
